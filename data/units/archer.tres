@@ -4,12 +4,13 @@
 [ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_4sx6m"]
 [ext_resource type="Resource" path="res://data/spells/arrow.tres" id="3_34fyh"]
 [ext_resource type="Resource" path="res://data/spells/volley.tres" id="4_0fivp"]
+[ext_resource type="Resource" path="res://data/spells/poison_arrow.tres" id="5_4sx6m"]
 
 [resource]
 script = ExtResource("1_c613e")
 display_name = "Archer"
-max_hp = 24
+max_hp = 28
 mp = 4
 initiative = 115
-spells = Array[ExtResource("2_4sx6m")]([ExtResource("3_34fyh"), ExtResource("4_0fivp")])
+spells = Array[ExtResource("2_4sx6m")]([ExtResource("3_34fyh"), ExtResource("4_0fivp"), ExtResource("5_4sx6m")])
 color = Color(0.9, 0.55, 0.2, 1)

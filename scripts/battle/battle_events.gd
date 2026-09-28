@@ -3,15 +3,24 @@ extends RefCounted
 ## What happened during an action, in order. The display replays these; tests assert on them.
 ## Events are data records: set once in the constructor and never modified by convention
 ## (GDScript has no read-only fields). Units are ids. Deaths are reported by Battle, after
-## the action's own events, for every unit that died during it.
+## the events that caused them, for every unit that died.
 
 
 @abstract class Event extends RefCounted:
-	pass
+	## The unit the event is about (the one it animates), or -1.
+	func subject_id() -> int:
+		return -1
 
 
-class TurnStarted extends Event:
+## Base for events about one unit.
+@abstract class UnitEvent extends Event:
 	var unit_id: int
+
+	func subject_id() -> int:
+		return unit_id
+
+
+class TurnStarted extends UnitEvent:
 	var round_number: int
 
 	func _init(unit: int, round_value: int) -> void:
@@ -19,15 +28,12 @@ class TurnStarted extends Event:
 		round_number = round_value
 
 
-class TurnEnded extends Event:
-	var unit_id: int
-
+class TurnEnded extends UnitEvent:
 	func _init(unit: int) -> void:
 		unit_id = unit
 
 
-class UnitMoved extends Event:
-	var unit_id: int
+class UnitMoved extends UnitEvent:
 	var path: Array[Vector2i]  ## Excludes the start cell, ends on the destination.
 	var mp_spent: int
 
@@ -51,9 +57,11 @@ class SpellCast extends Event:
 		area = cells.duplicate()
 		ap_spent = cost
 
+	func subject_id() -> int:
+		return caster_id
 
-class DamageDealt extends Event:
-	var unit_id: int
+
+class DamageDealt extends UnitEvent:
 	var amount: int
 	var hp_after: int
 
@@ -63,8 +71,7 @@ class DamageDealt extends Event:
 		hp_after = hp
 
 
-class Healed extends Event:
-	var unit_id: int
+class Healed extends UnitEvent:
 	var amount: int
 	var hp_after: int
 
@@ -74,9 +81,35 @@ class Healed extends Event:
 		hp_after = hp
 
 
-class UnitDied extends Event:
-	var unit_id: int
+class StatusApplied extends UnitEvent:
+	var status: StatusData
+	var turns_left: int
 
+	func _init(unit: int, applied: StatusData, turns: int) -> void:
+		unit_id = unit
+		status = applied
+		turns_left = turns
+
+
+## At the carrier's turn start; the tick effects' own events (damage, heal) follow.
+class StatusTicked extends UnitEvent:
+	var status: StatusData
+
+	func _init(unit: int, ticked: StatusData) -> void:
+		unit_id = unit
+		status = ticked
+
+
+## At the carrier's turn end, after its last counted turn.
+class StatusExpired extends UnitEvent:
+	var status: StatusData
+
+	func _init(unit: int, expired: StatusData) -> void:
+		unit_id = unit
+		status = expired
+
+
+class UnitDied extends UnitEvent:
 	func _init(unit: int) -> void:
 		unit_id = unit
 

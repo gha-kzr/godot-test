@@ -32,6 +32,11 @@ func set_active(unit_id: int) -> void:
 		_views[id].set_active(id == unit_id)
 
 
+## The view of a unit, or null (without an error) for -1 or an unknown id.
+func find_view(unit_id: int) -> UnitView:
+	return _views.get(unit_id)
+
+
 func view(unit_id: int) -> UnitView:
 	if not _views.has(unit_id):
 		push_error("UnitsView: no view for unit %d" % unit_id)

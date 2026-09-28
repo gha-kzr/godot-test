@@ -12,8 +12,10 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 
 The order follows dependencies: each milestone needs the systems of the ones before it.
 
-### 1. Combat depth
-- **Status effects** (DoT first, then buffs / debuffs) — design notes in the slice plan, item 1. Includes, from the reviews: AI scoring of statuses (a pure DoT spell scores 0 today and would never be cast), a single event-dispatch point, the turn-start death loop, live HUD updates during playback.
+### 1. Combat depth — done
+Implemented per `plans/2026-09-28-status-effects.md` (all tasks checked; a hand playtest remains).
+
+- **Status effects** (DoT first, then buffs / debuffs) — decisions in `decisions/2026-09-28-status-effects.md`, plan in `plans/2026-09-28-status-effects.md`. Includes, from the reviews: AI scoring of statuses (a pure DoT spell scores 0 today and would never be cast), a single event-dispatch point, the turn-start death loop, live HUD updates during playback.
 - **Inspect any unit on hover** — show any unit's stats (enemies included) in the side panel.
 
 *Why first:* completes the combat rules while the code is fresh; statuses change the spell data model, which the skill tool will build on.
@@ -33,7 +35,7 @@ The order follows dependencies: each milestone needs the systems of the ones bef
 
 ### 4. Run loop (roguelite)
 - Procedural map generator (connectivity-checked, previewed in the editor — the preview part of slice plan item 3; the map painter is mostly replaced by generation).
-- Encounter generator: enemy presets and a difficulty budget that grows with depth.
+- Encounter generator: enemy presets and a difficulty budget that grows with depth. **The first battles must be easy** (playtest feedback: the slice battle is too hard as a first fight); the slice's 10–10 AI-vs-AI tuning is a mid-difficulty baseline, not the opening experience. Levers: encounter budget, enemy presets, a gentler AI profile early.
 - AI difficulty profiles and smarter strategies — slice plan item 2.
 - Run flow: battle → reward choice → next battle; death → hub, keeping level and loot.
 - Saving between battles.
@@ -55,7 +57,7 @@ Some early placeholder art (one model, one spell effect) can slot in anywhere; i
 To settle with `godot-grill` before the milestone that needs them:
 
 - **Milestone 2 / 4 — what persists on death:** character level only, equipped items, the whole inventory? What resets?
-- **Milestone 4 — difficulty scaling:** keeping level and loot while enemies scale endlessly risks runaway power. Does difficulty follow run depth, player level, or both?
+- **Milestone 4 — difficulty scaling:** keeping level and loot while enemies scale endlessly risks runaway power. Does difficulty follow run depth, player level, or both? Settle the difficulty curve here, starting easy.
 - **Milestone 2 — party:** a fixed party of heroes (Knight, Mage) or a recruitable roster?
 - **Milestone 4 — run length:** truly endless (depth as the score) or N battles ending with a boss?
 - **Any time — stalemates:** if units can never reach each other the battle never ends; a turn limit or draw rule is undecided (map generation must keep maps connected meanwhile).

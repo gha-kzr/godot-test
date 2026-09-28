@@ -55,3 +55,48 @@ static func state(layout: String, mp := 3, rng_seed := 1) -> BattleState:
 	for i in parsed.enemy_spawns.size():
 		enemies.append(unit("E%d" % i, 100 - i, mp))
 	return BattleState.create(parsed, players, enemies, rng_seed)
+
+
+static func modifier(stat: StatModifier.Stat, amount: int) -> StatModifier:
+	var result := StatModifier.new()
+	result.stat = stat
+	result.amount = amount
+	return result
+
+
+## A status with an optional fixed damage (> 0) or heal (< 0) per tick, and modifiers.
+static func status(status_name: String, duration := 2, tick_amount := 0,
+		modifiers: Array[StatModifier] = [], is_positive := false) -> StatusData:
+	var result := StatusData.new()
+	result.display_name = status_name
+	result.short_label = status_name.left(1)
+	result.duration = duration
+	result.is_positive = is_positive
+	if tick_amount > 0:
+		var damage := DamageEffect.new()
+		damage.min_amount = tick_amount
+		damage.max_amount = tick_amount
+		result.tick_effects = [damage] as Array[EffectData]
+	elif tick_amount < 0:
+		var heal := HealEffect.new()
+		heal.min_amount = -tick_amount
+		heal.max_amount = -tick_amount
+		result.tick_effects = [heal] as Array[EffectData]
+	result.modifiers = modifiers
+	return result
+
+
+static func apply_status(applied: StatusData, filter := EffectData.TargetFilter.ALL) -> ApplyStatusEffect:
+	var effect := ApplyStatusEffect.new()
+	effect.status = applied
+	effect.target_filter = filter
+	return effect
+
+
+## A spell whose only effects are the given ones (no damage), 3 AP, range 0-3, no sight.
+static func effect_spell(effects: Array[EffectData], ap_cost := 3, min_range := 0, max_range := 3,
+		area_kind := AreaShape.Kind.SINGLE, area_size := 0) -> SpellData:
+	var spell := damage_spell(ap_cost, min_range, max_range, 0, area_kind, area_size)
+	spell.display_name = "Effect"
+	spell.effects = effects
+	return spell

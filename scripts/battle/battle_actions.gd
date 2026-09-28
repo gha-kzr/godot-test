@@ -79,17 +79,29 @@ class CastSpell extends Action:
 		var area := Targeting.area_cells(state.grid, spell.area, caster.cell, target)
 		var events: Array[BattleEvents.Event] = [BattleEvents.SpellCast.new(actor_id, spell, target, area, spell.ap_cost)]
 		# Targets are fixed before any effect lands, in area order.
-		var targets: Array[int] = []
+		var in_area: Array[int] = []
 		for cell in area:
 			var unit := state.unit_at(cell)
 			if unit != null:
-				targets.append(unit.id)
-		for target_id in targets:
-			for effect in spell.effects:
-				if not state.units[target_id].is_alive():
-					break  # A lethal effect skips the rest on that target.
-				events.append_array(effect.apply(state, actor_id, target_id))
+				in_area.append(unit.id)
+		# Effect by effect: every hit lands, then every status, and so on.
+		for effect in spell.effects:
+			for target_id in _targets_of(effect, state, in_area):
+				if state.units[target_id].is_alive():  # Killed by an earlier effect: skipped.
+					events.append_array(effect.apply(state, actor_id, target_id))
 		return events
+
+	## The units an effect applies to, by its target filter.
+	func _targets_of(effect: EffectData, state: BattleState, in_area: Array[int]) -> Array[int]:
+		var caster_team := state.units[actor_id].team
+		match effect.target_filter:
+			EffectData.TargetFilter.CASTER:
+				return [actor_id]
+			EffectData.TargetFilter.ALLIES:
+				return in_area.filter(func(id: int) -> bool: return state.units[id].team == caster_team)
+			EffectData.TargetFilter.ENEMIES:
+				return in_area.filter(func(id: int) -> bool: return state.units[id].team != caster_team)
+		return in_area
 
 
 class EndTurn extends Action:

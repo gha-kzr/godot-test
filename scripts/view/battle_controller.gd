@@ -134,13 +134,18 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(_delta: float) -> void:
 	if board_view.grid == null:
 		return
-	var cell := BoardView.NO_CELL
-	var over_hud := get_viewport().gui_get_hovered_control() != null
-	if not over_hud:
-		cell = board_view.pick_cell(camera_rig.camera, get_viewport().get_mouse_position())
+	var cell := _hover_cell(get_viewport().gui_get_hovered_control(), get_viewport().get_mouse_position())
 	if cell != _hovered_cell:
 		_hovered_cell = cell
 		_update_hover()
+
+
+## The cell the mouse designates: none over the HUD, except over the inspect panel, where
+## the hover sticks (so the panel stays up and its tooltips can be read).
+func _hover_cell(hovered_control: Control, mouse_position: Vector2) -> Vector2i:
+	if hovered_control != null:
+		return _hovered_cell if hud.is_inspect_control(hovered_control) else BoardView.NO_CELL
+	return board_view.pick_cell(camera_rig.camera, mouse_position)
 
 
 # --- Turn loop ---
@@ -193,6 +198,9 @@ func _run_enemy_action() -> void:
 	_play(result.events)
 
 
+## The HUD is refreshed after a whole playback (in _begin_next), not per event: the
+## battle state is already final while events play, so a per-event refresh would jump
+## ahead of the animations. Unit views show HP live; an event-driven HUD is milestone 5.
 func _on_event_played(event: BattleEvents.Event) -> void:
 	if event is BattleEvents.TurnStarted:
 		var unit := battle.state.units[(event as BattleEvents.TurnStarted).unit_id]
@@ -230,8 +238,10 @@ func _set_state(new_state: State) -> void:
 	_update_hover()
 
 
-## Path to the hovered cell while moving, or the spell's area while aiming.
+## Path to the hovered cell while moving, or the spell's area while aiming; in any state,
+## the hovered unit (other than the one acting) in the HUD's inspect panel.
 func _update_hover() -> void:
+	_update_inspected()
 	var cells: Array[Vector2i] = []
 	match input_state:
 		State.IDLE:
@@ -248,6 +258,16 @@ func _update_hover() -> void:
 		# may be showing a cast's flash from the EventPlayer, which hover must not touch.
 
 
+func _update_inspected() -> void:
+	var hovered: UnitState = null
+	if battle != null and _hovered_cell != BoardView.NO_CELL:
+		hovered = battle.state.unit_at(_hovered_cell)
+	if hovered == null or hovered == battle.state.current_unit():
+		hud.hide_inspected()
+	else:
+		hud.show_inspected(Hud.UnitInfo.from_unit(hovered))
+
+
 ## Shows the current turn in the HUD. The HUD gets plain UnitInfo values, never state.
 func _refresh_hud() -> void:
 	var battle_state := battle.state
@@ -259,6 +279,7 @@ func _refresh_hud() -> void:
 	if current != null:
 		hud.show_unit(Hud.UnitInfo.from_unit(current))
 		hud.show_spells(current.data.spells, current.ap)
+	_update_inspected()
 
 
 func _spawn_center(spawns: Array[Vector2i]) -> Vector3:

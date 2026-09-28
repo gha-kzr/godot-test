@@ -191,3 +191,77 @@ func test_spells_can_be_rebuilt_from_inside_a_button_press() -> void:
 	assert_eq(hud.get_node("%SpellBar").get_child_count(), 2, "rebuilt")
 	assert_true(_spell_button(hud, 0).disabled, "with the new AP")
 	hud.free()
+
+
+func _status_info(status_name: String, turns: int, description: String) -> Hud.StatusInfo:
+	var info := Hud.StatusInfo.new()
+	info.display_name = status_name
+	info.turns_left = turns
+	info.description = description
+	return info
+
+
+func test_unit_panel_lists_statuses_with_tooltips() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	info.statuses = [_status_info("Poison", 2, "3-4 damage per turn"), _status_info("Guarded", 1, "-30% damage taken")] as Array[Hud.StatusInfo]
+	hud.show_unit(info)
+	var rows := hud.get_node("%StatusList").get_children()
+	assert_eq(rows.size(), 2)
+	assert_eq(((rows[0] as Control).get_child(1) as Label).text, "Poison, 2 turns")
+	assert_eq(((rows[1] as Control).get_child(1) as Label).text, "Guarded, 1 turn")
+	assert_eq((rows[0] as Control).tooltip_text, "3-4 damage per turn")
+	info.statuses = [] as Array[Hud.StatusInfo]
+	hud.show_unit(info)
+	assert_eq(hud.get_node("%StatusList").get_child_count(), 0, "replaced")
+	hud.free()
+
+
+func test_modified_ap_and_mp_are_tinted() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	info.max_ap = 6
+	info.base_ap = 6
+	info.max_mp = 4
+	info.base_mp = 3
+	hud.show_unit(info)
+	assert_eq((hud.get_node("%ApLabel") as Label).modulate, Color.WHITE)
+	assert_eq((hud.get_node("%MpLabel") as Label).modulate, Hud.BUFFED_COLOR)
+	info.max_mp = 1
+	hud.show_unit(info)
+	assert_eq((hud.get_node("%MpLabel") as Label).modulate, Hud.DEBUFFED_COLOR)
+	hud.free()
+
+
+func test_inspect_panel_shows_a_unit_and_hides() -> void:
+	var hud := _hud()
+	var panel := hud.get_node("%InspectPanel") as Control
+	assert_false(panel.visible, "hidden at first")
+	var info := _info("Brute", false)
+	info.statuses = [_status_info("Crippled", 2, "-2 MP")] as Array[Hud.StatusInfo]
+	info.spells = _spells()
+	hud.show_inspected(info)
+	assert_true(panel.visible)
+	var rows := hud.get_node("%InspectRows")
+	assert_eq((rows.get_child(0).get_child(1) as Label).text, "Brute (enemy)")
+	assert_eq(rows.get_node("Statuses").get_child_count(), 1)
+	var spells := rows.get_node("Spells").get_children()
+	assert_eq(spells.size(), 2)
+	assert_eq((spells[0] as Label).text, "Hit (3 AP)")
+	assert_true((spells[0] as Label).tooltip_text.contains("5 damage"))
+	hud.hide_inspected()
+	assert_false(panel.visible)
+	hud.free()
+
+
+func test_unit_info_carries_statuses_modified_maxima_and_spells() -> void:
+	var state := BattleFixtures.state("0p 0e")
+	var unit := state.units[0]
+	unit.data.spells = _spells()
+	unit.add_status(BattleFixtures.status("Haste", 2, 0,
+			[BattleFixtures.modifier(StatModifier.Stat.MP, 2)] as Array[StatModifier], true), 1)
+	var info := Hud.UnitInfo.from_unit(unit)
+	assert_eq([info.max_mp, info.base_mp, info.mp], [5, 3, 5])
+	assert_eq(info.statuses.size(), 1)
+	assert_eq([info.statuses[0].display_name, info.statuses[0].turns_left, info.statuses[0].description], ["Haste", 2, "+2 MP"])
+	assert_eq(info.spells.size(), 2)

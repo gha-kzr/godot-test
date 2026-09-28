@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_iggew"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_rttsa"]
+[ext_resource type="Script" path="res://scripts/data/apply_status_effect.gd" id="3_c7tvn"]
+[ext_resource type="Resource" path="res://data/statuses/guarded.tres" id="4_6lefw"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="5_eprxx"]
+
+[sub_resource type="Resource" id="Resource_h2kpa"]
+script = ExtResource("1_iggew")
+
+[sub_resource type="Resource" id="Resource_4dbav"]
+script = ExtResource("3_c7tvn")
+status = ExtResource("4_6lefw")
+target_filter = 3
+
+[resource]
+script = ExtResource("5_eprxx")
+display_name = "Guard"
+ap_cost = 3
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_h2kpa")
+effects = Array[ExtResource("2_rttsa")]([SubResource("Resource_4dbav")])

@@ -114,6 +114,29 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "MP 0 / 0"
 
+[node name="StatusList" type="VBoxContainer" parent="Root/UnitPanel/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="InspectPanel" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -140.0
+offset_right = -12.0
+offset_bottom = 60.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="InspectRows" type="VBoxContainer" parent="Root/InspectPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="SpellBar" type="HBoxContainer" parent="Root"]
 unique_name_in_owner = true
 layout_mode = 1

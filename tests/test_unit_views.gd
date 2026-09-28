@@ -173,3 +173,76 @@ func test_stop_abandons_playback_even_if_a_view_is_freed() -> void:
 	assert_false(stage.player.is_playing)
 	assert_false(finished.value, "the abandoned playback never reports completion")
 	_done(stage)
+
+
+# --- Statuses ---
+
+func test_status_events_play_and_tags_follow() -> void:
+	var stage := _stage()
+	var view := stage.units.view(1)
+	var poison := BattleFixtures.status("Poison", 3, 2)
+	await view.play_status_applied(poison, 3)
+	assert_eq(view.status_tag_texts(), ["P3"] as Array[String])
+	assert_true(view.has_node("FloatingNumber"), "the status name floats up")
+	var guard := BattleFixtures.status("Guard", 2, 0, [BattleFixtures.modifier(StatModifier.Stat.MP, 1)] as Array[StatModifier], true)
+	await view.play_status_applied(guard, 2)
+	assert_eq(view.status_tag_texts(), ["P3", "G2"] as Array[String], "in status order")
+	await view.play_status_applied(poison, 3)
+	assert_eq(view.status_tag_texts(), ["P3", "G2"] as Array[String], "a refresh updates in place")
+	await view.play_status_ticked(poison)
+	await view.play_status_expired(poison)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_eq(view.status_tag_texts(), ["G2"] as Array[String])
+	_done(stage)
+
+
+func test_sync_rebuilds_status_tags_from_the_state() -> void:
+	var stage := _stage()
+	var unit := stage.battle.state.units[1]
+	var poison := BattleFixtures.status("Poison", 3, 2)
+	unit.add_status(poison, 0)
+	unit.statuses[0].turns_left = 1
+	stage.units.sync(stage.battle.state)
+	assert_eq(stage.units.view(1).status_tag_texts(), ["P1"] as Array[String], "turns left from the state")
+	unit.statuses.clear()
+	stage.units.sync(stage.battle.state)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_eq(stage.units.view(1).status_tag_texts(), [] as Array[String])
+	_done(stage)
+
+
+func test_event_player_plays_status_turns_end_to_end() -> void:
+	var stage := _stage("0p 0 0 0e")
+	var poison := BattleFixtures.status("Poison", 1, 3)
+	var spell := BattleFixtures.effect_spell([BattleFixtures.apply_status(poison)] as Array[EffectData], 3, 1, 3)
+	stage.battle.state.units[0].data.spells = [spell] as Array[SpellData]
+	var events: Array[BattleEvents.Event] = []
+	for action: BattleActions.Action in [BattleActions.CastSpell.new(0, 0, Vector2i(3, 0)), BattleActions.EndTurn.new(0),
+			BattleActions.EndTurn.new(1)]:
+		var result := stage.battle.perform(action)
+		assert_true(result.ok(), result.error)
+		events.append_array(result.events)
+	var played: Array[BattleEvents.Event] = []
+	var tags_seen: Array = []
+	stage.player.event_played.connect(func(event: BattleEvents.Event) -> void:
+		played.append(event)
+		if event is BattleEvents.StatusApplied or event is BattleEvents.StatusExpired:
+			tags_seen.append(stage.units.view(1).status_tag_texts()))
+	await stage.player.play(events)
+	assert_eq(played, events, "applied, ticked, hit, expired: all played in order")
+	assert_eq(tags_seen, [["P1"], []], "the player itself updates the tags")
+	stage.units.sync(stage.battle.state)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_eq(stage.units.view(1).status_tag_texts(), [] as Array[String], "expired")
+	_assert_in_sync(stage)
+	_done(stage)
+
+
+func test_zero_changes_float_no_number() -> void:
+	var stage := _stage()
+	var view := stage.units.view(1)
+	await view.play_heal(0, 20)
+	assert_false(view.has_node("FloatingNumber"), "no +0")
+	await view.play_hit(0, 20)
+	assert_false(view.has_node("FloatingNumber"), "no -0")
+	_done(stage)

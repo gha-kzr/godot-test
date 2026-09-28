@@ -313,3 +313,51 @@ func test_aiming_shows_cells_hidden_from_sight_faded() -> void:
 	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.RANGE_BLOCKED), 2)
 	controller.click_cell(Vector2i(4, 0))
 	assert_eq(controller.input_state, BattleController.State.TARGETING, "a blocked cell can't be aimed at")
+
+
+func test_hovering_another_unit_inspects_it() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var panel := controller.hud.get_node("%InspectPanel") as Control
+	controller._hovered_cell = Vector2i(3, 0)
+	controller._update_hover()
+	assert_true(panel.visible, "the enemy is shown")
+	controller._hovered_cell = Vector2i(0, 0)
+	controller._update_hover()
+	assert_false(panel.visible, "not the unit that's acting")
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	assert_false(panel.visible, "empty cell")
+
+
+func test_the_hud_never_runs_ahead_of_the_animations() -> void:
+	# P0 ends its turn; E0 dies to its poison at its turn start; E1 plays next.
+	var controller := _controller("0p 0 0e 0e", [_fighter("P0", 200)], [_fighter("E0", 100, 2), _fighter("E1", 90)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.battle.state.units[1].add_status(BattleFixtures.status("Poison", 2, 3), 0)
+	var panel_after_first_event := {}
+	controller.event_player.event_played.connect(func(event: BattleEvents.Event) -> void:
+		if panel_after_first_event.is_empty():
+			panel_after_first_event["name"] = (controller.hud.get_node("%UnitName") as Label).text)
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.IDLE]))
+	assert_eq(panel_after_first_event.get("name"), "P0", "still P0 while its turn end plays")
+	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "E1", "E1 once the playback is over")
+	var chips := controller.hud.get_node("%TurnOrder").get_child_count()
+	assert_eq(chips, 2, "E0 left the turn order")
+	controller._hovered_cell = Vector2i(3, 0)
+	controller._update_hover()
+	assert_false((controller.hud.get_node("%InspectPanel") as Control).visible, "E1 is acting, no inspect")
+
+
+func test_the_inspect_panel_stays_while_the_mouse_is_on_it() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller._hovered_cell = Vector2i(3, 0)
+	controller._update_hover()
+	var panel := controller.hud.get_node("%InspectPanel") as Control
+	var inside := controller.hud.get_node("%InspectRows").get_child(0) as Control
+	assert_eq(controller._hover_cell(inside, Vector2.ZERO), Vector2i(3, 0), "sticks over the panel")
+	assert_eq(controller._hover_cell(controller.hud.get_node("%EndTurnButton"), Vector2.ZERO), BoardView.NO_CELL,
+			"other HUD controls clear the hover")
+	assert_true(panel.visible)

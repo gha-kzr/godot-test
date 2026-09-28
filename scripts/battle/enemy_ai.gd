@@ -4,7 +4,7 @@ extends RefCounted
 ## perform each action until it returns EndTurn.
 ##
 ## Each call rates every (position in reach × spell × target) by simulating the cast on
-## a clone with average rolls and scoring the HP changes with an AIProfile's weights,
+## a clone with average rolls and scoring the HP and status changes with an AIProfile's weights,
 ## then returns the first step of the best plan:
 ## a Move to that position, or the cast itself. With nothing worth casting, it walks
 ## toward the nearest opponent. Team-agnostic: opponents are the units of the other team.
@@ -94,8 +94,12 @@ static func _area_hits_a_unit(state: BattleState, spell: SpellData, caster_cell:
 	return false
 
 
-## Value of the HP changes between two states, from `team`'s point of view.
+## Value of the HP and status changes between two states, from `team`'s point of view.
 static func _score(before: BattleState, after: BattleState, team: UnitState.Team, profile: AIProfile) -> float:
+	return _hp_score(before, after, team, profile) + _status_score(before, after, team, profile)
+
+
+static func _hp_score(before: BattleState, after: BattleState, team: UnitState.Team, profile: AIProfile) -> float:
 	var score := 0.0
 	for unit in before.units:
 		if not unit.is_alive():
@@ -109,6 +113,63 @@ static func _score(before: BattleState, after: BattleState, team: UnitState.Team
 		else:
 			score -= (lost + (profile.kill_bonus if killed else 0.0)) * profile.friendly_fire_weight
 	return score
+
+
+## Change in the expected value of every surviving unit's statuses. Comparing totals
+## means a refresh only scores what it adds, and a downgrade scores negative.
+static func _status_score(before: BattleState, after: BattleState, team: UnitState.Team, profile: AIProfile) -> float:
+	var score := 0.0
+	for unit in after.units:
+		if not unit.is_alive():
+			continue  # A kill is valued by the HP score; its statuses no longer matter.
+		var gained := _statuses_benefit(unit, profile) - _statuses_benefit(before.units[unit.id], profile)
+		if is_zero_approx(gained):
+			continue
+		if unit.team != team:
+			score -= gained  # Helping an opponent is bad, hurting one is good.
+		elif gained > 0.0:
+			score += gained
+		else:
+			score += gained * profile.friendly_fire_weight
+	return score * profile.status_weight
+
+
+## Expected worth of a unit's statuses to the unit itself, in HP, over their remaining
+## turns (positive helps it, negative hurts it).
+static func _statuses_benefit(unit: UnitState, profile: AIProfile) -> float:
+	var total := 0.0
+	var hp_left := float(unit.hp)
+	var hp_missing := float(unit.data.max_hp - unit.hp)
+	for status in unit.statuses:
+		# During its carrier's turn, the turn in progress has already ticked.
+		var turns := float(status.turns_left - (1 if status.counting else 0))
+		if turns <= 0.0:
+			continue
+		for effect in status.data.tick_effects:
+			if effect is DamageEffect:
+				var damage := effect as DamageEffect
+				var per_tick := (damage.min_amount + damage.max_amount) / 2.0 * unit.damage_taken_percent() / 100.0
+				var dealt := minf(per_tick * turns, hp_left)
+				hp_left -= dealt
+				total -= dealt
+			elif effect is HealEffect:
+				var heal := effect as HealEffect
+				var healed := minf((heal.min_amount + heal.max_amount) / 2.0 * turns, hp_missing)
+				hp_missing -= healed
+				total += healed
+			else:
+				push_warning("EnemyAI: can't value tick effect %s; counted as 0" % effect.get_script().get_global_name())
+		for modifier in status.data.modifiers:
+			match modifier.stat:
+				StatModifier.Stat.AP:
+					total += modifier.amount * turns * profile.ap_value
+				StatModifier.Stat.MP:
+					total += modifier.amount * turns * profile.mp_value
+				StatModifier.Stat.DAMAGE_TAKEN_PERCENT:
+					total -= modifier.amount / 100.0 * turns * profile.incoming_damage_per_turn
+				_:
+					push_warning("EnemyAI: can't value stat %s; counted as 0" % StatModifier.Stat.keys()[modifier.stat])
+	return total
 
 
 ## The cell in reach closest (in walking cost) to an opponent, or the unit's own cell

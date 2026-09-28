@@ -5,10 +5,11 @@
 [ext_resource type="Resource" path="res://data/spells/firebolt.tres" id="3_bs4io"]
 [ext_resource type="Resource" path="res://data/spells/fireball.tres" id="4_qm8lk"]
 [ext_resource type="Resource" path="res://data/spells/mend.tres" id="5_1autv"]
+[ext_resource type="Resource" path="res://data/spells/regeneration.tres" id="6_j17p4"]
 
 [resource]
 script = ExtResource("1_sglo2")
 display_name = "Mage"
 max_hp = 26
-spells = Array[ExtResource("2_j17p4")]([ExtResource("3_bs4io"), ExtResource("4_qm8lk"), ExtResource("5_1autv")])
+spells = Array[ExtResource("2_j17p4")]([ExtResource("3_bs4io"), ExtResource("4_qm8lk"), ExtResource("5_1autv"), ExtResource("6_j17p4")])
 color = Color(0.55, 0.35, 0.9, 1)

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SpellData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_28p66"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_uug3b"]
+[ext_resource type="Script" path="res://scripts/data/apply_status_effect.gd" id="3_qmcd3"]
+[ext_resource type="Resource" path="res://data/statuses/regeneration.tres" id="4_y8l52"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="5_pexgm"]
+
+[sub_resource type="Resource" id="Resource_4rnt5"]
+script = ExtResource("1_28p66")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_bcwnl"]
+script = ExtResource("3_qmcd3")
+status = ExtResource("4_y8l52")
+target_filter = 1
+
+[resource]
+script = ExtResource("5_pexgm")
+display_name = "Regeneration"
+ap_cost = 4
+min_range = 0
+max_range = 4
+needs_line_of_sight = false
+area = SubResource("Resource_4rnt5")
+effects = Array[ExtResource("2_uug3b")]([SubResource("Resource_bcwnl")])

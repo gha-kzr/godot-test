@@ -1,7 +1,8 @@
 class_name UnitView
 extends Node3D
 ## One unit on the board: a placeholder capsule (or UnitData.model_scene), a team ring,
-## an HP label and a pick collider that clicks through to the unit's cell (see BoardView).
+## an HP label, a row of status tags ("P3": Poison, 3 turns) and a pick collider that
+## clicks through to the unit's cell (see BoardView).
 ## Every play_* method returns once its animation is over, so callers can await them one
 ## after another.
 
@@ -19,18 +20,28 @@ const LUNGE_DISTANCE := 0.3
 ## The active unit's ring pulses between these scales.
 const ACTIVE_PULSE_SCALE := 1.25
 const ACTIVE_PULSE_DURATION := 0.5
+## Status tags: world spacing between tags, and the beats of their animations.
+const STATUS_TAG_SPACING := 0.42
+const STATUS_TAG_PIXEL_SIZE := 0.009
+const STATUS_APPLIED_DURATION := 0.35
+const STATUS_TICK_DURATION := 0.25
+const STATUS_EXPIRED_DURATION := 0.3
 
 var unit_id := -1
 var _board: BoardView
 var _max_hp := 1
 var _material: StandardMaterial3D  ## Placeholder only; models keep their own look.
 var _pulse_tween: Tween
+## Tags in status order (the tick order).
+var _status_tags: Dictionary[StatusData, Label3D] = {}
 
 @onready var _body: Node3D = $Body
 @onready var _placeholder: MeshInstance3D = $Body/Placeholder
 @onready var _ring: MeshInstance3D = $Ring
 @onready var _pick_body: StaticBody3D = $PickBody
 @onready var _hp_label: Label3D = $HpLabel
+## Turned to face the camera every frame, so the tags stay in a horizontal row on screen.
+@onready var _status_row: Node3D = $StatusRow
 
 
 ## One-time setup (model, colors), then sync() to the unit's current state.
@@ -39,6 +50,7 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	if not is_node_ready():
 		push_error("UnitView.setup: add the view to the tree first")
 		return
+	set_process(false)  # Until it has status tags.
 	unit_id = unit.id
 	_board = board
 	_max_hp = unit.data.max_hp
@@ -71,6 +83,9 @@ func sync(unit: UnitState) -> void:
 	if alive:  # Undo a death squash (e.g. after undo or a desync).
 		_body.scale = Vector3.ONE
 		_ring.scale = Vector3.ONE
+	_clear_status_tags()
+	for status in unit.statuses:
+		_set_status_tag(status.data, status.turns_left)
 
 
 ## Walks the path cell by cell. Climbs go up then across, drops go across then down.
@@ -110,6 +125,44 @@ func play_hit(amount: int, hp_after: int) -> void:
 
 func play_heal(amount: int, hp_after: int) -> void:
 	await _play_hp_change("+%d" % amount, HEAL_COLOR, hp_after)
+
+
+## Adds (or refreshes) the status tag and floats the status name.
+func play_status_applied(status: StatusData, turns_left: int) -> void:
+	_set_status_tag(status, turns_left)
+	_spawn_floating_number(status.display_name, status.color)
+	await create_tween().tween_interval(STATUS_APPLIED_DURATION).finished
+
+
+## Pulses the tag; the tick's damage or heal numbers come with the events that follow.
+func play_status_ticked(status: StatusData) -> void:
+	var tag: Label3D = _status_tags.get(status)
+	if tag == null:
+		await create_tween().tween_interval(STATUS_TICK_DURATION).finished
+		return
+	var tween := create_tween()
+	tween.tween_property(tag, "scale", Vector3.ONE * 1.5, STATUS_TICK_DURATION * 0.5)
+	tween.tween_property(tag, "scale", Vector3.ONE, STATUS_TICK_DURATION * 0.5)
+	await tween.finished
+
+
+## Fades the tag out and removes it.
+func play_status_expired(status: StatusData) -> void:
+	var tag: Label3D = _status_tags.get(status)
+	if tag == null:
+		return
+	var tween := create_tween()
+	tween.tween_property(tag, "modulate:a", 0.0, STATUS_EXPIRED_DURATION)
+	await tween.finished
+	_remove_status_tag(status)
+
+
+## Tag texts in order, e.g. ["P3", "G1"].
+func status_tag_texts() -> Array[String]:
+	var texts: Array[String] = []
+	for status in _status_tags:
+		texts.append(_status_tags[status].text)
+	return texts
 
 
 func play_death() -> void:
@@ -154,6 +207,8 @@ func picked_cell() -> Vector2i:
 ## of the placeholder in the number's color.
 func _play_hp_change(text: String, color: Color, hp_after: int) -> void:
 	_set_hp(hp_after)
+	if text.substr(1) == "0":
+		return  # Nothing happened (a heal at full HP, damage fully resisted): no "+0".
 	_spawn_floating_number(text, color)
 	var tween := create_tween()
 	if _material != null:
@@ -176,6 +231,56 @@ func _spawn_floating_number(text: String, color: Color) -> void:
 	tween.tween_property(label, "position:y", label.position.y + 0.8, FLOAT_DURATION)
 	tween.tween_property(label, "modulate:a", 0.0, FLOAT_DURATION).set_delay(FLOAT_DURATION * 0.4)
 	tween.chain().tween_callback(label.queue_free)
+
+
+## Keeps the tag row facing the camera; runs only while the unit has tags.
+func _process(_delta: float) -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera != null:
+		_status_row.global_basis = camera.global_basis
+
+
+func _set_status_tag(status: StatusData, turns_left: int) -> void:
+	var tag: Label3D = _status_tags.get(status)
+	if tag == null:
+		tag = Label3D.new()
+		tag.name = "Tag"
+		tag.no_depth_test = true
+		# World-sized (unlike the HP label), so the spacing between tags holds at any zoom.
+		tag.pixel_size = STATUS_TAG_PIXEL_SIZE
+		tag.font_size = _hp_label.font_size
+		tag.outline_size = _hp_label.outline_size
+		tag.render_priority = 1
+		_status_row.add_child(tag)
+		_status_tags[status] = tag
+	tag.text = "%s%d" % [status.short_label, turns_left]
+	tag.modulate = status.color
+	_layout_status_tags()
+	set_process(true)
+
+
+func _remove_status_tag(status: StatusData) -> void:
+	var tag: Label3D = _status_tags.get(status)
+	if tag == null:
+		return
+	_status_tags.erase(status)
+	tag.queue_free()
+	_layout_status_tags()
+	set_process(not _status_tags.is_empty())
+
+
+func _clear_status_tags() -> void:
+	for status in _status_tags.keys():
+		_remove_status_tag(status)
+
+
+## Centers the tags in a row along the row node's local X.
+func _layout_status_tags() -> void:
+	var index := 0
+	var count := _status_tags.size()
+	for status in _status_tags:
+		_status_tags[status].position = Vector3((index - (count - 1) / 2.0) * STATUS_TAG_SPACING, 0.0, 0.0)
+		index += 1
 
 
 func _set_hp(hp: int) -> void:

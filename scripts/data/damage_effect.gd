@@ -7,7 +7,8 @@ extends EffectData
 
 func apply(state: BattleState, _caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
 	var target := state.units[target_id]
-	var amount := mini(state.roll(min_amount, max_amount), target.hp)
+	var scaled := roundi(state.roll(min_amount, max_amount) * target.damage_taken_percent() / 100.0)
+	var amount := mini(scaled, target.hp)
 	target.hp -= amount
 	return [BattleEvents.DamageDealt.new(target_id, amount, target.hp)]
 

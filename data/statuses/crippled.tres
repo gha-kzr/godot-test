@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_7kn5s"]
+[ext_resource type="Script" path="res://scripts/data/status_data.gd" id="2_dodfg"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="3_b2hke"]
+
+[sub_resource type="Resource" id="Resource_7kn5s"]
+script = ExtResource("1_7kn5s")
+stat = 0
+amount = -1
+
+[sub_resource type="Resource" id="Resource_dodfg"]
+script = ExtResource("1_7kn5s")
+amount = -1
+
+[sub_resource type="Resource" id="Resource_b2hke"]
+script = ExtResource("1_7kn5s")
+stat = 2
+amount = 25
+
+[resource]
+script = ExtResource("2_dodfg")
+display_name = "Crippled"
+short_label = "C"
+color = Color(0.9, 0.5, 0.2, 1)
+modifiers = Array[ExtResource("1_7kn5s")]([SubResource("Resource_7kn5s"), SubResource("Resource_dodfg"), SubResource("Resource_b2hke")])

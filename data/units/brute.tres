@@ -4,11 +4,12 @@
 [ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_jcwbx"]
 [ext_resource type="Resource" path="res://data/spells/smash.tres" id="3_57etr"]
 [ext_resource type="Resource" path="res://data/spells/ground_slam.tres" id="4_pfxpi"]
+[ext_resource type="Resource" path="res://data/spells/crippling_blow.tres" id="5_jcwbx"]
 
 [resource]
 script = ExtResource("1_is2yb")
 display_name = "Brute"
-max_hp = 38
+max_hp = 42
 initiative = 105
-spells = Array[ExtResource("2_jcwbx")]([ExtResource("3_57etr"), ExtResource("4_pfxpi")])
+spells = Array[ExtResource("2_jcwbx")]([ExtResource("3_57etr"), ExtResource("4_pfxpi"), ExtResource("5_jcwbx")])
 color = Color(0.85, 0.25, 0.2, 1)

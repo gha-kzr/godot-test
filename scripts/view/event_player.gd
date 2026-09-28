@@ -46,10 +46,13 @@ func stop() -> void:
 		_board.clear_highlight(BoardView.Highlight.AREA)
 
 
+## One dispatch point: the event's subject_id() names the view, the type picks the
+## animation. Events with no board animation (turns, battle end) just pass through; the
+## HUD and controller react to them through event_played.
 func _play_event(event: BattleEvents.Event) -> void:
-	var view := _view_for(event)
-	if view == null:
-		return  # No animation, or the view is gone.
+	var view := _units.find_view(event.subject_id())
+	if view == null or not is_instance_valid(view):
+		return
 	if event is BattleEvents.UnitMoved:
 		await view.play_move((event as BattleEvents.UnitMoved).path)
 	elif event is BattleEvents.SpellCast:
@@ -67,25 +70,12 @@ func _play_event(event: BattleEvents.Event) -> void:
 	elif event is BattleEvents.Healed:
 		var heal := event as BattleEvents.Healed
 		await view.play_heal(heal.amount, heal.hp_after)
+	elif event is BattleEvents.StatusApplied:
+		var applied := event as BattleEvents.StatusApplied
+		await view.play_status_applied(applied.status, applied.turns_left)
+	elif event is BattleEvents.StatusTicked:
+		await view.play_status_ticked((event as BattleEvents.StatusTicked).status)
+	elif event is BattleEvents.StatusExpired:
+		await view.play_status_expired((event as BattleEvents.StatusExpired).status)
 	elif event is BattleEvents.UnitDied:
 		await view.play_death()
-
-
-## The view an event animates, or null for events with no board animation (TurnStarted,
-## TurnEnded, BattleEnded: the HUD and controller react to those through event_played).
-func _view_for(event: BattleEvents.Event) -> UnitView:
-	var unit_id := -1
-	if event is BattleEvents.UnitMoved:
-		unit_id = (event as BattleEvents.UnitMoved).unit_id
-	elif event is BattleEvents.SpellCast:
-		unit_id = (event as BattleEvents.SpellCast).caster_id
-	elif event is BattleEvents.DamageDealt:
-		unit_id = (event as BattleEvents.DamageDealt).unit_id
-	elif event is BattleEvents.Healed:
-		unit_id = (event as BattleEvents.Healed).unit_id
-	elif event is BattleEvents.UnitDied:
-		unit_id = (event as BattleEvents.UnitDied).unit_id
-	if unit_id < 0:
-		return null
-	var view := _units.view(unit_id)
-	return view if is_instance_valid(view) else null

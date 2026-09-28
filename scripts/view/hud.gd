@@ -1,8 +1,9 @@
 class_name Hud
 extends CanvasLayer
-## Battle HUD: turn order, active unit, spells, end turn, view toggle, turn banner and
-## result. The controller updates it with show_* calls (calls down) and listens to its
-## signals (signals up); the HUD never reads or changes battle state itself.
+## Battle HUD: turn order, active unit (with its statuses), spells, a panel for the unit
+## under the mouse, end turn, view toggle, turn banner and result. The controller updates
+## it with show_* calls (calls down) and listens to its signals (signals up); the HUD never
+## reads or changes battle state itself.
 ##
 ## Buttons never take keyboard focus, so Space can't press a focused button; spells and
 ## End turn have keyboard shortcuts (1-9, the end_turn action) that respect disabled state.
@@ -18,6 +19,18 @@ const PLAYER_CHIP_COLOR := Color(0.16, 0.26, 0.42, 0.9)
 const ENEMY_CHIP_COLOR := Color(0.42, 0.16, 0.16, 0.9)
 const CURRENT_BORDER_COLOR := Color(1.0, 0.85, 0.3)
 const SPELL_KEYS: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
+const BUFFED_COLOR := Color(0.5, 1.0, 0.5)
+const DEBUFFED_COLOR := Color(1.0, 0.5, 0.45)
+
+
+## A status as the HUD shows it.
+class StatusInfo:
+	var display_name := ""
+	var short_label := ""
+	var color := Color.WHITE
+	var turns_left := 0
+	var description := ""
+	var is_positive := false
 
 
 ## What the HUD shows about a unit. Built by the controller from the battle state.
@@ -31,6 +44,11 @@ class UnitInfo:
 	var max_ap := 0
 	var mp := 0
 	var max_mp := 0
+	## Maxima without modifiers, to show buffs and debuffs.
+	var base_ap := 0
+	var base_mp := 0
+	var statuses: Array[StatusInfo] = []
+	var spells: Array[SpellData] = []
 
 	static func from_unit(unit: UnitState) -> UnitInfo:
 		var info := UnitInfo.new()
@@ -40,9 +58,21 @@ class UnitInfo:
 		info.hp = unit.hp
 		info.max_hp = unit.data.max_hp
 		info.ap = unit.ap
-		info.max_ap = unit.data.ap
+		info.max_ap = unit.max_ap()
+		info.base_ap = unit.data.ap
 		info.mp = unit.mp
-		info.max_mp = unit.data.mp
+		info.max_mp = unit.max_mp()
+		info.base_mp = unit.data.mp
+		for status in unit.statuses:
+			var status_info := StatusInfo.new()
+			status_info.display_name = status.data.display_name
+			status_info.short_label = status.data.short_label
+			status_info.color = status.data.color
+			status_info.turns_left = status.turns_left
+			status_info.description = status.data.describe()
+			status_info.is_positive = status.data.is_positive
+			info.statuses.append(status_info)
+		info.spells = unit.data.spells
 		return info
 
 
@@ -68,6 +98,9 @@ var _banner_tween: Tween
 @onready var _result_label: Label = %ResultLabel
 @onready var _restart_button: Button = %RestartButton
 @onready var _seed_label: Label = %SeedLabel
+@onready var _status_list: VBoxContainer = %StatusList
+@onready var _inspect_panel: PanelContainer = %InspectPanel
+@onready var _inspect_rows: VBoxContainer = %InspectRows
 
 
 func _ready() -> void:
@@ -81,6 +114,7 @@ func _ready() -> void:
 	_end_turn_button.shortcut = end_turn_shortcut
 	_banner.modulate.a = 0.0
 	_result_panel.hide()
+	_inspect_panel.hide()
 
 
 ## Units in the order they'll act, the current one first.
@@ -100,6 +134,64 @@ func show_unit(info: UnitInfo) -> void:
 	_hp_label.text = "%d / %d HP" % [info.hp, info.max_hp]
 	_ap_label.text = "AP %d / %d" % [info.ap, info.max_ap]
 	_mp_label.text = "MP %d / %d" % [info.mp, info.max_mp]
+	_ap_label.modulate = _modifier_tint(info.max_ap, info.base_ap)
+	_mp_label.modulate = _modifier_tint(info.max_mp, info.base_mp)
+	_fill_status_list(_status_list, info.statuses)
+
+
+## The panel for the unit under the mouse: HP, AP / MP, statuses and spells.
+func show_inspected(info: UnitInfo) -> void:
+	_clear_children(_inspect_rows)
+	var title := HBoxContainer.new()
+	var swatch := ColorRect.new()
+	swatch.color = info.color
+	swatch.custom_minimum_size = Vector2(16, 16)
+	swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	title.add_child(swatch)
+	var name_label := Label.new()
+	name_label.text = "%s (%s)" % [info.display_name, "ally" if info.is_player else "enemy"]
+	name_label.add_theme_font_size_override("font_size", 18)
+	title.add_child(name_label)
+	_inspect_rows.add_child(title)
+	var hp_bar := ProgressBar.new()
+	hp_bar.show_percentage = false
+	hp_bar.custom_minimum_size = Vector2(0, 12)
+	hp_bar.max_value = info.max_hp
+	hp_bar.value = info.hp
+	hp_bar.add_theme_stylebox_override("fill", _hp_bar.get_theme_stylebox("fill"))
+	_inspect_rows.add_child(hp_bar)
+	_inspect_rows.add_child(_label("%d / %d HP" % [info.hp, info.max_hp]))
+	var points := HBoxContainer.new()
+	points.add_theme_constant_override("separation", 24)
+	var ap := _label("AP %d / %d" % [info.ap, info.max_ap])
+	ap.modulate = _modifier_tint(info.max_ap, info.base_ap)
+	var mp := _label("MP %d / %d" % [info.mp, info.max_mp])
+	mp.modulate = _modifier_tint(info.max_mp, info.base_mp)
+	points.add_child(ap)
+	points.add_child(mp)
+	_inspect_rows.add_child(points)
+	var statuses := VBoxContainer.new()
+	statuses.name = "Statuses"
+	_fill_status_list(statuses, info.statuses)
+	_inspect_rows.add_child(statuses)
+	var spells := VBoxContainer.new()
+	spells.name = "Spells"
+	for spell in info.spells:
+		var row := _label("%s (%d AP)" % [spell.display_name, spell.ap_cost])
+		row.tooltip_text = spell_description(spell)
+		row.mouse_filter = Control.MOUSE_FILTER_PASS
+		spells.add_child(row)
+	_inspect_rows.add_child(spells)
+	_inspect_panel.show()
+
+
+func hide_inspected() -> void:
+	_inspect_panel.hide()
+
+
+## Whether a control belongs to the (visible) inspect panel.
+func is_inspect_control(control: Control) -> bool:
+	return _inspect_panel.visible and (control == _inspect_panel or _inspect_panel.is_ancestor_of(control))
 
 
 ## One button per spell; spells costing more than `ap` are disabled.
@@ -180,9 +272,43 @@ static func spell_description(spell: SpellData) -> String:
 		parts.append("%s area %d" % [AreaShape.Kind.keys()[spell.area.kind].capitalize(), spell.area.size])
 	for effect in spell.effects:
 		if effect != null:
-			var text := effect.describe()
+			var text := effect.full_description()
 			parts.append(text.left(1).to_upper() + text.substr(1))
 	return ". ".join(parts) + "."
+
+
+func _fill_status_list(list: VBoxContainer, statuses: Array[StatusInfo]) -> void:
+	_clear_children(list)
+	for status in statuses:
+		var row := HBoxContainer.new()
+		row.name = "Status"
+		row.tooltip_text = status.description
+		row.mouse_filter = Control.MOUSE_FILTER_PASS  # Tooltips need the mouse.
+		var swatch := ColorRect.new()
+		swatch.color = status.color
+		swatch.custom_minimum_size = Vector2(12, 12)
+		swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		swatch.mouse_filter = Control.MOUSE_FILTER_PASS
+		row.add_child(swatch)
+		var turns := "1 turn" if status.turns_left == 1 else "%d turns" % status.turns_left
+		var text := _label("%s, %s" % [status.display_name, turns])
+		text.mouse_filter = Control.MOUSE_FILTER_PASS
+		row.add_child(text)
+		list.add_child(row)
+
+
+static func _modifier_tint(value: int, base: int) -> Color:
+	if value > base:
+		return BUFFED_COLOR
+	if value < base:
+		return DEBUFFED_COLOR
+	return Color.WHITE
+
+
+static func _label(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	return label
 
 
 func _refresh_buttons() -> void:

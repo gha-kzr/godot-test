@@ -2,10 +2,12 @@ extends TestCase
 ## The shipped slice content: every resource loads and validates, the map is playable,
 ## and AI-vs-AI battles on it finish.
 
-const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai"]
+const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses"]
 const MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
 const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
+## AI-vs-AI battles for the balance checks (deterministic seeds; ~5 s).
+const BALANCE_SEEDS := 20
 
 
 func _content_paths() -> Array[String]:
@@ -44,7 +46,7 @@ func _walkable_from(grid: Grid, start: Vector2i) -> Dictionary[Vector2i, bool]:
 
 func test_every_content_file_loads_and_validates() -> void:
 	var paths := _content_paths()
-	assert_true(paths.size() >= 15, "found %d content files" % paths.size())
+	assert_true(paths.size() >= 23, "found %d content files" % paths.size())
 	for path in paths:
 		var resource := load(path)
 		assert_true(resource != null and resource.has_method("get_validation_errors"), "%s loads as content" % path)
@@ -56,7 +58,7 @@ func test_slice_teams_and_spell_kinds() -> void:
 	var units := _team(PLAYERS + ENEMIES)
 	var kinds := {}
 	for unit in units:
-		assert_true(unit.spells.size() >= 2 and unit.spells.size() <= 3, "%s has 2-3 spells" % unit.display_name)
+		assert_true(unit.spells.size() >= 2 and unit.spells.size() <= 4, "%s has 2-4 spells" % unit.display_name)
 		for spell in unit.spells:
 			if spell.area.kind != AreaShape.Kind.SINGLE:
 				kinds["area"] = true
@@ -92,7 +94,8 @@ func test_slice_map_is_playable() -> void:
 
 func test_ai_vs_ai_battles_on_the_slice_finish() -> void:
 	var outcomes := {}
-	for rng_seed in range(1, 11):
+	var casts := {}
+	for rng_seed in range(1, BALANCE_SEEDS + 1):
 		var battle := Battle.new(_slice_state(rng_seed))
 		battle.start()
 		var actions := 0
@@ -102,8 +105,18 @@ func test_ai_vs_ai_battles_on_the_slice_finish() -> void:
 			if not result.ok():
 				assert_true(false, "seed %d: invalid action: %s" % [rng_seed, result.error])
 				break
+			for event in result.events:
+				if event is BattleEvents.SpellCast:
+					var spell_name := (event as BattleEvents.SpellCast).spell.display_name
+					casts[spell_name] = casts.get(spell_name, 0) + 1
 			actions += 1
 		assert_true(battle.state.is_over(), "seed %d: battle ends within 1000 actions" % rng_seed)
 		var outcome: String = BattleState.Outcome.keys()[battle.state.outcome()]
 		outcomes[outcome] = outcomes.get(outcome, 0) + 1
-	print("  slice AI-vs-AI outcomes over 10 seeds: %s" % outcomes)
+	print("  slice AI-vs-AI outcomes over %d seeds: %s" % [BALANCE_SEEDS, outcomes])
+	print("  spells cast: %s" % casts)
+	for spell_name in ["Poison Arrow", "Regeneration", "Crippling Blow", "Guard", "Arrow", "Slash", "Smash", "Firebolt"]:
+		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
+	# A loose balance guard (AI plays both sides): neither team should always win.
+	assert_true(outcomes.get("PLAYER_WON", 0) >= BALANCE_SEEDS / 10, "players win sometimes: %s" % outcomes)
+	assert_true(outcomes.get("ENEMY_WON", 0) >= BALANCE_SEEDS / 10, "enemies win sometimes: %s" % outcomes)
