@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dv21237jvfieq"]
+[gd_resource type="Resource" script_class="SpellData" format=3]
 
-[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_ecc7m"]
-[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_jw1x3"]
-[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_ag3yy"]
-[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_pdlt8"]
+[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_ecc7m"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_jw1x3"]
+[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="3_ag3yy"]
+[ext_resource type="Resource" path="res://data/damage_types/fire.tres" id="3_jw1x3"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="4_pdlt8"]
 
 [sub_resource type="Resource" id="Resource_nqnep"]
 script = ExtResource("1_ecc7m")
@@ -12,8 +13,9 @@ size = 1
 
 [sub_resource type="Resource" id="Resource_08d2k"]
 script = ExtResource("3_ag3yy")
-min_amount = 5
-max_amount = 7
+min_amount = 6
+max_amount = 8
+damage_type = ExtResource("3_jw1x3")
 
 [resource]
 script = ExtResource("4_pdlt8")

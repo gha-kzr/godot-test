@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Roster" format=3]
+
+[ext_resource type="Resource" path="res://data/progression/config.tres" id="1_1h3os"]
+[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="2_grhyv"]
+[ext_resource type="Resource" path="res://data/heroes/knight.tres" id="3_vqi2v"]
+[ext_resource type="Resource" path="res://data/heroes/mage.tres" id="4_kqugl"]
+[ext_resource type="Resource" path="res://data/heroes/ranger.tres" id="5_106by"]
+[ext_resource type="Script" path="res://scripts/data/roster.gd" id="6_icgdy"]
+
+[resource]
+script = ExtResource("6_icgdy")
+heroes = Array[ExtResource("2_grhyv")]([ExtResource("3_vqi2v"), ExtResource("4_kqugl"), ExtResource("5_106by")])
+config = ExtResource("1_1h3os")

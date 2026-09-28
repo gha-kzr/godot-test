@@ -53,7 +53,7 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	set_process(false)  # Until it has status tags.
 	unit_id = unit.id
 	_board = board
-	_max_hp = unit.data.max_hp
+	_max_hp = unit.max_hp()
 	name = "Unit%d" % unit.id
 	if unit.data.model_scene != null:
 		_placeholder.queue_free()

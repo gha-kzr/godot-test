@@ -2,7 +2,7 @@ extends TestCase
 ## The shipped slice content: every resource loads and validates, the map is playable,
 ## and AI-vs-AI battles on it finish.
 
-const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses"]
+const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression"]
 const MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
 const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
@@ -46,7 +46,7 @@ func _walkable_from(grid: Grid, start: Vector2i) -> Dictionary[Vector2i, bool]:
 
 func test_every_content_file_loads_and_validates() -> void:
 	var paths := _content_paths()
-	assert_true(paths.size() >= 23, "found %d content files" % paths.size())
+	assert_true(paths.size() >= 39, "found %d content files" % paths.size())
 	for path in paths:
 		var resource := load(path)
 		assert_true(resource != null and resource.has_method("get_validation_errors"), "%s loads as content" % path)
@@ -115,8 +115,54 @@ func test_ai_vs_ai_battles_on_the_slice_finish() -> void:
 		outcomes[outcome] = outcomes.get(outcome, 0) + 1
 	print("  slice AI-vs-AI outcomes over %d seeds: %s" % [BALANCE_SEEDS, outcomes])
 	print("  spells cast: %s" % casts)
-	for spell_name in ["Poison Arrow", "Regeneration", "Crippling Blow", "Guard", "Arrow", "Slash", "Smash", "Firebolt"]:
+	for spell_name in ["Poison Arrow", "Crippling Blow", "Guard", "Arrow", "Slash", "Smash", "Firebolt"]:
 		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
 	# A loose balance guard (AI plays both sides): neither team should always win.
 	assert_true(outcomes.get("PLAYER_WON", 0) >= BALANCE_SEEDS / 10, "players win sometimes: %s" % outcomes)
 	assert_true(outcomes.get("ENEMY_WON", 0) >= BALANCE_SEEDS / 10, "enemies win sometimes: %s" % outcomes)
+
+
+func test_heroes_grow_with_levels() -> void:
+	var roster := load("res://data/progression/roster.tres") as Roster
+	assert_eq(roster.heroes.size(), 3)
+	var profile := Profile.create(roster)
+	assert_false(profile.is_unlocked(2), "the Ranger starts locked")
+	var knight := profile.heroes[0]
+	assert_eq(knight.spells().size(), 3, "level 1: base kit")
+	knight.level = 3
+	assert_eq(knight.spells().size(), 4, "level 3: Whirlwind")
+	assert_eq(knight.spells().back().display_name, "Whirlwind")
+	knight.level = 6
+	var mp := knight.modifiers().filter(func(m: StatModifier) -> bool: return m.stat == StatModifier.Stat.MP)
+	assert_eq(mp.size(), 1, "level 6: +1 MP")
+	assert_eq(profile.heroes[1].spells().size() + 1, 4, "the Mage learns Regeneration at 3")
+	profile.heroes[1].level = 3
+	assert_eq(profile.heroes[1].spells().back().display_name, "Regeneration")
+	for record in profile.heroes:
+		record.level = 10
+		assert_true(record.spells().size() <= HeroData.MAX_SPELLS, "%s within the spell cap" % record.hero.display_name())
+
+
+func test_enemies_give_xp_and_loot() -> void:
+	for path: String in ENEMIES:
+		var enemy := load(path) as UnitData
+		assert_true(enemy.xp_reward > 0, "%s gives XP" % enemy.display_name)
+		assert_true(enemy.loot_table != null and not enemy.loot_table.runes.is_empty(), "%s drops runes" % enemy.display_name)
+
+
+func test_heroes_grow_differently() -> void:
+	var roster := load("res://data/progression/roster.tres") as Roster
+	var growth := func(hero: HeroData, stat: StatModifier.Stat) -> int:
+		return hero.reward_for(2).modifiers.filter(func(m: StatModifier) -> bool: return m.stat == stat)[0].amount
+	var knight := roster.heroes[0]
+	var mage := roster.heroes[1]
+	assert_true(growth.call(knight, StatModifier.Stat.MAX_HP) > growth.call(mage, StatModifier.Stat.MAX_HP), "the Knight gains more HP")
+	assert_true(growth.call(mage, StatModifier.Stat.POWER) > growth.call(knight, StatModifier.Stat.POWER), "the Mage gains more Power")
+
+
+func test_each_enemy_resists_a_hero_damage_type() -> void:
+	var brute := load("res://data/units/brute.tres") as UnitData
+	var archer := load("res://data/units/archer.tres") as UnitData
+	var state := BattleFixtures.state_with("0p 0e 0e", [BattleFixtures.unit("P0", 200)] as Array[UnitData], [brute, archer] as Array[UnitData])
+	assert_eq(state.units[1].resistance_percent(load("res://data/damage_types/physical.tres")), 20, "the Brute resists the Knight")
+	assert_eq(state.units[2].resistance_percent(load("res://data/damage_types/fire.tres")), 20, "the Archer resists the Mage")

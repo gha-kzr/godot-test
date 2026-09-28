@@ -1,0 +1,205 @@
+class_name Profile
+extends RefCounted
+## The player's lasting progress: every hero's record, which are unlocked, the party, and
+## the shared rune stash. Plain data, independent from battles; the game root applies
+## battle rewards to it and saves it.
+
+class LevelUp:
+	var hero_index: int
+	var from_level: int
+	var to_level: int
+
+	func _init(hero: int, from: int, to: int) -> void:
+		hero_index = hero
+		from_level = from
+		to_level = to
+
+
+## Save format version; bump on incompatible changes (from_dict must read older ones).
+const SAVE_VERSION := 2
+
+var roster: Roster
+var heroes: Array[HeroRecord] = []  ## One per roster hero, same order.
+var unlocked: Array[int] = []  ## Hero indices.
+var party: Array[int] = []  ## Hero indices, in spawn order.
+var stash: Array[RuneData] = []
+
+
+## A fresh profile: every hero at level 1, the roster's starting unlocks and party.
+static func create(from_roster: Roster) -> Profile:
+	var profile := Profile.new()
+	profile.roster = from_roster
+	for hero in from_roster.heroes:
+		profile.heroes.append(HeroRecord.new(hero))
+	profile.unlocked = from_roster.starting_unlocked.duplicate()
+	profile.party = from_roster.starting_party.duplicate()
+	return profile
+
+
+func party_records() -> Array[HeroRecord]:
+	var records: Array[HeroRecord] = []
+	for index in party:
+		records.append(heroes[index])
+	return records
+
+
+func is_unlocked(hero_index: int) -> bool:
+	return hero_index in unlocked
+
+
+## The party as battle input: units in spawn order, with their permanent modifiers.
+func battle_units() -> Array[UnitData]:
+	var units: Array[UnitData] = []
+	for record in party_records():
+		units.append(record.battle_unit_data())
+	return units
+
+
+func battle_modifiers() -> Array:
+	var modifiers: Array = []
+	for record in party_records():
+		modifiers.append(record.modifiers())
+	return modifiers
+
+
+## Moves a rune from the stash to a hero's slot (the first free one if `slot` is -1).
+## Returns an error message, or "" on success.
+func equip(hero_index: int, stash_index: int, slot := -1) -> String:
+	if hero_index < 0 or hero_index >= heroes.size() or not is_unlocked(hero_index):
+		return "That hero isn't available."
+	if stash_index < 0 or stash_index >= stash.size():
+		return "No such rune in the stash."
+	var record := heroes[hero_index]
+	var rune := stash[stash_index]
+	if slot == -1:
+		slot = record.free_slot()
+		if slot == -1:
+			return "%s has no free rune slot." % record.hero.display_name()
+	elif slot < 0 or slot >= HeroRecord.RUNE_SLOTS or record.runes[slot] != null:
+		return "That rune slot isn't free."
+	if rune.is_unique() and rune in record.runes:
+		return "%s is %s: one per hero." % [rune.display_name, rune.rarity_name().to_lower()]
+	record.runes[slot] = rune
+	stash.remove_at(stash_index)
+	return ""
+
+
+## Moves a hero's rune back to the stash. Returns an error message, or "".
+func unequip(hero_index: int, slot: int) -> String:
+	if hero_index < 0 or hero_index >= heroes.size():
+		return "No such hero."
+	var record := heroes[hero_index]
+	if slot < 0 or slot >= HeroRecord.RUNE_SLOTS or record.runes[slot] == null:
+		return "That rune slot is empty."
+	stash.append(record.runes[slot])
+	record.runes[slot] = null
+	return ""
+
+
+## A won battle's rewards: the full XP to every party hero (fallen ones too), levels
+## gained up to the cap, runes into the stash. Returns the level-ups.
+func apply_rewards(rewards: BattleRewards) -> Array[LevelUp]:
+	var level_ups: Array[LevelUp] = []
+	for index in party:
+		var record := heroes[index]
+		record.xp += rewards.xp
+		var new_level := roster.config.level_for_xp(record.xp)
+		if new_level > record.level:
+			level_ups.append(LevelUp.new(index, record.level, new_level))
+			record.level = new_level
+	stash.append_array(rewards.runes)
+	return level_ups
+
+
+## Plain data for saving: resources (heroes, runes) are referenced by path, so reordering
+## the roster or adding heroes doesn't scramble saves.
+func to_dict() -> Dictionary:
+	var hero_entries: Array = []
+	for record in heroes:
+		var rune_paths: Array = []
+		for rune in record.runes:
+			rune_paths.append(rune.resource_path if rune != null else null)
+		hero_entries.append({"hero": record.hero.resource_path, "xp": record.xp, "runes": rune_paths})
+	var stash_paths: Array = []
+	for rune in stash:
+		stash_paths.append(rune.resource_path)
+	return {"version": SAVE_VERSION, "heroes": hero_entries, "unlocked": _hero_paths(unlocked),
+			"party": _hero_paths(party), "stash": stash_paths}
+
+
+## Rebuilds a profile saved by to_dict(), on top of a fresh one from `from_roster`: heroes
+## are matched by resource path, unknown heroes or runes and malformed fields are skipped
+## (with a warning), levels are recomputed from XP, the roster's starting unlocks are kept,
+## and an invalid party falls back to the roster's. Reads version 1 saves (party and
+## unlocks as roster indices). Returns null for a save from a newer version of the game.
+static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
+	var version := int(data.get("version", 0)) if data.get("version") is int or data.get("version") is float else 0
+	if version > SAVE_VERSION:
+		push_warning("Profile: save version %s is newer than %d" % [data.get("version"), SAVE_VERSION])
+		return null
+	var profile := Profile.create(from_roster)
+	for entry: Variant in _array(data, "heroes"):
+		if entry is not Dictionary:
+			continue
+		var index := profile._hero_index(entry.get("hero"))
+		if index == -1:
+			push_warning("Profile: unknown hero %s skipped" % entry.get("hero"))
+			continue
+		var record := profile.heroes[index]
+		var xp: Variant = entry.get("xp", 0)
+		record.xp = maxi(0, int(xp)) if xp is int or xp is float else 0
+		record.level = from_roster.config.level_for_xp(record.xp)
+		var rune_paths := _array(entry, "runes")
+		for slot in mini(rune_paths.size(), HeroRecord.RUNE_SLOTS):
+			record.runes[slot] = _load_rune(rune_paths[slot])
+	for index in profile._saved_heroes(_array(data, "unlocked"), version):
+		if index not in profile.unlocked:
+			profile.unlocked.append(index)
+	var saved_party := profile._saved_heroes(_array(data, "party"), version)
+	if not saved_party.is_empty() and saved_party.all(func(i: int) -> bool: return profile.is_unlocked(i)):
+		profile.party.assign(saved_party)
+	for path: Variant in _array(data, "stash"):
+		var rune := _load_rune(path)
+		if rune != null:
+			profile.stash.append(rune)
+	return profile
+
+
+func _hero_paths(indices: Array[int]) -> Array:
+	return indices.map(func(i: int) -> String: return heroes[i].hero.resource_path)
+
+
+func _hero_index(path: Variant) -> int:
+	if path is not String:
+		return -1
+	return heroes.find_custom(func(r: HeroRecord) -> bool: return r.hero.resource_path == path)
+
+
+## Saved hero references (paths; roster indices in version 1) as roster indices, without
+## unknown ones or duplicates.
+func _saved_heroes(values: Array, version: int) -> Array[int]:
+	var indices: Array[int] = []
+	for value: Variant in values:
+		var index := -1
+		if version <= 1 and (value is int or value is float):
+			index = int(value) if int(value) >= 0 and int(value) < heroes.size() else -1
+		else:
+			index = _hero_index(value)
+		if index != -1 and index not in indices:
+			indices.append(index)
+	return indices
+
+
+## `data[key]` if it's an array, else an empty one (a malformed save).
+static func _array(data: Dictionary, key: String) -> Array:
+	var value: Variant = data.get(key, [])
+	return value if value is Array else []
+
+
+static func _load_rune(path: Variant) -> RuneData:
+	if path == null or path is not String or path.is_empty():
+		return null
+	var rune := load(path) as RuneData if ResourceLoader.exists(path) else null
+	if rune == null:
+		push_warning("Profile: unknown rune %s skipped" % path)
+	return rune

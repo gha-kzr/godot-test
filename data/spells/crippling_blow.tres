@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_jdfao"]
 [ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_pecx3"]
 [ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="3_jioob"]
+[ext_resource type="Resource" path="res://data/damage_types/physical.tres" id="3_pecx3"]
 [ext_resource type="Script" path="res://scripts/data/apply_status_effect.gd" id="4_77nd0"]
 [ext_resource type="Resource" path="res://data/statuses/crippled.tres" id="5_7uoj3"]
 [ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="6_6kr0h"]
@@ -14,6 +15,7 @@ script = ExtResource("1_jdfao")
 script = ExtResource("3_jioob")
 min_amount = 4
 max_amount = 6
+damage_type = ExtResource("3_pecx3")
 
 [sub_resource type="Resource" id="Resource_bsphb"]
 script = ExtResource("4_77nd0")
@@ -22,7 +24,6 @@ status = ExtResource("5_7uoj3")
 [resource]
 script = ExtResource("6_6kr0h")
 display_name = "Crippling Blow"
-ap_cost = 3
 needs_line_of_sight = false
 area = SubResource("Resource_owgko")
 effects = Array[ExtResource("2_pecx3")]([SubResource("Resource_v5klr"), SubResource("Resource_bsphb")])

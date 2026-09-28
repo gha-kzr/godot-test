@@ -13,8 +13,8 @@ var _current_removed := false
 static func from_units(units: Array[UnitState]) -> TurnOrder:
 	var sorted := units.duplicate()
 	sorted.sort_custom(func(a: UnitState, b: UnitState) -> bool:
-		if a.data.initiative != b.data.initiative:
-			return a.data.initiative > b.data.initiative
+		if a.initiative() != b.initiative():
+			return a.initiative() > b.initiative()
 		return a.id < b.id)
 	var turn_order := TurnOrder.new()
 	for unit in sorted:

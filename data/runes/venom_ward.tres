@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RuneData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_wj1nh"]
+[ext_resource type="Resource" path="res://data/damage_types/poison.tres" id="2_gfoil"]
+[ext_resource type="Script" path="res://scripts/data/rune_data.gd" id="3_ilr1t"]
+
+[sub_resource type="Resource" id="Resource_h8nb7"]
+script = ExtResource("1_wj1nh")
+stat = 4
+amount = 25
+damage_type = ExtResource("2_gfoil")
+
+[resource]
+script = ExtResource("3_ilr1t")
+display_name = "Venom Ward Rune"
+rarity = 1
+modifiers = Array[ExtResource("1_wj1nh")]([SubResource("Resource_h8nb7")])

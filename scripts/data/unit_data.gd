@@ -9,6 +9,14 @@ extends Resource
 ## Higher acts first in the turn order.
 @export_range(0, 999) var initiative := 100
 @export var spells: Array[SpellData] = []
+## Modifiers the unit always has, in every battle (e.g. an enemy's resistances). Summed
+## with statuses, levels and runes like any other modifier.
+@export var innate_modifiers: Array[StatModifier] = []
+
+@export_group("Rewards")
+## XP each hero gets when this unit is killed in a won battle (enemies).
+@export_range(0, 9999) var xp_reward := 0
+@export var loot_table: LootTable
 
 @export_group("Visuals")
 ## Placeholder color used when no model_scene is set.
@@ -31,4 +39,13 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("%s: %s" % [display_name, error])
 		if spell.ap_cost > ap:
 			errors.append("%s: %s costs %d AP but the unit has %d" % [display_name, spell.display_name, spell.ap_cost, ap])
+	for modifier in innate_modifiers:
+		if modifier == null:
+			errors.append("%s: empty innate modifier slot" % display_name)
+			continue
+		for error in modifier.get_validation_errors():
+			errors.append("%s: %s" % [display_name, error])
+	if loot_table != null:
+		for error in loot_table.get_validation_errors():
+			errors.append("%s: %s" % [display_name, error])
 	return errors

@@ -1,0 +1,144 @@
+[gd_resource type="Resource" script_class="HeroData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/level_reward.gd" id="1_i2tvk"]
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="2_f32ot"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="3_1oiju"]
+[ext_resource type="Resource" path="res://data/spells/hamstring.tres" id="4_ngarg"]
+[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="5_d17fs"]
+[ext_resource type="Resource" path="res://data/units/ranger.tres" id="6_1khxu"]
+
+[sub_resource type="Resource" id="Resource_jmkuu"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_04djn"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_aw6ix"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_jmkuu"), SubResource("Resource_04djn")])
+
+[sub_resource type="Resource" id="Resource_ltcfi"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_f0ktp"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_a7nip"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_ltcfi"), SubResource("Resource_f0ktp")])
+spells = Array[ExtResource("3_1oiju")]([ExtResource("4_ngarg")])
+
+[sub_resource type="Resource" id="Resource_1qslm"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_cwo0m"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_gsema"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_1qslm"), SubResource("Resource_cwo0m")])
+
+[sub_resource type="Resource" id="Resource_mbn01"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_8sqt2"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_so480"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_mbn01"), SubResource("Resource_8sqt2")])
+
+[sub_resource type="Resource" id="Resource_61abf"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_ph8ds"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_n46qs"]
+script = ExtResource("2_f32ot")
+amount = 1
+
+[sub_resource type="Resource" id="Resource_b0g7h"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_61abf"), SubResource("Resource_ph8ds"), SubResource("Resource_n46qs")])
+
+[sub_resource type="Resource" id="Resource_jfpcv"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_7x0m4"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_3tsdi"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_jfpcv"), SubResource("Resource_7x0m4")])
+
+[sub_resource type="Resource" id="Resource_i5tks"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_u35df"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_kbt3e"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_i5tks"), SubResource("Resource_u35df")])
+
+[sub_resource type="Resource" id="Resource_ecytg"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_0fujt"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_ifqgi"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_ecytg"), SubResource("Resource_0fujt")])
+
+[sub_resource type="Resource" id="Resource_dkw53"]
+script = ExtResource("2_f32ot")
+stat = 5
+amount = 3
+
+[sub_resource type="Resource" id="Resource_y3dy0"]
+script = ExtResource("2_f32ot")
+stat = 3
+amount = 4
+
+[sub_resource type="Resource" id="Resource_dvflo"]
+script = ExtResource("1_i2tvk")
+modifiers = Array[ExtResource("2_f32ot")]([SubResource("Resource_dkw53"), SubResource("Resource_y3dy0")])
+
+[resource]
+script = ExtResource("5_d17fs")
+unit = ExtResource("6_1khxu")
+level_rewards = Array[ExtResource("1_i2tvk")]([SubResource("Resource_aw6ix"), SubResource("Resource_a7nip"), SubResource("Resource_gsema"), SubResource("Resource_so480"), SubResource("Resource_b0g7h"), SubResource("Resource_3tsdi"), SubResource("Resource_kbt3e"), SubResource("Resource_ifqgi"), SubResource("Resource_dvflo")])

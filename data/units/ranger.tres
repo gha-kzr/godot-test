@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_v46hb"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_rhw08"]
+[ext_resource type="Resource" path="res://data/spells/arrow.tres" id="3_wqxi5"]
+[ext_resource type="Resource" path="res://data/spells/volley.tres" id="4_yuw5u"]
+[ext_resource type="Resource" path="res://data/spells/poison_arrow.tres" id="5_4h3xc"]
+
+[resource]
+script = ExtResource("1_v46hb")
+display_name = "Ranger"
+mp = 4
+initiative = 108
+spells = Array[ExtResource("2_rhw08")]([ExtResource("3_wqxi5"), ExtResource("4_yuw5u"), ExtResource("5_4h3xc")])
+color = Color(0.3, 0.75, 0.4, 1)

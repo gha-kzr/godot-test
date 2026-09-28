@@ -1,0 +1,144 @@
+[gd_resource type="Resource" script_class="HeroData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/level_reward.gd" id="1_a5eu4"]
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="2_5ejea"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="3_8jq1i"]
+[ext_resource type="Resource" path="res://data/spells/whirlwind.tres" id="4_huhsi"]
+[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="5_1xxd6"]
+[ext_resource type="Resource" path="res://data/units/knight.tres" id="6_avtmt"]
+
+[sub_resource type="Resource" id="Resource_ty23w"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_dxahs"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_pb4jf"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_ty23w"), SubResource("Resource_dxahs")])
+
+[sub_resource type="Resource" id="Resource_jqtvh"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_vgg05"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_atr1p"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_jqtvh"), SubResource("Resource_vgg05")])
+spells = Array[ExtResource("3_8jq1i")]([ExtResource("4_huhsi")])
+
+[sub_resource type="Resource" id="Resource_fibtj"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_fk4rn"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_evlkk"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_fibtj"), SubResource("Resource_fk4rn")])
+
+[sub_resource type="Resource" id="Resource_4q245"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_x4l48"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_ww6jl"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_4q245"), SubResource("Resource_x4l48")])
+
+[sub_resource type="Resource" id="Resource_2v6ik"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_6kqxo"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_fclkv"]
+script = ExtResource("2_5ejea")
+amount = 1
+
+[sub_resource type="Resource" id="Resource_n3nf4"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_2v6ik"), SubResource("Resource_6kqxo"), SubResource("Resource_fclkv")])
+
+[sub_resource type="Resource" id="Resource_ydxvw"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_2fkkh"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_w0u82"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_ydxvw"), SubResource("Resource_2fkkh")])
+
+[sub_resource type="Resource" id="Resource_677h1"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_yiyyp"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_roctw"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_677h1"), SubResource("Resource_yiyyp")])
+
+[sub_resource type="Resource" id="Resource_tqh27"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_jkiqr"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_rh1t3"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_tqh27"), SubResource("Resource_jkiqr")])
+
+[sub_resource type="Resource" id="Resource_7j7xb"]
+script = ExtResource("2_5ejea")
+stat = 5
+amount = 4
+
+[sub_resource type="Resource" id="Resource_5t42s"]
+script = ExtResource("2_5ejea")
+stat = 3
+amount = 2
+
+[sub_resource type="Resource" id="Resource_wtv1j"]
+script = ExtResource("1_a5eu4")
+modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_7j7xb"), SubResource("Resource_5t42s")])
+
+[resource]
+script = ExtResource("5_1xxd6")
+unit = ExtResource("6_avtmt")
+level_rewards = Array[ExtResource("1_a5eu4")]([SubResource("Resource_pb4jf"), SubResource("Resource_atr1p"), SubResource("Resource_evlkk"), SubResource("Resource_ww6jl"), SubResource("Resource_n3nf4"), SubResource("Resource_w0u82"), SubResource("Resource_roctw"), SubResource("Resource_rh1t3"), SubResource("Resource_wtv1j")])

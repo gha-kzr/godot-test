@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SpellData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_c68ey"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_7p5ph"]
+[ext_resource type="Resource" path="res://data/damage_types/physical.tres" id="3_we8vm"]
+[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="4_2lp00"]
+[ext_resource type="Script" path="res://scripts/data/apply_status_effect.gd" id="5_h6gto"]
+[ext_resource type="Resource" path="res://data/statuses/crippled.tres" id="6_8euco"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="7_22t7y"]
+
+[sub_resource type="Resource" id="Resource_7uvpo"]
+script = ExtResource("1_c68ey")
+
+[sub_resource type="Resource" id="Resource_lax1v"]
+script = ExtResource("4_2lp00")
+min_amount = 2
+max_amount = 3
+damage_type = ExtResource("3_we8vm")
+
+[sub_resource type="Resource" id="Resource_scqne"]
+script = ExtResource("5_h6gto")
+status = ExtResource("6_8euco")
+
+[resource]
+script = ExtResource("7_22t7y")
+display_name = "Hamstring"
+min_range = 2
+max_range = 5
+area = SubResource("Resource_7uvpo")
+effects = Array[ExtResource("2_7p5ph")]([SubResource("Resource_lax1v"), SubResource("Resource_scqne")])

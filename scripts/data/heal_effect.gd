@@ -5,11 +5,21 @@ extends EffectData
 @export_range(0, 999) var max_amount := 1
 
 
-func apply(state: BattleState, _caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
+func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
 	var target := state.units[target_id]
-	var amount := mini(state.roll(min_amount, max_amount), target.data.max_hp - target.hp)
+	var amount := clampi(roundi(scaled(state, caster_id, state.roll(min_amount, max_amount))), 0, maxi(0, target.max_hp() - target.hp))
 	target.hp += amount
 	return [BattleEvents.Healed.new(target_id, amount, target.hp)]
+
+
+## A roll after the caster's power: roll x (100 + power) %.
+func scaled(state: BattleState, caster_id: int, roll: float) -> float:
+	var power := state.units[caster_id].power() if caster_id >= 0 else 0
+	return roll * maxf(0.0, 100.0 + power) / 100.0
+
+
+func average_roll() -> float:
+	return (min_amount + max_amount) / 2.0
 
 
 func describe() -> String:

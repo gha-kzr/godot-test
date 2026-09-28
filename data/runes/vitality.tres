@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RuneData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_ergat"]
+[ext_resource type="Script" path="res://scripts/data/rune_data.gd" id="2_bcven"]
+
+[sub_resource type="Resource" id="Resource_bgo5l"]
+script = ExtResource("1_ergat")
+stat = 5
+amount = 6
+
+[resource]
+script = ExtResource("2_bcven")
+display_name = "Rune of Vitality"
+modifiers = Array[ExtResource("1_ergat")]([SubResource("Resource_bgo5l")])

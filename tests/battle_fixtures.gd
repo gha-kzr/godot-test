@@ -100,3 +100,11 @@ static func effect_spell(effects: Array[EffectData], ap_cost := 3, min_range := 
 	spell.display_name = "Effect"
 	spell.effects = effects
 	return spell
+
+
+static func rune(rune_name: String, rarity := RuneData.Rarity.COMMON, modifiers: Array[StatModifier] = []) -> RuneData:
+	var result := RuneData.new()
+	result.display_name = rune_name
+	result.rarity = rarity
+	result.modifiers = modifiers if not modifiers.is_empty() else ([modifier(StatModifier.Stat.POWER, 5)] as Array[StatModifier])
+	return result

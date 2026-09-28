@@ -1,8 +1,12 @@
 class_name UnitState
 extends RefCounted
 ## Per-battle values of one unit. The UnitData template is shared and never mutated.
-## Statuses change numbers through modifiers that are added up when asked (max_ap(),
-## max_mp(), damage_taken_percent()); nothing is stored, so expiry has nothing to undo.
+## Innate modifiers (UnitData), statuses (expiring) and permanent sources (levels, runes)
+## change numbers through modifiers that are added up when asked (max_hp(), power(),
+## resistance_percent(), …); nothing derived is stored, so expiry has nothing to undo.
+
+## Resistance never goes past this, so nothing becomes immune.
+const MAX_RESISTANCE_PERCENT := 50
 
 enum Team { PLAYER, ENEMY }
 
@@ -15,6 +19,8 @@ var ap: int
 var mp: int
 ## In application order, which is also tick order.
 var statuses: Array[StatusInstance] = []
+## For the whole battle: a hero's level rewards and runes. Shared resources, read-only.
+var permanent_modifiers: Array[StatModifier] = []
 
 
 func _init(unit_id: int, unit_data: UnitData, unit_team: Team, start_cell: Vector2i) -> void:
@@ -22,9 +28,9 @@ func _init(unit_id: int, unit_data: UnitData, unit_team: Team, start_cell: Vecto
 	data = unit_data
 	team = unit_team
 	cell = start_cell
-	hp = unit_data.max_hp
-	ap = unit_data.ap
-	mp = unit_data.mp
+	hp = max_hp()  # Innate modifiers count from the start.
+	ap = max_ap()
+	mp = max_mp()
 
 
 func is_alive() -> bool:
@@ -37,14 +43,42 @@ func start_turn() -> void:
 	mp = max_mp()
 
 
-## Sum of the active statuses' modifiers for one stat.
-func stat_bonus(stat: StatModifier.Stat) -> int:
+## Sum of the permanent and status modifiers for one stat (and damage type, for
+## per-type stats).
+func stat_bonus(stat: StatModifier.Stat, damage_type: DamageType = null) -> int:
 	var total := 0
+	for modifier in data.innate_modifiers:
+		if modifier.applies_to(stat, damage_type):
+			total += modifier.amount
+	for modifier in permanent_modifiers:
+		if modifier.applies_to(stat, damage_type):
+			total += modifier.amount
 	for status in statuses:
 		for modifier in status.data.modifiers:
-			if modifier.stat == stat:
+			if modifier.applies_to(stat, damage_type):
 				total += modifier.amount
 	return total
+
+
+func max_hp() -> int:
+	return maxi(1, data.max_hp + stat_bonus(StatModifier.Stat.MAX_HP))
+
+
+func initiative() -> int:
+	return data.initiative + stat_bonus(StatModifier.Stat.INITIATIVE)
+
+
+## Percent added to the damage and heals the unit deals (0 = normal).
+func power() -> int:
+	return stat_bonus(StatModifier.Stat.POWER)
+
+
+## Percent less damage of that type taken, at most MAX_RESISTANCE_PERCENT (may be
+## negative: a weakness). Untyped damage (null) is never resisted.
+func resistance_percent(damage_type: DamageType) -> int:
+	if damage_type == null:
+		return 0
+	return mini(MAX_RESISTANCE_PERCENT, stat_bonus(StatModifier.Stat.RESISTANCE_PERCENT, damage_type))
 
 
 func max_ap() -> int:
@@ -58,6 +92,19 @@ func max_mp() -> int:
 ## Percent of incoming damage the unit takes (100 = normal), never below 0.
 func damage_taken_percent() -> int:
 	return maxi(0, 100 + stat_bonus(StatModifier.Stat.DAMAGE_TAKEN_PERCENT))
+
+
+## Damage types the unit has any resistance modifier for (permanent or status).
+func resistance_types() -> Array[DamageType]:
+	var types: Array[DamageType] = []
+	var modifiers: Array[StatModifier] = data.innate_modifiers.duplicate()
+	modifiers.append_array(permanent_modifiers)
+	for status in statuses:
+		modifiers.append_array(status.data.modifiers)
+	for modifier in modifiers:
+		if modifier.damage_type != null and modifier.damage_type not in types:
+			types.append(modifier.damage_type)
+	return types
 
 
 func find_status(status: StatusData) -> StatusInstance:
@@ -91,4 +138,5 @@ func clone() -> UnitState:
 	copy.mp = mp
 	for status in statuses:
 		copy.statuses.append(status.clone())
+	copy.permanent_modifiers = permanent_modifiers.duplicate()
 	return copy

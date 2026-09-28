@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="DamageType" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/damage_type.gd" id="1_bfksa"]
+
+[resource]
+script = ExtResource("1_bfksa")
+display_name = "Fire"
+color = Color(1, 0.45, 0.15, 1)

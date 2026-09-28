@@ -4,6 +4,10 @@ extends Resource
 ## starts (damage over time, heal over time) and stat modifiers active the whole time.
 ## New kinds of status are new EffectData / StatModifier kinds, not new battle code.
 
+## Stats a status can't change yet: HP isn't re-clamped when a status comes or goes, and
+## the turn order is fixed when a battle starts. Levels and runes may use them.
+const UNSUPPORTED_STATS: Array[StatModifier.Stat] = [StatModifier.Stat.MAX_HP, StatModifier.Stat.INITIATIVE]
+
 ## Tags above units are spaced for labels this short.
 const MAX_SHORT_LABEL := 2
 
@@ -59,6 +63,8 @@ func get_validation_errors() -> PackedStringArray:
 		if modifier == null:
 			errors.append("%s: empty modifier slot" % display_name)
 			continue
+		if modifier.stat in UNSUPPORTED_STATS:
+			errors.append("%s: statuses can't change %s yet" % [display_name, StatModifier.Stat.keys()[modifier.stat]])
 		for error in modifier.get_validation_errors():
 			errors.append("%s: %s" % [display_name, error])
 	return errors

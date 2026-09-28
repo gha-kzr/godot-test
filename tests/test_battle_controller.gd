@@ -44,7 +44,7 @@ func _assert_views_in_sync(controller: BattleController) -> void:
 	for unit in controller.battle.state.units:
 		var view := controller.units_view.view(unit.id)
 		assert_eq(view.visible, unit.is_alive(), "unit %d visibility" % unit.id)
-		assert_eq(view.hp_text(), "%d/%d" % [unit.hp, unit.data.max_hp], "unit %d HP" % unit.id)
+		assert_eq(view.hp_text(), "%d/%d" % [unit.hp, unit.max_hp()], "unit %d HP" % unit.id)
 		if unit.is_alive():
 			assert_true(view.position.is_equal_approx(controller.board_view.cell_to_world(unit.cell)), "unit %d position" % unit.id)
 

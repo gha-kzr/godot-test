@@ -49,6 +49,9 @@ class UnitInfo:
 	var base_mp := 0
 	var statuses: Array[StatusInfo] = []
 	var spells: Array[SpellData] = []
+	var power := 0
+	## Damage type name → resistance %, only non-zero ones.
+	var resistances: Dictionary[String, int] = {}
 
 	static func from_unit(unit: UnitState) -> UnitInfo:
 		var info := UnitInfo.new()
@@ -56,7 +59,7 @@ class UnitInfo:
 		info.color = unit.data.color
 		info.is_player = unit.team == UnitState.Team.PLAYER
 		info.hp = unit.hp
-		info.max_hp = unit.data.max_hp
+		info.max_hp = unit.max_hp()
 		info.ap = unit.ap
 		info.max_ap = unit.max_ap()
 		info.base_ap = unit.data.ap
@@ -73,7 +76,20 @@ class UnitInfo:
 			status_info.is_positive = status.data.is_positive
 			info.statuses.append(status_info)
 		info.spells = unit.data.spells
+		info.power = unit.power()
+		for type in unit.resistance_types():
+			var value := unit.resistance_percent(type)
+			if value != 0:
+				info.resistances[type.display_name] = value
 		return info
+
+	## e.g. "Power +14% · Resist Fire +25%", "Power +0% · Resist none". Always shown, so
+	## a unit without resistances reads as such rather than as missing information.
+	func combat_stats_text() -> String:
+		var resist: Array[String] = []
+		for type_name in resistances:
+			resist.append("%s %+d%%" % [type_name, resistances[type_name]])
+		return "Power %+d%% · Resist %s" % [power, ", ".join(resist) if not resist.is_empty() else "none"]
 
 
 var _spell_costs: Array[int] = []
@@ -99,6 +115,7 @@ var _banner_tween: Tween
 @onready var _restart_button: Button = %RestartButton
 @onready var _seed_label: Label = %SeedLabel
 @onready var _status_list: VBoxContainer = %StatusList
+@onready var _combat_stats: Label = %CombatStats
 @onready var _inspect_panel: PanelContainer = %InspectPanel
 @onready var _inspect_rows: VBoxContainer = %InspectRows
 
@@ -136,6 +153,8 @@ func show_unit(info: UnitInfo) -> void:
 	_mp_label.text = "MP %d / %d" % [info.mp, info.max_mp]
 	_ap_label.modulate = _modifier_tint(info.max_ap, info.base_ap)
 	_mp_label.modulate = _modifier_tint(info.max_mp, info.base_mp)
+	_combat_stats.text = info.combat_stats_text()
+	_combat_stats.visible = true
 	_fill_status_list(_status_list, info.statuses)
 
 
@@ -170,6 +189,9 @@ func show_inspected(info: UnitInfo) -> void:
 	points.add_child(ap)
 	points.add_child(mp)
 	_inspect_rows.add_child(points)
+	var combat_label := _label(info.combat_stats_text())
+	combat_label.name = "CombatStats"
+	_inspect_rows.add_child(combat_label)
 	var statuses := VBoxContainer.new()
 	statuses.name = "Statuses"
 	_fill_status_list(statuses, info.statuses)
@@ -253,6 +275,11 @@ func show_result(won: bool, battle_seed := 0) -> void:
 	_seed_label.text = "Battle seed %d" % battle_seed
 	set_player_controls_enabled(false)
 	_result_panel.show()
+
+
+## The result screen's button: "Play again" standalone, "Continue" in the game flow.
+func set_result_action_text(text: String) -> void:
+	_restart_button.text = text
 
 
 func hide_result() -> void:

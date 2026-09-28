@@ -1,0 +1,111 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/party_screen.gd" id="1_party"]
+
+[node name="PartyScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_party")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.11, 0.14, 1)
+
+[node name="Rows" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Party"
+
+[node name="Summary" type="Label" parent="Rows"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+
+[node name="Main" type="HBoxContainer" parent="Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="HeroColumn" type="VBoxContainer" parent="Rows/Main"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+
+[node name="HeroesTitle" type="Label" parent="Rows/Main/HeroColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Heroes"
+
+[node name="HeroList" type="VBoxContainer" parent="Rows/Main/HeroColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DetailColumn" type="VBoxContainer" parent="Rows/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Details" type="VBoxContainer" parent="Rows/Main/DetailColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RunesTitle" type="Label" parent="Rows/Main/DetailColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Runes"
+
+[node name="RuneSlots" type="GridContainer" parent="Rows/Main/DetailColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 3
+
+[node name="StashColumn" type="VBoxContainer" parent="Rows/Main"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="StashTitle" type="Label" parent="Rows/Main/StashColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Stash"
+
+[node name="StashScroll" type="ScrollContainer" parent="Rows/Main/StashColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Stash" type="VBoxContainer" parent="Rows/Main/StashColumn/StashScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StartButton" type="Button" parent="Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "Start battle"

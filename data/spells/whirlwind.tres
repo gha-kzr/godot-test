@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="SpellData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_rlfnd"]
+[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_w1d03"]
+[ext_resource type="Resource" path="res://data/damage_types/physical.tres" id="3_5dvkl"]
+[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="4_t0icf"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="5_xxcw0"]
+
+[sub_resource type="Resource" id="Resource_6vqqv"]
+script = ExtResource("1_rlfnd")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_m8q72"]
+script = ExtResource("4_t0icf")
+min_amount = 5
+max_amount = 7
+damage_type = ExtResource("3_5dvkl")
+target_filter = 2
+
+[resource]
+script = ExtResource("5_xxcw0")
+display_name = "Whirlwind"
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_6vqqv")
+effects = Array[ExtResource("2_w1d03")]([SubResource("Resource_m8q72")])

@@ -104,15 +104,15 @@ func test_status_value_accounts_for_damage_taken_and_remaining_hp() -> void:
 	var state := BattleFixtures.state("0p 0e")
 	var enemy := state.units[1]
 	enemy.add_status(BattleFixtures.status("Poison", 3, 4), 0)
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -12.0, "4 x 3 turns")
+	assert_eq(EnemyAI._statuses_benefit(state, enemy, profile), -12.0, "4 x 3 turns")
 	enemy.statuses[0].counting = true
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -8.0, "one turn already counted")
+	assert_eq(EnemyAI._statuses_benefit(state, enemy, profile), -8.0, "one turn already counted")
 	enemy.hp = 5
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -5.0, "capped at the HP left")
+	assert_eq(EnemyAI._statuses_benefit(state, enemy, profile), -5.0, "capped at the HP left")
 	enemy.hp = 20
 	enemy.add_status(BattleFixtures.status("Vulnerable", 2, 0,
 			[BattleFixtures.modifier(StatModifier.Stat.DAMAGE_TAKEN_PERCENT, 50)] as Array[StatModifier]), 0)
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -12.0 - 10.0, "poison x150%, plus 50% x 2 turns x 10 incoming")
+	assert_eq(EnemyAI._statuses_benefit(state, enemy, profile), -12.0 - 10.0, "poison x150%, plus 50% x 2 turns x 10 incoming")
 
 
 func test_the_ai_leaves_real_statuses_untouched() -> void:
@@ -131,11 +131,11 @@ func test_status_value_follows_real_turns() -> void:
 	var battle := _battle("0p 0e", [_caster([] as Array[SpellData])], [BattleFixtures.unit("E0", 100)])
 	var enemy := battle.state.units[1]
 	enemy.add_status(BattleFixtures.status("Poison", 3, 3), 0)
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -9.0, "3 ticks ahead")
+	assert_eq(EnemyAI._statuses_benefit(battle.state, enemy, profile), -9.0, "3 ticks ahead")
 	battle.perform(BattleActions.EndTurn.new(0))  # E0's turn: tick 1.
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -6.0, "during E0's turn, 2 ahead")
+	assert_eq(EnemyAI._statuses_benefit(battle.state, enemy, profile), -6.0, "during E0's turn, 2 ahead")
 	battle.perform(BattleActions.EndTurn.new(1))  # Back to P0.
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -6.0, "still 2 ahead on P0's turn")
+	assert_eq(EnemyAI._statuses_benefit(battle.state, enemy, profile), -6.0, "still 2 ahead on P0's turn")
 	battle.perform(BattleActions.EndTurn.new(0))
 	battle.perform(BattleActions.EndTurn.new(1))
-	assert_eq(EnemyAI._statuses_benefit(enemy, profile), -3.0, "1 ahead")
+	assert_eq(EnemyAI._statuses_benefit(battle.state, enemy, profile), -3.0, "1 ahead")

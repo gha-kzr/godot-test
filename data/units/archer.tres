@@ -1,10 +1,33 @@
 [gd_resource type="Resource" script_class="UnitData" format=3]
 
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_30gr4"]
 [ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_c613e"]
+[ext_resource type="Script" path="res://scripts/data/rune_data.gd" id="1_ubpyg"]
 [ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_4sx6m"]
+[ext_resource type="Resource" path="res://data/damage_types/fire.tres" id="2_mjm55"]
+[ext_resource type="Resource" path="res://data/runes/might.tres" id="2_pkrqo"]
+[ext_resource type="Resource" path="res://data/runes/vitality.tres" id="3_30gr4"]
 [ext_resource type="Resource" path="res://data/spells/arrow.tres" id="3_34fyh"]
 [ext_resource type="Resource" path="res://data/spells/volley.tres" id="4_0fivp"]
+[ext_resource type="Resource" path="res://data/runes/quickness.tres" id="4_mjm55"]
 [ext_resource type="Resource" path="res://data/spells/poison_arrow.tres" id="5_4sx6m"]
+[ext_resource type="Resource" path="res://data/runes/stone_skin.tres" id="5_chh7w"]
+[ext_resource type="Resource" path="res://data/runes/fire_ward.tres" id="6_c0f7c"]
+[ext_resource type="Resource" path="res://data/runes/venom_ward.tres" id="7_wddrr"]
+[ext_resource type="Resource" path="res://data/runes/swiftness.tres" id="8_3saht"]
+[ext_resource type="Resource" path="res://data/runes/focus.tres" id="9_wd56x"]
+[ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="10_tqa5h"]
+
+[sub_resource type="Resource" id="Resource_chh7w"]
+script = ExtResource("1_30gr4")
+stat = 4
+amount = 20
+damage_type = ExtResource("2_mjm55")
+
+[sub_resource type="Resource" id="Resource_tu46y"]
+script = ExtResource("10_tqa5h")
+drop_chance = 0.6
+runes = Array[ExtResource("1_ubpyg")]([ExtResource("2_pkrqo"), ExtResource("3_30gr4"), ExtResource("4_mjm55"), ExtResource("5_chh7w"), ExtResource("6_c0f7c"), ExtResource("7_wddrr"), ExtResource("8_3saht"), ExtResource("9_wd56x")])
 
 [resource]
 script = ExtResource("1_c613e")
@@ -13,4 +36,7 @@ max_hp = 28
 mp = 4
 initiative = 115
 spells = Array[ExtResource("2_4sx6m")]([ExtResource("3_34fyh"), ExtResource("4_0fivp"), ExtResource("5_4sx6m")])
+innate_modifiers = Array[ExtResource("1_30gr4")]([SubResource("Resource_chh7w")])
+xp_reward = 12
+loot_table = SubResource("Resource_tu46y")
 color = Color(0.9, 0.55, 0.2, 1)

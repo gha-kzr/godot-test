@@ -122,7 +122,7 @@ static func _status_score(before: BattleState, after: BattleState, team: UnitSta
 	for unit in after.units:
 		if not unit.is_alive():
 			continue  # A kill is valued by the HP score; its statuses no longer matter.
-		var gained := _statuses_benefit(unit, profile) - _statuses_benefit(before.units[unit.id], profile)
+		var gained := _statuses_benefit(after, unit, profile) - _statuses_benefit(before, before.units[unit.id], profile)
 		if is_zero_approx(gained):
 			continue
 		if unit.team != team:
@@ -136,10 +136,10 @@ static func _status_score(before: BattleState, after: BattleState, team: UnitSta
 
 ## Expected worth of a unit's statuses to the unit itself, in HP, over their remaining
 ## turns (positive helps it, negative hurts it).
-static func _statuses_benefit(unit: UnitState, profile: AIProfile) -> float:
+static func _statuses_benefit(state: BattleState, unit: UnitState, profile: AIProfile) -> float:
 	var total := 0.0
 	var hp_left := float(unit.hp)
-	var hp_missing := float(unit.data.max_hp - unit.hp)
+	var hp_missing := float(unit.max_hp() - unit.hp)
 	for status in unit.statuses:
 		# During its carrier's turn, the turn in progress has already ticked.
 		var turns := float(status.turns_left - (1 if status.counting else 0))
@@ -148,13 +148,13 @@ static func _statuses_benefit(unit: UnitState, profile: AIProfile) -> float:
 		for effect in status.data.tick_effects:
 			if effect is DamageEffect:
 				var damage := effect as DamageEffect
-				var per_tick := (damage.min_amount + damage.max_amount) / 2.0 * unit.damage_taken_percent() / 100.0
+				var per_tick := damage.scaled(state, status.caster_id, unit.id, damage.average_roll())
 				var dealt := minf(per_tick * turns, hp_left)
 				hp_left -= dealt
 				total -= dealt
 			elif effect is HealEffect:
 				var heal := effect as HealEffect
-				var healed := minf((heal.min_amount + heal.max_amount) / 2.0 * turns, hp_missing)
+				var healed := minf(heal.scaled(state, status.caster_id, heal.average_roll()) * turns, hp_missing)
 				hp_missing -= healed
 				total += healed
 			else:

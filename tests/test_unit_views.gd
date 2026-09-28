@@ -49,7 +49,7 @@ func _assert_in_sync(stage: Stage) -> void:
 	for unit in stage.battle.state.units:
 		var view := stage.units.view(unit.id)
 		assert_eq(view.visible, unit.is_alive(), "unit %d visibility" % unit.id)
-		assert_eq(view.hp_text(), "%d/%d" % [unit.hp, unit.data.max_hp], "unit %d HP label" % unit.id)
+		assert_eq(view.hp_text(), "%d/%d" % [unit.hp, unit.max_hp()], "unit %d HP label" % unit.id)
 		if unit.is_alive():
 			assert_true(view.position.is_equal_approx(stage.board.cell_to_world(unit.cell)), "unit %d position" % unit.id)
 

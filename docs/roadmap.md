@@ -20,7 +20,8 @@ Implemented per `plans/2026-09-28-status-effects.md` (all tasks checked; a hand 
 
 *Why first:* completes the combat rules while the code is fresh; statuses change the spell data model, which the skill tool will build on.
 
-### 2. Progression model
+### 2. Progression model — done
+Decisions: `decisions/2026-09-28-progression.md`; plan: `plans/2026-09-28-progression.md`.
 - Unit stats (e.g. power, defense), levels and XP.
 - Spell scaling formula (damage / heal growing with stats or level).
 - Items and equipment that modify stats; loot drops.

@@ -7,6 +7,16 @@ extends Node3D
 ## Input states (enum FSM): IDLE (player's turn, moving), TARGETING (a spell is aimed),
 ## ANIMATING (events playing), ENEMY_TURN (the AI is acting), ENDED (result shown).
 ## Signals up from the HUD and camera, calls down to them.
+##
+## Standalone (battle.tscn run on its own) it plays from its exports and the result
+## screen offers "Play again". Run by the Game root, setup() injects the battle before it
+## enters the tree, and the result screen's "Continue" emits battle_finished.
+
+## The battle just ended (the result screen shows). The state is final: the caller applies
+## and saves rewards now, so closing the game on the result screen loses nothing.
+signal battle_ended(state: BattleState)
+## A battle set up by setup() ended and the player chose to continue.
+signal battle_finished(state: BattleState)
 
 enum State { IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
 
@@ -19,6 +29,10 @@ const ENEMY_ACTION_DELAY := 0.35
 @export var ai_profile: AIProfile
 ## 0 picks a random seed for each battle.
 @export var rng_seed := 0
+## Permanent modifiers of each player unit (levels, runes), parallel to `players`.
+var player_modifiers: Array = []
+## False once setup() was called: the Game root owns what happens after the battle.
+var standalone := true
 
 var battle: Battle
 ## The seed of the current battle; set rng_seed to it to replay a battle.
@@ -39,11 +53,24 @@ var _battle_generation := 0
 @onready var hud: Hud = $Hud
 
 
+## Injects a battle. Call before the controller enters the tree (its _ready starts it).
+func setup(battle_map: MapData, player_units: Array[UnitData], modifiers: Array, enemy_units: Array[UnitData],
+		profile: AIProfile, battle_rng_seed := 0) -> void:
+	map = battle_map
+	players = player_units
+	player_modifiers = modifiers
+	enemies = enemy_units
+	ai_profile = profile
+	rng_seed = battle_rng_seed
+	standalone = false
+
+
 func _ready() -> void:
 	hud.spell_selected.connect(select_spell)
 	hud.end_turn_pressed.connect(end_turn)
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
-	hud.restart_pressed.connect(restart)
+	hud.restart_pressed.connect(_on_result_action)
+	hud.set_result_action_text("Play again" if standalone else "Continue")
 	camera_rig.overhead_changed.connect(hud.set_overhead_view)
 	event_player.event_played.connect(_on_event_played)
 	start_battle()
@@ -57,7 +84,7 @@ func start_battle() -> bool:
 		return false
 	var parsed := map.parse()
 	var new_seed := rng_seed if rng_seed != 0 else randi()
-	var battle_state := BattleState.create(parsed, players, enemies, new_seed)
+	var battle_state := BattleState.create(parsed, players, enemies, new_seed, player_modifiers)
 	if battle_state == null:
 		return false  # BattleState.create reported why.
 	event_player.stop()  # Abandon the previous battle's playback, if any.
@@ -78,6 +105,13 @@ func start_battle() -> bool:
 ## Abandons the current battle (even mid-animation) and starts a new one.
 func restart() -> void:
 	start_battle()
+
+
+func _on_result_action() -> void:
+	if standalone:
+		restart()
+	else:
+		battle_finished.emit(battle.state)
 
 
 # --- Player commands (from the HUD and board clicks) ---
@@ -177,6 +211,7 @@ func _begin_next() -> void:
 		_set_state(State.ENDED)
 		# A mutual wipe (DRAW) is shown as a defeat (decision record).
 		hud.show_result(battle_state.outcome() == BattleState.Outcome.PLAYER_WON, battle_seed)
+		battle_ended.emit(battle_state)
 		return
 	if battle_state.current_unit().team == UnitState.Team.PLAYER:
 		_enter_idle()

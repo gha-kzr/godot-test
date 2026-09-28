@@ -23,8 +23,8 @@ Run these from the repo root:
 
 | Task | Command |
 | --- | --- |
-| Run the game (the battle) | `godot` |
-| Run a specific scene | `godot scenes/battle/battle.tscn` |
+| Run the game (party screen, then battles) | `godot` |
+| Run one battle on its own (no progression) | `godot scenes/battle/battle.tscn` |
 | Run headless (no window), quit after N frames | `godot --headless --quit-after 60` |
 | Import assets, refresh the `.godot/` cache (run after adding a `class_name` script) | `godot --headless --import` |
 | Check a script for errors | `godot --headless --check-only --script scripts/battle/battle.gd` |
@@ -36,7 +36,14 @@ Run these from the repo root:
 
 ## Playing
 
-A turn-based tactical battle (Dofus / Disgaea style): your Knight and Mage against a Brute and an Archer. Units act in initiative order; each turn a unit has AP for spells and MP for moving.
+A turn-based tactical RPG (Dofus / Disgaea style). The game opens on the **party screen**: your heroes (Knight and Mage; a Ranger is locked for now), their level, stats and runes, and the rune stash. **Start battle** fights a Brute and an Archer; after the battle, **Continue** returns to the party screen with what you gained.
+
+- **Progression:** every enemy killed gives XP; a won battle gives each hero the full XP (fallen heroes too), levels (+HP, +Power; a 4th spell at level 3, +1 MP at level 6; cap 10) and the runes the enemies dropped. A lost battle gives nothing, and earlier progress is kept.
+- **Runes:** 6 slots per hero. Click a rune in the stash to equip it on the selected hero, click a slot to unequip it. Common and rare runes stack; epic and legendary ones are one per hero.
+- **Stats:** Power raises damage and heals by a percentage; resistances reduce damage of one type (Physical, Fire, Poison), at most 50 %.
+- **Save:** automatic after each battle and rune change, in `user://profile.json` (on macOS `~/Library/Application Support/Godot/app_userdata/godot-test/profile.json`). Delete it to start over.
+
+In battle, units act in initiative order; each turn a unit has AP for spells and MP for moving.
 
 | Control | Action |
 | --- | --- |
@@ -57,9 +64,14 @@ Content is data (`.tres` resources), edited in the Inspector or as text; no code
 
 - **A spell** — `data/spells/<name>.tres`, a `SpellData`: `display_name`, `ap_cost`, `min_range` / `max_range` (Manhattan; `min_range = 0` allows the caster's own cell), `needs_line_of_sight`, `height_extends_range`, an `area` (`AreaShape`: SINGLE, CROSS, CIRCLE or LINE with a `size`) and `effects`, applied one after another: `DamageEffect` / `HealEffect` (`min_amount` / `max_amount`) or `ApplyStatusEffect` (`status`). Each effect has a `target_filter`: ALL units in the area (default), ALLIES, ENEMIES, or the CASTER only (even outside the area). New effect kinds are `EffectData` subclasses implementing `apply()` and `describe()`.
 - **A status** — `data/statuses/<name>.tres`, a `StatusData`: `display_name`, `short_label` (tag text), `color`, `is_positive`, `duration` (the carrier's turns), `tick_effects` (fired at each of its turn starts, e.g. a `DamageEffect` for poison) and `modifiers` (`StatModifier`: AP, MP or DAMAGE_TAKEN_PERCENT with an `amount`). Recasting a status refreshes it; it keeps running if its caster dies. A spell applies it through an `ApplyStatusEffect`.
-- **A unit** — `data/units/<name>.tres`, a `UnitData`: `display_name`, `max_hp`, `ap`, `mp`, `initiative` (higher acts first), `spells` (2–4 spell files), and a placeholder `color` (or a `model_scene` from an asset pack). A spell costing more AP than the unit has is a validation error.
+- **A unit** — `data/units/<name>.tres`, a `UnitData`: `display_name`, `max_hp`, `ap`, `mp`, `initiative` (higher acts first), `spells` (2–4 spell files), `innate_modifiers` (always-on stats, e.g. an enemy's resistances), and a placeholder `color` (or a `model_scene` from an asset pack). A spell costing more AP than the unit has is a validation error.
 - **A map** — `data/maps/<name>.tres`, a `MapData` whose `layout` is text, one row per line, one token per cell: a height (`0`, `1`, `2`…), `<height>p` / `<height>e` for player / enemy spawns (used in reading order), `#` for an obstacle, `.` for a hole. A step can climb 1 level and drop 2; keep every floor cell reachable from the spawns (the slice map test checks this for its map).
-- **A battle** — select the `Battle` node in `scenes/battle/battle.tscn` and set `map`, `players` and `enemies` (one unit per spawn at most), `ai_profile` (`data/ai/*.tres`: kill bonus, heal and friendly-fire weights, and how it values statuses) and `rng_seed` (0 = random).
+- **A damage type** — `data/damage_types/<name>.tres`, a `DamageType` (`display_name`, `color`); set it as a `DamageEffect`'s `damage_type` and in resistance modifiers.
+- **A rune** — `data/runes/<name>.tres`, a `RuneData`: `display_name`, `rarity` (COMMON, RARE, EPIC, LEGENDARY: drop weight and color; epic+ are one per hero), `modifiers` (`StatModifier`: AP, MP, POWER, MAX_HP, INITIATIVE, DAMAGE_TAKEN_PERCENT, or RESISTANCE_PERCENT with a `damage_type`). Add it to enemies' loot tables to make it drop.
+- **Enemy rewards** — on the enemy's `UnitData`: `xp_reward` and a `loot_table` (`rolls`, `drop_chance`, `runes`; a drop picks a rune weighted by rarity).
+- **A hero** — `data/heroes/<name>.tres`, a `HeroData`: its `unit` (a `UnitData`: base stats and kit) and `level_rewards` (one `LevelReward` per level from 2: `modifiers` and unlocked `spells`; 4 spells at most in total). Add it to `data/progression/roster.tres` (`heroes`, `starting_unlocked`, `starting_party`); the XP curve and level cap are in `data/progression/config.tres`.
+- **The game's battle** — select the `Game` node in `scenes/game/game.tscn`: `map`, `enemies`, `ai_profile` (the party comes from the profile).
+- **A standalone battle** — select the `Battle` node in `scenes/battle/battle.tscn` and set `map`, `players` and `enemies` (one unit per spawn at most), `ai_profile` (`data/ai/*.tres`: kill bonus, heal and friendly-fire weights, and how it values statuses) and `rng_seed` (0 = random).
 
 ## Agent guidelines
 
@@ -77,13 +89,15 @@ Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://gi
 ## Project layout
 
 ```
-project.godot     # project config (main scene: res://scenes/battle/battle.tscn)
+project.godot     # project config (main scene: res://scenes/game/game.tscn)
 scenes/           # .tscn scene files
 scripts/          # .gd scripts (and their .uid files, commit these)
   battle/         #   rules: state, movement, targeting, actions, AI (no nodes)
   data/           #   content resource classes (units, spells, effects, maps, AI profiles)
   view/           #   display: board, camera, units, event player, HUD, controller
-data/             # content .tres files (units, spells, maps, AI profiles)
+  progression/    #   lasting progress: hero records, profile, save (no nodes)
+  game/           #   game root (profile, screens) and party screen
+data/             # content .tres files (units, spells, statuses, damage types, runes, heroes, maps, AI profiles)
 tests/            # headless tests: test_*.gd files extending TestCase
 docs/roadmap.md   # milestones toward the full game
 docs/decisions/   # design decision records

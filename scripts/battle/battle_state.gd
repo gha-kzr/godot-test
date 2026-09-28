@@ -15,8 +15,10 @@ var use_average_rolls := false
 
 
 ## Places players on the map's player spawns and enemies on its enemy spawns, in order.
+## `player_modifiers[i]` (optional) are player i's permanent modifiers (levels, runes).
 ## Returns null (with an error) if the map is invalid or has too few spawns.
-static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: Array[UnitData], rng_seed: int) -> BattleState:
+static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: Array[UnitData], rng_seed: int,
+		player_modifiers: Array = []) -> BattleState:
 	if map.grid == null:
 		push_error("BattleState: invalid map %s" % [map.errors])
 		return null
@@ -32,7 +34,12 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 	var state := BattleState.new()
 	state.grid = map.grid
 	for i in players.size():
-		state.units.append(UnitState.new(state.units.size(), players[i], UnitState.Team.PLAYER, map.player_spawns[i]))
+		var unit := UnitState.new(state.units.size(), players[i], UnitState.Team.PLAYER, map.player_spawns[i])
+		if i < player_modifiers.size():
+			unit.permanent_modifiers.assign(player_modifiers[i])
+			unit.hp = unit.max_hp()
+			unit.start_turn()
+		state.units.append(unit)
 	for i in enemies.size():
 		state.units.append(UnitState.new(state.units.size(), enemies[i], UnitState.Team.ENEMY, map.enemy_spawns[i]))
 	state.turn_order = TurnOrder.from_units(state.units)

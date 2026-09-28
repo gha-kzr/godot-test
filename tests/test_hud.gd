@@ -175,7 +175,7 @@ func test_hud_lets_clicks_through_to_the_board_and_never_takes_focus() -> void:
 
 func test_spell_description_covers_range_area_and_effects() -> void:
 	var fireball := load("res://data/spells/fireball.tres") as SpellData
-	assert_eq(Hud.spell_description(fireball), "Range 3-5, line of sight. Circle area 1. 5-7 damage.")
+	assert_eq(Hud.spell_description(fireball), "Range 3-5, line of sight. Circle area 1. 6-8 fire damage.")
 	var mend := load("res://data/spells/mend.tres") as SpellData
 	assert_eq(Hud.spell_description(mend), "Range 0-3. Heals 6-10.")
 	var firebolt := load("res://data/spells/firebolt.tres") as SpellData
@@ -265,3 +265,32 @@ func test_unit_info_carries_statuses_modified_maxima_and_spells() -> void:
 	assert_eq(info.statuses.size(), 1)
 	assert_eq([info.statuses[0].display_name, info.statuses[0].turns_left, info.statuses[0].description], ["Haste", 2, "+2 MP"])
 	assert_eq(info.spells.size(), 2)
+
+
+func test_power_and_resistances_always_show() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	hud.show_unit(info)
+	assert_true((hud.get_node("%CombatStats") as Label).visible, "always shown")
+	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power +0% · Resist none")
+	info.power = 14
+	info.resistances = {"Fire": 25, "Poison": -10}
+	hud.show_unit(info)
+	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power +14% · Resist Fire +25%, Poison -10%")
+	hud.show_inspected(info)
+	assert_eq((hud.get_node("%InspectRows").get_node("CombatStats") as Label).text, "Power +14% · Resist Fire +25%, Poison -10%")
+	hud.free()
+
+
+func test_unit_info_reads_power_and_resistances() -> void:
+	var fire := DamageType.new()
+	fire.display_name = "Fire"
+	var ward := BattleFixtures.modifier(StatModifier.Stat.RESISTANCE_PERCENT, 25)
+	ward.damage_type = fire
+	var map := MapData.new()
+	map.layout = "0p 0e"
+	var state := BattleState.create(map.parse(), [BattleFixtures.unit("P0")] as Array[UnitData],
+			[BattleFixtures.unit("E0")] as Array[UnitData], 1, [[ward, BattleFixtures.modifier(StatModifier.Stat.POWER, 9)] as Array[StatModifier]])
+	var info := Hud.UnitInfo.from_unit(state.units[0])
+	assert_eq(info.power, 9)
+	assert_eq(info.resistances, {"Fire": 25} as Dictionary[String, int])

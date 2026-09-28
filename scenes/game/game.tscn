@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
+[ext_resource type="Resource" path="res://data/progression/roster.tres" id="2_roster"]
+[ext_resource type="Resource" path="res://data/maps/slice.tres" id="3_map"]
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="4_unit_data"]
+[ext_resource type="Resource" path="res://data/units/brute.tres" id="5_brute"]
+[ext_resource type="Resource" path="res://data/units/archer.tres" id="6_archer"]
+[ext_resource type="Resource" path="res://data/ai/default.tres" id="7_ai"]
+
+[node name="Game" type="Node"]
+script = ExtResource("1_game")
+roster = ExtResource("2_roster")
+map = ExtResource("3_map")
+enemies = Array[ExtResource("4_unit_data")]([ExtResource("5_brute"), ExtResource("6_archer")])
+ai_profile = ExtResource("7_ai")
