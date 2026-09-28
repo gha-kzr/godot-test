@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cb7cx71ggckwt"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_yx4ma"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_64poo"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_lotta"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_sxol3"]
+
+[sub_resource type="Resource" id="Resource_ct23v"]
+script = ExtResource("1_yx4ma")
+
+[sub_resource type="Resource" id="Resource_qtak8"]
+script = ExtResource("3_lotta")
+min_amount = 6
+max_amount = 9
+
+[resource]
+script = ExtResource("4_sxol3")
+display_name = "Firebolt"
+min_range = 2
+max_range = 6
+height_extends_range = true
+area = SubResource("Resource_ct23v")
+effects = Array[ExtResource("2_64poo")]([SubResource("Resource_qtak8")])

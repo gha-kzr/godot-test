@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://3fjh0xu6he4k"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_h00el"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_cxook"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_bpmjk"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_hya6t"]
+
+[sub_resource type="Resource" id="Resource_gx1gh"]
+script = ExtResource("1_h00el")
+kind = 1
+size = 1
+
+[sub_resource type="Resource" id="Resource_6lqvo"]
+script = ExtResource("3_bpmjk")
+min_amount = 5
+max_amount = 8
+
+[resource]
+script = ExtResource("4_hya6t")
+display_name = "Ground Slam"
+ap_cost = 5
+min_range = 2
+max_range = 2
+needs_line_of_sight = false
+area = SubResource("Resource_gx1gh")
+effects = Array[ExtResource("2_cxook")]([SubResource("Resource_6lqvo")])

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_sglo2"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_j17p4"]
+[ext_resource type="Resource" path="res://data/spells/firebolt.tres" id="3_bs4io"]
+[ext_resource type="Resource" path="res://data/spells/fireball.tres" id="4_qm8lk"]
+[ext_resource type="Resource" path="res://data/spells/mend.tres" id="5_1autv"]
+
+[resource]
+script = ExtResource("1_sglo2")
+display_name = "Mage"
+max_hp = 26
+spells = Array[ExtResource("2_j17p4")]([ExtResource("3_bs4io"), ExtResource("4_qm8lk"), ExtResource("5_1autv")])
+color = Color(0.55, 0.35, 0.9, 1)

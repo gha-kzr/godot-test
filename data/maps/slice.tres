@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MapData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/map_data.gd" id="1_arflf"]
+
+[resource]
+script = ExtResource("1_arflf")
+display_name = "Ruined Courtyard"
+layout = "0  0  0  1  1  1  0  0  0e 0
+0  #  0  1  2  1  0  #  0  0e
+0  0  0  1  2  1  0  0  0  0
+1  1  0  0  1  0  0  .  .  0
+2  1  0  #  0  0  #  0  0  0
+2  1  0  0  0  #  0  0  1  1
+1  1  .  0  0  0  0  1  2  2
+0  0  .  0  1  0  0  1  2  1
+0p 0  0  0  1  1  0  #  1  0
+0  0p 0  0  0  0  0  0  0  0"

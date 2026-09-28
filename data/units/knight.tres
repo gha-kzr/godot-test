@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_jitr7"]
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_ee11w"]
+[ext_resource type="Resource" path="res://data/spells/slash.tres" id="3_b81ym"]
+[ext_resource type="Resource" path="res://data/spells/piercing_thrust.tres" id="4_10phg"]
+
+[resource]
+script = ExtResource("1_jitr7")
+display_name = "Knight"
+max_hp = 40
+initiative = 110
+spells = Array[ExtResource("2_ee11w")]([ExtResource("3_b81ym"), ExtResource("4_10phg")])
+color = Color(0.25, 0.45, 0.9, 1)

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dpb2w46u8qbu7"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_32akc"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_nyyug"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_a8xk0"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_ij030"]
+
+[sub_resource type="Resource" id="Resource_cvmaw"]
+script = ExtResource("1_32akc")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_saujk"]
+script = ExtResource("3_a8xk0")
+min_amount = 4
+max_amount = 6
+
+[resource]
+script = ExtResource("4_ij030")
+display_name = "Volley"
+ap_cost = 4
+min_range = 3
+max_range = 6
+area = SubResource("Resource_cvmaw")
+effects = Array[ExtResource("2_nyyug")]([SubResource("Resource_saujk")])

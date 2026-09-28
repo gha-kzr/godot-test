@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ymsble0hinxw"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_13460"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_hw5ua"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_e5j67"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_b6men"]
+
+[sub_resource type="Resource" id="Resource_fb6bh"]
+script = ExtResource("1_13460")
+kind = 3
+size = 3
+
+[sub_resource type="Resource" id="Resource_2qpxk"]
+script = ExtResource("3_e5j67")
+min_amount = 6
+max_amount = 9
+
+[resource]
+script = ExtResource("4_b6men")
+display_name = "Piercing Thrust"
+ap_cost = 4
+needs_line_of_sight = false
+area = SubResource("Resource_fb6bh")
+effects = Array[ExtResource("2_hw5ua")]([SubResource("Resource_2qpxk")])

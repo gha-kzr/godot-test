@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dqbuvtrn3c153"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_pe0po"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_rgwqt"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_17wf5"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_m7vfp"]
+
+[sub_resource type="Resource" id="Resource_6ljn6"]
+script = ExtResource("1_pe0po")
+
+[sub_resource type="Resource" id="Resource_2j2jj"]
+script = ExtResource("3_17wf5")
+min_amount = 9
+max_amount = 13
+
+[resource]
+script = ExtResource("4_m7vfp")
+display_name = "Smash"
+needs_line_of_sight = false
+area = SubResource("Resource_6ljn6")
+effects = Array[ExtResource("2_rgwqt")]([SubResource("Resource_2j2jj")])

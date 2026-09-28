@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/view/battle_controller.gd" id="1_ctrl"]
+[ext_resource type="Resource" path="res://data/maps/slice.tres" id="2_map"]
+[ext_resource type="PackedScene" path="res://scenes/battle/camera_rig.tscn" id="3_rig"]
+[ext_resource type="Script" path="res://scripts/view/board_view.gd" id="4_board"]
+[ext_resource type="Script" path="res://scripts/view/units_view.gd" id="5_units"]
+[ext_resource type="Script" path="res://scripts/view/event_player.gd" id="6_events"]
+[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="7_unit_data"]
+[ext_resource type="Resource" path="res://data/units/knight.tres" id="8_knight"]
+[ext_resource type="Resource" path="res://data/units/mage.tres" id="9_mage"]
+[ext_resource type="Resource" path="res://data/units/brute.tres" id="10_brute"]
+[ext_resource type="Resource" path="res://data/units/archer.tres" id="11_archer"]
+[ext_resource type="PackedScene" path="res://scenes/battle/hud.tscn" id="12_hud"]
+[ext_resource type="Resource" path="res://data/ai/default.tres" id="13_ai"]
+
+[sub_resource type="Environment" id="Environment_env"]
+background_mode = 1
+background_color = Color(0.1, 0.11, 0.14, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.78, 0.85, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+
+[node name="Battle" type="Node3D"]
+script = ExtResource("1_ctrl")
+map = ExtResource("2_map")
+players = Array[ExtResource("7_unit_data")]([ExtResource("8_knight"), ExtResource("9_mage")])
+enemies = Array[ExtResource("7_unit_data")]([ExtResource("10_brute"), ExtResource("11_archer")])
+ai_profile = ExtResource("13_ai")
+
+[node name="CameraRig" parent="." instance=ExtResource("3_rig")]
+
+[node name="BoardView" type="Node3D" parent="."]
+script = ExtResource("4_board")
+
+[node name="UnitsView" type="Node3D" parent="."]
+script = ExtResource("5_units")
+
+[node name="EventPlayer" type="Node" parent="."]
+script = ExtResource("6_events")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+light_energy = 1.1
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_env")
+
+[node name="Hud" parent="." instance=ExtResource("12_hud")]

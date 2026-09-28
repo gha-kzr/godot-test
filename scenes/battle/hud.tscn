@@ -1,0 +1,211 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/view/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.35, 0.8, 0.4, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 8.0
+offset_bottom = 72.0
+grow_horizontal = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="RoundLabel" type="Label" parent="Root/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/outline_size = 6
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+text = "Round 1"
+horizontal_alignment = 1
+
+[node name="TurnOrder" type="HBoxContainer" parent="Root/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Banner" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 96.0
+offset_bottom = 150.0
+grow_horizontal = 2
+theme_override_constants/outline_size = 10
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 34
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UnitPanel" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -118.0
+offset_right = 262.0
+offset_bottom = -12.0
+grow_vertical = 0
+
+[node name="Rows" type="VBoxContainer" parent="Root/UnitPanel"]
+layout_mode = 2
+
+[node name="NameRow" type="HBoxContainer" parent="Root/UnitPanel/Rows"]
+layout_mode = 2
+
+[node name="UnitSwatch" type="ColorRect" parent="Root/UnitPanel/Rows/NameRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="UnitName" type="Label" parent="Root/UnitPanel/Rows/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Unit"
+
+[node name="HpBar" type="ProgressBar" parent="Root/UnitPanel/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+show_percentage = false
+
+[node name="HpLabel" type="Label" parent="Root/UnitPanel/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0 HP"
+
+[node name="PointsRow" type="HBoxContainer" parent="Root/UnitPanel/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="ApLabel" type="Label" parent="Root/UnitPanel/Rows/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "AP 0 / 0"
+
+[node name="MpLabel" type="Label" parent="Root/UnitPanel/Rows/PointsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "MP 0 / 0"
+
+[node name="SpellBar" type="HBoxContainer" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -72.0
+offset_right = 240.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+alignment = 1
+
+[node name="Actions" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -182.0
+offset_top = -112.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
+
+[node name="ViewButton" type="Button" parent="Root/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Top view (T)"
+
+[node name="EndTurnButton" type="Button" parent="Root/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "End turn (Space)"
+
+[node name="ResultPanel" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="Root/ResultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Box" type="PanelContainer" parent="Root/ResultPanel/Center"]
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="Root/ResultPanel/Center/Box"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ResultLabel" type="Label" parent="Root/ResultPanel/Center/Box/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Victory!"
+horizontal_alignment = 1
+
+[node name="SeedLabel" type="Label" parent="Root/ResultPanel/Center/Box/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Root/ResultPanel/Center/Box/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Play again"
