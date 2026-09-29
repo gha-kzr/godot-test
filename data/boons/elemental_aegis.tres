@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="BoonData" format=3 uid="uid://b1n66fbebbn1u"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_qpg6o"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="2_esig5"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_cug8q"]
+[ext_resource type="Resource" uid="uid://bpx5i7f4hovmg" path="res://data/damage_types/poison.tres" id="4_2vvbn"]
+[ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="5_1jfy6"]
+
+[sub_resource type="Resource" id="Resource_783yc"]
+script = ExtResource("1_qpg6o")
+stat = 4
+amount = 25
+damage_type = ExtResource("2_esig5")
+
+[sub_resource type="Resource" id="Resource_7is4s"]
+script = ExtResource("1_qpg6o")
+stat = 4
+amount = 25
+damage_type = ExtResource("3_cug8q")
+
+[sub_resource type="Resource" id="Resource_m0uh4"]
+script = ExtResource("1_qpg6o")
+stat = 4
+amount = 25
+damage_type = ExtResource("4_2vvbn")
+
+[resource]
+script = ExtResource("5_1jfy6")
+display_name = "Elemental Aegis"
+tier = 3
+modifiers = Array[ExtResource("1_qpg6o")]([SubResource("Resource_783yc"), SubResource("Resource_7is4s"), SubResource("Resource_m0uh4")])

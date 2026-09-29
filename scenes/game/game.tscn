@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://0u4qo0kit652" path="res://scripts/game/game.gd" id="1_game"]
 [ext_resource type="Resource" uid="uid://encs5dyj658n" path="res://data/progression/roster.tres" id="2_roster"]
-[ext_resource type="Resource" uid="uid://coynthw3vfyac" path="res://data/encounters/slice.tres" id="3_encounter"]
+[ext_resource type="Resource" uid="uid://cysn65nnodvan" path="res://data/tower/tower.tres" id="3_tower"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_game")
 roster = ExtResource("2_roster")
-encounter = ExtResource("3_encounter")
+tower = ExtResource("3_tower")

@@ -100,3 +100,20 @@ func test_duplicating_an_enemy_copies_its_unit_under_the_new_name() -> void:
 	assert_eq(brute.display_name(), "Brute", "the original is untouched")
 	assert_eq(copy.loot_table, brute.loot_table, "the loot table file stays shared")
 	_clean()
+
+
+func test_a_tower_floor_exports_as_an_encounter() -> void:
+	var factory := _factory()
+	var tower := load("res://data/tower/tower.tres") as TowerConfig
+	assert_eq(factory.export_floor(tower, 5), "")
+	assert_eq(factory.last_path, ROOT + "/encounters/floor_5.tres")
+	var exported := load(factory.last_path) as Encounter
+	var generated := FloorGenerator.encounter(tower, 5)
+	assert_eq(exported.display_name, "Floor 5")
+	assert_eq(exported.map.layout, generated.map.layout, "the same map, saved inside")
+	assert_eq(exported.spawns.map(func(s: EncounterSpawn) -> String: return s.enemy.resource_path),
+			generated.spawns.map(func(s: EncounterSpawn) -> String: return s.enemy.resource_path))
+	assert_eq(exported.get_validation_errors(), PackedStringArray())
+	assert_true(factory.export_floor(tower, 5).contains("already exists"))
+	assert_eq(factory.export_floor(tower, 0), "Floors start at 1.")
+	_clean()

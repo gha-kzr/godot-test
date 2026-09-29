@@ -69,7 +69,7 @@ func test_a_profile_survives_a_round_trip() -> void:
 	assert_eq(loaded.heroes[0].runes[0], null)
 	assert_eq(loaded.stash, [might, might] as Array[RuneData])
 	assert_eq(loaded.unlocked, [0, 1, 2] as Array[int])
-	assert_eq(loaded.party, [2, 0] as Array[int])
+	assert_eq(loaded.party, [2, 0, 1] as Array[int], "saved order, then the roster's missing starting heroes")
 	store.delete()
 	_clean()
 
@@ -195,7 +195,7 @@ func test_party_and_unlocks_follow_heroes_when_the_roster_is_reordered() -> void
 func test_duplicate_party_entries_are_dropped() -> void:
 	var roster := _roster()
 	var data := {"version": 2, "party": [roster.heroes[0].resource_path, roster.heroes[0].resource_path]}  # A version 2 save.
-	assert_eq(Profile.from_dict(data, roster).party, [0] as Array[int])
+	assert_eq(Profile.from_dict(data, roster).party, [0, 1] as Array[int], "once each, plus the missing starting heroes")
 	_clean()
 
 
@@ -224,7 +224,7 @@ func test_version_3_saves_store_uids_and_paths() -> void:
 	var profile := Profile.create(roster)
 	profile.stash = [load("res://data/runes/might.tres")] as Array[RuneData]
 	var data := profile.to_dict()
-	assert_eq(data["version"], 3)
+	assert_eq(data["version"], Profile.SAVE_VERSION)
 	var ref: Dictionary = data["stash"][0]
 	assert_true(String(ref["uid"]).begins_with("uid://"))
 	assert_eq(ref["path"], "res://data/runes/might.tres")

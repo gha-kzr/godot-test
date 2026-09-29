@@ -6,10 +6,15 @@ extends RefCounted
 ## Wrap a clone (Battle.new(state.clone())) to simulate without touching the real battle.
 ##
 ## Turn end: the unit's statuses count down (expired ones are removed), then TurnEnded.
-## Turn start: TurnStarted, the unit's statuses tick, deaths are checked; a unit killed by
+## Turn start: TurnStarted, sudden-death damage (party only, late rounds), the unit's
+## statuses tick, deaths are checked; a unit killed by
 ## its own ticks is skipped and the next one starts; otherwise it refills AP and MP.
 
 var state: BattleState
+## Stalemate safety net: from this round (0: never), each party unit loses
+## sudden_death_percent of its max HP at its turn start, so a stalled battle always ends.
+var sudden_death_round := 0
+var sudden_death_percent := 10
 var _started := false
 
 
@@ -83,6 +88,7 @@ func _start_turns(advance_first: bool) -> Array[BattleEvents.Event]:
 		var unit := state.current_unit()
 		events.append(BattleEvents.TurnStarted.new(unit.id, state.turn_order.round_number))
 		var alive_before := _alive_ids()
+		events.append_array(_sudden_death(unit))
 		events.append_array(_tick_statuses(unit))
 		events.append_array(_report_deaths(alive_before))
 		if state.is_over():
@@ -91,6 +97,18 @@ func _start_turns(advance_first: bool) -> Array[BattleEvents.Event]:
 			unit.start_turn()
 			break
 	return events
+
+
+func is_sudden_death() -> bool:
+	return sudden_death_round > 0 and state.turn_order.round_number >= sudden_death_round
+
+
+func _sudden_death(unit: UnitState) -> Array[BattleEvents.Event]:
+	if unit.team != UnitState.Team.PLAYER or not is_sudden_death() or not unit.is_alive():
+		return []
+	var amount := mini(maxi(1, roundi(unit.max_hp() * sudden_death_percent / 100.0)), unit.hp)
+	unit.hp -= amount
+	return [BattleEvents.DamageDealt.new(unit.id, amount, unit.hp)]
 
 
 ## Fires each status's tick effects on its carrier, in application order, as if cast by

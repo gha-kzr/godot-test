@@ -1,0 +1,85 @@
+[gd_resource type="Resource" script_class="TowerConfig" format=3 uid="uid://cysn65nnodvan"]
+
+[ext_resource type="Script" uid="uid://dufislnto0wn3" path="res://scripts/data/floor_band.gd" id="1_2021b"]
+[ext_resource type="Resource" uid="uid://cw0qadwpbynea" path="res://data/ai/default.tres" id="1_hfmpi"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="2_hfmpi"]
+[ext_resource type="Resource" uid="uid://cljtsr3vu6yxp" path="res://data/enemies/brute.tres" id="3_6mk45"]
+[ext_resource type="Resource" uid="uid://5et4vmvo2won" path="res://data/enemies/archer.tres" id="4_7d522"]
+[ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="5_1pmip"]
+[ext_resource type="Resource" uid="uid://cp682n27hhug1" path="res://data/boons/tower_might.tres" id="6_da6r2"]
+[ext_resource type="Resource" uid="uid://2hdoidu40ayc" path="res://data/boons/tough_skin.tres" id="7_mqrmq"]
+[ext_resource type="Resource" uid="uid://bcdlqgav0lodh" path="res://data/boons/iron_ward.tres" id="8_m824n"]
+[ext_resource type="Resource" uid="uid://dqimt82pbanhh" path="res://data/boons/surge.tres" id="9_elsql"]
+[ext_resource type="Resource" uid="uid://73pyey1257kh" path="res://data/boons/swift_stride.tres" id="10_c3hl3"]
+[ext_resource type="Resource" uid="uid://3bscsti37y35" path="res://data/boons/vigor.tres" id="11_i74nq"]
+[ext_resource type="Resource" uid="uid://dq55wrjnydp7o" path="res://data/boons/focus_crown.tres" id="12_56dro"]
+[ext_resource type="Resource" uid="uid://bapwa72vvbwnj" path="res://data/boons/titan.tres" id="13_1cj0i"]
+[ext_resource type="Resource" uid="uid://b1n66fbebbn1u" path="res://data/boons/elemental_aegis.tres" id="14_v8keq"]
+[ext_resource type="Resource" uid="uid://dn0a7its43pau" path="res://data/presets/boss.tres" id="15_w7drk"]
+[ext_resource type="Resource" uid="uid://t07p8d1mjnpg" path="res://data/presets/elite.tres" id="16_gjhya"]
+[ext_resource type="Script" uid="uid://d4lye25ap03ii" path="res://scripts/data/map_gen_settings.gd" id="17_dasot"]
+[ext_resource type="Resource" uid="uid://b6yxvpm43xmv3" path="res://data/presets/normal.tres" id="18_ee8oe"]
+[ext_resource type="Script" uid="uid://d0wmjpvbquaxd" path="res://scripts/data/tower_config.gd" id="19_a8lb2"]
+[ext_resource type="Script" uid="uid://c8wwtfep5bqe1" path="res://scripts/data/stage_data.gd" id="20_76bp1"]
+[ext_resource type="Resource" uid="uid://dckqa3gpfnl3e" path="res://data/stages/ruined_gate.tres" id="21_h0g44"]
+[ext_resource type="Resource" uid="uid://o34jlgmg6x4o" path="res://data/stages/sunken_crypt.tres" id="22_4pmag"]
+[ext_resource type="Resource" uid="uid://baxm0tw8w7yfk" path="res://data/stages/sky_bastion.tres" id="23_dnkor"]
+
+[sub_resource type="Resource" id="Resource_ykx3g"]
+script = ExtResource("1_2021b")
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
+
+[sub_resource type="Resource" id="Resource_r5yn0"]
+script = ExtResource("1_2021b")
+from_floor = 5
+enemy_level = 1
+levels_per_floor = 0.25
+min_enemies = 2
+max_enemies = 2
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
+
+[sub_resource type="Resource" id="Resource_e8d23"]
+script = ExtResource("1_2021b")
+from_floor = 10
+enemy_level = 2
+levels_per_floor = 0.3
+min_enemies = 2
+max_enemies = 2
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_0gqvx"]
+script = ExtResource("1_2021b")
+from_floor = 20
+enemy_level = 4
+levels_per_floor = 0.3
+min_enemies = 3
+max_enemies = 3
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_d4bcx"]
+script = ExtResource("1_2021b")
+from_floor = 30
+enemy_level = 9
+levels_per_floor = 0.5
+min_enemies = 3
+max_enemies = 3
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_mdxgi"]
+script = ExtResource("17_dasot")
+
+[resource]
+script = ExtResource("19_a8lb2")
+bands = Array[ExtResource("1_2021b")]([SubResource("Resource_ykx3g"), SubResource("Resource_r5yn0"), SubResource("Resource_e8d23"), SubResource("Resource_0gqvx"), SubResource("Resource_d4bcx")])
+normal_preset = ExtResource("18_ee8oe")
+elite_preset = ExtResource("16_gjhya")
+boss_preset = ExtResource("15_w7drk")
+ai_profile = ExtResource("1_hfmpi")
+boons = Array[ExtResource("5_1pmip")]([ExtResource("6_da6r2"), ExtResource("7_mqrmq"), ExtResource("8_m824n"), ExtResource("9_elsql"), ExtResource("10_c3hl3"), ExtResource("11_i74nq"), ExtResource("12_56dro"), ExtResource("13_1cj0i"), ExtResource("14_v8keq")])
+map_settings = SubResource("Resource_mdxgi")
+stages = Array[ExtResource("20_76bp1")]([ExtResource("21_h0g44"), ExtResource("22_4pmag"), ExtResource("23_dnkor")])

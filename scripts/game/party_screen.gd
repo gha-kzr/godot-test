@@ -1,11 +1,15 @@
 class_name PartyScreen
 extends Control
-## Between battles: the party, each hero's level, XP, stats, spells and 6 rune slots, the
-## shared rune stash, and what the last battle brought. Reads the profile to display it;
-## changes go up as signals and the Game root applies them (then calls show_profile).
-## First version, to be revamped in milestone 5.
+## The hub between runs: the party, each hero's level, XP, stats, spells and 6 rune slots,
+## the shared rune stash, what the last run brought, and where to fight next (the tower
+## from an unlocked starting floor, a stage, or the saved run). Reads the profile to
+## display it; choices go up as signals and the Game root applies them (then calls
+## show_profile). First version, to be revamped in milestone 5.
 
-signal start_pressed
+signal tower_pressed(start_floor: int)
+signal stage_pressed(stage_index: int)
+signal continue_pressed
+signal abandon_pressed
 signal equip_requested(hero_index: int, stash_index: int)
 signal unequip_requested(hero_index: int, slot: int)
 
@@ -14,22 +18,22 @@ const LOCKED_TEXT := "%s (locked)"
 ## The hero whose details are shown (a roster index).
 var selected_hero := 0
 var _profile: Profile
+var _tower: TowerConfig
 
 @onready var _summary: Label = %Summary
-@onready var _start_button: Button = %StartButton
+@onready var _hub: VBoxContainer = %Hub
 @onready var _hero_list: VBoxContainer = %HeroList
 @onready var _details: VBoxContainer = %Details
 @onready var _rune_slots: GridContainer = %RuneSlots
 @onready var _stash: VBoxContainer = %Stash
 
 
-func _ready() -> void:
-	_start_button.pressed.connect(start_pressed.emit)
-
-
-## `summary`: what the last battle brought ("" for none); `message`: e.g. an equip error.
-func show_profile(profile: Profile, summary := "", message := "") -> void:
+## `summary`: what the last run brought ("" for none); `message`: e.g. an equip error;
+## `tower`: the tower and stages to offer (none: no hub).
+func show_profile(profile: Profile, summary := "", message := "", tower: TowerConfig = null) -> void:
 	_profile = profile
+	if tower != null:
+		_tower = tower
 	if not profile.is_unlocked(selected_hero):
 		selected_hero = profile.party[0] if not profile.party.is_empty() else 0
 	_summary.text = "\n".join([summary, message].filter(func(t: String) -> bool: return not t.is_empty()))
@@ -37,6 +41,7 @@ func show_profile(profile: Profile, summary := "", message := "") -> void:
 	_show_heroes()
 	_show_details()
 	_show_stash()
+	_show_hub()
 
 
 func select_hero(hero_index: int) -> void:
@@ -137,6 +142,66 @@ func _show_stash() -> void:
 				rune.display_name, rune.describe(), rune.rarity_name(), " (one per hero)" if rune.is_unique() else ""]
 		button.pressed.connect(func() -> void: equip_requested.emit(selected_hero, index))
 		_stash.add_child(button)
+
+
+func _show_hub() -> void:
+	_clear(_hub)
+	if _tower == null:
+		return
+	var run := _profile.run
+	if run != null:
+		var where := run.stage.display_name if run.mode == RunState.Mode.STAGE else "Tower, floor %d" % run.floor_number
+		if run.awaiting_choice():
+			where += " (boss reward to pick)"
+		_hub.add_child(_label("Run in progress: " + where, 18))
+		_hub.add_child(_row([_hub_button("ContinueButton", "Continue run", continue_pressed.emit),
+				_hub_button("AbandonButton", "Abandon run", abandon_pressed.emit)]))
+		return
+	var cap := _profile.tower_cap(_tower)
+	var best := "best floor %d" % _profile.best_depth if _profile.best_depth > 0 else "not climbed yet"
+	_hub.add_child(_label("Tower — up to floor %d, %s" % [cap, best], 18))
+	var floors := OptionButton.new()
+	floors.name = "StartFloor"
+	floors.focus_mode = Control.FOCUS_NONE
+	floors.custom_minimum_size = Vector2(180, 44)
+	for start in _profile.start_floors(_tower):
+		floors.add_item("From floor %d" % start, start)
+	floors.select(floors.item_count - 1)
+	var climb := _hub_button("TowerButton", "Climb the tower",
+			func() -> void: tower_pressed.emit(floors.get_selected_id()))
+	_hub.add_child(_row([floors, climb]))
+	_hub.add_child(_label("Stages", 18))
+	var stages: Array[Control] = []
+	for index in _tower.stages.size():
+		var stage := _tower.stages[index]
+		var cleared := stage in _profile.cleared_stages
+		var button := _hub_button("Stage%d" % index, stage.display_name + (" ✓" if cleared else ""),
+				stage_pressed.emit.bind(index))
+		if not _profile.is_stage_available(_tower, stage):
+			button.text = LOCKED_TEXT % stage.display_name
+			button.disabled = true
+			button.tooltip_text = "Clear the previous stage first."
+		else:
+			button.tooltip_text = "One battle. Clearing it lets the tower go up to floor %d and start at floor %d." % [
+					stage.unlocks_cap, stage.unlocks_start_floor]
+		stages.append(button)
+	_hub.add_child(_row(stages))
+
+
+func _hub_button(node_name: String, text: String, on_pressed: Callable) -> Button:
+	var button := _button(text)
+	button.name = node_name
+	button.custom_minimum_size = Vector2(200, 44)
+	button.pressed.connect(on_pressed)
+	return button
+
+
+func _row(controls: Array) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	for control: Control in controls:
+		row.add_child(control)
+	return row
 
 
 ## The hero as it would enter a battle, to read its stats with the battle rules' own

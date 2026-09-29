@@ -15,12 +15,14 @@ func _profile() -> Profile:
 	return Profile.create(load("res://data/progression/roster.tres") as Roster)
 
 
-func test_lists_heroes_and_shows_the_locked_one() -> void:
-	var screen := _screen(_profile())
+func test_lists_heroes_and_shows_a_locked_one() -> void:
+	var profile := _profile()
+	profile.unlocked = [0, 1] as Array[int]
+	var screen := _screen(profile)
 	var heroes := screen.get_node("%HeroList").get_children()
 	assert_eq(heroes.size(), 3)
 	assert_true((heroes[0] as Button).text.begins_with("Knight  Lv 1"))
-	assert_true((heroes[2] as Button).disabled, "the Ranger is locked")
+	assert_true((heroes[2] as Button).disabled, "a locked hero")
 	assert_eq((heroes[2] as Button).text, "Ranger (locked)")
 	screen.free()
 
@@ -79,10 +81,40 @@ func test_summary_and_messages() -> void:
 	screen.free()
 
 
-func test_start_button_asks_for_a_battle() -> void:
-	var screen := _screen(_profile())
-	var started := {"count": 0}
-	screen.start_pressed.connect(func() -> void: started.count += 1)
-	(screen.get_node("%StartButton") as Button).pressed.emit()
-	assert_eq(started.count, 1)
+func _tower() -> TowerConfig:
+	return load("res://data/tower/tower.tres") as TowerConfig
+
+
+func test_the_hub_asks_for_a_tower_run_or_a_stage() -> void:
+	var profile := _profile()
+	profile.cleared_stages.append(_tower().stages[0])
+	var screen := PARTY_SCENE.instantiate() as PartyScreen
+	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
+	screen.show_profile(profile, "", "", _tower())
+	var requests: Array = []
+	screen.tower_pressed.connect(func(start: int) -> void: requests.append(["tower", start]))
+	screen.stage_pressed.connect(func(index: int) -> void: requests.append(["stage", index]))
+	(screen.find_child("TowerButton", true, false) as Button).pressed.emit()
+	(screen.find_child("Stage1", true, false) as Button).pressed.emit()
+	assert_eq(requests, [["tower", 11], ["stage", 1]], "the highest starting floor by default")
+	assert_true((screen.find_child("Stage0", true, false) as Button).text.ends_with("✓"), "cleared")
+	assert_true((screen.find_child("Stage2", true, false) as Button).disabled, "locked")
+	screen.free()
+
+
+func test_the_hub_offers_the_saved_run() -> void:
+	var profile := _profile()
+	RunDirector.start_tower(profile, _tower(), 1)
+	profile.run.floor_number = 7
+	var screen := PARTY_SCENE.instantiate() as PartyScreen
+	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
+	screen.show_profile(profile, "", "", _tower())
+	var requests: Array = []
+	screen.continue_pressed.connect(func() -> void: requests.append("continue"))
+	screen.abandon_pressed.connect(func() -> void: requests.append("abandon"))
+	(screen.find_child("ContinueButton", true, false) as Button).pressed.emit()
+	(screen.find_child("AbandonButton", true, false) as Button).pressed.emit()
+	assert_eq(requests, ["continue", "abandon"])
+	assert_eq(screen.find_child("TowerButton", true, false), null)
+	assert_true((screen.get_node("%Hub").get_child(0) as Label).text.contains("floor 7"))
 	screen.free()

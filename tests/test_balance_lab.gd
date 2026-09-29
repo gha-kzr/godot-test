@@ -100,3 +100,26 @@ func test_runs_on_a_worker_thread() -> void:
 func test_lab_panel_script_loads() -> void:
 	var script := load("res://addons/design_tools/lab_panel.gd") as GDScript
 	assert_true(script != null and script.is_tool())
+
+
+func test_tower_runs_play_floors_through_the_run_rules() -> void:
+	var roster := load(ROSTER) as Roster
+	var tower := (load("res://data/tower/tower.tres") as TowerConfig).duplicate_deep(Resource.DEEP_DUPLICATE_ALL) as TowerConfig
+	tower.initial_cap = 2  # Two floors per run keeps it quick.
+	var input := TowerSim.snapshot(roster, tower)
+	var result := TowerSim.run(input[0], input[1], 1, 10, 2)
+	assert_eq(result.runs, 2)
+	assert_eq(result.plays.get(1, 0), 2, "each run starts at floor 1")
+	assert_eq(result.cleared, 2, "level 10 heroes clear floors 1-2")
+	assert_eq(result.depths, [2, 2] as Array[int])
+	assert_true(result.summary()[0].begins_with("2 runs from floor 1: cleared the cap 2 times"), result.summary()[0])
+
+
+func test_a_cancelled_tower_sim_stops() -> void:
+	var control := BalanceLab.RunControl.new()
+	control.cancel()
+	var input := TowerSim.snapshot(load(ROSTER) as Roster, load("res://data/tower/tower.tres") as TowerConfig)
+	var result := TowerSim.run(input[0], input[1], 1, 1, 5, true, 1, control)
+	assert_true(result.cancelled)
+	assert_eq(result.runs, 0)
+	assert_eq(result.plays.size(), 0, "the unfinished run isn't counted")

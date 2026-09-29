@@ -2,7 +2,8 @@
 class_name ContentFactory
 extends RefCounted
 ## Creates content files for the Design panel: a new spell, enemy (with its unit),
-## encounter or preset from a template, or a copy of an existing one. Files get a UID so
+## encounter or preset from a template, a copy of an existing one, or a tower floor's
+## generated encounter (to edit by hand or run in the balance lab). Files get a UID so
 ## saves can find them after renames. Returns an error message, or "" and sets `last_path`.
 
 enum Kind { SPELL, ENEMY, ENCOUNTER, PRESET }
@@ -99,6 +100,23 @@ func duplicate_resource(source: Resource, display_name: String) -> String:
 	elif "display_name" in copy and copy.get("display_name") is String:
 		copy.set("display_name", display_name)
 	return _save(copy, path)
+
+
+## Floor `floor_number` of `config`'s tower as an encounter file ("Floor 7" →
+## encounters/floor_7.tres), its generated map saved inside it.
+func export_floor(config: TowerConfig, floor_number: int) -> String:
+	if config == null:
+		return "No tower config."
+	if floor_number < 1:
+		return "Floors start at 1."
+	var errors := config.get_validation_errors()
+	if not errors.is_empty():
+		return "The tower has errors: %s" % "; ".join(errors)
+	var encounter := FloorGenerator.encounter(config, floor_number)
+	var path := _free_path(Kind.ENCOUNTER, encounter.display_name)
+	if path.is_empty():
+		return _path_error
+	return _save(encounter, path)
 
 
 ## The file path for a new resource, or "" (with the reason in _path_error).

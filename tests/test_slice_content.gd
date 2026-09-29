@@ -2,7 +2,7 @@ extends TestCase
 ## The shipped slice content: every resource loads and validates, the map is playable,
 ## and AI-vs-AI battles on it finish.
 
-const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression", "res://data/enemies", "res://data/loot", "res://data/presets", "res://data/encounters"]
+const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression", "res://data/enemies", "res://data/loot", "res://data/presets", "res://data/encounters", "res://data/boons", "res://data/stages", "res://data/tower"]
 const MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
 const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
@@ -46,7 +46,7 @@ func _walkable_from(grid: Grid, start: Vector2i) -> Dictionary[Vector2i, bool]:
 
 func test_every_content_file_loads_and_validates() -> void:
 	var paths := _content_paths()
-	assert_true(paths.size() >= 47, "found %d content files" % paths.size())
+	assert_true(paths.size() >= 60, "found %d content files" % paths.size())
 	for path in paths:
 		var resource := load(path)
 		assert_true(resource != null and resource.has_method("get_validation_errors"), "%s loads as content" % path)
@@ -73,7 +73,7 @@ func test_slice_map_is_playable() -> void:
 	var parsed := (load(MAP) as MapData).parse()
 	assert_eq(parsed.errors, PackedStringArray())
 	assert_eq(parsed.grid.size, Vector2i(10, 10))
-	assert_eq(parsed.player_spawns.size(), PLAYERS.size())
+	assert_eq(parsed.player_spawns.size(), 3, "room for the party of three")
 	assert_eq(parsed.enemy_spawns.size(), ENEMIES.size())
 	# Climbing and dropping limits make walking one-way, so check both directions:
 	# every floor cell can walk to a spawn, and a spawn can walk to every floor cell.
@@ -126,7 +126,7 @@ func test_heroes_grow_with_levels() -> void:
 	var roster := load("res://data/progression/roster.tres") as Roster
 	assert_eq(roster.heroes.size(), 3)
 	var profile := Profile.create(roster)
-	assert_false(profile.is_unlocked(2), "the Ranger starts locked")
+	assert_eq(profile.party, [0, 1, 2] as Array[int], "all three heroes play from the start")
 	var knight := profile.heroes[0]
 	assert_eq(knight.spells().size(), 3, "level 1: base kit")
 	knight.level = 3

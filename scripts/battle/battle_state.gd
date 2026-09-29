@@ -18,9 +18,10 @@ var use_average_rolls := false
 ## Places players on the map's player spawns and enemies on its enemy spawns, in order.
 ## `player_modifiers[i]` (optional) are player i's permanent modifiers (levels, runes);
 ## `enemy_builds[i]` (optional) is enemy i's build (level, preset, reward, AI, label).
+## `player_hp[i]` (optional) is player i's starting HP (a run's carried-over HP; -1: full).
 ## Returns null (with an error) if the map is invalid or has too few spawns.
 static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: Array[UnitData], rng_seed: int,
-		player_modifiers: Array = [], enemy_builds: Array = []) -> BattleState:
+		player_modifiers: Array = [], enemy_builds: Array = [], player_hp: Array = []) -> BattleState:
 	if map.grid == null:
 		push_error("BattleState: invalid map %s" % [map.errors])
 		return null
@@ -41,6 +42,8 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 			unit.permanent_modifiers.assign(player_modifiers[i])
 			unit.hp = unit.max_hp()
 			unit.start_turn()
+		if i < player_hp.size() and int(player_hp[i]) >= 0:
+			unit.hp = clampi(int(player_hp[i]), 1, unit.max_hp())
 		state.units.append(unit)
 	for i in enemies.size():
 		var unit := UnitState.new(state.units.size(), enemies[i], UnitState.Team.ENEMY, map.enemy_spawns[i])

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BoonData" format=3 uid="uid://dq55wrjnydp7o"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_haljw"]
+[ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="2_k4nti"]
+
+[sub_resource type="Resource" id="Resource_porxr"]
+script = ExtResource("1_haljw")
+stat = 0
+amount = 1
+
+[resource]
+script = ExtResource("2_k4nti")
+display_name = "Focus Crown"
+tier = 3
+modifiers = Array[ExtResource("1_haljw")]([SubResource("Resource_porxr")])

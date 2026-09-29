@@ -137,9 +137,10 @@ func _ready() -> void:
 	_inspect_panel.hide()
 
 
-## Units in the order they'll act, the current one first.
-func show_turn_order(units: Array[UnitInfo], round_number: int) -> void:
-	_round_label.text = "Round %d" % round_number
+## Units in the order they'll act, the current one first; `title` (e.g. "Floor 3") goes
+## before the round number.
+func show_turn_order(units: Array[UnitInfo], round_number: int, title := "") -> void:
+	_round_label.text = ("%s · Round %d" % [title, round_number]) if not title.is_empty() else "Round %d" % round_number
 	_clear_children(_turn_order)
 	for i in units.size():
 		_turn_order.add_child(_turn_chip(units[i], i == 0))

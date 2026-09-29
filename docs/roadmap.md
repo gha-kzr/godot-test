@@ -35,7 +35,8 @@ Decisions: `decisions/2026-09-29-design-tools.md`; plan: `plans/2026-09-29-desig
 
 *Why here:* content volume grows from now on; tools built on a stable data model don't need rework.
 
-### 4. Run loop (roguelite)
+### 4. Run loop (roguelite) — done
+Decisions: `decisions/2026-09-29-run-loop.md` (stages + infinite tower; supersedes the bullets below where they differ); plan: `plans/2026-09-29-run-loop.md`.
 - Procedural map generator (connectivity-checked, previewed in the editor — the preview part of slice plan item 3; the map painter is mostly replaced by generation).
 - Encounter generator: enemy presets and a difficulty budget that grows with depth. **The first battles must be easy** (playtest feedback: the slice battle is too hard as a first fight); the slice's 10–10 AI-vs-AI tuning is a mid-difficulty baseline, not the opening experience. Levers: encounter budget, enemy presets, a gentler AI profile early.
 - AI difficulty profiles and smarter strategies — slice plan item 2.
@@ -59,8 +60,5 @@ Some early placeholder art (one model, one spell effect) can slot in anywhere; i
 To settle with `godot-grill` before the milestone that needs them:
 
 - **Milestone 2 / 4 — what persists on death:** character level only, equipped items, the whole inventory? What resets?
-- **Milestone 4 — difficulty scaling:** keeping level and loot while enemies scale endlessly risks runaway power. Does difficulty follow run depth, player level, or both? Settle the difficulty curve here, starting easy.
 - **Milestone 2 — party:** a fixed party of heroes (Knight, Mage) or a recruitable roster?
-- **Milestone 4 — run length:** truly endless (depth as the score) or N battles ending with a boss?
-- **Any time — stalemates:** if units can never reach each other the battle never ends; a turn limit or draw rule is undecided (map generation must keep maps connected meanwhile).
 - **Undo:** the design keeps it cheap (command actions, views re-sync from state); decide whether the game wants it.

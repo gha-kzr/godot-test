@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BoonData" format=3 uid="uid://3bscsti37y35"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_hcdsa"]
+[ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="2_t73h4"]
+
+[sub_resource type="Resource" id="Resource_n5r4b"]
+script = ExtResource("1_hcdsa")
+stat = 5
+amount = 20
+
+[resource]
+script = ExtResource("2_t73h4")
+display_name = "Vigor"
+tier = 2
+modifiers = Array[ExtResource("1_hcdsa")]([SubResource("Resource_n5r4b")])

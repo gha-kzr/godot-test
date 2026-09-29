@@ -34,6 +34,14 @@ const ENEMY_ACTION_DELAY := 0.35
 var player_modifiers: Array = []
 ## False once setup() was called: the Game root owns what happens after the battle.
 var standalone := true
+## Starting HP per player (-1: full), from a run.
+var player_hp: Array = []
+## Stalemate safety net (0: off); see Battle.sudden_death_round.
+var sudden_death_round := 0
+var sudden_death_percent := 10
+## Shown before the round number in the HUD (e.g. "Floor 3").
+var battle_title := ""
+var _sudden_death_announced := false
 
 var battle: Battle
 ## The seed of the current battle; set rng_seed to it to replay a battle.
@@ -55,11 +63,17 @@ var _battle_generation := 0
 
 
 ## Injects a battle. Call before the controller enters the tree (its _ready starts it).
-func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers: Array, battle_rng_seed := 0) -> void:
+## `hero_hp`: starting HP per player (-1: full); `title`: shown in the HUD (e.g. "Floor 3").
+func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers: Array, battle_rng_seed := 0,
+		hero_hp: Array = [], death_round := 0, death_percent := 10, title := "") -> void:
 	encounter = battle_encounter
 	players = player_units
 	player_modifiers = modifiers
 	rng_seed = battle_rng_seed
+	player_hp = hero_hp
+	sudden_death_round = death_round
+	sudden_death_percent = death_percent
+	battle_title = title
 	standalone = false
 
 
@@ -90,13 +104,16 @@ func start_battle() -> bool:
 	for build in builds:
 		enemies.append(build.unit)
 	var new_seed := rng_seed if rng_seed != 0 else randi()
-	var battle_state := BattleState.create(parsed, players, enemies, new_seed, player_modifiers, builds)
+	var battle_state := BattleState.create(parsed, players, enemies, new_seed, player_modifiers, builds, player_hp)
 	if battle_state == null:
 		return false  # BattleState.create reported why.
 	event_player.stop()  # Abandon the previous battle's playback, if any.
 	battle_seed = new_seed
 	_battle_generation += 1
 	battle = Battle.new(battle_state)
+	battle.sudden_death_round = sudden_death_round
+	battle.sudden_death_percent = sudden_death_percent
+	_sudden_death_announced = false
 	selected_spell = -1
 	board_view.build(battle_state.grid)
 	units_view.build(battle_state, board_view)
@@ -250,6 +267,10 @@ func _ai_profile_for(unit: UnitState) -> AIProfile:
 
 
 func _on_event_played(event: BattleEvents.Event) -> void:
+	if event is BattleEvents.TurnStarted and battle.is_sudden_death() and not _sudden_death_announced:
+		_sudden_death_announced = true
+		hud.show_banner("Sudden death: the party loses %d%% HP every turn" % sudden_death_percent)
+		return
 	if event is BattleEvents.TurnStarted:
 		var unit := battle.state.units[(event as BattleEvents.TurnStarted).unit_id]
 		hud.show_banner("%s's turn" % unit.data.display_name)
@@ -322,7 +343,7 @@ func _refresh_hud() -> void:
 	var order: Array[Hud.UnitInfo] = []
 	for id in battle_state.turn_order.upcoming():
 		order.append(Hud.UnitInfo.from_unit(battle_state.units[id]))
-	hud.show_turn_order(order, battle_state.turn_order.round_number)
+	hud.show_turn_order(order, battle_state.turn_order.round_number, battle_title)
 	var current := battle_state.current_unit()
 	if current != null:
 		hud.show_unit(Hud.UnitInfo.from_unit(current))

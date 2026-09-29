@@ -1,12 +1,15 @@
 @tool
 extends VBoxContainer
-## The Design bottom panel: create or duplicate content, and the balance lab.
+## The Design bottom panel: create or duplicate content, export a tower floor, and the
+## balance lab.
 ## Creation goes through ContentFactory; the new file is scanned and opened in the Inspector.
 
 const LabPanel := preload("res://addons/design_tools/lab_panel.gd")
+const TOWER := "res://data/tower/tower.tres"
 
 var _kind: OptionButton
 var _name: LineEdit
+var _floor: SpinBox
 var _status: Label
 var _factory := ContentFactory.new()
 
@@ -33,6 +36,17 @@ func _init() -> void:
 	duplicate.tooltip_text = "Copies the spell / enemy / encounter / preset open in the Inspector under the new name."
 	duplicate.pressed.connect(_on_duplicate)
 	row.add_child(duplicate)
+	row.add_child(VSeparator.new())
+	_floor = SpinBox.new()
+	_floor.min_value = 1
+	_floor.max_value = 999
+	_floor.prefix = "Floor"
+	row.add_child(_floor)
+	var export := Button.new()
+	export.text = "Export floor"
+	export.tooltip_text = "Saves the tower floor's generated encounter (map and enemies) in data/encounters/."
+	export.pressed.connect(_on_export_floor)
+	row.add_child(export)
 	_status = Label.new()
 	_status.text = "Create content from a template, or copy the one open in the Inspector."
 	add_child(_status)
@@ -50,6 +64,11 @@ func _on_duplicate() -> void:
 		_status.text = "Open a spell, enemy, encounter or preset in the Inspector first."
 		return
 	_report(_factory.duplicate_resource(edited, _name.text))
+
+
+func _on_export_floor() -> void:
+	var tower := load(TOWER) as TowerConfig if ResourceLoader.exists(TOWER) else null
+	_report(_factory.export_floor(tower, int(_floor.value)))
 
 
 func _report(error: String) -> void:

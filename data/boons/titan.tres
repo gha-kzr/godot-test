@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BoonData" format=3 uid="uid://bapwa72vvbwnj"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_erhdv"]
+[ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="2_xqtl3"]
+
+[sub_resource type="Resource" id="Resource_auvvp"]
+script = ExtResource("1_erhdv")
+stat = 5
+amount = 40
+
+[resource]
+script = ExtResource("2_xqtl3")
+display_name = "Titan's Heart"
+tier = 3
+modifiers = Array[ExtResource("1_erhdv")]([SubResource("Resource_auvvp")])

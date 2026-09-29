@@ -9,5 +9,7 @@
 
 [resource]
 script = ExtResource("6_icgdy")
+starting_unlocked = Array[int]([0, 1, 2])
+starting_party = Array[int]([0, 1, 2])
 heroes = Array[ExtResource("2_grhyv")]([ExtResource("3_vqi2v"), ExtResource("4_kqugl"), ExtResource("5_106by")])
 config = ExtResource("1_1h3os")
