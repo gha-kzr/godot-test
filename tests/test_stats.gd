@@ -176,3 +176,8 @@ func test_innate_modifiers_apply_in_every_battle() -> void:
 	assert_eq(_dealt(state, _damage(10, fire)), 6)
 	data.innate_modifiers.append(null)
 	assert_true(Array(data.get_validation_errors()).any(func(e: String) -> bool: return "empty innate modifier slot" in e))
+
+
+func test_the_damage_type_catalog_lists_every_type_in_order() -> void:
+	var names := DamageType.all().map(func(t: DamageType) -> String: return t.display_name)
+	assert_eq(names, ["Physical", "Fire", "Poison"])

@@ -50,7 +50,7 @@ class UnitInfo:
 	var statuses: Array[StatusInfo] = []
 	var spells: Array[SpellData] = []
 	var power := 0
-	## Damage type name → resistance %, only non-zero ones.
+	## Damage type name → resistance %, every damage type of the game, in display order.
 	var resistances: Dictionary[String, int] = {}
 
 	static func from_unit(unit: UnitState) -> UnitInfo:
@@ -77,19 +77,22 @@ class UnitInfo:
 			info.statuses.append(status_info)
 		info.spells = unit.data.spells
 		info.power = unit.power()
-		for type in unit.resistance_types():
-			var value := unit.resistance_percent(type)
-			if value != 0:
-				info.resistances[type.display_name] = value
+		var types := DamageType.all().duplicate()
+		for type in unit.resistance_types():  # A type outside the catalog still shows.
+			if type not in types:
+				types.append(type)
+		for type in types:
+			info.resistances[type.display_name] = unit.resistance_percent(type)
 		return info
 
-	## e.g. "Power +14% · Resist Fire +25%", "Power +0% · Resist none". Always shown, so
-	## a unit without resistances reads as such rather than as missing information.
+	## Two lines, e.g. "Power: All +8%" and "Resist: Physical +0%, Fire +20%, Poison +0%".
+	## Every damage type is listed, zeros included, so nothing reads as missing. "All"
+	## leaves room for per-type power later.
 	func combat_stats_text() -> String:
 		var resist: Array[String] = []
 		for type_name in resistances:
 			resist.append("%s %+d%%" % [type_name, resistances[type_name]])
-		return "Power %+d%% · Resist %s" % [power, ", ".join(resist) if not resist.is_empty() else "none"]
+		return "Power: All %+d%%\nResist: %s" % [power, ", ".join(resist) if not resist.is_empty() else "none"]
 
 
 var _spell_costs: Array[int] = []

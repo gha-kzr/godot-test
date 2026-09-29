@@ -6,3 +6,4 @@
 script = ExtResource("1_bfksa")
 display_name = "Fire"
 color = Color(1, 0.45, 0.15, 1)
+sort_order = 1

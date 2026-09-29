@@ -272,25 +272,27 @@ func test_power_and_resistances_always_show() -> void:
 	var info := _info("Knight")
 	hud.show_unit(info)
 	assert_true((hud.get_node("%CombatStats") as Label).visible, "always shown")
-	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power +0% · Resist none")
-	info.power = 14
-	info.resistances = {"Fire": 25, "Poison": -10}
+	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power: All +0%\nResist: none")
+	info.power = 8
+	info.resistances = {"Physical": 0, "Fire": 20, "Poison": -10}
 	hud.show_unit(info)
-	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power +14% · Resist Fire +25%, Poison -10%")
+	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
 	hud.show_inspected(info)
-	assert_eq((hud.get_node("%InspectRows").get_node("CombatStats") as Label).text, "Power +14% · Resist Fire +25%, Poison -10%")
+	assert_eq((hud.get_node("%InspectRows").get_node("CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
 	hud.free()
 
 
 func test_unit_info_reads_power_and_resistances() -> void:
-	var fire := DamageType.new()
-	fire.display_name = "Fire"
+	var ice := DamageType.new()  # Not one of the game's types.
+	ice.display_name = "Ice"
 	var ward := BattleFixtures.modifier(StatModifier.Stat.RESISTANCE_PERCENT, 25)
-	ward.damage_type = fire
+	ward.damage_type = ice
 	var map := MapData.new()
 	map.layout = "0p 0e"
 	var state := BattleState.create(map.parse(), [BattleFixtures.unit("P0")] as Array[UnitData],
 			[BattleFixtures.unit("E0")] as Array[UnitData], 1, [[ward, BattleFixtures.modifier(StatModifier.Stat.POWER, 9)] as Array[StatModifier]])
 	var info := Hud.UnitInfo.from_unit(state.units[0])
 	assert_eq(info.power, 9)
-	assert_eq(info.resistances, {"Fire": 25} as Dictionary[String, int])
+	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Ice"], "every game type in order, then the unit's own")
+	assert_eq(info.resistances["Physical"], 0, "zeros included")
+	assert_eq(info.resistances["Ice"], 25)
