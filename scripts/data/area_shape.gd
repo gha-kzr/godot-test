@@ -1,3 +1,4 @@
+@tool
 class_name AreaShape
 extends Resource
 ## Cells a spell affects around its target cell. Cell expansion lives in the targeting rules.

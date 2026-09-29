@@ -1,3 +1,4 @@
+@tool
 class_name Battle
 extends RefCounted
 ## Single entry point that mutates a battle: validates an action, applies it, then

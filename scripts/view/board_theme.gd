@@ -1,3 +1,4 @@
+@tool
 class_name BoardTheme
 extends Resource
 ## How the board looks. Plain colored boxes by default; set the scenes to use an asset pack.

@@ -1,3 +1,4 @@
+@tool
 class_name Movement
 extends RefCounted
 ## Movement rules: which cells a unit can reach with its MP, and by which path.

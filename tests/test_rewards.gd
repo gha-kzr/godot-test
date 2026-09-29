@@ -12,13 +12,18 @@ func _loot(runes: Array[RuneData], chance := 1.0, rolls := 1) -> LootTable:
 
 ## P0 vs E0 and E1 (xp 10 and 15, each with a loot table), outcome set by who's dead.
 func _state(rng_seed := 1) -> BattleState:
-	var e0 := BattleFixtures.unit("E0", 100)
-	e0.xp_reward = 10
-	e0.loot_table = _loot([BattleFixtures.rune("Might")] as Array[RuneData])
-	var e1 := BattleFixtures.unit("E1", 90)
-	e1.xp_reward = 15
-	e1.loot_table = _loot([BattleFixtures.rune("Ward")] as Array[RuneData])
-	return BattleFixtures.state_with("0p 0e 0e", [BattleFixtures.unit("P0", 200)] as Array[UnitData], [e0, e1] as Array[UnitData], rng_seed)
+	var builds: Array = []
+	var enemies: Array[UnitData] = []
+	for entry in [["E0", 10, "Might"], ["E1", 15, "Ward"]]:
+		var enemy := EnemyData.new()
+		enemy.unit = BattleFixtures.unit(entry[0], 100)
+		enemy.xp_base = entry[1]
+		enemy.loot_table = _loot([BattleFixtures.rune(entry[2])] as Array[RuneData])
+		builds.append(enemy.build(1))
+		enemies.append(enemy.unit)
+	var map := MapData.new()
+	map.layout = "0p 0e 0e"
+	return BattleState.create(map.parse(), [BattleFixtures.unit("P0", 200)] as Array[UnitData], enemies, rng_seed, [], builds)
 
 
 func test_a_win_gives_every_killed_enemys_xp_and_loot() -> void:
@@ -45,7 +50,7 @@ func test_loot_is_deterministic_per_battle_seed() -> void:
 	var drops: Array = []
 	for i in 2:
 		var state := _state(42)
-		state.units[1].data.loot_table = _loot([BattleFixtures.rune("A"), BattleFixtures.rune("B"), BattleFixtures.rune("C")] as Array[RuneData], 0.5, 5)
+		state.units[1].reward.loot_table = _loot([BattleFixtures.rune("A"), BattleFixtures.rune("B"), BattleFixtures.rune("C")] as Array[RuneData], 0.5, 5)
 		state.units[1].hp = 0
 		state.units[2].hp = 0
 		drops.append(BattleRewards.compute(state).runes.map(func(r: RuneData) -> String: return r.display_name))
@@ -79,16 +84,17 @@ func test_rune_rules_and_validation() -> void:
 	assert_true(errors.any(func(e: String) -> bool: return "no modifiers" in e))
 	var table := _loot([] as Array[RuneData])
 	assert_true(Array(table.get_validation_errors()).any(func(e: String) -> bool: return "no runes" in e))
-	var unit := BattleFixtures.unit("E")
-	unit.loot_table = table
-	assert_true(Array(unit.get_validation_errors()).any(func(e: String) -> bool: return "E: loot table" in e), "reaches the unit")
+	var enemy := EnemyData.new()
+	enemy.unit = BattleFixtures.unit("E")
+	enemy.loot_table = table
+	assert_true(Array(enemy.get_validation_errors()).any(func(e: String) -> bool: return "E: loot table" in e), "reaches the enemy")
 
 
 func test_loot_ignores_how_many_dice_the_battle_rolled() -> void:
 	var drops: Array = []
 	for rolls_before in [0, 50]:
 		var state := _state(42)
-		state.units[1].data.loot_table = _loot([BattleFixtures.rune("A"), BattleFixtures.rune("B"), BattleFixtures.rune("C")] as Array[RuneData], 0.5, 5)
+		state.units[1].reward.loot_table = _loot([BattleFixtures.rune("A"), BattleFixtures.rune("B"), BattleFixtures.rune("C")] as Array[RuneData], 0.5, 5)
 		for i in rolls_before:
 			state.rng.randi()
 		var copy := state.clone()

@@ -10,10 +10,8 @@ const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
 const SAVE_FAILED := "Progress couldn't be saved."
 
 @export var roster: Roster
-## The battle every fight uses for now (milestone 4 generates them).
-@export var map: MapData
-@export var enemies: Array[UnitData] = []
-@export var ai_profile: AIProfile
+## The fight every battle uses for now (milestone 4 generates them).
+@export var encounter: Encounter
 @export var save_path := SaveStore.DEFAULT_PATH
 ## 0 picks a random seed per battle.
 @export var rng_seed := 0
@@ -42,12 +40,16 @@ func show_party(message := "") -> void:
 
 
 func start_battle() -> void:
-	var spawns := map.parse().player_spawns.size()
+	var errors := encounter.get_validation_errors() if encounter != null else PackedStringArray(["no encounter set"])
+	if not errors.is_empty():
+		show_party("The encounter is invalid: %s" % "; ".join(errors))
+		return
+	var spawns := encounter.map.parse().player_spawns.size()
 	if profile.party.is_empty() or profile.party.size() > spawns:
 		show_party("The party needs 1 to %d heroes to fight on this map." % spawns)
 		return
 	var battle := BATTLE_SCENE.instantiate() as BattleController
-	battle.setup(map, profile.battle_units(), profile.battle_modifiers(), enemies, ai_profile, rng_seed)
+	battle.setup(encounter, profile.battle_units(), profile.battle_modifiers(), rng_seed)
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
 	_replace_screen(battle)

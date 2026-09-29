@@ -2,7 +2,7 @@ extends TestCase
 ## The shipped slice content: every resource loads and validates, the map is playable,
 ## and AI-vs-AI battles on it finish.
 
-const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression"]
+const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression", "res://data/enemies", "res://data/loot", "res://data/presets", "res://data/encounters"]
 const MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
 const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
@@ -46,7 +46,7 @@ func _walkable_from(grid: Grid, start: Vector2i) -> Dictionary[Vector2i, bool]:
 
 func test_every_content_file_loads_and_validates() -> void:
 	var paths := _content_paths()
-	assert_true(paths.size() >= 39, "found %d content files" % paths.size())
+	assert_true(paths.size() >= 47, "found %d content files" % paths.size())
 	for path in paths:
 		var resource := load(path)
 		assert_true(resource != null and resource.has_method("get_validation_errors"), "%s loads as content" % path)
@@ -144,10 +144,10 @@ func test_heroes_grow_with_levels() -> void:
 
 
 func test_enemies_give_xp_and_loot() -> void:
-	for path: String in ENEMIES:
-		var enemy := load(path) as UnitData
-		assert_true(enemy.xp_reward > 0, "%s gives XP" % enemy.display_name)
-		assert_true(enemy.loot_table != null and not enemy.loot_table.runes.is_empty(), "%s drops runes" % enemy.display_name)
+	for path in ["res://data/enemies/brute.tres", "res://data/enemies/archer.tres"]:
+		var enemy := load(path) as EnemyData
+		assert_true(enemy.xp_base > 0, "%s gives XP" % enemy.display_name())
+		assert_true(enemy.loot_table != null and not enemy.loot_table.runes.is_empty(), "%s drops runes" % enemy.display_name())
 
 
 func test_heroes_grow_differently() -> void:

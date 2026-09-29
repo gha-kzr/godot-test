@@ -1,3 +1,4 @@
+@tool
 class_name DamageEffect
 extends EffectData
 
@@ -5,6 +6,9 @@ extends EffectData
 @export_range(0, 999) var max_amount := 1
 ## Null: untyped, never resisted.
 @export var damage_type: DamageType
+## How much of the caster's Power applies, in percent (100: all of it; 150: a heavy hit
+## that gains more from Power; 50: a light one).
+@export_range(0, 500) var power_scaling := 100
 
 
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
@@ -19,8 +23,13 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 func scaled(state: BattleState, caster_id: int, target_id: int, roll: float) -> float:
 	var target := state.units[target_id]
 	var power := state.units[caster_id].power() if caster_id >= 0 else 0
-	return roll * maxf(0.0, 100.0 + power) / 100.0 * target.damage_taken_percent() / 100.0 \
+	return roll * power_multiplier(power) * target.damage_taken_percent() / 100.0 \
 			* (100.0 - target.resistance_percent(damage_type)) / 100.0
+
+
+## (100 + Power x power_scaling %) / 100, never below 0.
+func power_multiplier(power: int) -> float:
+	return maxf(0.0, 100.0 + power * power_scaling / 100.0) / 100.0
 
 
 func average_roll() -> float:
@@ -29,7 +38,8 @@ func average_roll() -> float:
 
 func describe() -> String:
 	var type_text := damage_type.display_name.to_lower() + " " if damage_type != null else ""
-	return "%s %sdamage" % [amount_text(min_amount, max_amount), type_text]
+	var scaling_text := " (%d%% Power)" % power_scaling if power_scaling != 100 else ""
+	return "%s %sdamage%s" % [amount_text(min_amount, max_amount), type_text, scaling_text]
 
 
 func get_validation_errors() -> PackedStringArray:

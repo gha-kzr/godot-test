@@ -1,3 +1,4 @@
+@tool
 class_name StatusData
 extends Resource
 ## A status a unit can carry for a few of its turns: effects fired at each of its turn

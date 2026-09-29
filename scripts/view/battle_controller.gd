@@ -23,9 +23,10 @@ enum State { IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
 
-@export var map: MapData
+## The fight: map, enemies (levels, presets) and their AI profile.
+@export var encounter: Encounter
 @export var players: Array[UnitData] = []
-@export var enemies: Array[UnitData] = []
+## Fallback AI profile when neither the enemy's preset nor the encounter sets one.
 @export var ai_profile: AIProfile
 ## 0 picks a random seed for each battle.
 @export var rng_seed := 0
@@ -54,13 +55,10 @@ var _battle_generation := 0
 
 
 ## Injects a battle. Call before the controller enters the tree (its _ready starts it).
-func setup(battle_map: MapData, player_units: Array[UnitData], modifiers: Array, enemy_units: Array[UnitData],
-		profile: AIProfile, battle_rng_seed := 0) -> void:
-	map = battle_map
+func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers: Array, battle_rng_seed := 0) -> void:
+	encounter = battle_encounter
 	players = player_units
 	player_modifiers = modifiers
-	enemies = enemy_units
-	ai_profile = profile
 	rng_seed = battle_rng_seed
 	standalone = false
 
@@ -76,15 +74,23 @@ func _ready() -> void:
 	start_battle()
 
 
-## Builds a fresh battle from the exported map and teams, and starts it.
-## Returns false (and changes nothing) if the map or teams are invalid.
+## Builds a fresh battle from the encounter and the players, and starts it.
+## Returns false (and changes nothing) if the encounter or teams are invalid.
 func start_battle() -> bool:
-	if map == null:
-		push_error("Battle: no map set")
+	if encounter == null or encounter.map == null:
+		push_error("Battle: no encounter or map set")
 		return false
-	var parsed := map.parse()
+	var errors := encounter.get_validation_errors()
+	if not errors.is_empty():
+		push_error("Battle: invalid encounter: %s" % "; ".join(errors))
+		return false
+	var parsed := encounter.map.parse()
+	var builds := encounter.builds()
+	var enemies: Array[UnitData] = []
+	for build in builds:
+		enemies.append(build.unit)
 	var new_seed := rng_seed if rng_seed != 0 else randi()
-	var battle_state := BattleState.create(parsed, players, enemies, new_seed, player_modifiers)
+	var battle_state := BattleState.create(parsed, players, enemies, new_seed, player_modifiers, builds)
 	if battle_state == null:
 		return false  # BattleState.create reported why.
 	event_player.stop()  # Abandon the previous battle's playback, if any.
@@ -226,7 +232,7 @@ func _run_enemy_action() -> void:
 	if generation != _battle_generation:
 		return
 	var unit_id := battle.state.current_unit().id
-	var result := battle.perform(EnemyAI.choose_next(battle.state, unit_id, ai_profile))
+	var result := battle.perform(EnemyAI.choose_next(battle.state, unit_id, _ai_profile_for(battle.state.units[unit_id])))
 	if not result.ok():
 		push_error("Battle: AI chose an invalid action: %s" % result.error)
 		result = battle.perform(BattleActions.EndTurn.new(unit_id))
@@ -236,6 +242,13 @@ func _run_enemy_action() -> void:
 ## The HUD is refreshed after a whole playback (in _begin_next), not per event: the
 ## battle state is already final while events play, so a per-event refresh would jump
 ## ahead of the animations. Unit views show HP live; an event-driven HUD is milestone 5.
+## The unit's own profile (its preset), else the encounter's, else the fallback.
+func _ai_profile_for(unit: UnitState) -> AIProfile:
+	if unit.ai_profile != null:
+		return unit.ai_profile
+	return encounter.ai_profile if encounter.ai_profile != null else ai_profile
+
+
 func _on_event_played(event: BattleEvents.Event) -> void:
 	if event is BattleEvents.TurnStarted:
 		var unit := battle.state.units[(event as BattleEvents.TurnStarted).unit_id]

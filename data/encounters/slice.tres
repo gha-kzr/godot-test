@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Encounter" format=3 uid="uid://coynthw3vfyac"]
+
+[ext_resource type="Resource" path="res://data/ai/default.tres" id="1_i6h7i"]
+[ext_resource type="Resource" path="res://data/maps/slice.tres" id="2_cxphx"]
+[ext_resource type="Script" path="res://scripts/data/encounter.gd" id="3_ov08w"]
+[ext_resource type="Script" path="res://scripts/data/encounter_spawn.gd" id="4_43o03"]
+[ext_resource type="Resource" path="res://data/enemies/brute.tres" id="5_6jck5"]
+[ext_resource type="Resource" path="res://data/presets/normal.tres" id="6_gc54w"]
+[ext_resource type="Resource" path="res://data/enemies/archer.tres" id="7_m8ows"]
+
+[sub_resource type="Resource" id="Resource_ampax"]
+script = ExtResource("4_43o03")
+enemy = ExtResource("5_6jck5")
+preset = ExtResource("6_gc54w")
+
+[sub_resource type="Resource" id="Resource_n3e5a"]
+script = ExtResource("4_43o03")
+enemy = ExtResource("7_m8ows")
+preset = ExtResource("6_gc54w")
+
+[resource]
+script = ExtResource("3_ov08w")
+display_name = "Ruined Courtyard"
+map = ExtResource("2_cxphx")
+spawns = Array[ExtResource("4_43o03")]([SubResource("Resource_ampax"), SubResource("Resource_n3e5a")])
+ai_profile = ExtResource("1_i6h7i")

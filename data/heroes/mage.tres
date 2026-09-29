@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="HeroData" format=3]
+[gd_resource type="Resource" script_class="HeroData" format=3 uid="uid://yokf50dmbf6o"]
 
 [ext_resource type="Script" path="res://scripts/data/level_reward.gd" id="1_pgojp"]
 [ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="2_t2s1d"]

@@ -1,8 +1,11 @@
+@tool
 class_name HealEffect
 extends EffectData
 
 @export_range(0, 999) var min_amount := 1
 @export_range(0, 999) var max_amount := 1
+## How much of the caster's Power applies, in percent (see DamageEffect).
+@export_range(0, 500) var power_scaling := 100
 
 
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
@@ -15,7 +18,7 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 ## A roll after the caster's power: roll x (100 + power) %.
 func scaled(state: BattleState, caster_id: int, roll: float) -> float:
 	var power := state.units[caster_id].power() if caster_id >= 0 else 0
-	return roll * maxf(0.0, 100.0 + power) / 100.0
+	return roll * maxf(0.0, 100.0 + power * power_scaling / 100.0) / 100.0
 
 
 func average_roll() -> float:
@@ -23,7 +26,8 @@ func average_roll() -> float:
 
 
 func describe() -> String:
-	return "heals %s" % amount_text(min_amount, max_amount)
+	var scaling_text := " (%d%% Power)" % power_scaling if power_scaling != 100 else ""
+	return "heals %s%s" % [amount_text(min_amount, max_amount), scaling_text]
 
 
 func get_validation_errors() -> PackedStringArray:

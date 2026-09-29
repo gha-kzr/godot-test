@@ -1,3 +1,4 @@
+@tool
 class_name Profile
 extends RefCounted
 ## The player's lasting progress: every hero's record, which are unlocked, the party, and
@@ -16,7 +17,7 @@ class LevelUp:
 
 
 ## Save format version; bump on incompatible changes (from_dict must read older ones).
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 
 var roster: Roster
 var heroes: Array[HeroRecord] = []  ## One per roster hero, same order.
@@ -111,27 +112,29 @@ func apply_rewards(rewards: BattleRewards) -> Array[LevelUp]:
 	return level_ups
 
 
-## Plain data for saving: resources (heroes, runes) are referenced by path, so reordering
-## the roster or adding heroes doesn't scramble saves.
+## Plain data for saving: resources (heroes, runes) are referenced as {"uid", "path"}, so
+## renaming or moving a file (the UID follows it) or reordering the roster can't break a
+## save; the path is the fallback when a UID is unknown.
 func to_dict() -> Dictionary:
 	var hero_entries: Array = []
 	for record in heroes:
-		var rune_paths: Array = []
+		var rune_refs: Array = []
 		for rune in record.runes:
-			rune_paths.append(rune.resource_path if rune != null else null)
-		hero_entries.append({"hero": record.hero.resource_path, "xp": record.xp, "runes": rune_paths})
-	var stash_paths: Array = []
+			rune_refs.append(_ref(rune) if rune != null else null)
+		hero_entries.append({"hero": _ref(record.hero), "xp": record.xp, "runes": rune_refs})
+	var stash_refs: Array = []
 	for rune in stash:
-		stash_paths.append(rune.resource_path)
-	return {"version": SAVE_VERSION, "heroes": hero_entries, "unlocked": _hero_paths(unlocked),
-			"party": _hero_paths(party), "stash": stash_paths}
+		stash_refs.append(_ref(rune))
+	return {"version": SAVE_VERSION, "heroes": hero_entries, "unlocked": _hero_refs(unlocked),
+			"party": _hero_refs(party), "stash": stash_refs}
 
 
 ## Rebuilds a profile saved by to_dict(), on top of a fresh one from `from_roster`: heroes
 ## are matched by resource path, unknown heroes or runes and malformed fields are skipped
 ## (with a warning), levels are recomputed from XP, the roster's starting unlocks are kept,
 ## and an invalid party falls back to the roster's. Reads version 1 saves (party and
-## unlocks as roster indices). Returns null for a save from a newer version of the game.
+## unlocks as roster indices) and 2 (resources by path). Returns null for a save from a
+## newer version of the game.
 static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 	var version := int(data.get("version", 0)) if data.get("version") is int or data.get("version") is float else 0
 	if version > SAVE_VERSION:
@@ -143,7 +146,7 @@ static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 			continue
 		var index := profile._hero_index(entry.get("hero"))
 		if index == -1:
-			push_warning("Profile: unknown hero %s skipped" % entry.get("hero"))
+			push_warning("Profile: unknown hero %s skipped" % str(entry.get("hero")))
 			continue
 		var record := profile.heroes[index]
 		var xp: Variant = entry.get("xp", 0)
@@ -165,14 +168,37 @@ static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 	return profile
 
 
-func _hero_paths(indices: Array[int]) -> Array:
-	return indices.map(func(i: int) -> String: return heroes[i].hero.resource_path)
+func _hero_refs(indices: Array[int]) -> Array:
+	return indices.map(func(i: int) -> Dictionary: return _ref(heroes[i].hero))
 
 
-func _hero_index(path: Variant) -> int:
-	if path is not String:
+func _hero_index(ref: Variant) -> int:
+	var path := _resolve_path(ref)
+	if path.is_empty():
 		return -1
 	return heroes.find_custom(func(r: HeroRecord) -> bool: return r.hero.resource_path == path)
+
+
+## A saved reference to a resource: its UID (if it has one) and its path.
+static func _ref(resource: Resource) -> Dictionary:
+	var id := ResourceLoader.get_resource_uid(resource.resource_path)
+	return {"uid": ResourceUID.id_to_text(id) if id != ResourceUID.INVALID_ID else "", "path": resource.resource_path}
+
+
+## The current path of a saved reference: from its UID when known (the file may have
+## moved), else its path. Version 1 / 2 saves store plain path strings.
+static func _resolve_path(ref: Variant) -> String:
+	if ref is String:
+		return ref
+	if ref is not Dictionary:
+		return ""
+	var uid_text: Variant = ref.get("uid", "")
+	if uid_text is String and not uid_text.is_empty():
+		var id := ResourceUID.text_to_id(uid_text)
+		if id != ResourceUID.INVALID_ID and ResourceUID.has_id(id):
+			return ResourceUID.get_id_path(id)
+	var path: Variant = ref.get("path", "")
+	return path if path is String else ""
 
 
 ## Saved hero references (paths; roster indices in version 1) as roster indices, without
@@ -196,8 +222,9 @@ static func _array(data: Dictionary, key: String) -> Array:
 	return value if value is Array else []
 
 
-static func _load_rune(path: Variant) -> RuneData:
-	if path == null or path is not String or path.is_empty():
+static func _load_rune(ref: Variant) -> RuneData:
+	var path := _resolve_path(ref)
+	if path.is_empty():
 		return null
 	var rune := load(path) as RuneData if ResourceLoader.exists(path) else null
 	if rune == null:

@@ -181,3 +181,32 @@ func test_innate_modifiers_apply_in_every_battle() -> void:
 func test_the_damage_type_catalog_lists_every_type_in_order() -> void:
 	var names := DamageType.all().map(func(t: DamageType) -> String: return t.display_name)
 	assert_eq(names, ["Physical", "Fire", "Poison"])
+
+
+func test_power_scaling_per_effect() -> void:
+	var state := _state([_modifier(Stat.POWER, 50)] as Array[StatModifier])
+	var heavy := _damage(10)
+	heavy.power_scaling = 150
+	assert_eq(_dealt(state, heavy), 18, "10 x (100 + 50 x 150%) = 17.5, rounded")
+	var light := _damage(10)
+	light.power_scaling = 50
+	assert_eq(_dealt(state, light), 13, "10 x 1.25")
+	state.units[1].hp = 40
+	var fixed := _damage(10)
+	fixed.power_scaling = 0
+	assert_eq(_dealt(state, fixed), 10, "ignores Power")
+	var heal := _heal(10)
+	heal.power_scaling = 200
+	state.units[0].hp = 1
+	assert_eq(_dealt(state, heal, 0, 0), 20)
+	assert_eq(heavy.describe(), "10 damage (150% Power)")
+	assert_eq(_damage(10).describe(), "10 damage", "100% says nothing")
+
+
+func test_rules_and_data_scripts_run_in_the_editor() -> void:
+	# Editor code (previews, balance lab) can only run @tool scripts.
+	for dir in ["res://scripts/data", "res://scripts/battle", "res://scripts/progression"]:
+		for file in DirAccess.get_files_at(dir):
+			if file.ends_with(".gd"):
+				var script := load(dir.path_join(file)) as GDScript
+				assert_true(script.is_tool(), "%s is @tool" % file)

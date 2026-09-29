@@ -37,7 +37,7 @@ func test_one_tagged_collider_per_floor_or_obstacle_cell() -> void:
 
 func test_cells_stand_at_their_height() -> void:
 	var board := _board()
-	var level := board.board_theme.level_height
+	var level := board.active_theme().level_height
 	assert_eq(board.cell_to_world(Vector2i(0, 0)), Vector3(0, 0, 0))
 	assert_eq(board.cell_to_world(Vector2i(1, 0)), Vector3(1, level, 0))
 	assert_eq(board.cell_to_world(Vector2i(0, 1)), Vector3(0, 2 * level, 1))
@@ -149,3 +149,40 @@ func test_camera_toggles_the_overhead_view() -> void:
 	_assert_aims_at_pivot(rig, rig.pitch_degrees)
 	assert_eq(rig.camera.size, rig.default_size)
 	rig.free()
+
+
+# --- Editor preview ---
+
+func test_the_preview_map_is_not_built_at_runtime() -> void:
+	var board := BoardView.new()
+	board.preview_map = load("res://data/maps/slice.tres")
+	(Engine.get_main_loop() as SceneTree).root.add_child(board)
+	assert_eq(board.grid, null, "at runtime the battle builds the board, not the preview")
+	board.show_preview()
+	assert_eq(board.grid.size, Vector2i(10, 10), "show_preview draws it (what the editor does)")
+	board.free()
+
+
+func test_map_edits_emit_changed() -> void:
+	var map := MapData.new()
+	var seen := {"count": 0}
+	map.changed.connect(func() -> void: seen.count += 1)
+	map.layout = "0p 0e"
+	assert_eq(seen.count, 1)
+
+
+func test_preview_cells_are_never_saved_into_the_scene() -> void:
+	var root := Node3D.new()
+	var board := BoardView.new()
+	root.add_child(board)
+	board.owner = root
+	board.preview_map = load("res://data/maps/slice.tres")
+	board.show_preview()
+	assert_true(board.get_node("Cells").get_child_count() > 0)
+	var packed := PackedScene.new()
+	packed.pack(root)
+	var copy := packed.instantiate()
+	assert_eq((copy.get_child(0) as BoardView).get_node("Cells").get_child_count(), 0, "no generated cells in the file")
+	assert_eq((copy.get_child(0) as BoardView).board_theme, null, "no default theme written into the scene")
+	copy.free()
+	root.free()

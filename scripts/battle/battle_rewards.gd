@@ -1,3 +1,4 @@
+@tool
 class_name BattleRewards
 extends RefCounted
 ## What a won battle gives: the XP of every enemy killed and the runes their loot tables
@@ -15,9 +16,9 @@ static func compute(state: BattleState) -> BattleRewards:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash([state.rng.seed, "loot"])
 	for unit in state.units:
-		if unit.team != UnitState.Team.ENEMY or unit.is_alive():
+		if unit.team != UnitState.Team.ENEMY or unit.is_alive() or unit.reward == null:
 			continue
-		rewards.xp += unit.data.xp_reward
-		if unit.data.loot_table != null:
-			rewards.runes.append_array(unit.data.loot_table.roll(rng))
+		rewards.xp += unit.reward.xp
+		if unit.reward.loot_table != null:
+			rewards.runes.append_array(unit.reward.loot_table.roll(rng, unit.reward.extra_rolls, unit.reward.rarity_floor))
 	return rewards

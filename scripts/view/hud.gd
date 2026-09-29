@@ -55,7 +55,7 @@ class UnitInfo:
 
 	static func from_unit(unit: UnitState) -> UnitInfo:
 		var info := UnitInfo.new()
-		info.display_name = unit.data.display_name
+		info.display_name = unit.label
 		info.color = unit.data.color
 		info.is_player = unit.team == UnitState.Team.PLAYER
 		info.hp = unit.hp

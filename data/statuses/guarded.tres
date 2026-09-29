@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="StatusData" format=3]
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://cu6cxdyh684h8"]
 
 [ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_4n73f"]
 [ext_resource type="Script" path="res://scripts/data/status_data.gd" id="2_exbst"]

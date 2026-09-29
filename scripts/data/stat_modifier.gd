@@ -1,3 +1,4 @@
+@tool
 class_name StatModifier
 extends Resource
 ## One number a status, a level or a rune changes while it's active. Units add up the

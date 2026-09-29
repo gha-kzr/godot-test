@@ -1,3 +1,4 @@
+@tool
 class_name StatusInstance
 extends RefCounted
 ## A status on a unit: which one, how many of the unit's turns it has left, and who cast

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DamageType" format=3]
+[gd_resource type="Resource" script_class="DamageType" format=3 uid="uid://cd6kstb7xerof"]
 
 [ext_resource type="Script" path="res://scripts/data/damage_type.gd" id="1_bfksa"]
 

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AIProfile" format=3 uid="uid://cfy17nro8y2fe"]
+
+[ext_resource type="Script" path="res://scripts/data/ai_profile.gd" id="1_iun1l"]
+
+[resource]
+script = ExtResource("1_iun1l")
+kill_bonus = 20.0
+friendly_fire_weight = 2.0
+status_weight = 1.0

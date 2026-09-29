@@ -1,3 +1,4 @@
+@tool
 class_name DamageType
 extends Resource
 ## A kind of damage (Physical, Fire, Poison, …). Data only: a new element is a new .tres;

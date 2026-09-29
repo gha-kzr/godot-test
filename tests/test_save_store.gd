@@ -35,6 +35,8 @@ func _store() -> SaveStore:
 
 ## Removes everything the test wrote under DIR.
 func _clean() -> void:
+	if not DirAccess.dir_exists_absolute(DIR):
+		return
 	for file in DirAccess.get_files_at(DIR):
 		DirAccess.remove_absolute(DIR.path_join(file))
 	DirAccess.remove_absolute(DIR)
@@ -192,7 +194,7 @@ func test_party_and_unlocks_follow_heroes_when_the_roster_is_reordered() -> void
 
 func test_duplicate_party_entries_are_dropped() -> void:
 	var roster := _roster()
-	var data := {"version": 2, "party": [roster.heroes[0].resource_path, roster.heroes[0].resource_path]}
+	var data := {"version": 2, "party": [roster.heroes[0].resource_path, roster.heroes[0].resource_path]}  # A version 2 save.
 	assert_eq(Profile.from_dict(data, roster).party, [0] as Array[int])
 	_clean()
 
@@ -201,4 +203,47 @@ func test_new_starting_unlocks_reach_old_saves() -> void:
 	var roster := _roster()
 	var data := {"version": 2, "unlocked": [roster.heroes[0].resource_path]}
 	assert_eq(Profile.from_dict(data, roster).unlocked, [0, 1] as Array[int], "the roster's starting unlocks stay")
+	_clean()
+
+
+func test_saves_find_resources_by_uid_when_files_move() -> void:
+	# A real content rune, saved under a path it no longer has: its UID still finds it.
+	var might := load("res://data/runes/might.tres") as RuneData
+	var uid := ResourceUID.id_to_text(ResourceLoader.get_resource_uid(might.resource_path))
+	assert_true(uid.begins_with("uid://"), "content files have UIDs")
+	var roster := load("res://data/progression/roster.tres") as Roster
+	var data := {"version": 3, "stash": [{"uid": uid, "path": "res://data/runes/renamed_since.tres"}]}
+	assert_eq(Profile.from_dict(data, roster).stash, [might] as Array[RuneData])
+	var by_path := {"version": 3, "stash": [{"uid": "", "path": might.resource_path}]}
+	assert_eq(Profile.from_dict(by_path, roster).stash, [might] as Array[RuneData], "the path is the fallback")
+	_clean()
+
+
+func test_version_3_saves_store_uids_and_paths() -> void:
+	var roster := load("res://data/progression/roster.tres") as Roster
+	var profile := Profile.create(roster)
+	profile.stash = [load("res://data/runes/might.tres")] as Array[RuneData]
+	var data := profile.to_dict()
+	assert_eq(data["version"], 3)
+	var ref: Dictionary = data["stash"][0]
+	assert_true(String(ref["uid"]).begins_with("uid://"))
+	assert_eq(ref["path"], "res://data/runes/might.tres")
+	assert_true(String(data["party"][0]["uid"]).begins_with("uid://"), "heroes too")
+	var loaded := Profile.from_dict(data, roster)
+	assert_eq(loaded.stash, profile.stash)
+	assert_eq(loaded.party, profile.party)
+	_clean()
+
+
+func test_every_content_file_has_a_uid() -> void:
+	var missing: Array[String] = []
+	var dirs := ["res://data"]
+	while not dirs.is_empty():
+		var dir: String = dirs.pop_back()
+		for sub in DirAccess.get_directories_at(dir):
+			dirs.append(dir.path_join(sub))
+		for file in DirAccess.get_files_at(dir):
+			if file.ends_with(".tres") and ResourceLoader.get_resource_uid(dir.path_join(file)) == ResourceUID.INVALID_ID:
+				missing.append(dir.path_join(file))
+	assert_eq(missing, [] as Array[String])
 	_clean()

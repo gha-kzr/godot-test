@@ -1,3 +1,4 @@
+@tool
 class_name BattleEvents
 extends RefCounted
 ## What happened during an action, in order. The display replays these; tests assert on them.

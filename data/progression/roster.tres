@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Roster" format=3]
+[gd_resource type="Resource" script_class="Roster" format=3 uid="uid://encs5dyj658n"]
 
 [ext_resource type="Resource" path="res://data/progression/config.tres" id="1_1h3os"]
 [ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="2_grhyv"]

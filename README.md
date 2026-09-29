@@ -58,20 +58,31 @@ In battle, units act in initiative order; each turn a unit has AP for spells and
 
 Hover a spell button for its range, area and effect; hover any other unit on the board to see its HP, AP / MP, statuses and spells in the panel on the right. Statuses show as colored tags above units (e.g. `P3`: Poison, 3 turns left) and in the unit panels: damage or heal over time ticks at the carrier's turn start, AP / MP and damage-taken changes last for the status's turns. While aiming, orange cells can be targeted and darker cells are in range but out of line of sight. The unit whose turn it is has a pulsing ring. The result screen shows the battle seed: set it as `rng_seed` on the `Battle` node to replay that battle.
 
+## Design tools (editor plugin)
+
+`addons/design_tools` is enabled in the project. Open the editor (`godot -e`):
+
+- **Previews in the Inspector** — select a spell `.tres` to see its range and area on a grid, expected damage / heal across Power (columns) and resistance (rows), damage per AP and its statuses' totals; select an enemy to see HP / Power / XP / resistances at levels 1–10 for the normal, elite and boss presets, and its loot odds. Previews follow your edits.
+- **Design panel** (bottom, next to Output) — **New** creates a spell, enemy (with its unit), encounter or preset from a valid template; **Duplicate selected** copies the one open in the Inspector under a new name. New files get a UID and open in the Inspector.
+- **Balance lab** (in the Design panel) — pick an encounter, two heroes and their levels, a battle count, and **Run**: AI-vs-AI battles run in the background and show the party's win rate, average rounds, damage dealt / taken per unit and spell use.
+- **Board preview** — `scenes/battle/battle.tscn` shows its map in the 3D viewport (`BoardView.preview_map`), updated live as you edit the map's layout.
+
 ## Adding content
 
 Content is data (`.tres` resources), edited in the Inspector or as text; no code changes. The headless tests load and validate every file under `data/`, so run them after any change.
 
-- **A spell** — `data/spells/<name>.tres`, a `SpellData`: `display_name`, `ap_cost`, `min_range` / `max_range` (Manhattan; `min_range = 0` allows the caster's own cell), `needs_line_of_sight`, `height_extends_range`, an `area` (`AreaShape`: SINGLE, CROSS, CIRCLE or LINE with a `size`) and `effects`, applied one after another: `DamageEffect` / `HealEffect` (`min_amount` / `max_amount`) or `ApplyStatusEffect` (`status`). Each effect has a `target_filter`: ALL units in the area (default), ALLIES, ENEMIES, or the CASTER only (even outside the area). New effect kinds are `EffectData` subclasses implementing `apply()` and `describe()`.
+- **A spell** — `data/spells/<name>.tres`, a `SpellData`: `display_name`, `ap_cost`, `min_range` / `max_range` (Manhattan; `min_range = 0` allows the caster's own cell), `needs_line_of_sight`, `height_extends_range`, an `area` (`AreaShape`: SINGLE, CROSS, CIRCLE or LINE with a `size`) and `effects`, applied one after another: `DamageEffect` / `HealEffect` (`min_amount` / `max_amount`, `power_scaling`: how much of the caster's Power applies, 100 % by default) or `ApplyStatusEffect` (`status`). Each effect has a `target_filter`: ALL units in the area (default), ALLIES, ENEMIES, or the CASTER only (even outside the area). New effect kinds are `EffectData` subclasses implementing `apply()` and `describe()`.
 - **A status** — `data/statuses/<name>.tres`, a `StatusData`: `display_name`, `short_label` (tag text), `color`, `is_positive`, `duration` (the carrier's turns), `tick_effects` (fired at each of its turn starts, e.g. a `DamageEffect` for poison) and `modifiers` (`StatModifier`: AP, MP or DAMAGE_TAKEN_PERCENT with an `amount`). Recasting a status refreshes it; it keeps running if its caster dies. A spell applies it through an `ApplyStatusEffect`.
 - **A unit** — `data/units/<name>.tres`, a `UnitData`: `display_name`, `max_hp`, `ap`, `mp`, `initiative` (higher acts first), `spells` (2–4 spell files), `innate_modifiers` (always-on stats, e.g. an enemy's resistances), and a placeholder `color` (or a `model_scene` from an asset pack). A spell costing more AP than the unit has is a validation error.
 - **A map** — `data/maps/<name>.tres`, a `MapData` whose `layout` is text, one row per line, one token per cell: a height (`0`, `1`, `2`…), `<height>p` / `<height>e` for player / enemy spawns (used in reading order), `#` for an obstacle, `.` for a hole. A step can climb 1 level and drop 2; keep every floor cell reachable from the spawns (the slice map test checks this for its map).
 - **A damage type** — `data/damage_types/<name>.tres`, a `DamageType` (`display_name`, `color`); set it as a `DamageEffect`'s `damage_type` and in resistance modifiers.
 - **A rune** — `data/runes/<name>.tres`, a `RuneData`: `display_name`, `rarity` (COMMON, RARE, EPIC, LEGENDARY: drop weight and color; epic+ are one per hero), `modifiers` (`StatModifier`: AP, MP, POWER, MAX_HP, INITIATIVE, DAMAGE_TAKEN_PERCENT, or RESISTANCE_PERCENT with a `damage_type`). Add it to enemies' loot tables to make it drop.
-- **Enemy rewards** — on the enemy's `UnitData`: `xp_reward` and a `loot_table` (`rolls`, `drop_chance`, `runes`; a drop picks a rune weighted by rarity).
+- **An enemy** — `data/enemies/<name>.tres`, an `EnemyData`: its `unit` (a `UnitData`), per-level growth (`hp_per_level`, `power_per_level`), XP (`xp_base` + `xp_per_level`) and a `loot_table` (`data/loot/*.tres`: `rolls`, `drop_chance`, `runes`; a drop picks a rune weighted by rarity). Use **New → Enemy** in the Design panel.
+- **A difficulty preset** — `data/presets/<name>.tres`, a `DifficultyPreset`: `tag` (shown after the name, e.g. "Elite"), `hp_multiplier`, `power_bonus`, `extra_modifiers`, `xp_multiplier`, `extra_loot_rolls`, `rarity_floor`, an optional `ai_profile` and `visual_scale`.
+- **An encounter** — `data/encounters/<name>.tres`, an `Encounter`: a `map`, `spawns` (each an enemy, a `level` and a `preset`, in enemy-spawn order) and an `ai_profile`. Try it in the balance lab.
 - **A hero** — `data/heroes/<name>.tres`, a `HeroData`: its `unit` (a `UnitData`: base stats and kit) and `level_rewards` (one `LevelReward` per level from 2: `modifiers` and unlocked `spells`; 4 spells at most in total). Add it to `data/progression/roster.tres` (`heroes`, `starting_unlocked`, `starting_party`); the XP curve and level cap are in `data/progression/config.tres`.
-- **The game's battle** — select the `Game` node in `scenes/game/game.tscn`: `map`, `enemies`, `ai_profile` (the party comes from the profile).
-- **A standalone battle** — select the `Battle` node in `scenes/battle/battle.tscn` and set `map`, `players` and `enemies` (one unit per spawn at most), `ai_profile` (`data/ai/*.tres`: kill bonus, heal and friendly-fire weights, and how it values statuses) and `rng_seed` (0 = random).
+- **The game's battle** — select the `Game` node in `scenes/game/game.tscn` and set its `encounter` (the party comes from the profile).
+- **A standalone battle** — select the `Battle` node in `scenes/battle/battle.tscn` and set `encounter`, `players`, a fallback `ai_profile` (`data/ai/*.tres`: kill bonus, heal and friendly-fire weights, and how it values statuses) and `rng_seed` (0 = random).
 
 ## Agent guidelines
 
@@ -90,6 +101,7 @@ Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://gi
 
 ```
 project.godot     # project config (main scene: res://scenes/game/game.tscn)
+addons/           # editor plugins (design_tools: previews, Design panel, balance lab)
 scenes/           # .tscn scene files
 scripts/          # .gd scripts (and their .uid files, commit these)
   battle/         #   rules: state, movement, targeting, actions, AI (no nodes)
@@ -97,7 +109,7 @@ scripts/          # .gd scripts (and their .uid files, commit these)
   view/           #   display: board, camera, units, event player, HUD, controller
   progression/    #   lasting progress: hero records, profile, save (no nodes)
   game/           #   game root (profile, screens) and party screen
-data/             # content .tres files (units, spells, statuses, damage types, runes, heroes, maps, AI profiles)
+data/             # content .tres files (units, enemies, spells, statuses, damage types, runes, loot, presets, encounters, heroes, maps, AI profiles)
 tests/            # headless tests: test_*.gd files extending TestCase
 docs/roadmap.md   # milestones toward the full game
 docs/decisions/   # design decision records

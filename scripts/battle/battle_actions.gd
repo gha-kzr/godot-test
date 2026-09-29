@@ -1,3 +1,4 @@
+@tool
 class_name BattleActions
 extends RefCounted
 ## Player and AI commands (command pattern). An action names its actor by id and holds

@@ -1,3 +1,4 @@
+@tool
 class_name AIProfile
 extends Resource
 ## Scoring weights for EnemyAI. Different profiles give different behaviour

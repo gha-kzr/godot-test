@@ -1,3 +1,4 @@
+@tool
 class_name SaveStore
 extends RefCounted
 ## Reads and writes the profile as JSON. A missing, unreadable or newer save never

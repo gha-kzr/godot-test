@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/view/battle_controller.gd" id="1_ctrl"]
-[ext_resource type="Resource" path="res://data/maps/slice.tres" id="2_map"]
+[ext_resource type="Resource" path="res://data/encounters/slice.tres" id="2_encounter"]
 [ext_resource type="PackedScene" path="res://scenes/battle/camera_rig.tscn" id="3_rig"]
 [ext_resource type="Script" path="res://scripts/view/board_view.gd" id="4_board"]
 [ext_resource type="Script" path="res://scripts/view/units_view.gd" id="5_units"]
@@ -9,10 +9,9 @@
 [ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="7_unit_data"]
 [ext_resource type="Resource" path="res://data/units/knight.tres" id="8_knight"]
 [ext_resource type="Resource" path="res://data/units/mage.tres" id="9_mage"]
-[ext_resource type="Resource" path="res://data/units/brute.tres" id="10_brute"]
-[ext_resource type="Resource" path="res://data/units/archer.tres" id="11_archer"]
 [ext_resource type="PackedScene" path="res://scenes/battle/hud.tscn" id="12_hud"]
 [ext_resource type="Resource" path="res://data/ai/default.tres" id="13_ai"]
+[ext_resource type="Resource" path="res://data/maps/slice.tres" id="14_preview_map"]
 
 [sub_resource type="Environment" id="Environment_env"]
 background_mode = 1
@@ -24,15 +23,15 @@ tonemap_mode = 2
 
 [node name="Battle" type="Node3D"]
 script = ExtResource("1_ctrl")
-map = ExtResource("2_map")
+encounter = ExtResource("2_encounter")
 players = Array[ExtResource("7_unit_data")]([ExtResource("8_knight"), ExtResource("9_mage")])
-enemies = Array[ExtResource("7_unit_data")]([ExtResource("10_brute"), ExtResource("11_archer")])
 ai_profile = ExtResource("13_ai")
 
 [node name="CameraRig" parent="." instance=ExtResource("3_rig")]
 
 [node name="BoardView" type="Node3D" parent="."]
 script = ExtResource("4_board")
+preview_map = ExtResource("14_preview_map")
 
 [node name="UnitsView" type="Node3D" parent="."]
 script = ExtResource("5_units")

@@ -32,6 +32,7 @@ var _board: BoardView
 var _max_hp := 1
 var _material: StandardMaterial3D  ## Placeholder only; models keep their own look.
 var _pulse_tween: Tween
+var _visual_scale := 1.0
 ## Tags in status order (the tick order).
 var _status_tags: Dictionary[StatusData, Label3D] = {}
 
@@ -53,6 +54,7 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	set_process(false)  # Until it has status tags.
 	unit_id = unit.id
 	_board = board
+	_visual_scale = unit.visual_scale
 	_max_hp = unit.max_hp()
 	name = "Unit%d" % unit.id
 	if unit.data.model_scene != null:
@@ -81,8 +83,8 @@ func sync(unit: UnitState) -> void:
 	_hp_label.visible = alive
 	_pick_body.collision_layer = BoardView.UNITS_LAYER if alive else 0
 	if alive:  # Undo a death squash (e.g. after undo or a desync).
-		_body.scale = Vector3.ONE
-		_ring.scale = Vector3.ONE
+		_body.scale = Vector3.ONE * _visual_scale
+		_ring.scale = Vector3.ONE * _visual_scale
 	_clear_status_tags()
 	for status in unit.statuses:
 		_set_status_tag(status.data, status.turns_left)
@@ -181,11 +183,11 @@ func set_active(active: bool) -> void:
 	if _pulse_tween != null:
 		_pulse_tween.kill()
 		_pulse_tween = null
-	_ring.scale = Vector3.ONE
+	_ring.scale = Vector3.ONE * _visual_scale
 	if active and visible:
 		_pulse_tween = create_tween().set_loops().set_trans(Tween.TRANS_SINE)
-		_pulse_tween.tween_property(_ring, "scale", Vector3.ONE * ACTIVE_PULSE_SCALE, ACTIVE_PULSE_DURATION)
-		_pulse_tween.tween_property(_ring, "scale", Vector3.ONE, ACTIVE_PULSE_DURATION)
+		_pulse_tween.tween_property(_ring, "scale", Vector3.ONE * ACTIVE_PULSE_SCALE * _visual_scale, ACTIVE_PULSE_DURATION)
+		_pulse_tween.tween_property(_ring, "scale", Vector3.ONE * _visual_scale, ACTIVE_PULSE_DURATION)
 
 
 func is_active() -> bool:

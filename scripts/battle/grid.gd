@@ -1,3 +1,4 @@
+@tool
 class_name Grid
 extends RefCounted
 ## Static battlefield terrain: size, height and type per cell. Immutable once built,

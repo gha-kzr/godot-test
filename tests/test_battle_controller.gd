@@ -17,11 +17,8 @@ func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[Uni
 	var controller := BATTLE_SCENE.instantiate() as BattleController
 	controller.rng_seed = 7
 	if not layout.is_empty():
-		var map := MapData.new()
-		map.layout = layout
-		controller.map = map
+		controller.encounter = BattleFixtures.encounter(layout, enemies)
 		controller.players = players
-		controller.enemies = enemies
 	_tree().root.add_child(controller)
 	return controller
 
@@ -271,8 +268,8 @@ func test_a_failed_restart_keeps_the_current_battle() -> void:
 	controller.click_cell(Vector2i(3, 0))
 	await _tree().process_frame
 	assert_eq(controller.input_state, BattleController.State.ANIMATING, "mid-walk")
-	controller.map = null
-	expect_error("no map set")
+	controller.encounter = null
+	expect_error("no encounter or map set")
 	controller.restart()
 	assert_eq(controller.battle, old_battle)
 	Engine.time_scale = TIME_SCALE
@@ -342,7 +339,7 @@ func test_the_hud_never_runs_ahead_of_the_animations() -> void:
 	controller.end_turn()
 	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.IDLE]))
 	assert_eq(panel_after_first_event.get("name"), "P0", "still P0 while its turn end plays")
-	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "E1", "E1 once the playback is over")
+	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "E1 Lv 1", "E1 once the playback is over")
 	var chips := controller.hud.get_node("%TurnOrder").get_child_count()
 	assert_eq(chips, 2, "E0 left the turn order")
 	controller._hovered_cell = Vector2i(3, 0)

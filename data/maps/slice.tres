@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MapData" format=3]
+[gd_resource type="Resource" script_class="MapData" format=3 uid="uid://cr166ra0kg83f"]
 
 [ext_resource type="Script" path="res://scripts/data/map_data.gd" id="1_arflf"]
 

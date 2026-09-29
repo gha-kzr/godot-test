@@ -1,3 +1,4 @@
+@tool
 class_name HeroData
 extends Resource
 ## A playable hero: its base unit (stats and starting kit) and what each level brings.

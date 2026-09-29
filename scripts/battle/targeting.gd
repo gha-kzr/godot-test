@@ -1,3 +1,4 @@
+@tool
 class_name Targeting
 extends RefCounted
 ## Spell geometry: range, line of sight and area. Pure rules on a BattleState;

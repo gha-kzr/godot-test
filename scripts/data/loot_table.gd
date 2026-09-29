@@ -1,3 +1,4 @@
+@tool
 class_name LootTable
 extends Resource
 ## What an enemy can drop when a battle is won: `rolls` tries, each dropping a rune with
@@ -8,26 +9,45 @@ extends Resource
 @export var runes: Array[RuneData] = []
 
 
-func roll(rng: RandomNumberGenerator) -> Array[RuneData]:
+## `extra_rolls` (e.g. from a preset) add tries; drops are at least `rarity_floor` rare
+## (the whole table if nothing is that rare).
+func roll(rng: RandomNumberGenerator, extra_rolls := 0, rarity_floor := RuneData.Rarity.COMMON) -> Array[RuneData]:
 	var dropped: Array[RuneData] = []
-	if runes.is_empty():
+	var pool := runes.filter(func(r: RuneData) -> bool: return r.rarity >= rarity_floor)
+	if pool.is_empty():
+		pool = runes
+	if pool.is_empty():
 		return dropped
-	for i in rolls:
+	for i in rolls + extra_rolls:
 		if rng.randf() < drop_chance:
-			dropped.append(_pick(rng))
+			dropped.append(_pick(rng, pool))
 	return dropped
 
 
-func _pick(rng: RandomNumberGenerator) -> RuneData:
+## Probability that one roll drops each rune (for previews).
+func drop_odds(rarity_floor := RuneData.Rarity.COMMON) -> Dictionary[RuneData, float]:
+	var odds: Dictionary[RuneData, float] = {}
+	var pool := runes.filter(func(r: RuneData) -> bool: return r.rarity >= rarity_floor)
+	if pool.is_empty():
+		pool = runes
 	var total := 0
-	for rune in runes:
+	for rune in pool:
+		total += RuneData.RARITY_WEIGHTS[rune.rarity]
+	for rune in pool:
+		odds[rune] = drop_chance * RuneData.RARITY_WEIGHTS[rune.rarity] / float(total)
+	return odds
+
+
+static func _pick(rng: RandomNumberGenerator, pool: Array) -> RuneData:
+	var total := 0
+	for rune: RuneData in pool:
 		total += RuneData.RARITY_WEIGHTS[rune.rarity]
 	var pick := rng.randi_range(1, total)
-	for rune in runes:
+	for rune: RuneData in pool:
 		pick -= RuneData.RARITY_WEIGHTS[rune.rarity]
 		if pick <= 0:
 			return rune
-	return runes.back()
+	return pool.back()
 
 
 func get_validation_errors() -> PackedStringArray:

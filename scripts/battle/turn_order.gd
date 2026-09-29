@@ -1,3 +1,4 @@
+@tool
 class_name TurnOrder
 extends RefCounted
 ## Initiative order of unit ids: highest initiative first, ties broken by lower id.

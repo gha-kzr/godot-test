@@ -1,3 +1,4 @@
+@tool
 class_name Roster
 extends Resource
 ## Every hero the game has, which ones start unlocked and in the party, and the

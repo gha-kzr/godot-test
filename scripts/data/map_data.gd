@@ -1,3 +1,4 @@
+@tool
 class_name MapData
 extends Resource
 ## A battle map written as text: one row per line, one whitespace-separated token per cell.
@@ -11,7 +12,11 @@ const PLAYER_SPAWN := "p"
 const ENEMY_SPAWN := "e"
 
 @export var display_name := ""
-@export_multiline var layout := ""
+## Emits `changed` when edited, so editor previews can follow.
+@export_multiline var layout := "":
+	set(value):
+		layout = value
+		emit_changed()
 
 
 func get_validation_errors() -> PackedStringArray:

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RuneData" format=3]
+[gd_resource type="Resource" script_class="RuneData" format=3 uid="uid://b7bfjsxn2vfb7"]
 
 [ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_jlemi"]
 [ext_resource type="Resource" path="res://data/damage_types/fire.tres" id="2_8sktr"]

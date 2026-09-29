@@ -1,3 +1,4 @@
+@tool
 class_name ProgressionConfig
 extends Resource
 ## Shared progression numbers: the level cap and the XP curve.

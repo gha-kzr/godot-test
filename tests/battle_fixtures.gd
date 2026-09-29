@@ -108,3 +108,24 @@ static func rune(rune_name: String, rarity := RuneData.Rarity.COMMON, modifiers:
 	result.rarity = rarity
 	result.modifiers = modifiers if not modifiers.is_empty() else ([modifier(StatModifier.Stat.POWER, 5)] as Array[StatModifier])
 	return result
+
+
+## An encounter on `layout` with each unit as a level-1 enemy (no growth, no rewards unless
+## `xp` is given), for tests that fight through the battle controller.
+static func encounter(layout: String, enemies: Array[UnitData], xp := 0, preset: DifficultyPreset = null) -> Encounter:
+	var result := Encounter.new()
+	result.display_name = "Test"
+	result.map = MapData.new()
+	result.map.layout = layout
+	for unit_data in enemies:
+		var enemy := EnemyData.new()
+		enemy.unit = unit_data
+		enemy.hp_per_level = 0
+		enemy.power_per_level = 0
+		enemy.xp_base = xp
+		enemy.xp_per_level = 0
+		var spawn := EncounterSpawn.new()
+		spawn.enemy = enemy
+		spawn.preset = preset
+		result.spawns.append(spawn)
+	return result

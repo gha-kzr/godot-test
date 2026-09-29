@@ -65,7 +65,7 @@ func test_move_climbs_before_crossing_and_crosses_before_dropping() -> void:
 	var stage := _stage()  # Cells (0,0) level 0, (1,0) level 1, (2,0) level 0.
 	Engine.time_scale = 1.0  # Real speed, so frames sample the middle of each step.
 	var view := stage.units.view(0)
-	var level := stage.board.board_theme.level_height
+	var level := stage.board.active_theme().level_height
 	# Lambdas capture locals by value; a Dictionary is shared by reference.
 	var probe := {"moving": true, "crossing_samples": 0}
 	var watch := func() -> void:

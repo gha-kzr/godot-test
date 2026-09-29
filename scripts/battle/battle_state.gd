@@ -1,3 +1,4 @@
+@tool
 class_name BattleState
 extends RefCounted
 ## Everything that changes during a battle. The rules read and mutate it; views only read it.
@@ -15,10 +16,11 @@ var use_average_rolls := false
 
 
 ## Places players on the map's player spawns and enemies on its enemy spawns, in order.
-## `player_modifiers[i]` (optional) are player i's permanent modifiers (levels, runes).
+## `player_modifiers[i]` (optional) are player i's permanent modifiers (levels, runes);
+## `enemy_builds[i]` (optional) is enemy i's build (level, preset, reward, AI, label).
 ## Returns null (with an error) if the map is invalid or has too few spawns.
 static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: Array[UnitData], rng_seed: int,
-		player_modifiers: Array = []) -> BattleState:
+		player_modifiers: Array = [], enemy_builds: Array = []) -> BattleState:
 	if map.grid == null:
 		push_error("BattleState: invalid map %s" % [map.errors])
 		return null
@@ -41,7 +43,17 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 			unit.start_turn()
 		state.units.append(unit)
 	for i in enemies.size():
-		state.units.append(UnitState.new(state.units.size(), enemies[i], UnitState.Team.ENEMY, map.enemy_spawns[i]))
+		var unit := UnitState.new(state.units.size(), enemies[i], UnitState.Team.ENEMY, map.enemy_spawns[i])
+		if i < enemy_builds.size():
+			var build: EnemyData.Build = enemy_builds[i]
+			unit.permanent_modifiers.assign(build.modifiers)
+			unit.reward = build.reward
+			unit.ai_profile = build.ai_profile
+			unit.label = build.label
+			unit.visual_scale = build.visual_scale
+			unit.hp = unit.max_hp()
+			unit.start_turn()
+		state.units.append(unit)
 	state.turn_order = TurnOrder.from_units(state.units)
 	state.rng.seed = rng_seed
 	return state

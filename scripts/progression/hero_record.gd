@@ -1,3 +1,4 @@
+@tool
 class_name HeroRecord
 extends RefCounted
 ## A hero's lasting progress: level, XP and its 6 rune slots. Plain data, saved in the

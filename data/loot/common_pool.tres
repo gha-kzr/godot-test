@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://bxe0fj01ic8ox"]
+
+[ext_resource type="Script" path="res://scripts/data/rune_data.gd" id="1_5o5eh"]
+[ext_resource type="Resource" path="res://data/runes/fire_ward.tres" id="2_27hw5"]
+[ext_resource type="Resource" path="res://data/runes/focus.tres" id="3_4xy6t"]
+[ext_resource type="Resource" path="res://data/runes/might.tres" id="4_1wqtl"]
+[ext_resource type="Resource" path="res://data/runes/quickness.tres" id="5_34jlr"]
+[ext_resource type="Resource" path="res://data/runes/stone_skin.tres" id="6_uojhm"]
+[ext_resource type="Resource" path="res://data/runes/swiftness.tres" id="7_8pb16"]
+[ext_resource type="Resource" path="res://data/runes/venom_ward.tres" id="8_hhwjy"]
+[ext_resource type="Resource" path="res://data/runes/vitality.tres" id="9_vxaqx"]
+[ext_resource type="Script" path="res://scripts/data/loot_table.gd" id="10_y7stt"]
+
+[resource]
+script = ExtResource("10_y7stt")
+drop_chance = 0.6
+runes = Array[ExtResource("1_5o5eh")]([ExtResource("2_27hw5"), ExtResource("3_4xy6t"), ExtResource("4_1wqtl"), ExtResource("5_34jlr"), ExtResource("6_uojhm"), ExtResource("7_8pb16"), ExtResource("8_hhwjy"), ExtResource("9_vxaqx")])

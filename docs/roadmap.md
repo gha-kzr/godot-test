@@ -28,7 +28,8 @@ Decisions: `decisions/2026-09-28-progression.md`; plan: `plans/2026-09-28-progre
 
 *Why here:* this is the core of "keep level and loot", and both design tools need it.
 
-### 3. Design tools
+### 3. Design tools — done
+Decisions: `decisions/2026-09-29-design-tools.md`; plan: `plans/2026-09-29-design-tools.md`.
 - **Skill designer** — area of effect (visual shape preview), power, scaling; previews such as damage per AP at each level. Slice plan item 5.
 - **Enemy designer** — level, stats, loot table, XP given on death, difficulty presets (normal / elite / boss). Slice plan item 6.
 

@@ -1,3 +1,4 @@
+@tool
 class_name EnemyAI
 extends RefCounted
 ## Greedy utility AI for the unit whose turn it is. Call choose_next() repeatedly and

@@ -1,3 +1,4 @@
+@tool
 class_name UnitState
 extends RefCounted
 ## Per-battle values of one unit. The UnitData template is shared and never mutated.
@@ -19,8 +20,16 @@ var ap: int
 var mp: int
 ## In application order, which is also tick order.
 var statuses: Array[StatusInstance] = []
-## For the whole battle: a hero's level rewards and runes. Shared resources, read-only.
+## For the whole battle: a hero's level rewards and runes, an enemy's level and preset.
+## Shared resources, read-only.
 var permanent_modifiers: Array[StatModifier] = []
+## What killing it gives (enemies from an encounter); null for heroes.
+var reward: UnitReward
+## Overrides the encounter's AI profile (e.g. a boss preset); null: the encounter's.
+var ai_profile: AIProfile
+## Name shown in the HUD, e.g. "Brute Lv 5 · Elite".
+var label := ""
+var visual_scale := 1.0
 
 
 func _init(unit_id: int, unit_data: UnitData, unit_team: Team, start_cell: Vector2i) -> void:
@@ -28,6 +37,7 @@ func _init(unit_id: int, unit_data: UnitData, unit_team: Team, start_cell: Vecto
 	data = unit_data
 	team = unit_team
 	cell = start_cell
+	label = unit_data.display_name
 	hp = max_hp()  # Innate modifiers count from the start.
 	ap = max_ap()
 	mp = max_mp()
@@ -139,4 +149,8 @@ func clone() -> UnitState:
 	for status in statuses:
 		copy.statuses.append(status.clone())
 	copy.permanent_modifiers = permanent_modifiers.duplicate()
+	copy.reward = reward
+	copy.ai_profile = ai_profile
+	copy.label = label
+	copy.visual_scale = visual_scale
 	return copy

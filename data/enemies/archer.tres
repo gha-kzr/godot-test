@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://5et4vmvo2won"]
+
+[ext_resource type="Resource" path="res://data/loot/common_pool.tres" id="1_8gvap"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="2_w5n1o"]
+[ext_resource type="Resource" path="res://data/units/archer.tres" id="3_e6vrm"]
+
+[resource]
+script = ExtResource("2_w5n1o")
+unit = ExtResource("3_e6vrm")
+hp_per_level = 3
+power_per_level = 4
+xp_base = 12
+xp_per_level = 4
+loot_table = ExtResource("1_8gvap")

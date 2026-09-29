@@ -1,3 +1,4 @@
+@tool
 class_name LevelReward
 extends Resource
 ## What a hero gains on reaching a level: stat modifiers and spells. A hero's rewards are

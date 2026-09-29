@@ -1,3 +1,4 @@
+@tool
 class_name ApplyStatusEffect
 extends EffectData
 ## Puts a status on the target, or refreshes it (the new one replaces the old). Two

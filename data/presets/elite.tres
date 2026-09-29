@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DifficultyPreset" format=3 uid="uid://t07p8d1mjnpg"]
+
+[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_2m8uw"]
+[ext_resource type="Script" path="res://scripts/data/difficulty_preset.gd" id="2_cqe3q"]
+
+[resource]
+script = ExtResource("2_cqe3q")
+display_name = "Elite"
+tag = "Elite"
+tag_color = Color(0.45, 0.7, 1, 1)
+hp_multiplier = 1.5
+power_bonus = 20
+xp_multiplier = 2.0
+extra_loot_rolls = 1
+visual_scale = 1.1

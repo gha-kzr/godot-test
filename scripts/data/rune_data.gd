@@ -1,3 +1,4 @@
+@tool
 class_name RuneData
 extends Resource
 ## An item a hero equips in one of its 6 rune slots. Hand-made, fixed stats, a rarity.

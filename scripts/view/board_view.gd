@@ -1,3 +1,4 @@
+@tool
 class_name BoardView
 extends Node3D
 ## Draws a Grid: one column per cell stacked to its height, with a collider tagged with
@@ -25,8 +26,22 @@ const HIGHLIGHT_LAYER_GAP := 0.01
 const PIT_DEPTH := 2.0
 
 @export var board_theme: BoardTheme
+## Editor only: a map drawn in the 3D viewport so the scene isn't empty, rebuilt live when
+## the map's layout changes. At runtime the battle builds the real board instead.
+@export var preview_map: MapData:
+	set(value):
+		if preview_map != null and preview_map.changed.is_connected(show_preview):
+			preview_map.changed.disconnect(show_preview)
+		preview_map = value
+		if preview_map != null and Engine.is_editor_hint():
+			preview_map.changed.connect(show_preview)
+		if Engine.is_editor_hint() and is_inside_tree():
+			show_preview()
 
 var grid: Grid
+## Used when board_theme is empty; never written to the export, so the editor preview
+## doesn't save a theme into the scene.
+var _default_theme := BoardTheme.new()
 var _cells := Node3D.new()
 var _highlights := Node3D.new()
 var _highlight_groups: Dictionary[Highlight, Node3D] = {}
@@ -48,10 +63,30 @@ func _init() -> void:
 	_highlight_mesh.size = Vector2.ONE * CELL_SIZE * 0.9
 
 
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		show_preview()
+
+
+## Draws `preview_map` (the generated nodes have no owner, so they're never saved into the
+## scene). Clears the board when there's no valid map.
+func show_preview() -> void:
+	if preview_map == null:
+		_clear_cells()
+		return
+	var parsed := preview_map.parse()
+	if parsed.grid != null:
+		build(parsed.grid)
+
+
+func _clear_cells() -> void:
+	for child in _cells.get_children():
+		child.free()
+	grid = null
+
+
 ## Rebuilds every cell for `board_grid`, clearing highlights.
 func build(board_grid: Grid) -> void:
-	if board_theme == null:
-		board_theme = BoardTheme.new()
 	grid = board_grid
 	for child in _cells.get_children():
 		child.free()
@@ -67,9 +102,14 @@ func build(board_grid: Grid) -> void:
 	_add_pit()
 
 
+## The theme in use: board_theme, or the defaults.
+func active_theme() -> BoardTheme:
+	return board_theme if board_theme != null else _default_theme
+
+
 ## Top center of a cell in local space: where units stand and highlights lie.
 func cell_to_world(cell: Vector2i) -> Vector3:
-	return Vector3(cell.x * CELL_SIZE, grid.height_at(cell) * board_theme.level_height, cell.y * CELL_SIZE)
+	return Vector3(cell.x * CELL_SIZE, grid.height_at(cell) * active_theme().level_height, cell.y * CELL_SIZE)
 
 
 ## Center of the board at height 0, for the camera to orbit.
@@ -125,8 +165,8 @@ func highlighted_count(kind: Highlight) -> int:
 
 
 func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
-	var top := grid.height_at(cell) * board_theme.level_height
-	var bottom := -board_theme.base_thickness
+	var top := grid.height_at(cell) * active_theme().level_height
+	var bottom := -active_theme().base_thickness
 	var body := StaticBody3D.new()
 	body.name = "Cell_%d_%d" % [cell.x, cell.y]
 	body.collision_layer = BOARD_LAYER
@@ -135,24 +175,24 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 	body.position = Vector3(cell.x * CELL_SIZE, 0.0, cell.y * CELL_SIZE)
 	_cells.add_child(body)
 
-	if board_theme.floor_scene != null and not is_obstacle:
-		var model := board_theme.floor_scene.instantiate() as Node3D
+	if active_theme().floor_scene != null and not is_obstacle:
+		var model := active_theme().floor_scene.instantiate() as Node3D
 		model.position.y = top
 		body.add_child(model)
 	else:
-		var fill := CELL_SIZE * board_theme.block_fill
+		var fill := CELL_SIZE * active_theme().block_fill
 		var column := _box(Vector3(fill, top - bottom, fill), (top + bottom) / 2.0, _floor_color(cell))
 		column.name = "Column"
 		body.add_child(column)
 
 	var collider_top := top
 	if is_obstacle:
-		if board_theme.obstacle_scene != null:
-			var model := board_theme.obstacle_scene.instantiate() as Node3D
+		if active_theme().obstacle_scene != null:
+			var model := active_theme().obstacle_scene.instantiate() as Node3D
 			model.position.y = top
 			body.add_child(model)
 		else:
-			var block := _box(OBSTACLE_SIZE, top + OBSTACLE_SIZE.y / 2.0, board_theme.obstacle_color)
+			var block := _box(OBSTACLE_SIZE, top + OBSTACLE_SIZE.y / 2.0, active_theme().obstacle_color)
 			block.name = "Obstacle"
 			body.add_child(block)
 		collider_top = top + OBSTACLE_SIZE.y
@@ -169,7 +209,7 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 
 func _add_pit() -> void:
 	var pit := _box(Vector3(grid.size.x * CELL_SIZE + 2.0, 0.1, grid.size.y * CELL_SIZE + 2.0),
-			-board_theme.base_thickness - PIT_DEPTH, board_theme.pit_color)
+			-active_theme().base_thickness - PIT_DEPTH, active_theme().pit_color)
 	pit.name = "Pit"
 	pit.position.x = center().x
 	pit.position.z = center().z
@@ -187,16 +227,16 @@ func _box(size: Vector3, center_y: float, color: Color) -> MeshInstance3D:
 
 
 func _floor_color(cell: Vector2i) -> Color:
-	return board_theme.floor_color.lightened(grid.height_at(cell) * board_theme.lighten_per_level)
+	return active_theme().floor_color.lightened(grid.height_at(cell) * active_theme().lighten_per_level)
 
 
 func _highlight_color(kind: Highlight) -> Color:
 	match kind:
-		Highlight.REACH: return board_theme.reach_color
-		Highlight.PATH: return board_theme.path_color
-		Highlight.RANGE: return board_theme.range_color
-		Highlight.RANGE_BLOCKED: return board_theme.range_blocked_color
-		_: return board_theme.area_color
+		Highlight.REACH: return active_theme().reach_color
+		Highlight.PATH: return active_theme().path_color
+		Highlight.RANGE: return active_theme().range_color
+		Highlight.RANGE_BLOCKED: return active_theme().range_blocked_color
+		_: return active_theme().area_color
 
 
 ## One shared material per color (and kind), so the board batches well.
