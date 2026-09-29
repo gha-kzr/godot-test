@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="HeroData" format=3 uid="uid://c8tbmj3nc8kon"]
 
-[ext_resource type="Script" path="res://scripts/data/level_reward.gd" id="1_a5eu4"]
-[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="2_5ejea"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="3_8jq1i"]
-[ext_resource type="Resource" path="res://data/spells/whirlwind.tres" id="4_huhsi"]
-[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="5_1xxd6"]
-[ext_resource type="Resource" path="res://data/units/knight.tres" id="6_avtmt"]
+[ext_resource type="Script" uid="uid://crogid3nmpvqc" path="res://scripts/data/level_reward.gd" id="1_a5eu4"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="2_5ejea"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="3_8jq1i"]
+[ext_resource type="Resource" uid="uid://cj5peyqoj2mrh" path="res://data/spells/whirlwind.tres" id="4_huhsi"]
+[ext_resource type="Script" uid="uid://k0qhv5lhw2yq" path="res://scripts/data/hero_data.gd" id="5_1xxd6"]
+[ext_resource type="Resource" uid="uid://mkham6vekv07" path="res://data/units/knight.tres" id="6_avtmt"]
 
 [sub_resource type="Resource" id="Resource_ty23w"]
 script = ExtResource("2_5ejea")

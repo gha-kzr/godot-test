@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="HeroData" format=3 uid="uid://yokf50dmbf6o"]
 
-[ext_resource type="Script" path="res://scripts/data/level_reward.gd" id="1_pgojp"]
-[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="2_t2s1d"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="3_65wfw"]
-[ext_resource type="Resource" path="res://data/spells/regeneration.tres" id="4_oi40l"]
-[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="5_ij7mj"]
-[ext_resource type="Resource" path="res://data/units/mage.tres" id="6_duldw"]
+[ext_resource type="Script" uid="uid://crogid3nmpvqc" path="res://scripts/data/level_reward.gd" id="1_pgojp"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="2_t2s1d"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="3_65wfw"]
+[ext_resource type="Resource" uid="uid://dtq082vvu40wm" path="res://data/spells/regeneration.tres" id="4_oi40l"]
+[ext_resource type="Script" uid="uid://k0qhv5lhw2yq" path="res://scripts/data/hero_data.gd" id="5_ij7mj"]
+[ext_resource type="Resource" uid="uid://chk68t5vjn12d" path="res://data/units/mage.tres" id="6_duldw"]
 
 [sub_resource type="Resource" id="Resource_byjel"]
 script = ExtResource("2_t2s1d")

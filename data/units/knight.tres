@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://mkham6vekv07"]
 
-[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_jitr7"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_ee11w"]
-[ext_resource type="Resource" path="res://data/spells/slash.tres" id="3_b81ym"]
-[ext_resource type="Resource" path="res://data/spells/piercing_thrust.tres" id="4_10phg"]
-[ext_resource type="Resource" path="res://data/spells/guard.tres" id="5_ee11w"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="1_jitr7"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="2_ee11w"]
+[ext_resource type="Resource" uid="uid://bqv6y2fxdy7uh" path="res://data/spells/slash.tres" id="3_b81ym"]
+[ext_resource type="Resource" uid="uid://c4ktapn8lviu2" path="res://data/spells/piercing_thrust.tres" id="4_10phg"]
+[ext_resource type="Resource" uid="uid://c0tntaelyfj11" path="res://data/spells/guard.tres" id="5_ee11w"]
 
 [resource]
 script = ExtResource("1_jitr7")

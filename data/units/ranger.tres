@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://c7dakb4enn1a0"]
 
-[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_v46hb"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_rhw08"]
-[ext_resource type="Resource" path="res://data/spells/arrow.tres" id="3_wqxi5"]
-[ext_resource type="Resource" path="res://data/spells/volley.tres" id="4_yuw5u"]
-[ext_resource type="Resource" path="res://data/spells/poison_arrow.tres" id="5_4h3xc"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="1_v46hb"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="2_rhw08"]
+[ext_resource type="Resource" uid="uid://dn5jxbiiomuku" path="res://data/spells/arrow.tres" id="3_wqxi5"]
+[ext_resource type="Resource" uid="uid://mm2oow61uiin" path="res://data/spells/volley.tres" id="4_yuw5u"]
+[ext_resource type="Resource" uid="uid://c0lpi0wcttyeh" path="res://data/spells/poison_arrow.tres" id="5_4h3xc"]
 
 [resource]
 script = ExtResource("1_v46hb")

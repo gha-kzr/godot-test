@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="Roster" format=3 uid="uid://encs5dyj658n"]
 
-[ext_resource type="Resource" path="res://data/progression/config.tres" id="1_1h3os"]
-[ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="2_grhyv"]
-[ext_resource type="Resource" path="res://data/heroes/knight.tres" id="3_vqi2v"]
-[ext_resource type="Resource" path="res://data/heroes/mage.tres" id="4_kqugl"]
-[ext_resource type="Resource" path="res://data/heroes/ranger.tres" id="5_106by"]
-[ext_resource type="Script" path="res://scripts/data/roster.gd" id="6_icgdy"]
+[ext_resource type="Resource" uid="uid://bxceknp21j5h0" path="res://data/progression/config.tres" id="1_1h3os"]
+[ext_resource type="Script" uid="uid://k0qhv5lhw2yq" path="res://scripts/data/hero_data.gd" id="2_grhyv"]
+[ext_resource type="Resource" uid="uid://c8tbmj3nc8kon" path="res://data/heroes/knight.tres" id="3_vqi2v"]
+[ext_resource type="Resource" uid="uid://yokf50dmbf6o" path="res://data/heroes/mage.tres" id="4_kqugl"]
+[ext_resource type="Resource" uid="uid://btx47anmq8vdk" path="res://data/heroes/ranger.tres" id="5_106by"]
+[ext_resource type="Script" uid="uid://4kuccsbw10rr" path="res://scripts/data/roster.gd" id="6_icgdy"]
 
 [resource]
 script = ExtResource("6_icgdy")

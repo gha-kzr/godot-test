@@ -30,6 +30,7 @@ Run these from the repo root:
 | Check a script for errors | `godot --headless --check-only --script scripts/battle/battle.gd` |
 | Run all tests (exit code 1 on failure) | `godot --headless --script res://tests/run_tests.gd` |
 | Run tests whose file name matches | `godot --headless --script res://tests/run_tests.gd -- movement` |
+| Add missing UIDs / `uid=` references to `.tres` / `.tscn` made from the CLI | `godot --headless --script res://tools/fill_uid_refs.gd` |
 | Render frames to PNG (visual check; needs a window, not `--headless`) | `godot --write-movie /tmp/shot.png --fixed-fps 10 --quit-after 30 scenes/battle/battle.tscn` |
 | Open the editor | `godot -e` |
 | Export (needs `export_presets.cfg`) | `godot --headless --export-release "<preset>" build/<file>` |
@@ -93,6 +94,7 @@ Instructions for AI agents working on this repo:
 - **Verify through the CLI:** run `--check-only` on edited scripts and run the game headless. Write tests following `godot-gdscript-headless-testing`.
 - **No `assert()` in game or test code:** a failed assert hangs headless runs instead of failing. Use `push_error()` with a safe fallback in game code, and `TestCase` assertions in tests. Any error logged during a test fails it; a test that triggers one on purpose declares it with `expect_error()`.
 - **Review with `godot-code-review`** before calling a mechanic done.
+- **Keep resource files in the editor's format.** After generating or hand-editing `.tres` / `.tscn` files from the CLI, run `tools/fill_uid_refs.gd` (a test fails otherwise), so opening the editor doesn't rewrite them into formatting-only diffs. Commit any editor re-save on its own.
 - **Design decisions are recorded in `docs/decisions/`.** Read them before designing; don't re-ask what's settled. The milestone order is in `docs/roadmap.md`.
 
 Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://github.com/jame581/GodotPrompter) and [awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) and trimmed to stand alone.
@@ -111,6 +113,7 @@ scripts/          # .gd scripts (and their .uid files, commit these)
   game/           #   game root (profile, screens) and party screen
 data/             # content .tres files (units, enemies, spells, statuses, damage types, runes, loot, presets, encounters, heroes, maps, AI profiles)
 tests/            # headless tests: test_*.gd files extending TestCase
+tools/            # CLI helper scripts (fill_uid_refs.gd)
 docs/roadmap.md   # milestones toward the full game
 docs/decisions/   # design decision records
 docs/plans/       # implementation plans

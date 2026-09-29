@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="DifficultyPreset" format=3 uid="uid://t07p8d1mjnpg"]
 
-[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_2m8uw"]
-[ext_resource type="Script" path="res://scripts/data/difficulty_preset.gd" id="2_cqe3q"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_2m8uw"]
+[ext_resource type="Script" uid="uid://c26l866clg0wm" path="res://scripts/data/difficulty_preset.gd" id="2_cqe3q"]
 
 [resource]
 script = ExtResource("2_cqe3q")

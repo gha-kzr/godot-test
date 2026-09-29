@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dn5jxbiiomuku"]
 
-[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_6p22i"]
-[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_8a0t4"]
-[ext_resource type="Resource" path="res://data/damage_types/physical.tres" id="3_8a0t4"]
-[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="3_74hn8"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="4_awjva"]
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_6p22i"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_8a0t4"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_8a0t4"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_74hn8"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_awjva"]
 
 [sub_resource type="Resource" id="Resource_knx6w"]
 script = ExtResource("1_6p22i")

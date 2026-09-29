@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://3bptfresyfqc"]
 
-[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_yx4ma"]
-[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_64poo"]
-[ext_resource type="Resource" path="res://data/damage_types/fire.tres" id="3_64poo"]
-[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="3_lotta"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="4_sxol3"]
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_yx4ma"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_64poo"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_64poo"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_lotta"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_sxol3"]
 
 [sub_resource type="Resource" id="Resource_ct23v"]
 script = ExtResource("1_yx4ma")

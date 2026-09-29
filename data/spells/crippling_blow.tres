@@ -1,12 +1,12 @@
 [gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://c71jd5qaybrc8"]
 
-[ext_resource type="Script" path="res://scripts/data/area_shape.gd" id="1_jdfao"]
-[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="2_pecx3"]
-[ext_resource type="Script" path="res://scripts/data/damage_effect.gd" id="3_jioob"]
-[ext_resource type="Resource" path="res://data/damage_types/physical.tres" id="3_pecx3"]
-[ext_resource type="Script" path="res://scripts/data/apply_status_effect.gd" id="4_77nd0"]
-[ext_resource type="Resource" path="res://data/statuses/crippled.tres" id="5_7uoj3"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="6_6kr0h"]
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_jdfao"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_pecx3"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_jioob"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_pecx3"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="4_77nd0"]
+[ext_resource type="Resource" uid="uid://dwd0srqca2oww" path="res://data/statuses/crippled.tres" id="5_7uoj3"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_6kr0h"]
 
 [sub_resource type="Resource" id="Resource_owgko"]
 script = ExtResource("1_jdfao")

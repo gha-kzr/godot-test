@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://dwd0srqca2oww"]
 
-[ext_resource type="Script" path="res://scripts/data/stat_modifier.gd" id="1_7kn5s"]
-[ext_resource type="Script" path="res://scripts/data/status_data.gd" id="2_dodfg"]
-[ext_resource type="Script" path="res://scripts/data/effect_data.gd" id="3_b2hke"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_7kn5s"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_dodfg"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_b2hke"]
 
 [sub_resource type="Resource" id="Resource_7kn5s"]
 script = ExtResource("1_7kn5s")

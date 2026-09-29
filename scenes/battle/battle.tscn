@@ -1,17 +1,17 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cmdj5j2exkl1d"]
 
-[ext_resource type="Script" path="res://scripts/view/battle_controller.gd" id="1_ctrl"]
-[ext_resource type="Resource" path="res://data/encounters/slice.tres" id="2_encounter"]
-[ext_resource type="PackedScene" path="res://scenes/battle/camera_rig.tscn" id="3_rig"]
-[ext_resource type="Script" path="res://scripts/view/board_view.gd" id="4_board"]
-[ext_resource type="Script" path="res://scripts/view/units_view.gd" id="5_units"]
-[ext_resource type="Script" path="res://scripts/view/event_player.gd" id="6_events"]
-[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="7_unit_data"]
-[ext_resource type="Resource" path="res://data/units/knight.tres" id="8_knight"]
-[ext_resource type="Resource" path="res://data/units/mage.tres" id="9_mage"]
-[ext_resource type="PackedScene" path="res://scenes/battle/hud.tscn" id="12_hud"]
-[ext_resource type="Resource" path="res://data/ai/default.tres" id="13_ai"]
-[ext_resource type="Resource" path="res://data/maps/slice.tres" id="14_preview_map"]
+[ext_resource type="Script" uid="uid://cwkpahbpnouqx" path="res://scripts/view/battle_controller.gd" id="1_ctrl"]
+[ext_resource type="Resource" uid="uid://coynthw3vfyac" path="res://data/encounters/slice.tres" id="2_encounter"]
+[ext_resource type="PackedScene" uid="uid://b2t6kloj1y2ny" path="res://scenes/battle/camera_rig.tscn" id="3_rig"]
+[ext_resource type="Script" uid="uid://cbdeb2snmkgq1" path="res://scripts/view/board_view.gd" id="4_board"]
+[ext_resource type="Script" uid="uid://dicm74k3wokd1" path="res://scripts/view/units_view.gd" id="5_units"]
+[ext_resource type="Script" uid="uid://0olsf0kckl33" path="res://scripts/view/event_player.gd" id="6_events"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="7_unit_data"]
+[ext_resource type="Resource" uid="uid://mkham6vekv07" path="res://data/units/knight.tres" id="8_knight"]
+[ext_resource type="Resource" uid="uid://chk68t5vjn12d" path="res://data/units/mage.tres" id="9_mage"]
+[ext_resource type="PackedScene" uid="uid://cclqktq8mxis" path="res://scenes/battle/hud.tscn" id="12_hud"]
+[ext_resource type="Resource" uid="uid://cw0qadwpbynea" path="res://data/ai/default.tres" id="13_ai"]
+[ext_resource type="Resource" uid="uid://cr166ra0kg83f" path="res://data/maps/slice.tres" id="14_preview_map"]
 
 [sub_resource type="Environment" id="Environment_env"]
 background_mode = 1
@@ -21,30 +21,30 @@ ambient_light_color = Color(0.75, 0.78, 0.85, 1)
 ambient_light_energy = 0.6
 tonemap_mode = 2
 
-[node name="Battle" type="Node3D"]
+[node name="Battle" type="Node3D" unique_id=1176574393]
 script = ExtResource("1_ctrl")
 encounter = ExtResource("2_encounter")
 players = Array[ExtResource("7_unit_data")]([ExtResource("8_knight"), ExtResource("9_mage")])
 ai_profile = ExtResource("13_ai")
 
-[node name="CameraRig" parent="." instance=ExtResource("3_rig")]
+[node name="CameraRig" parent="." unique_id=128530857 instance=ExtResource("3_rig")]
 
-[node name="BoardView" type="Node3D" parent="."]
+[node name="BoardView" type="Node3D" parent="." unique_id=731596455]
 script = ExtResource("4_board")
 preview_map = ExtResource("14_preview_map")
 
-[node name="UnitsView" type="Node3D" parent="."]
+[node name="UnitsView" type="Node3D" parent="." unique_id=706700500]
 script = ExtResource("5_units")
 
-[node name="EventPlayer" type="Node" parent="."]
+[node name="EventPlayer" type="Node" parent="." unique_id=538355750]
 script = ExtResource("6_events")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1612363647]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
 light_energy = 1.1
 shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2045285415]
 environment = SubResource("Environment_env")
 
-[node name="Hud" parent="." instance=ExtResource("12_hud")]
+[node name="Hud" parent="." unique_id=1002629313 instance=ExtResource("12_hud")]

@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://clj1k4ep88016"]
 
-[ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
-[ext_resource type="Resource" path="res://data/progression/roster.tres" id="2_roster"]
-[ext_resource type="Resource" path="res://data/encounters/slice.tres" id="3_encounter"]
+[ext_resource type="Script" uid="uid://0u4qo0kit652" path="res://scripts/game/game.gd" id="1_game"]
+[ext_resource type="Resource" uid="uid://encs5dyj658n" path="res://data/progression/roster.tres" id="2_roster"]
+[ext_resource type="Resource" uid="uid://coynthw3vfyac" path="res://data/encounters/slice.tres" id="3_encounter"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_game")

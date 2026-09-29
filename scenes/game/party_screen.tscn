@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dxrbdgordbuh6"]
 
-[ext_resource type="Script" path="res://scripts/game/party_screen.gd" id="1_party"]
+[ext_resource type="Script" uid="uid://bykym7jg47d1g" path="res://scripts/game/party_screen.gd" id="1_party"]
 
 [node name="PartyScreen" type="Control"]
 layout_mode = 3

@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://vjq0g8f8ym8h"]
 
-[ext_resource type="Script" path="res://scripts/view/unit_view.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://cq7mwkd4saqg4" path="res://scripts/view/unit_view.gd" id="1_unit"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
 radius = 0.25

@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://5et4vmvo2won"]
 
-[ext_resource type="Resource" path="res://data/loot/common_pool.tres" id="1_8gvap"]
-[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="2_w5n1o"]
-[ext_resource type="Resource" path="res://data/units/archer.tres" id="3_e6vrm"]
+[ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="1_8gvap"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="2_w5n1o"]
+[ext_resource type="Resource" uid="uid://ch70fg7o86gqf" path="res://data/units/archer.tres" id="3_e6vrm"]
 
 [resource]
 script = ExtResource("2_w5n1o")

@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://chk68t5vjn12d"]
 
-[ext_resource type="Script" path="res://scripts/data/unit_data.gd" id="1_sglo2"]
-[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="2_j17p4"]
-[ext_resource type="Resource" path="res://data/spells/firebolt.tres" id="3_bs4io"]
-[ext_resource type="Resource" path="res://data/spells/fireball.tres" id="4_qm8lk"]
-[ext_resource type="Resource" path="res://data/spells/mend.tres" id="5_1autv"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="1_sglo2"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="2_j17p4"]
+[ext_resource type="Resource" uid="uid://3bptfresyfqc" path="res://data/spells/firebolt.tres" id="3_bs4io"]
+[ext_resource type="Resource" uid="uid://dgs2h32llyj5h" path="res://data/spells/fireball.tres" id="4_qm8lk"]
+[ext_resource type="Resource" uid="uid://igvcnh0uv7e7" path="res://data/spells/mend.tres" id="5_1autv"]
 
 [resource]
 script = ExtResource("1_sglo2")
