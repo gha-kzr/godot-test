@@ -106,6 +106,19 @@ func play_move(path: Array[Vector2i]) -> void:
 		_pick_body.set_meta(BoardView.CELL_META, cell)
 
 
+## Before the battle: a quick hop to another start cell.
+func play_place(cell: Vector2i) -> void:
+	var target := _board.cell_to_world(cell)
+	var top := maxf(target.y, position.y) + 0.6
+	var tween := create_tween()
+	tween.tween_property(self, "position", Vector3(position.x, top, position.z), STEP_DURATION * 0.5)
+	tween.tween_property(self, "position", Vector3(target.x, top, target.z), STEP_DURATION)
+	tween.tween_property(self, "position:y", target.y, STEP_DURATION * 0.5)
+	await tween.finished
+	position = target
+	_pick_body.set_meta(BoardView.CELL_META, cell)
+
+
 ## A short lunge toward the target cell (a hop when casting on its own cell).
 func play_cast(target_cell: Vector2i) -> void:
 	var target := _board.cell_to_world(target_cell)

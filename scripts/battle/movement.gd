@@ -20,26 +20,30 @@ class Reach:
 	var origin: Vector2i
 	var _costs: Dictionary[Vector2i, int]
 	var _came_from: Dictionary[Vector2i, Vector2i]
+	## Cells walked through but not ends of a move (allies stand there).
+	var _pass_only: Dictionary[Vector2i, bool]
 
-	func _init(start: Vector2i, costs: Dictionary[Vector2i, int], came_from: Dictionary[Vector2i, Vector2i]) -> void:
+	func _init(start: Vector2i, costs: Dictionary[Vector2i, int], came_from: Dictionary[Vector2i, Vector2i],
+			pass_only: Dictionary[Vector2i, bool] = {}) -> void:
 		origin = start
 		_costs = costs
 		_came_from = came_from
+		_pass_only = pass_only
 
 	## Reachable destination cells, excluding the origin.
 	func cells() -> Array[Vector2i]:
 		var result: Array[Vector2i] = []
 		for cell in _costs:
-			if cell != origin:
+			if cell != origin and cell not in _pass_only:
 				result.append(cell)
 		return result
 
 	func can_reach(cell: Vector2i) -> bool:
-		return cell != origin and _costs.has(cell)
+		return cell != origin and _costs.has(cell) and cell not in _pass_only
 
-	## MP needed to reach the cell, or -1 if unreachable.
+	## MP needed to reach the cell, or -1 if unreachable (or an ally stands there).
 	func cost_to(cell: Vector2i) -> int:
-		return _costs.get(cell, -1)
+		return _costs.get(cell, -1) if cell not in _pass_only else -1
 
 	## Cells to walk through, excluding the origin and including the destination.
 	## Empty if unreachable.
@@ -66,21 +70,27 @@ static func step_cost(grid: Grid, from: Vector2i, to: Vector2i) -> int:
 
 
 ## Every cell the unit can end its move on with its current MP.
-## Living units block their cells, allies included.
+## Enemies block their cells; allies can be walked through but not stopped on.
 ## Takes a unit id, not a UnitState: the unit is looked up in `state`, so the same call
 ## works on the real state and on AI clones.
 static func reach(state: BattleState, unit_id: int) -> Reach:
 	var unit := state.units[unit_id]
 	var costs: Dictionary[Vector2i, int] = {unit.cell: 0}
 	var came_from: Dictionary[Vector2i, Vector2i] = {}
+	var pass_only: Dictionary[Vector2i, bool] = {}
 	var frontier: Array[Vector2i] = [unit.cell]
 
 	while not frontier.is_empty():
 		var current := _pop_cheapest(frontier, costs)
 		for next in state.grid.neighbors(current):
 			var step := step_cost(state.grid, current, next)
-			if step < 0 or state.is_occupied(next):
+			if step < 0:
 				continue
+			var other := state.unit_at(next)
+			if other != null and other.id != unit_id:
+				if other.team != unit.team:
+					continue
+				pass_only[next] = true
 			var cost := costs[current] + step
 			if cost > unit.mp:
 				continue
@@ -89,7 +99,7 @@ static func reach(state: BattleState, unit_id: int) -> Reach:
 				came_from[next] = current
 				if next not in frontier:
 					frontier.append(next)
-	return Reach.new(unit.cell, costs, came_from)
+	return Reach.new(unit.cell, costs, came_from, pass_only)
 
 
 ## Linear scan is fine at battle-map sizes (~100 cells). First-in wins ties,

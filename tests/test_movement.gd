@@ -54,12 +54,39 @@ func test_obstacles_and_holes_block() -> void:
 	assert_false(_reach(layout, 5).can_reach(Vector2i(2, 0)), "5 MP is not enough")
 
 
-func test_units_block_including_allies() -> void:
+func test_allies_are_walked_through_but_not_stopped_on() -> void:
 	# Corridor: P0 at the left, ally P1 in the middle, enemy E0 below.
 	var reach := _reach("0p 0p 0\n#  0e #", 5)
-	assert_false(reach.can_reach(Vector2i(1, 0)), "ally cell")
-	assert_false(reach.can_reach(Vector2i(2, 0)), "can't pass through the ally")
-	assert_false(reach.can_reach(Vector2i(1, 1)), "enemy cell")
+	assert_false(reach.can_reach(Vector2i(1, 0)), "ally cell: not a destination")
+	assert_eq(reach.cost_to(Vector2i(1, 0)), -1)
+	assert_false(Vector2i(1, 0) in reach.cells())
+	assert_true(reach.can_reach(Vector2i(2, 0)), "through the ally")
+	assert_eq(reach.path_to(Vector2i(2, 0)), [Vector2i(1, 0), Vector2i(2, 0)] as Array[Vector2i])
+	assert_eq(reach.cost_to(Vector2i(2, 0)), 2, "the ally's cell costs its normal step")
+
+
+func test_enemies_block() -> void:
+	var reach := _reach("0p 0e 0\n#  #  #", 5)
+	assert_false(reach.can_reach(Vector2i(1, 0)), "enemy cell")
+	assert_false(reach.can_reach(Vector2i(2, 0)), "can't pass through an enemy")
+
+
+func test_enemies_walk_through_their_allies_too() -> void:
+	var state := BattleFixtures.state("0p 0 0 0e 0e", 5)
+	var reach := Movement.reach(state, 2)  # The enemy at the far end, behind its ally.
+	assert_true(reach.can_reach(Vector2i(1, 0)))
+	assert_false(reach.can_reach(Vector2i(0, 0)), "the hero still blocks")
+
+
+func test_a_move_through_an_ally_reports_the_whole_path() -> void:
+	var state := BattleFixtures.state("0p 0p 0\n#  0e #", 5)
+	var battle := Battle.new(state)
+	battle.start()  # P0 acts first.
+	var result := battle.perform(BattleActions.Move.new(0, Vector2i(2, 0)))
+	assert_true(result.ok(), result.error)
+	var moved := result.events[0] as BattleEvents.UnitMoved
+	assert_eq(moved.path, [Vector2i(1, 0), Vector2i(2, 0)] as Array[Vector2i])
+	assert_false(battle.perform(BattleActions.Move.new(0, Vector2i(1, 0))).ok(), "can't end on the ally")
 
 
 func test_dead_units_do_not_block() -> void:
@@ -127,3 +154,8 @@ func test_distances_charge_climbing_on_the_way_to_the_goal() -> void:
 	var cliff := BattleFixtures.state("0p 0 2e")
 	var up := Movement.distances_to(cliff.grid, [Vector2i(2, 0)] as Array[Vector2i])
 	assert_false(up.has(Vector2i(1, 0)), "a 2-level climb can't reach the goal")
+
+
+func test_the_origin_costs_nothing() -> void:
+	var reach := _reach("0p 0 0e", 3)
+	assert_eq(reach.cost_to(Vector2i(0, 0)), 0, "not an ally's cell to walk through")

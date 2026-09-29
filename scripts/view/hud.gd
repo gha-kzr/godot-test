@@ -99,6 +99,7 @@ var _spell_costs: Array[int] = []
 var _selected_style := _make_selected_style()
 var _ap := 0
 var _controls_enabled := true
+var _placing := false
 var _banner_tween: Tween
 
 @onready var _round_label: Label = %RoundLabel
@@ -257,6 +258,13 @@ func set_player_controls_enabled(enabled: bool) -> void:
 	_refresh_buttons()
 
 
+## While heroes are placed before the battle: no spells, and End turn becomes Ready.
+func set_placing(placing: bool) -> void:
+	_placing = placing
+	_end_turn_button.text = "Ready (Space)" if placing else "End turn (Space)"
+	_refresh_buttons()
+
+
 func set_overhead_view(enabled: bool) -> void:
 	_view_button.text = "Side view (T)" if enabled else "Top view (T)"
 
@@ -344,7 +352,7 @@ static func _label(text: String) -> Label:
 
 func _refresh_buttons() -> void:
 	for i in _spell_bar.get_child_count():
-		(_spell_bar.get_child(i) as Button).disabled = not _controls_enabled or _spell_costs[i] > _ap
+		(_spell_bar.get_child(i) as Button).disabled = not _controls_enabled or _placing or _spell_costs[i] > _ap
 	_end_turn_button.disabled = not _controls_enabled
 
 

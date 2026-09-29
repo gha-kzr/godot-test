@@ -115,8 +115,10 @@ func test_ai_vs_ai_battles_on_the_slice_finish() -> void:
 		outcomes[outcome] = outcomes.get(outcome, 0) + 1
 	print("  slice AI-vs-AI outcomes over %d seeds: %s" % [BALANCE_SEEDS, outcomes])
 	print("  spells cast: %s" % casts)
-	for spell_name in ["Poison Arrow", "Crippling Blow", "Guard", "Arrow", "Slash", "Smash", "Firebolt"]:
+	for spell_name in ["Crippling Blow", "Guard", "Slash", "Smash", "Firebolt"]:
 		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
+	# Which Archer attack wins depends on where the heroes stand (Volley when they're close).
+	assert_true(["Arrow", "Poison Arrow", "Volley"].any(func(s: String) -> bool: return casts.get(s, 0) > 0), "the Archer shoots")
 	# A loose balance guard (AI plays both sides): neither team should always win.
 	assert_true(outcomes.get("PLAYER_WON", 0) >= BALANCE_SEEDS / 10, "players win sometimes: %s" % outcomes)
 	assert_true(outcomes.get("ENEMY_WON", 0) >= BALANCE_SEEDS / 10, "enemies win sometimes: %s" % outcomes)

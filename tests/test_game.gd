@@ -203,6 +203,8 @@ func test_results_are_saved_as_soon_as_the_battle_ends() -> void:
 	var game := _game()
 	game.start_tower(1)
 	var battle := _battle(game)
+	assert_eq(battle.input_state, BattleController.State.PLACING, "a floor opens on placement")
+	battle.end_turn()  # Ready.
 	for unit in battle.battle.state.units:
 		if unit.team == UnitState.Team.ENEMY:
 			unit.hp = 0

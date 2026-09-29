@@ -18,7 +18,8 @@ signal battle_ended(state: BattleState)
 ## A battle set up by setup() ended and the player chose to continue.
 signal battle_finished(state: BattleState)
 
-enum State { IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
+## PLACING: before the first turn, heroes are rearranged in the start zone until Ready.
+enum State { PLACING, IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
 
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
@@ -52,6 +53,8 @@ var selected_spell := -1
 var _hovered_cell := BoardView.NO_CELL
 var _reach: Movement.Reach
 var _targetable: Dictionary[Vector2i, bool] = {}
+## The hero selected for placement (a unit id), or -1.
+var _placing_hero := -1
 ## Bumped by each new battle; coroutines of an abandoned battle stop after their awaits.
 var _battle_generation := 0
 
@@ -121,7 +124,10 @@ func start_battle() -> bool:
 	camera_rig.focus(board_view.center())
 	camera_rig.face_toward(_spawn_center(parsed.player_spawns) - board_view.center())
 	hud.hide_result()
-	_play(battle.start())
+	_placing_hero = -1
+	_refresh_hud()
+	_set_state(State.PLACING)
+	hud.show_banner("Place your heroes: click one, then a cell. Ready (Space) to fight")
 	return true
 
 
@@ -154,10 +160,17 @@ func select_spell(index: int) -> void:
 func cancel() -> void:
 	if input_state == State.TARGETING:
 		_enter_idle()
+	elif input_state == State.PLACING and _placing_hero != -1:
+		_placing_hero = -1
+		_set_state(State.PLACING)
 
 
+## Ends the turn, or ends placement and starts the fight.
 func end_turn() -> void:
-	if input_state == State.IDLE or input_state == State.TARGETING:
+	if input_state == State.PLACING:
+		_placing_hero = -1
+		_play(battle.start())
+	elif input_state == State.IDLE or input_state == State.TARGETING:
 		_perform(BattleActions.EndTurn.new(battle.state.current_unit().id))
 
 
@@ -165,6 +178,20 @@ func end_turn() -> void:
 func click_cell(cell: Vector2i) -> void:
 	var unit_id := battle.state.current_unit().id if battle != null else -1
 	match input_state:
+		State.PLACING:
+			# Select a hero, then a zone cell (a hero there swaps); the selected hero again deselects.
+			var unit := battle.state.unit_at(cell)
+			if _placing_hero == -1:
+				if unit != null and unit.team == UnitState.Team.PLAYER:
+					_placing_hero = unit.id
+					_refresh_hud()
+					_set_state(State.PLACING)
+			elif unit != null and unit.id == _placing_hero:
+				cancel()
+			elif cell in battle.state.zone:
+				var hero := _placing_hero
+				_placing_hero = -1
+				_perform(BattleActions.Place.new(hero, cell))
 		State.IDLE:
 			if _reach != null and _reach.can_reach(cell):
 				_perform(BattleActions.Move.new(unit_id, cell))
@@ -229,6 +256,9 @@ func _play(events: Array[BattleEvents.Event]) -> void:
 func _begin_next() -> void:
 	var battle_state := battle.state
 	_refresh_hud()
+	if not battle_state.started:
+		_set_state(State.PLACING)
+		return
 	units_view.set_active(battle_state.current_unit().id if not battle_state.is_over() else -1)
 	if battle_state.is_over():
 		_set_state(State.ENDED)
@@ -285,14 +315,18 @@ func _enter_idle() -> void:
 
 func _set_state(new_state: State) -> void:
 	input_state = new_state
-	var player_turn := new_state == State.IDLE or new_state == State.TARGETING
+	var player_turn := new_state == State.IDLE or new_state == State.TARGETING or new_state == State.PLACING
 	hud.set_player_controls_enabled(player_turn)
+	hud.set_placing(new_state == State.PLACING)
 	hud.set_selected_spell(selected_spell if new_state == State.TARGETING else -1)
 	board_view.clear_highlights()
 	_reach = null
 	_targetable.clear()
 	var unit_id := battle.state.current_unit().id if battle != null and not battle.state.is_over() else -1
 	match new_state:
+		State.PLACING:
+			units_view.set_active(_placing_hero)
+			board_view.show_highlight(BoardView.Highlight.ZONE, battle.state.zone)
 		State.IDLE:
 			_reach = Movement.reach(battle.state, unit_id)
 			board_view.show_highlight(BoardView.Highlight.REACH, _reach.cells())
@@ -313,6 +347,12 @@ func _update_hover() -> void:
 	_update_inspected()
 	var cells: Array[Vector2i] = []
 	match input_state:
+		State.PLACING:
+			if _placing_hero != -1:
+				cells.append(battle.state.units[_placing_hero].cell)
+				if _hovered_cell in battle.state.zone:
+					cells.append(_hovered_cell)
+			board_view.show_highlight(BoardView.Highlight.PATH, cells)
 		State.IDLE:
 			if _reach != null and _reach.can_reach(_hovered_cell):
 				cells = _reach.path_to(_hovered_cell)
@@ -331,7 +371,7 @@ func _update_inspected() -> void:
 	var hovered: UnitState = null
 	if battle != null and _hovered_cell != BoardView.NO_CELL:
 		hovered = battle.state.unit_at(_hovered_cell)
-	if hovered == null or hovered == battle.state.current_unit():
+	if hovered == null or (battle.state.started and hovered == battle.state.current_unit()):
 		hud.hide_inspected()
 	else:
 		hud.show_inspected(Hud.UnitInfo.from_unit(hovered))
@@ -345,6 +385,8 @@ func _refresh_hud() -> void:
 		order.append(Hud.UnitInfo.from_unit(battle_state.units[id]))
 	hud.show_turn_order(order, battle_state.turn_order.round_number, battle_title)
 	var current := battle_state.current_unit()
+	if not battle_state.started:  # Placing: the selected hero, else the first one.
+		current = battle_state.units[_placing_hero] if _placing_hero != -1 else battle_state.units[0]
 	if current != null:
 		hud.show_unit(Hud.UnitInfo.from_unit(current))
 		hud.show_spells(current.data.spells, current.ap)

@@ -11,8 +11,9 @@ func _tree() -> SceneTree:
 	return Engine.get_main_loop() as SceneTree
 
 
-## The slice battle (enemy Archer acts first), or a small custom one.
-func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = []) -> BattleController:
+## The slice battle (enemy Archer acts first), or a small custom one; placement is skipped
+## (Ready) unless `ready` is false.
+func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = [], ready := true) -> BattleController:
 	Engine.time_scale = TIME_SCALE
 	var controller := BATTLE_SCENE.instantiate() as BattleController
 	controller.rng_seed = 7
@@ -20,6 +21,8 @@ func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[Uni
 		controller.encounter = BattleFixtures.encounter(layout, enemies)
 		controller.players = players
 	_tree().root.add_child(controller)
+	if ready:
+		controller.end_turn()
 	return controller
 
 
@@ -148,6 +151,8 @@ func test_restart_mid_animation_starts_a_clean_battle() -> void:
 	var old_battle := controller.battle
 	controller.restart()
 	assert_ne(controller.battle, old_battle)
+	assert_eq(controller.input_state, BattleController.State.PLACING, "a new battle opens on placement")
+	controller.end_turn()
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]), "the new battle reaches the player's turn")
 	assert_eq(controller.battle.state.units[0].cell, Vector2i(0, 0), "fresh positions")
 	assert_false((controller.hud.get_node("%ResultPanel") as Control).visible)
@@ -196,6 +201,7 @@ func test_restart_during_a_cast_does_not_replay_old_events_on_the_new_battle() -
 	controller.click_cell(Vector2i(1, 0))
 	assert_true(await _wait_for_area_flash(controller, 0), "inside the area flash")
 	controller.restart()
+	controller.end_turn()
 	Engine.time_scale = TIME_SCALE
 	for i in 60:
 		await _tree().process_frame  # Let the old playback's flash end and resume.
@@ -257,6 +263,7 @@ func test_play_again_starts_a_new_battle_and_the_seed_is_shown() -> void:
 	(controller.hud.get_node("%RestartButton") as Button).pressed.emit()
 	assert_ne(controller.battle, old_battle)
 	assert_false((controller.hud.get_node("%ResultPanel") as Control).visible)
+	controller.end_turn()
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 
 
@@ -358,3 +365,51 @@ func test_the_inspect_panel_stays_while_the_mouse_is_on_it() -> void:
 	assert_eq(controller._hover_cell(controller.hud.get_node("%EndTurnButton"), Vector2.ZERO), BoardView.NO_CELL,
 			"other HUD controls clear the hover")
 	assert_true(panel.visible)
+
+
+func test_a_battle_opens_on_placement_and_ready_starts_it() -> void:
+	var controller := _controller("0p 0p 0p 0p\n0  0  0  0\n0  0  0  0\n0  0  0  0\n0  0  0e 0",
+			[_fighter("A", 200), _fighter("B", 190)] as Array[UnitData], [_fighter("E", 100)] as Array[UnitData], false)
+	assert_eq(controller.input_state, BattleController.State.PLACING)
+	assert_false(controller.battle.state.started)
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.ZONE), 4, "the zone is shown")
+	var end_turn := controller.hud.get_node("%EndTurnButton") as Button
+	assert_eq(end_turn.text, "Ready (Space)")
+	assert_false(end_turn.disabled)
+	var a := controller.battle.state.units[0]
+	var b := controller.battle.state.units[1]
+	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "A", "the first hero, not the first to act")
+	controller.click_cell(b.cell)
+	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "B", "the selected hero")
+	controller.cancel()
+	controller.click_cell(a.cell)  # Select A...
+	controller.click_cell(Vector2i(3, 0))  # ...and place it.
+	assert_true(await _wait_for(controller, [BattleController.State.PLACING]))
+	assert_eq(a.cell, Vector2i(3, 0))
+	await _tree().process_frame
+	_assert_views_in_sync(controller)
+	controller.click_cell(Vector2i(1, 2))  # Outside the zone, nothing selected: ignored.
+	assert_eq(controller.input_state, BattleController.State.PLACING)
+	end_turn.pressed.emit()
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]), "the fight starts")
+	assert_true(controller.battle.state.started)
+	assert_eq(end_turn.text, "End turn (Space)")
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.ZONE), 0)
+
+
+func test_placement_swaps_heroes_and_cancel_deselects() -> void:
+	var controller := _controller("0p 0p 0p\n0  0  0\n0  0  0\n0  0  0\n0  0e 0",
+			[_fighter("A", 200), _fighter("B", 190)] as Array[UnitData], [_fighter("E", 100)] as Array[UnitData], false)
+	var a := controller.battle.state.units[0]
+	var b := controller.battle.state.units[1]
+	var a_cell := a.cell
+	var b_cell := b.cell
+	controller.click_cell(a_cell)
+	controller.cancel()
+	controller.click_cell(b_cell)  # Nothing selected any more: selects B, moves nothing.
+	assert_eq([a.cell, b.cell], [a_cell, b_cell])
+	controller.click_cell(b_cell)  # B again: deselects.
+	controller.click_cell(a_cell)  # Selects A...
+	controller.click_cell(b_cell)  # ...then B's cell: they swap.
+	assert_true(await _wait_for(controller, [BattleController.State.PLACING]))
+	assert_eq([a.cell, b.cell], [b_cell, a_cell], "swapped")

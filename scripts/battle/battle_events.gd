@@ -44,6 +44,15 @@ class UnitMoved extends UnitEvent:
 		mp_spent = cost
 
 
+## Before the battle: a hero set on another start cell (instantly, no MP).
+class UnitPlaced extends UnitEvent:
+	var cell: Vector2i
+
+	func _init(unit: int, placed_on: Vector2i) -> void:
+		unit_id = unit
+		cell = placed_on
+
+
 class SpellCast extends Event:
 	var caster_id: int
 	var spell: SpellData

@@ -55,6 +55,8 @@ func _play_event(event: BattleEvents.Event) -> void:
 		return
 	if event is BattleEvents.UnitMoved:
 		await view.play_move((event as BattleEvents.UnitMoved).path)
+	elif event is BattleEvents.UnitPlaced:
+		await view.play_place((event as BattleEvents.UnitPlaced).cell)
 	elif event is BattleEvents.SpellCast:
 		var cast := event as BattleEvents.SpellCast
 		_board.show_highlight(BoardView.Highlight.AREA, cast.area)

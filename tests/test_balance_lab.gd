@@ -8,15 +8,22 @@ const SLICE := "res://data/encounters/slice.tres"
 static var _cached: BalanceLab.Result
 
 
-func _party(level: int) -> Array:
+## The Knight and Mage at `level`, plus the Ranger with `with_ranger` (a poisoner).
+func _party(level: int, with_ranger := false) -> Array:
 	var roster := load(ROSTER) as Roster
-	return BalanceLab.party([roster.heroes[0], roster.heroes[1]] as Array[HeroData], [level, level] as Array[int])
+	var heroes: Array[HeroData] = [roster.heroes[0], roster.heroes[1]]
+	if with_ranger:
+		heroes.append(roster.heroes[2])
+	var levels: Array[int] = []
+	for hero in heroes:
+		levels.append(level)
+	return BalanceLab.party(heroes, levels)
 
 
-## 4 battles of level-3 heroes against the slice (seeds 1-4).
+## 4 battles of the three level-3 heroes against the slice (seeds 1-4).
 func _run() -> BalanceLab.Result:
 	if _cached == null:
-		var input := _party(3)
+		var input := _party(3, true)
 		_cached = BalanceLab.run(input[0], input[1], load(SLICE) as Encounter, 4)
 	return _cached
 
@@ -35,7 +42,7 @@ func test_runs_and_tallies_battles() -> void:
 
 
 func test_same_seeds_same_results() -> void:
-	var input := _party(3)
+	var input := _party(3, true)
 	var again := BalanceLab.run(input[0], input[1], load(SLICE) as Encounter, 4)
 	assert_eq([again.player_wins, again.total_rounds, again.damage_dealt], [_run().player_wins, _run().total_rounds, _run().damage_dealt])
 

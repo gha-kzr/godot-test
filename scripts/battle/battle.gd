@@ -36,6 +36,7 @@ func start() -> Array[BattleEvents.Event]:
 		push_error("Battle.start: already started or over")
 		return []
 	_started = true
+	state.started = true
 	return _start_turns(false)
 
 

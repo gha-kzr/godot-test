@@ -16,6 +16,8 @@ extends Resource
 @export var pit_color := Color(0.04, 0.04, 0.06)
 
 @export_group("Highlights")
+## The start zone while placing heroes.
+@export var zone_color := Color(0.2, 0.85, 0.75, 0.4)
 @export var reach_color := Color(0.3, 0.6, 1.0, 0.45)
 @export var path_color := Color(1.0, 1.0, 1.0, 0.6)
 @export var range_color := Color(1.0, 0.55, 0.15, 0.4)

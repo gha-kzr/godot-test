@@ -14,6 +14,8 @@ extends RefCounted
 	func validate(state: BattleState) -> String:
 		if state.is_over():
 			return "the battle is over"
+		if not state.started:
+			return "the battle hasn't started"
 		if actor_id < 0 or actor_id >= state.units.size():
 			return "unknown unit %d" % actor_id
 		if not state.units[actor_id].is_alive():
@@ -103,6 +105,45 @@ class CastSpell extends Action:
 			EffectData.TargetFilter.ENEMIES:
 				return in_area.filter(func(id: int) -> bool: return state.units[id].team != caster_team)
 		return in_area
+
+
+## Before the battle starts: moves a hero to a cell of the start zone, swapping with the
+## hero standing there, if any.
+class Place extends Action:
+	var cell: Vector2i
+
+	func _init(actor: int, zone_cell: Vector2i) -> void:
+		actor_id = actor
+		cell = zone_cell
+
+	func validate(state: BattleState) -> String:
+		if state.started:
+			return "the battle has started"
+		if actor_id < 0 or actor_id >= state.units.size():
+			return "unknown unit %d" % actor_id
+		if state.units[actor_id].team != UnitState.Team.PLAYER:
+			return "only heroes are placed"
+		if not state.units[actor_id].is_alive():
+			return "unit %d is dead" % actor_id
+		return _validate(state)
+
+	func _validate(state: BattleState) -> String:
+		if cell not in state.zone:
+			return "%s isn't in the start zone" % cell
+		return ""
+
+	func apply(state: BattleState) -> Array[BattleEvents.Event]:
+		var unit := state.units[actor_id]
+		if unit.cell == cell:
+			return []
+		var events: Array[BattleEvents.Event] = []
+		var other := state.unit_at(cell)
+		if other != null and other.team == UnitState.Team.PLAYER:
+			other.cell = unit.cell
+			events.append(BattleEvents.UnitPlaced.new(other.id, other.cell))
+		unit.cell = cell
+		events.push_front(BattleEvents.UnitPlaced.new(actor_id, cell))
+		return events
 
 
 class EndTurn extends Action:

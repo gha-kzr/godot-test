@@ -13,9 +13,15 @@ var turn_order: TurnOrder
 var rng := RandomNumberGenerator.new()
 ## Simulations (AI) set this so effects use the average roll instead of the dice.
 var use_average_rolls := false
+## The cells players may start on (the map's player spawns); heroes can be rearranged in
+## it until the battle starts.
+var zone: Array[Vector2i] = []
+## Set by Battle.start(): placement is over.
+var started := false
 
 
-## Places players on the map's player spawns and enemies on its enemy spawns, in order.
+## Places players in the map's player zone (Placement.default_cells: by role when the zone
+## has spare cells, in order otherwise) and enemies on its enemy spawns, in order.
 ## `player_modifiers[i]` (optional) are player i's permanent modifiers (levels, runes);
 ## `enemy_builds[i]` (optional) is enemy i's build (level, preset, reward, AI, label).
 ## `player_hp[i]` (optional) is player i's starting HP (a run's carried-over HP; -1: full).
@@ -36,8 +42,10 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 
 	var state := BattleState.new()
 	state.grid = map.grid
+	state.zone = map.player_spawns.duplicate()
+	var starts := Placement.default_cells(map.grid, map.player_spawns, map.enemy_spawns, players)
 	for i in players.size():
-		var unit := UnitState.new(state.units.size(), players[i], UnitState.Team.PLAYER, map.player_spawns[i])
+		var unit := UnitState.new(state.units.size(), players[i], UnitState.Team.PLAYER, starts[i])
 		if i < player_modifiers.size():
 			unit.permanent_modifiers.assign(player_modifiers[i])
 			unit.hp = unit.max_hp()
@@ -115,4 +123,6 @@ func clone() -> BattleState:
 	copy.rng.seed = rng.seed
 	copy.rng.state = rng.state
 	copy.use_average_rolls = use_average_rolls
+	copy.zone = zone.duplicate()
+	copy.started = started
 	return copy

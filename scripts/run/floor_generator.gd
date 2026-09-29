@@ -39,5 +39,6 @@ static func _build(config: TowerConfig, floor_number: int, rng: RandomNumberGene
 			spawn.enemy = band.enemy_pool[rng.randi_range(0, band.enemy_pool.size() - 1)]
 			spawn.preset = config.elite_preset if i == 0 and TowerConfig.is_elite_floor(floor_number) else config.normal_preset
 		result.spawns.append(spawn)
-	result.map = MapGenerator.generate(rng, config.map_settings, count, boss)
+	result.map = MapGenerator.generate(rng, config.map_settings, count, boss,
+			MapGenerator.pick_layout(rng, config.map_settings, floor_number))
 	return result
