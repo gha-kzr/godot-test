@@ -52,13 +52,28 @@ Decisions: `decisions/2026-09-29-allies-and-placement.md`; plan: `plans/2026-09-
 
 *Why here:* both change the rules; polish should come after the mechanics settle.
 
-### 5. Polish
-- Assets: unit models and animations, spell VFX, particles, sound, board tiles — slice plan item 4 (display polish and asset integration).
-- UI theme and spell icons; title, hub and settings menus.
-- Balance pass, first-run hints, exported builds.
-- Small UX items from the reviews: rebindable click and spell keys, right click over the HUD cancels aiming, a hint when a unit has nothing left to do.
+Milestone 5 used to be one "Polish" milestone; it is split in three. Earlier decision records and plans that defer items "to M5" mean the matching part below: UI and UX items → 5, art and audio → 6, balance, exports and release checks → 7.
 
-*Why last:* polish on stable mechanics isn't wasted. The "small but polished" goal lives here.
+### 5. UI and UX revamp
+- UI theme, fonts and spell / status icons; title, hub (party screen), run screen and settings menus — the first-version screens from M2 and M4 are replaced.
+- Battle HUD: an event-driven refresh (events carrying "after" values, status countdowns mid-playback), the status display and unit inspection panels redone, the preset tag color, a lasting sudden-death tag, the placement phase's hints.
+- Readability: move costs on the hovered path (see "Clearer climbing cost" below), first-run hints, a hint when a unit has nothing left to do.
+- Small UX items from the reviews: rebindable click and spell keys, right click over the HUD cancels aiming, keeping the selected hero across screens, spells in the level-up summary, self-buff turns wording.
+
+*Why here:* the screens are placeholders over stable mechanics; independent of the art, so 5 and 6 can swap order.
+
+### 6. Art and audio
+- Replace the placeholder capsules and boxes: unit models and animations (idle, walk, cast, hit, death) through `UnitData.model_scene`, board tiles and props through `BoardTheme` — slice plan item 4 (display polish and asset integration).
+- Spell VFX and particles, hit and heal feedback; sound effects and music.
+- Visual scale for elites and bosses carried to labels, pick colliders and status tags.
+
+*Why here:* the display already reads everything from data (`model_scene`, `BoardTheme`), so assets slot in without rule changes; independent of the UI revamp.
+
+### 7. Balance and release
+- Balance pass with playtests and the balance lab (tower bands, boons, presets, the slice baseline).
+- Exported builds (`export_presets.cfg`), an export filter for `addons/`, UID save references checked in a real export, a golden test pinning generated floors across engine upgrades.
+
+*Why last:* balance and builds are only final once the content and UI stop moving. The "small but polished" goal lives in 5–7.
 
 Some early placeholder art (one model, one spell effect) can slot in anywhere; it's independent of the rest.
 
