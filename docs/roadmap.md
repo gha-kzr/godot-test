@@ -62,6 +62,12 @@ Decisions: `decisions/2026-09-29-allies-and-placement.md`; plan: `plans/2026-09-
 
 Some early placeholder art (one model, one spell effect) can slot in anywhere; it's independent of the rest.
 
+## Future features
+
+Ideas to schedule into a milestone (grill them first):
+
+- **Clearer climbing cost** — a climb costs 1 extra MP per level, so a 3-cell move can spend 4 MP, and players can't tell why (playtest feedback). Either drop the extra cost (climbing costs a normal step; the climb and drop limits stay), or make it readable: the MP cost shown next to the hovered path (e.g. "4 MP"), climbing steps marked on the path, and the reachable area shaded by cost. Deciding means weighing height as a tactical lever against readability; the AI and balance follow the rule either way.
+
 ## Open questions
 
 To settle with `godot-grill` before the milestone that needs them:
