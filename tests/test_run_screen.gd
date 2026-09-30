@@ -125,3 +125,69 @@ func test_the_party_chips_carry_a_thin_xp_bar() -> void:
 	var bar := chip.find_child("XpBar", true, false) as ProgressBar
 	assert_eq([bar.value, bar.max_value], [10.0, 20.0])
 	screen.free()
+
+
+func _xp_chip(screen: RunScreen, slot := 0) -> Node:
+	return screen.get_node("%PartyHpRow").get_child(slot)
+
+
+func test_the_xp_bar_is_two_tone_with_the_gain_and_its_text() -> void:
+	var profile := _profile_on_floor(2)
+	profile.heroes[0].level = 2
+	profile.heroes[0].xp = 30  # Level 2 spans 20..50: 10 of 30 now.
+	var report := RunDirector.Report.new()
+	report.rewards = BattleRewards.new()
+	report.rewards.xp = 7
+	var screen := _screen(profile, report)
+	var chip := _xp_chip(screen)
+	var solid := chip.find_child("XpBar", true, false) as ProgressBar
+	var gain := chip.find_child("GainBar", true, false) as ProgressBar
+	assert_eq([solid.value, gain.value, solid.max_value], [3.0, 10.0, 30.0], "3 before the fight, 10 now")
+	assert_eq(solid.theme_type_variation, &"XpBarOverlay")
+	assert_eq(gain.theme_type_variation, &"XpGainBar")
+	assert_eq((chip.find_child("XpLabel", true, false) as Label).text, "XP 30 / 50 (+7)")
+	screen.free()
+
+
+func test_a_level_up_shows_a_full_bar_and_says_so() -> void:
+	var profile := _profile_on_floor(2)
+	profile.heroes[0].level = 3
+	profile.heroes[0].xp = 52
+	var report := RunDirector.Report.new()
+	report.rewards = BattleRewards.new()
+	report.rewards.xp = 27
+	report.level_ups = [Profile.LevelUp.new(0, 2, 3)] as Array[Profile.LevelUp]
+	var screen := _screen(profile, report)
+	var chip := _xp_chip(screen)
+	var solid := chip.find_child("XpBar", true, false) as ProgressBar
+	assert_eq(solid.value, solid.max_value, "full")
+	assert_eq((chip.find_child("XpLabel", true, false) as Label).text, "Level up! (+27 XP)")
+	var other := _xp_chip(screen, 1)
+	assert_false((other.find_child("XpLabel", true, false) as Label).text.begins_with("Level up"), "only the hero that levelled")
+	screen.free()
+
+
+func test_without_a_fight_the_text_has_no_gain() -> void:
+	var profile := _profile_on_floor(2)
+	profile.heroes[0].xp = 10
+	var screen := _screen(profile)
+	assert_eq((_xp_chip(screen).find_child("XpLabel", true, false) as Label).text, "XP 10 / 20")
+	var gain := _xp_chip(screen).find_child("GainBar", true, false) as ProgressBar
+	var solid := _xp_chip(screen).find_child("XpBar", true, false) as ProgressBar
+	assert_eq(gain.value, solid.value, "no lighter segment")
+	screen.free()
+
+
+func test_a_hero_at_the_level_cap_shows_a_full_gold_bar_not_a_pale_one() -> void:
+	var profile := _profile_on_floor(2)
+	profile.heroes[0].level = profile.roster.config.level_cap
+	profile.heroes[0].xp = 999
+	var report := RunDirector.Report.new()
+	report.rewards = BattleRewards.new()
+	report.rewards.xp = 30
+	var screen := _screen(profile, report)
+	var chip := _xp_chip(screen)
+	var solid := chip.find_child("XpBar", true, false) as ProgressBar
+	assert_eq(solid.value, solid.max_value, "full gold: nothing left to gain")
+	assert_true((chip.find_child("XpLabel", true, false) as Label).text.contains("max level"))
+	screen.free()

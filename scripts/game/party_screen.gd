@@ -12,6 +12,8 @@ signal continue_pressed
 signal abandon_pressed
 signal equip_requested(hero_index: int, stash_index: int)
 signal unequip_requested(hero_index: int, slot: int)
+## A rune of the stash is to be thrown away for good (after its inline Yes).
+signal drop_requested(stash_index: int)
 ## The player picked a hero's tab (the Game keeps it across screens).
 signal hero_selected(hero_index: int)
 ## The hint card was dismissed.
@@ -37,6 +39,7 @@ func _ready() -> void:
 	_tabs.hero_selected.connect(select_hero)
 	_panel.unequip_requested.connect(func(slot: int) -> void: unequip_requested.emit(selected_hero, slot))
 	_stash.equip_requested.connect(func(index: int) -> void: equip_requested.emit(selected_hero, index))
+	_stash.drop_requested.connect(drop_requested.emit)
 	_destinations.tower_pressed.connect(tower_pressed.emit)
 	_destinations.stage_pressed.connect(stage_pressed.emit)
 	_destinations.continue_pressed.connect(continue_pressed.emit)
@@ -72,6 +75,10 @@ func _restore_focus(focused: StringName) -> void:
 	if not is_inside_tree() or focused == &"":
 		return
 	var again := find_child(focused, true, false) as Control
+	# A rune left the stash, so its buttons are gone: land on the row that took its place.
+	var stash_row := RegEx.create_from_string("^(?:Stash|Drop|DropYes|DropNo)([0-9]+)$").search(String(focused))
+	if again == null and stash_row != null and _stash.focus_row(int(stash_row.get_string(1))):
+		return
 	if again != null and again.focus_mode == Control.FOCUS_ALL and again.is_visible_in_tree():
 		again.grab_focus()
 	else:

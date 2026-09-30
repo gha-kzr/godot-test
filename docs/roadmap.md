@@ -69,6 +69,11 @@ Decisions: `decisions/2026-09-30-gameplay-rules.md`; plan: `plans/2026-09-30-gam
 - Obstacles are full two-level cubes and block line of sight only up to their top (high ground sees over low blocks); maps can write `<height>#` so blocks stand on plateaus.
 - Runes can be changed between floors (a Party button on the run screen), never during a fight; saved HP never rises with a bigger maximum.
 
+### 5.6. Playtest polish — done
+Decisions: `decisions/2026-09-30-playtest-polish.md`; plan: `plans/2026-09-30-playtest-polish.md`.
+- Camera: arrow keys and left / middle drag pan it (a short press is still a click), it stays within the board, follows the acting unit every turn, and `C` / a button recenters; a row of the full turn order looks at that unit.
+- The floor-cleared screen shows XP text and a two-tone bar (lighter gold for the XP just gained); a rune can be dropped from the stash (inline confirm).
+
 ### 6. Art and audio
 - Replace the placeholder capsules and boxes: unit models and animations (idle, walk, cast, hit, death) through `UnitData.model_scene`, board tiles and props through `BoardTheme` — slice plan item 4 (display polish and asset integration).
 - Spell VFX and particles, hit and heal feedback; sound effects and music.
@@ -94,10 +99,7 @@ Ideas to schedule into a milestone (grill them first):
 - **Undo a move** — a hero can take back its move(s) as long as it hasn't cast anything this turn (Disgaea-style). The slice already kept actions as commands and views re-syncing from state so undo stays cheap (`decisions/2026-09-27-tactical-rpg-slice.md`, "Undo"); needs a snapshot of the unit before its first move, an Undo button / key, and the AI never using it.
 - **Localization** — translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
 
-- **Managing accumulating runes** — the stash grows without limit (every win can drop runes, and duplicates of common ones pile up), so the player needs a way to get rid of the ones they don't want. Options to grill: (a) **drop / discard** a rune (a button on a stash rune, with a confirm) — trivial, no economy; (b) **sell** it for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions for the grill: is a currency wanted in the game at all, what would it buy, and is the rune stash meant to stay a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` on the hub and the drop rules (`LootTable`).
-
-- **Focus a unit from the full turn order** — clicking a chip in the top bar moves the camera to its unit, but the bar shows only the next 5 turns, so a later unit can't be found that way. Let a row of the full-order overlay (Tab) do the same (close the overlay, move the camera there), and probably a click on a unit card too.
-- **Camera: free movement and reset** — once the camera is moved to a unit (chip click) it stays there: the rig only rotates, zooms and toggles the overhead view, it cannot pan or return. To discuss: (a) **recenter automatically** on the acting unit at the start of each ally turn (and on demand with a key / button), (b) **free panning** (drag, arrow keys or screen edge) plus a recenter key, or both: auto-recenter on turns and free panning in between. Questions: does the camera follow enemy turns, and should the bounds keep the board on screen? Touches `CameraRig`, the input map (and the rebindable keys in the settings), the HUD hints.
+- **Managing accumulating runes, beyond dropping** — dropping a rune is done (5d), but the stash can still grow large, and a dropped rune is just gone. Options to grill: (b) **sell** runes for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions: is a currency wanted in the game at all, what would it buy, and is the stash a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` and the drop rules (`LootTable`).
 
 ## Open questions
 

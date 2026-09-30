@@ -175,3 +175,13 @@ func test_xp_progress_counts_from_the_current_level_and_fills_at_the_cap() -> vo
 	profile.heroes[0].xp = 999
 	assert_eq(profile.xp_progress(0), Vector2i(1, 1), "a full bar at the cap")
 	assert_eq(profile.xp_text(0), "XP 999 (max level)")
+
+
+func test_dropping_a_rune_removes_it_for_good() -> void:
+	var profile := Profile.create(load("res://data/progression/roster.tres") as Roster)
+	profile.stash = [load("res://data/runes/might.tres"), load("res://data/runes/focus.tres")] as Array[RuneData]
+	assert_eq(profile.drop_rune(0), "")
+	assert_eq(profile.stash, [load("res://data/runes/focus.tres")] as Array[RuneData], "the other stays")
+	assert_ne(profile.drop_rune(5), "", "no such rune")
+	assert_ne(profile.drop_rune(-1), "")
+	assert_eq(profile.stash.size(), 1, "a bad index changes nothing")

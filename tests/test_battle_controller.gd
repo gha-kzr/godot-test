@@ -173,6 +173,10 @@ func test_a_real_mouse_click_moves_the_unit() -> void:
 	click.pressed = true
 	click.position = controller.camera_rig.camera.unproject_position(target)
 	controller.get_viewport().push_input(click)
+	assert_eq(controller.input_state, BattleController.State.IDLE, "a press alone does nothing: the click acts on release")
+	var release := click.duplicate() as InputEventMouseButton
+	release.pressed = false
+	controller.get_viewport().push_input(release)
 	assert_true(await _wait_for(controller, [BattleController.State.ANIMATING]), "the click started a move")
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 	assert_eq(controller.battle.state.units[0].cell, Vector2i(2, 0))
@@ -491,7 +495,12 @@ func test_a_turn_order_chip_hovers_its_unit_and_a_click_focuses_the_camera() -> 
 	controller.hud.chip_unhovered.emit()
 	assert_eq(controller._hover_cell(controller.hud.get_node("%TurnTimeline"), Vector2.ZERO), BoardView.NO_CELL)
 	controller.hud.chip_pressed.emit(1)
-	assert_eq(controller.camera_rig.position, controller.board_view.cell_to_world(Vector2i(3, 0)))
+	var goal := controller.board_view.cell_to_world(Vector2i(3, 0))
+	for i in MAX_WAIT_FRAMES:
+		if controller.camera_rig.position.is_equal_approx(goal):
+			break
+		await _tree().process_frame
+	assert_eq(controller.camera_rig.position, goal, "the camera slid to the unit")
 
 
 func test_esc_closes_the_order_overlay_first() -> void:
@@ -618,3 +627,139 @@ func test_leaving_the_fight_is_offered_when_injected_and_esc_closes_the_question
 	(controller.hud.get_node("%MenuButton") as Button).pressed.emit()
 	(controller.hud.get_node("%LeaveButton") as Button).pressed.emit()
 	assert_eq(left.count, 1)
+
+
+func _mouse(controller: BattleController, pressed: bool, at: Vector2) -> void:
+	var button := InputEventMouseButton.new()
+	button.button_index = MOUSE_BUTTON_LEFT
+	button.pressed = pressed
+	button.position = at
+	button.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+	controller.get_viewport().push_input(button)
+
+
+func test_a_left_drag_pans_the_camera_and_does_not_click_the_board() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	await _tree().physics_frame
+	await _tree().physics_frame
+	controller.camera_rig.bounds = Rect2()  # No limit for this test.
+	var start := controller.camera_rig.camera.unproject_position(
+			controller.board_view.to_global(controller.board_view.cell_to_world(Vector2i(2, 0))))
+	var focus_before := controller.camera_rig.position
+	_mouse(controller, true, start)
+	var motion := InputEventMouseMotion.new()
+	motion.position = start + Vector2(60, 0)
+	motion.relative = Vector2(60, 0)
+	motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	controller.get_viewport().push_input(motion)
+	_mouse(controller, false, start + Vector2(60, 0))
+	assert_true(controller.camera_rig.dragged)
+	assert_ne(controller.camera_rig.position, focus_before, "the board was grabbed")
+	assert_eq(controller.input_state, BattleController.State.IDLE, "the release of a drag clicks nothing")
+	assert_eq(controller.battle.state.units[0].cell, Vector2i(0, 0))
+
+
+func test_a_release_without_a_board_press_clicks_nothing() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	await _tree().physics_frame
+	await _tree().physics_frame
+	var target := controller.camera_rig.camera.unproject_position(
+			controller.board_view.to_global(controller.board_view.cell_to_world(Vector2i(2, 0))))
+	_mouse(controller, false, target)  # E.g. a press that started on a HUD button.
+	assert_eq(controller.input_state, BattleController.State.IDLE)
+	assert_eq(controller.battle.state.units[0].cell, Vector2i(0, 0))
+
+
+func _camera_settles_on(controller: BattleController, point: Vector3) -> bool:
+	for i in MAX_WAIT_FRAMES:
+		if controller.camera_rig.position.is_equal_approx(point):
+			return true
+		await _tree().process_frame
+	return false
+
+
+func test_the_camera_follows_the_acting_unit_each_turn_and_recenter_goes_back() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var hero := controller.units_view.view(0).position
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(hero)), "on the hero whose turn it is")
+	controller.camera_rig.focus(Vector3(5, 0, 0))  # The player looked elsewhere.
+	var recenter := InputEventAction.new()
+	recenter.action = &"camera_recenter"
+	recenter.pressed = true
+	controller._unhandled_input(recenter)
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(hero)), "the Recenter key returns to the acting unit")
+	controller.camera_rig.focus(Vector3(5, 0, 0))
+	controller.hud.recenter_pressed.emit()
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(hero)), "so does the HUD button")
+	# An enemy turn: the camera goes to the enemy as its turn starts.
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.IDLE]))
+	assert_true(controller.camera_rig.bounds.has_area(), "the board's bounds were set")
+
+
+func test_unit_focus_uses_where_the_unit_is_drawn_now() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.units_view.view(1).position = Vector3(2, 0, 0)  # Mid-move: drawn here, the state says (5, 0).
+	controller.focus_unit(1)
+	assert_true(await _camera_settles_on(controller, Vector3(2, 0, 0)), "the drawn position, not the state's final cell")
+
+
+func test_a_row_of_the_full_order_moves_the_camera_to_that_unit() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	(controller.hud.get_node("%TurnTimeline/OrderButton") as Button).pressed.emit()
+	var rows := controller.hud.get_node("%OrderOverlay/%Rows").get_children()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	(rows[1] as Control).gui_input.emit(click)  # The enemy, second in the order.
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(controller.units_view.view(1).position)))
+
+
+func test_a_release_on_another_cell_or_over_the_hud_is_not_a_click() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	await _tree().physics_frame
+	await _tree().physics_frame
+	var screen_of := func(cell: Vector2i) -> Vector2:
+		return controller.camera_rig.camera.unproject_position(
+				controller.board_view.to_global(controller.board_view.cell_to_world(cell)))
+	_mouse(controller, true, screen_of.call(Vector2i(2, 0)))
+	_mouse(controller, false, screen_of.call(Vector2i(3, 0)))  # Released on another cell, no drag in between.
+	assert_eq(controller.input_state, BattleController.State.IDLE, "press and release on different cells: no click")
+	assert_eq(controller.battle.state.units[0].cell, Vector2i(0, 0))
+
+
+func test_the_arrows_are_left_to_the_menus_while_a_panel_is_open() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller._physics_process(0.0)
+	assert_true(controller.camera_rig.pan_enabled)
+	(controller.hud.get_node("%TurnTimeline/OrderButton") as Button).pressed.emit()
+	controller._physics_process(0.0)
+	assert_false(controller.camera_rig.pan_enabled, "the order overlay is open")
+	controller.cancel()
+	controller._physics_process(0.0)
+	assert_true(controller.camera_rig.pan_enabled)
+
+
+func test_the_camera_follows_a_sudden_death_turn_too() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.battle.sudden_death_round = 1  # Every round counts as sudden death.
+	controller.camera_rig.focus(Vector3(5, 0, 0))
+	controller._on_event_played(BattleEvents.TurnStarted.new(0, 1, 6, 3))
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(controller.units_view.view(0).position)))
+
+
+func test_recenter_goes_to_the_unit_on_screen_not_the_states_final_actor() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller._hud_model.current_id = 1  # On screen it is the enemy's turn, whatever the final state says.
+	controller.camera_rig.focus(Vector3(0, 0, 0))
+	controller.recenter()
+	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(controller.units_view.view(1).position)))

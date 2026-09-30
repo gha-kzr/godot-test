@@ -571,3 +571,42 @@ func test_the_menu_button_can_be_hidden_and_goes_away_with_the_result() -> void:
 	hud.show_result(true)
 	assert_false(menu.visible, "the result screen has its own button")
 	hud.free()
+
+
+func test_the_recenter_button_asks_the_controller_and_shows_its_key() -> void:
+	var settings := Settings.new()
+	var hud := _hud()
+	var asks := {"count": 0}
+	hud.recenter_pressed.connect(func() -> void: asks.count += 1)
+	assert_eq((hud.get_node("%RecenterButton") as Button).text, "Recenter (C)")
+	(hud.get_node("%RecenterButton") as Button).pressed.emit()
+	assert_eq(asks.count, 1)
+	hud.free()
+	SettingsApplier.set_binding(settings, &"camera_recenter", KEY_V)
+	var rebound := _hud()
+	assert_eq((rebound.get_node("%RecenterButton") as Button).text, "Recenter (V)")
+	rebound.free()
+
+
+func test_clicking_a_row_of_the_full_order_looks_at_that_unit_and_closes_the_overlay() -> void:
+	var hud := _hud()
+	var units: Array[UnitInfo] = []
+	for i in 7:
+		var info := _info("Unit%d" % i)
+		info.unit_id = i + 10
+		units.append(info)
+	hud.show_turn_order(units, 1)
+	var overlay := hud.get_node("%OrderOverlay") as OrderOverlay
+	overlay.open()
+	var looked: Array[int] = []
+	hud.chip_pressed.connect(func(id: int) -> void: looked.append(id))
+	var rows := overlay.get_node("%Rows").get_children()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	(rows[6] as Control).gui_input.emit(click)  # A unit beyond the timeline's 5.
+	assert_eq(looked, [16] as Array[int])
+	assert_false(overlay.visible, "closed to show the board")
+	for control: Control in [rows[0], rows[0].get_node("Line"), rows[0].get_node("Line/HpBox")]:
+		assert_true(control == rows[0] and control.mouse_filter == Control.MOUSE_FILTER_STOP or control != rows[0] and control.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: only the row takes the click" % control.name)
+	hud.free()

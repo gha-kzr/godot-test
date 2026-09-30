@@ -108,6 +108,15 @@ func equip(hero_index: int, stash_index: int, slot := -1) -> String:
 	return ""
 
 
+## Throws a rune of the stash away for good: no undo, no refund (there is no currency). Returns
+## an error message, or "".
+func drop_rune(stash_index: int) -> String:
+	if stash_index < 0 or stash_index >= stash.size():
+		return "No such rune in the stash."
+	stash.remove_at(stash_index)
+	return ""
+
+
 ## Moves a hero's rune back to the stash. Returns an error message, or "".
 func unequip(hero_index: int, slot: int) -> String:
 	if hero_index < 0 or hero_index >= heroes.size():

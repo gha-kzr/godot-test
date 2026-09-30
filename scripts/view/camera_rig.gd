@@ -1,8 +1,14 @@
 class_name CameraRig
 extends Node3D
-## Orbit camera for the board. The rig sits on the board center and turns in 90° steps
-## (tweened); the orthographic camera looks down at it and zooms by size. A toggle switches
-## to a near-overhead view where terrain hides almost nothing.
+## Orbit camera for the board. The rig sits on the focus point (the board center at first) and
+## turns in 90° steps (tweened); the orthographic camera looks down at it and zooms by size. A
+## toggle switches to a near-overhead view where terrain hides almost nothing.
+##
+## The focus point moves by focus_on() (a smooth slide), by the arrow keys (held) and by
+## dragging: a left-button press that moves more than `drag_threshold` pixels grabs the board
+## (a middle-button press grabs at once). A shorter press is a click, which the controller acts
+## on at release unless `dragged` is set. The focus point stays inside the bounds (the board
+## plus a margin), and pans follow the screen, so they stay right after rotating.
 
 signal overhead_changed(enabled: bool)
 
@@ -24,12 +30,29 @@ signal overhead_changed(enabled: bool)
 ## Shifts the view up (in world units at the screen) so the board clears the turn-order
 ## bar at the top; the HUD at the bottom is lower.
 @export var vertical_offset := 0.3
+## Arrow-key panning speed, in view heights per second.
+@export var pan_speed := 0.9
+## Pixels a left press may move and still be a click.
+@export var drag_threshold := 10.0
+## How far past the board the focus point may go, in cells.
+@export var bounds_margin := 1.0
 
 ## Quarter turns from the base yaw. Not wrapped, so a tween never spins the long way.
 var step := 0
 var target_size := 0.0
 var overhead := false
+## Whether the press in progress (or the last one) turned into a drag: the controller skips
+## the click at release then.
+var dragged := false
+## False while a full-screen panel is open: the arrow keys belong to the menus then.
+var pan_enabled := true
+## The area (x, z in world units) the focus point stays in; an empty rect means no limit.
+var bounds := Rect2()
 
+var _move_tween: Tween
+var _press_position := Vector2.ZERO
+## A left press the rig saw is still held (a press the HUD ate never starts a drag).
+var _left_down := false
 var _rotate_tween: Tween
 var _zoom_tween: Tween
 var _pitch_tween: Tween
@@ -48,7 +71,36 @@ func _ready() -> void:
 	rotation.y = target_yaw()
 
 
+func _process(delta: float) -> void:
+	var keys := Input.get_vector(&"camera_pan_left", &"camera_pan_right", &"camera_pan_up", &"camera_pan_down")
+	if keys != Vector2.ZERO and pan_enabled:
+		pan_by_view(Vector2(keys.x, -keys.y) * pan_speed * camera.size * delta)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var button := event as InputEventMouseButton
+		if button.button_index == MOUSE_BUTTON_LEFT:
+			_left_down = button.pressed
+		if button.pressed and button.button_index == MOUSE_BUTTON_LEFT:
+			_press_position = button.position
+			dragged = false
+		elif button.pressed and button.button_index == MOUSE_BUTTON_MIDDLE:
+			dragged = true
+		if button.button_index == MOUSE_BUTTON_LEFT or button.button_index == MOUSE_BUTTON_MIDDLE:
+			return  # Not handled: the controller acts on the left release.
+	elif event is InputEventMouseMotion:
+		# The motion's own button mask, not remembered presses: a release another node ate can't stick.
+		var motion := event as InputEventMouseMotion
+		var left := _left_down and motion.button_mask & MOUSE_BUTTON_MASK_LEFT != 0
+		_left_down = _left_down and motion.button_mask & MOUSE_BUTTON_MASK_LEFT != 0  # Known up: forget the press.
+		var middle := motion.button_mask & MOUSE_BUTTON_MASK_MIDDLE != 0
+		if middle or (left and motion.position.distance_to(_press_position) > drag_threshold):
+			dragged = true
+		if dragged and (left or middle):
+			pan_by_view(Vector2(-motion.relative.x, motion.relative.y) * _units_per_pixel())
+			get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed(&"camera_rotate_left"):
 		rotate_steps(-1)
 	elif event.is_action_pressed(&"camera_rotate_right"):
@@ -64,8 +116,50 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
+## Puts the focus point on `point` at once (clamped to the bounds).
 func focus(point: Vector3) -> void:
-	position = point
+	if _move_tween != null:
+		_move_tween.kill()
+	position = clamp_point(point)
+
+
+## Slides the focus point to `point` (clamped to the bounds).
+func focus_on(point: Vector3, animate := true) -> void:
+	if not animate or not is_inside_tree():
+		focus(point)
+		return
+	if _move_tween != null:
+		_move_tween.kill()
+	_move_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_move_tween.tween_property(self, "position", clamp_point(point), tween_duration)
+
+
+## Sets the area (x, z world coordinates of the cell centers) the focus point may roam:
+## the board plus `bounds_margin` cells.
+func set_bounds(cell_centers: Rect2) -> void:
+	bounds = cell_centers.grow(bounds_margin)
+
+
+func clamp_point(point: Vector3) -> Vector3:
+	if not bounds.has_area():
+		return point
+	return Vector3(clampf(point.x, bounds.position.x, bounds.end.x), point.y, clampf(point.z, bounds.position.y, bounds.end.y))
+
+
+## Moves the focus point by `view` (x right, y up, in world units at the screen plane).
+## Ground distance along the view's up axis is longer by 1 / sin(pitch).
+func pan_by_view(view: Vector2) -> void:
+	if _move_tween != null:
+		_move_tween.kill()  # The player takes over from a slide.
+	var right := Vector3(camera.global_basis.x.x, 0.0, camera.global_basis.x.z).normalized()
+	var forward := Vector3(-camera.global_basis.z.x, 0.0, -camera.global_basis.z.z).normalized()
+	var ground := right * view.x + forward * view.y / maxf(sin(deg_to_rad(_current_pitch)), 0.1)
+	position = clamp_point(position + ground)
+
+
+## World units at the screen plane per screen pixel.
+func _units_per_pixel() -> float:
+	return camera.size / maxf(get_viewport().get_visible_rect().size.y, 1.0)
 
 
 func target_yaw() -> float:

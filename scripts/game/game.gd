@@ -105,6 +105,7 @@ func show_party(message := "") -> void:
 	party.abandon_pressed.connect(_on_abandon_pressed)
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
+	party.drop_requested.connect(_on_drop_requested)
 	party.show_profile(profile, _summary, message, tower)
 	if hints.should_show("hub_intro"):
 		party.show_hint(hints.text("hub_intro"))
@@ -253,6 +254,17 @@ func _on_unequip_requested(hero_index: int, slot: int) -> void:
 		return
 	RunDirector.materialize_hp(profile)
 	_finish_rune_change(profile.unequip(hero_index, slot))
+
+
+## A rune is thrown away for good, on the hub only (never during a fight). Maxima don't change
+## (it wasn't equipped), so saved HP is untouched.
+func _on_drop_requested(stash_index: int) -> void:
+	if not screen is PartyScreen:
+		return
+	var error := profile.drop_rune(stash_index)
+	if error.is_empty() and not _save():
+		error = SAVE_FAILED
+	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 
 func _finish_rune_change(error: String) -> void:

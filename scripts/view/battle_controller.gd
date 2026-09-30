@@ -73,6 +73,10 @@ var _pinned_unit := -1
 var _hud_model: HudModel
 ## The unit whose turn-order chip the mouse is over, or -1: its cell counts as hovered.
 var _chip_unit := -1
+## A left press started on the board (not on the HUD): its release may be a click.
+var _board_press := false
+## The cell under the press, to compare with the one under the release.
+var _press_cell := BoardView.NO_CELL
 ## Bumped by each new battle; coroutines of an abandoned battle stop after their awaits.
 var _battle_generation := 0
 
@@ -110,6 +114,7 @@ func _ready() -> void:
 	hud.card_closed.connect(unpin)
 	hud.hint_dismissed.connect(hint_dismissed.emit)
 	hud.leave_confirmed.connect(left_battle.emit)
+	hud.recenter_pressed.connect(recenter)
 	hud.set_leave_available(not standalone)
 	hud.chip_hovered.connect(_on_chip_hovered)
 	hud.chip_unhovered.connect(_on_chip_unhovered)
@@ -150,6 +155,7 @@ func start_battle() -> bool:
 	board_view.build(battle_state.grid)
 	units_view.build(battle_state, board_view)
 	event_player.setup(units_view, board_view)
+	camera_rig.set_bounds(Rect2(Vector2.ZERO, Vector2(battle_state.grid.size - Vector2i.ONE) * BoardView.CELL_SIZE))
 	camera_rig.focus(board_view.center())
 	camera_rig.face_toward(_spawn_center(parsed.player_spawns) - board_view.center())
 	hud.hide_result()
@@ -271,16 +277,30 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"cancel"):
 		cancel()
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var cell := board_view.pick_cell(camera_rig.camera, event.position)
-		if cell != BoardView.NO_CELL:
-			click_cell(cell)
-			get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"camera_recenter"):
+		recenter()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# A click acts on release, unless the press turned into a camera drag; a press the HUD
+		# ate never reaches here, so its release can't click the board.
+		if event.pressed:
+			_board_press = true
+			_press_cell = board_view.pick_cell(camera_rig.camera, event.position)
+		elif _board_press:
+			_board_press = false
+			# Only a release on the cell that was pressed, over the board, after no drag: a release
+			# over the HUD, or after the camera slid under the cursor, is not a click.
+			if not camera_rig.dragged and get_viewport().gui_get_hovered_control() == null:
+				var cell := board_view.pick_cell(camera_rig.camera, event.position)
+				if cell != BoardView.NO_CELL and cell == _press_cell:
+					click_cell(cell)
+					get_viewport().set_input_as_handled()
 
 
 ## Hover is re-picked every physics frame from the mouse position, so it also follows
 ## camera turns and zooms; highlights only change when the hovered cell does.
 func _physics_process(_delta: float) -> void:
+	camera_rig.pan_enabled = not hud.is_modal_open()  # Arrow keys drive the menus over the board.
 	if board_view.grid == null:
 		return
 	var cell := _hover_cell(get_viewport().gui_get_hovered_control(), get_viewport().get_mouse_position())
@@ -309,8 +329,25 @@ func _on_chip_unhovered() -> void:
 
 ## Clicking a turn-order chip moves the camera to its unit.
 func _on_chip_pressed(unit_id: int) -> void:
-	if battle != null and unit_id >= 0 and unit_id < battle.state.units.size():
-		camera_rig.focus(board_view.cell_to_world(battle.state.units[unit_id].cell))
+	focus_unit(unit_id)
+
+
+## Slides the camera to a unit, where it is drawn right now (the state is already final while
+## events play, so a unit's cell would be where it will end up).
+func focus_unit(unit_id: int) -> void:
+	if battle == null or unit_id < 0 or unit_id >= battle.state.units.size():
+		return
+	var view := units_view.find_view(unit_id)
+	var point := view.position if view != null else board_view.cell_to_world(battle.state.units[unit_id].cell)
+	camera_rig.focus_on(point)
+
+
+## Back to the acting unit (the Recenter key and button).
+func recenter() -> void:
+	if battle != null and battle.state.started and _hud_model.current_id != -1:
+		focus_unit(_hud_model.current_id)  # The acting unit on screen: the state is already final while events play.
+	elif battle != null:
+		camera_rig.focus_on(board_view.center())
 
 
 # --- Turn loop ---
@@ -377,6 +414,8 @@ func _ai_profile_for(unit: UnitState) -> AIProfile:
 func _on_event_played(event: BattleEvents.Event) -> void:
 	_hud_model.apply(event)
 	_show_turn()
+	if event is BattleEvents.TurnStarted:
+		focus_unit((event as BattleEvents.TurnStarted).unit_id)  # Every turn, ally or enemy: the camera follows the action.
 	if event is BattleEvents.TurnStarted and battle.is_sudden_death() and not _sudden_death_announced:
 		_sudden_death_announced = true
 		hud.show_banner("Sudden death: the party loses %d%% HP every turn" % sudden_death_percent)
@@ -384,6 +423,7 @@ func _on_event_played(event: BattleEvents.Event) -> void:
 	if event is BattleEvents.TurnStarted:
 		var unit := battle.state.units[(event as BattleEvents.TurnStarted).unit_id]
 		hud.show_banner("%s's turn" % unit.data.display_name)
+
 
 
 # --- State and highlights ---

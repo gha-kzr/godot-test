@@ -18,6 +18,8 @@ signal chip_unhovered
 signal chip_pressed(unit_id: int)
 ## The inspect card's ✕ was pressed.
 signal card_closed
+## The Recenter button (back to the acting unit).
+signal recenter_pressed
 ## The player confirmed leaving the fight (Menu, then Leave).
 signal leave_confirmed
 ## The hint card was dismissed (its button, or Enter).
@@ -35,6 +37,7 @@ var _pulse_tween: Tween
 
 @onready var _round_label: Label = %RoundLabel
 @onready var _menu_button: Button = %MenuButton
+@onready var _recenter_button: Button = %RecenterButton
 @onready var _leave_panel: Control = %LeavePanel
 @onready var _leave_button: Button = %LeaveButton
 @onready var _stay_button: Button = %StayButton
@@ -66,9 +69,12 @@ func _ready() -> void:
 	# Shortcuts fire before GUI input, so the overlay's dim can't block them: lock the buttons.
 	_order_overlay.opened.connect(_refresh_buttons)
 	_order_overlay.closed.connect(_refresh_buttons)
+	_order_overlay.unit_pressed.connect(chip_pressed.emit)  # Same as a timeline chip: look at it.
 	_inspect_card.closed.connect(card_closed.emit)
 	_hint_card.dismissed.connect(hint_dismissed.emit)
 	_menu_button.pressed.connect(_open_leave_panel)
+	_recenter_button.pressed.connect(recenter_pressed.emit)
+	_recenter_button.text = "Recenter (%s)" % SettingsApplier.key_text(&"camera_recenter")
 	_stay_button.pressed.connect(close_leave_panel)
 	_leave_button.pressed.connect(func() -> void:
 		close_leave_panel()
@@ -142,6 +148,11 @@ func set_leave_available(available: bool) -> void:
 func _open_leave_panel() -> void:
 	_leave_panel.show()
 	_refresh_buttons()
+
+
+## Whether a full-screen panel (order, leave question, result) is over the board.
+func is_modal_open() -> bool:
+	return _order_overlay.is_open() or _leave_panel.visible or _result_panel.visible
 
 
 ## Closes the leave confirmation if it's open; true if it was (Esc closes it first).

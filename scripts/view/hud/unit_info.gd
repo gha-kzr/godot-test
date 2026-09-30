@@ -24,6 +24,9 @@ var power := 0
 ## A hero's XP towards its next level, for menus (xp_max 0: not shown, as in battle).
 var xp_value := 0
 var xp_max := 0
+## XP just gained (the bar's lighter segment) and the text under it; "" hides the text.
+var xp_gain := 0
+var xp_text := ""
 ## Damage type name → resistance %, every damage type of the game, in display order.
 var resistances: Dictionary[String, int] = {}
 

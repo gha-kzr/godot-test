@@ -80,6 +80,16 @@ func _base_theme() -> Theme:
 	xp_fill.set_content_margin_all(0)
 	xp_fill.shadow_size = 0
 	theme.set_stylebox("fill", "XpBar", xp_fill)
+	# A two-tone XP bar: a lighter gold bar (before + gained) under a gold bar on a clear
+	# background (what the hero had before).
+	theme.set_type_variation("XpGainBar", "ProgressBar")
+	var gain_fill := _box(ACCENT.lightened(0.5), 7, 0)
+	gain_fill.set_content_margin_all(0)
+	gain_fill.shadow_size = 0
+	theme.set_stylebox("fill", "XpGainBar", gain_fill)
+	theme.set_type_variation("XpBarOverlay", "ProgressBar")
+	theme.set_stylebox("fill", "XpBarOverlay", xp_fill)
+	theme.set_stylebox("background", "XpBarOverlay", StyleBoxEmpty.new())
 	theme.set_type_variation("SmallLabel", "Label")
 	theme.set_font_size("font_size", "SmallLabel", 14)
 	theme.set_type_variation("PromptLabel", "Label")

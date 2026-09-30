@@ -55,7 +55,7 @@ A turn-based tactical roguelite (Dofus / Disgaea style). The game opens on the *
 - **Runs are saved between floors:** quit any time outside a fight and **Continue run** from the hub (or **Abandon run**).
 - **Sudden death:** from round 40, each hero loses 10 % of max HP every turn, so a stalled battle always ends.
 - **Progression:** every enemy killed gives XP; a won battle gives each hero the full XP (fallen heroes too), levels (+HP, +Power; a 4th spell at level 3, +1 MP at level 6; cap 10) and the runes the enemies dropped. A lost battle ends the run and gives nothing for that fight; levels and runes are always kept.
-- **Runes:** 6 slots per hero. Click a rune in the stash to equip it on the selected hero, click a slot to unequip it. Common and rare runes stack; epic and legendary ones are one per hero. Between floors, **Party** on the run screen opens the hub so found runes can be equipped at once (Continue run picks the climb back up); runes can never change during a fight, and a rune that raises max HP doesn't heal (current HP only drops if the maximum does).
+- **Runes:** 6 slots per hero. Click a rune in the stash to equip it on the selected hero, click a slot to unequip it; **Drop** on a stash row (then **Yes**) throws a rune away for good (no refund: there is no currency yet). Common and rare runes stack; epic and legendary ones are one per hero. Between floors, **Party** on the run screen opens the hub so found runes can be equipped at once (Continue run picks the climb back up); runes can never change during a fight, and a rune that raises max HP doesn't heal (current HP only drops if the maximum does).
 - **Stats:** Power raises damage and heals by a percentage; resistances reduce damage of one type (Physical, Fire, Poison), at most 50 %.
 - **Save:** automatic after each battle, boss choice and rune change, in `user://profile.json` (on macOS `~/Library/Application Support/Godot/app_userdata/godot-test/profile.json`). Delete it to start over, or use **Reset save** in the settings.
 - **Screens:** the game opens on a **title** (Play, Settings, Quit; no Quit on web). **Play** opens the hub; `Esc` (or the Title button) goes back to the title. Every menu works with the keyboard (arrows, `Enter`, `Esc`).
@@ -75,9 +75,11 @@ In battle, units act in initiative order; each turn a unit has AP for spells and
 | `Esc` / right click | Close the order overlay, else stop aiming, else unpin the card |
 | Left click a unit | Pin its card on the right (it stays until its ✕ or `Esc`; a click on a target cell still casts) |
 | `Menu` button | Leave the fight and go back to the hub (asks first): nothing from it is kept, like quitting; the run waits at the same floor with its HP as before |
-| `Tab` | Open / close the full turn order (every unit, with HP and statuses) |
+| `Tab` | Open / close the full turn order (every unit, with HP and statuses); click a row to look at that unit |
 | `Space` | End turn |
 | `Q` / `E` (`A` / `E` on AZERTY) | Turn the camera 90° |
+| Arrow keys, or drag with the left (or middle) mouse button | Move the camera over the board (it stays within the board and a one-cell margin); a short press is still a click |
+| `C` | Recenter the camera on the acting unit (it also follows each turn, allies and enemies, on its own) |
 | Mouse wheel | Zoom |
 | `T` | Toggle the near-overhead view |
 

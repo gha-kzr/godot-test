@@ -36,7 +36,7 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 	if _strip.visible:
 		_strip.show_floors(run.floor_number)
 	_party_row.visible = run != null
-	_party_row.show_party(_party_infos(profile))
+	_party_row.show_party(_party_infos(profile, report))
 	_boons.visible = run != null and not run.boons.is_empty()
 	_boons.text = "Boons: " + ", ".join(run.boons.map(func(b: BoonData) -> String: return b.display_name)) if _boons.visible else ""
 	choice = NONE
@@ -100,7 +100,7 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 
 
 ## One UnitInfo per hero of the run's party, for the HP chips.
-func _party_infos(profile: Profile) -> Array[UnitInfo]:
+func _party_infos(profile: Profile, report: RunDirector.Report) -> Array[UnitInfo]:
 	var infos: Array[UnitInfo] = []
 	if profile.run == null:
 		return infos
@@ -109,14 +109,29 @@ func _party_infos(profile: Profile) -> Array[UnitInfo]:
 		var info := UnitInfo.new()
 		info.display_name = records[slot].hero.display_name()
 		info.level = records[slot].level
-		var progress := profile.xp_progress(profile.party[slot])
-		info.xp_value = progress.x
-		info.xp_max = progress.y
+		_fill_xp(info, profile, profile.party[slot], report)
 		info.max_hp = RunDirector.max_hp(profile, slot)
 		var hp: int = profile.run.hero_hp[slot] if slot < profile.run.hero_hp.size() else -1
 		info.hp = info.max_hp if hp < 0 else mini(hp, info.max_hp)
 		infos.append(info)
 	return infos
+
+
+## The bar and text for what this fight gave: the XP from before in gold, the gain in a lighter
+## gold after it; a level-up shows a full bar and says so.
+func _fill_xp(info: UnitInfo, profile: Profile, hero_index: int, report: RunDirector.Report) -> void:
+	var progress := profile.xp_progress(hero_index)
+	info.xp_max = progress.y
+	info.xp_value = progress.x
+	var gained := report.rewards.xp if report.rewards != null else 0
+	var leveled := report.level_ups.any(func(up: Profile.LevelUp) -> bool: return up.hero_index == hero_index)
+	if leveled:
+		info.xp_value = progress.y  # Full: the level is reached (the remainder belongs to the next one).
+		info.xp_text = "Level up! (+%d XP)" % gained
+		return
+	var capped := profile.roster.config.xp_for_next(profile.heroes[hero_index].level) < 0
+	info.xp_gain = 0 if capped else mini(gained, progress.x)  # At the cap the bar is simply full.
+	info.xp_text = profile.xp_text(hero_index) + (" (+%d)" % gained if gained > 0 else "")
 
 
 func _choice_button(node_name: String, text: String, value: int) -> Button:

@@ -485,3 +485,19 @@ func test_leaving_a_fight_returns_to_the_hub_with_the_run_and_no_rewards() -> vo
 	_press(game.screen, "ContinueButton")
 	assert_true(game.screen is BattleController, "continuing starts the floor over")
 	game.free()
+
+
+func test_dropping_a_rune_is_saved_and_ignored_during_a_fight() -> void:
+	var game := _game()
+	game.profile.stash.append(load("res://data/runes/might.tres") as RuneData)
+	game.profile.stash.append(load("res://data/runes/focus.tres") as RuneData)
+	game.show_party()
+	(game.screen.find_child("Drop0", true, false) as Button).pressed.emit()
+	(game.screen.find_child("DropYes0", true, false) as Button).pressed.emit()
+	assert_eq(game.profile.stash.size(), 1, "gone")
+	assert_eq(_saved(game).stash.size(), 1, "and saved")
+	assert_true(game.screen is PartyScreen, "still on the hub")
+	game.start_tower(1)
+	game._on_drop_requested(0)
+	assert_eq(game.profile.stash.size(), 1, "never during a fight")
+	game.free()
