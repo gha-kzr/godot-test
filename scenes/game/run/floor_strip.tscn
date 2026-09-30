@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cwewpt1cb3tpc"]
+
+[ext_resource type="Script" uid="uid://c0kgg2b0mt1fn" path="res://scripts/game/run/floor_strip.gd" id="1_strip"]
+
+[node name="FloorStrip" type="HBoxContainer"]
+theme_override_constants/separation = 6
+alignment = 1
+script = ExtResource("1_strip")

@@ -18,6 +18,8 @@ signal chip_unhovered
 signal chip_pressed(unit_id: int)
 ## The inspect card's ✕ was pressed.
 signal card_closed
+## The hint card was dismissed (its button, or Enter).
+signal hint_dismissed
 
 const BANNER_FADE := 0.2
 const BANNER_HOLD := 0.9
@@ -30,6 +32,7 @@ var _banner_tween: Tween
 var _pulse_tween: Tween
 
 @onready var _round_label: Label = %RoundLabel
+@onready var _hint_card: HintCard = %HintCard
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _timeline: TurnTimeline = %TurnTimeline
 @onready var _order_overlay: OrderOverlay = %OrderOverlay
@@ -58,6 +61,8 @@ func _ready() -> void:
 	_order_overlay.opened.connect(_refresh_buttons)
 	_order_overlay.closed.connect(_refresh_buttons)
 	_inspect_card.closed.connect(card_closed.emit)
+	_hint_card.dismissed.connect(hint_dismissed.emit)
+	(_hint_card.get_node("%DismissButton") as Button).focus_mode = Control.FOCUS_NONE  # Space ends the turn here.
 	# Spells listed on the inspect card show their details above the spell bar.
 	_inspect_card.spell_hovered.connect(_spell_bar.show_details)
 	_inspect_card.spell_unhovered.connect(_spell_bar.hide_details)
@@ -72,6 +77,12 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Enter dismisses a shown hint (Space is End turn; the card's button can't take focus).
+	if _hint_card.visible and event is InputEventKey and event.pressed and not event.echo \
+			and (event as InputEventKey).keycode in [KEY_ENTER, KEY_KP_ENTER]:
+		_hint_card.dismiss()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed(&"show_order"):
 		_order_overlay.toggle()
 		get_viewport().set_input_as_handled()
@@ -142,6 +153,11 @@ func set_placing(placing: bool) -> void:
 	_placing = placing
 	_end_turn_button.text = "Ready (Space)" if placing else "End turn (Space)"
 	_refresh_buttons()
+
+
+## Shows a dismissable hint card (top right).
+func show_hint(text: String) -> void:
+	_hint_card.show_hint(text)
 
 
 ## The persistent guidance line under the turn order ("" hides it).

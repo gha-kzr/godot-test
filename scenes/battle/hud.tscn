@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://cclqktq8mxis"]
 
 [ext_resource type="Script" uid="uid://bmy8ykl5jp7gt" path="res://scripts/view/hud.gd" id="1_hud"]
-[ext_resource type="PackedScene" uid="uid://hjqqf8xm60yy" path="res://scenes/battle/hud/turn_timeline.tscn" id="2_timeline"]
-[ext_resource type="PackedScene" uid="uid://daqdane2602db" path="res://scenes/battle/hud/unit_card.tscn" id="3_card"]
-[ext_resource type="PackedScene" uid="uid://cm7n7hrbt8twc" path="res://scenes/battle/hud/spell_bar.tscn" id="4_bar"]
-[ext_resource type="PackedScene" uid="uid://buxd8n6ocjo61" path="res://scenes/battle/hud/order_overlay.tscn" id="5_overlay"]
+[ext_resource type="PackedScene" uid="uid://8orjihkvj241" path="res://scenes/battle/hud/turn_timeline.tscn" id="2_timeline"]
+[ext_resource type="PackedScene" uid="uid://ci1gxhq2lqf8v" path="res://scenes/battle/hud/unit_card.tscn" id="3_card"]
+[ext_resource type="PackedScene" uid="uid://bv3003qifvei0" path="res://scenes/battle/hud/spell_bar.tscn" id="4_bar"]
+[ext_resource type="PackedScene" uid="uid://cdr8a0urm6koh" path="res://scenes/battle/hud/order_overlay.tscn" id="5_overlay"]
+[ext_resource type="PackedScene" uid="uid://d05xe2ggt3vys" path="res://scenes/game/hint_card.tscn" id="6_hint"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -87,6 +88,18 @@ offset_bottom = -60.0
 grow_horizontal = 0
 grow_vertical = 2
 show_spells = true
+
+[node name="HintCard" parent="Root" instance=ExtResource("6_hint")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -340.0
+offset_top = 96.0
+offset_right = -20.0
+offset_bottom = 96.0
+grow_horizontal = 0
 
 [node name="SpellBar" parent="Root" instance=ExtResource("4_bar")]
 unique_name_in_owner = true

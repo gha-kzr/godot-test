@@ -7,6 +7,10 @@ extends Node
 ## the report. No global state: everything a screen needs is passed to it (calls down,
 ## signals up).
 
+## The game's name (a placeholder), shown on the title screen.
+const TITLE := "Tower Tactics"
+const TITLE_SCENE := preload("res://scenes/game/title_screen.tscn")
+const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
@@ -16,29 +20,85 @@ const SAVE_FAILED := "Progress couldn't be saved."
 ## The tower's floors, boons and stages.
 @export var tower: TowerConfig
 @export var save_path := SaveStore.DEFAULT_PATH
+@export var settings_path := SettingsStore.DEFAULT_PATH
 ## 0 picks a random seed per battle (floors are deterministic anyway; this is the dice).
 @export var rng_seed := 0
 
 var profile: Profile
+var settings: Settings
+var hints: Hints
 var screen: Node
 var _store: SaveStore
+var _settings_store: SettingsStore
 ## What the last run brought, shown on the hub.
 var _summary := ""
 ## The state whose result was applied, so a battle can't count twice, and its report.
 var _applied_state: BattleState
 var _report: RunDirector.Report
 var _battle_title := ""
+## The hero whose tab the player picked last (kept when the hub is rebuilt).
+var _selected_hero := 0
 
 
 func _ready() -> void:
 	_store = SaveStore.new(save_path)
 	profile = _store.load_or_create(roster)
-	show_party()
+	_settings_store = SettingsStore.new(settings_path)
+	settings = _settings_store.load_or_default()
+	hints = Hints.new(settings)
+	SettingsApplier.apply(settings, get_window(), false)
+	show_title()
+
+
+## The first screen. Play opens the hub, where a saved run waits as Continue / Abandon.
+func show_title() -> void:
+	var title := TITLE_SCENE.instantiate() as TitleScreen
+	_replace_screen(title)
+	title.show_title(TITLE)
+	title.play_pressed.connect(show_party)
+	title.settings_pressed.connect(show_settings)
+	title.quit_pressed.connect(get_tree().quit)
+
+
+func show_settings() -> void:
+	var settings_screen := SETTINGS_SCENE.instantiate() as SettingsScreen
+	_replace_screen(settings_screen)
+	settings_screen.show_settings(settings)
+	settings_screen.back_pressed.connect(show_title)
+	settings_screen.changed.connect(_on_settings_changed)
+	settings_screen.reset_save_confirmed.connect(_on_reset_save_confirmed)
+
+
+## Records a dismissed hint so it doesn't come back.
+func _dismiss_hint(id: String) -> void:
+	hints.dismiss(id)
+	_settings_store.save(settings)
+
+
+func _on_settings_changed() -> void:
+	SettingsApplier.apply(settings, get_window())
+	if not _settings_store.save(settings) and screen is SettingsScreen:
+		(screen as SettingsScreen).show_message("Settings couldn't be saved.")
+
+
+## A fresh profile; the settings stay.
+func _on_reset_save_confirmed() -> void:
+	profile = Profile.create(roster)
+	_selected_hero = 0
+	_summary = ""
+	_applied_state = null
+	_report = null
+	var saved := _store.save(profile)
+	if screen is SettingsScreen:
+		(screen as SettingsScreen).show_message("Save reset." if saved else SAVE_FAILED)
 
 
 func show_party(message := "") -> void:
 	var party := PARTY_SCENE.instantiate() as PartyScreen
 	_replace_screen(party)
+	party.selected_hero = _selected_hero
+	party.hero_selected.connect(func(index: int) -> void: _selected_hero = index)
+	party.back_pressed.connect(show_title)
 	party.tower_pressed.connect(start_tower)
 	party.stage_pressed.connect(start_stage)
 	party.continue_pressed.connect(next_step)
@@ -46,6 +106,9 @@ func show_party(message := "") -> void:
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
 	party.show_profile(profile, _summary, message, tower)
+	if hints.should_show("hub_intro"):
+		party.show_hint(hints.text("hub_intro"))
+		party.hint_dismissed.connect(_dismiss_hint.bind("hub_intro"))
 
 
 func start_tower(start_floor: int) -> void:
@@ -89,6 +152,9 @@ func start_battle() -> void:
 	var battle := BATTLE_SCENE.instantiate() as BattleController
 	battle.setup(setup.encounter, setup.units, setup.modifiers, rng_seed, setup.hero_hp,
 			setup.sudden_death_round, setup.sudden_death_percent, setup.title, setup.levels)
+	if hints.should_show("first_battle"):
+		battle.hint_text = hints.text("first_battle")
+		battle.hint_dismissed.connect(_dismiss_hint.bind("first_battle"))
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
 	_battle_title = setup.title
@@ -195,3 +261,5 @@ func _replace_screen(next: Node) -> void:
 		screen.queue_free()
 	screen = next
 	add_child(next)
+	if next is Screen:
+		(next as Screen).focus_first.call_deferred()

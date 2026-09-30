@@ -4,12 +4,13 @@ extends VBoxContainer
 ## at a fixed place above them that shows the spell under the mouse (name, AP, range, area,
 ## effects). Slots are toggle buttons; selecting is reported as a signal up.
 ##
-## Buttons never take keyboard focus, so Space can't press a focused button; the number
-## keys 1-9 are shortcuts that respect the disabled state.
+## Buttons never take keyboard focus, so Space can't press a focused button; the spell
+## actions (keys 1-9 by default) are shortcuts that respect the disabled state.
 
 signal spell_pressed(index: int)
 
-const SPELL_KEYS: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
+## Spell slot i is pressed by the InputMap action "spell_<i+1>" (rebindable in the settings).
+const MAX_KEYED_SLOTS := 9
 const SLOT_SIZE := Vector2(64, 64)
 const HEAL_TINT := Color(0.55, 1.0, 0.6)
 
@@ -137,15 +138,16 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	cost.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(cost)
-	if index < SPELL_KEYS.size():
+	if index < MAX_KEYED_SLOTS:
+		var action := StringName("spell_%d" % (index + 1))
 		var key := Label.new()
 		key.name = "Key"
 		key.theme_type_variation = &"SmallLabel"
-		key.text = str(index + 1)
+		key.text = SettingsApplier.key_text(action)
 		key.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE, 6)
 		key.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(key)
-		button.shortcut = _key_shortcut(SPELL_KEYS[index])
+		button.shortcut = _action_shortcut(action)
 	button.pressed.connect(spell_pressed.emit.bind(index))
 	button.mouse_entered.connect(show_details.bind(spell))
 	button.mouse_exited.connect(hide_details)
@@ -159,9 +161,9 @@ func _refresh() -> void:
 		(slot_button.get_node("Icon") as TextureRect).self_modulate.a = 0.4 if slot_button.disabled else 1.0
 
 
-static func _key_shortcut(key: Key) -> Shortcut:
-	var event := InputEventKey.new()
-	event.physical_keycode = key  # Same key on AZERTY and QWERTY.
+static func _action_shortcut(action: StringName) -> Shortcut:
+	var event := InputEventAction.new()
+	event.action = action
 	var shortcut := Shortcut.new()
 	shortcut.events = [event]
 	return shortcut

@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cgugftdm3dh0a"]
+
+[ext_resource type="Script" uid="uid://dhwjej2807nx4" path="res://scripts/game/hub/destination_bar.gd" id="1_bar"]
+
+[node name="DestinationBar" type="VBoxContainer"]
+theme_override_constants/separation = 8
+script = ExtResource("1_bar")

@@ -1,15 +1,15 @@
 class_name RunScreen
-extends Control
+extends Screen
 ## Between two floors of a run: what the last battle brought (XP, level-ups, runes), the
 ## party's HP, then the next step: Next floor; after a boss, a boon or a full heal, then
 ## Continue or Leave; at the end of the run, Back to the party. Reads the director's report;
 ## choices go up as signals and the Game root applies them.
-## First version, to be revamped in milestone 5.
+## Shows the tower's floor strip and the party's HP between floors; a level-up lists the
+## spells it unlocks. No Esc: leaving is an explicit button.
 
 signal next_pressed
 ## `choice`: an index into the boss offer, or RunDirector.HEAL.
 signal boss_choice_made(choice: int, keep_going: bool)
-signal back_pressed
 
 ## The selected boss choice (an offer index or RunDirector.HEAL); NONE until one is picked.
 const NONE := -2
@@ -18,7 +18,9 @@ var choice := NONE
 
 @onready var _title: Label = %Title
 @onready var _lines: Label = %Lines
-@onready var _party: Label = %PartyHp
+@onready var _strip: FloorStrip = %FloorStrip
+@onready var _party_row: PartyHpRow = %PartyHpRow
+@onready var _boons: Label = %Boons
 @onready var _choices: VBoxContainer = %Choices
 @onready var _buttons: HBoxContainer = %Buttons
 
@@ -27,8 +29,14 @@ var choice := NONE
 func show_report(report: RunDirector.Report, profile: Profile, title: String) -> void:
 	_title.text = title
 	_lines.text = "\n".join(_report_lines(report, profile))
-	_party.text = _party_hp(profile)
-	_party.visible = profile.run != null
+	var run := profile.run
+	_strip.visible = run != null and run.mode == RunState.Mode.TOWER
+	if _strip.visible:
+		_strip.show_floors(run.floor_number)
+	_party_row.visible = run != null
+	_party_row.show_party(_party_infos(profile))
+	_boons.visible = run != null and not run.boons.is_empty()
+	_boons.text = "Boons: " + ", ".join(run.boons.map(func(b: BoonData) -> String: return b.display_name)) if _boons.visible else ""
 	choice = NONE
 	_clear(_choices)
 	_clear(_buttons)
@@ -38,6 +46,10 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 		_show_boss_choice(profile.run.boss_offer)
 	else:
 		_buttons.add_child(_button("NextButton", "Floor %d" % profile.run.floor_number, next_pressed.emit))
+
+
+func _ready() -> void:
+	back_enabled = false  # Leaving the run is an explicit button.
 
 
 func select_choice(value: int) -> void:
@@ -66,7 +78,15 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 	if report.rewards != null:
 		lines.append("+%d XP for each hero." % report.rewards.xp)
 		for level_up in report.level_ups:
-			lines.append("%s reached level %d." % [profile.heroes[level_up.hero_index].hero.display_name(), level_up.to_level])
+			var hero := profile.heroes[level_up.hero_index].hero
+			var learned: Array[String] = []
+			for level in range(level_up.from_level + 1, level_up.to_level + 1):
+				var reward := hero.reward_for(level)
+				if reward != null:
+					for spell in reward.spells:
+						learned.append(spell.display_name)
+			var text := "%s reached level %d" % [hero.display_name(), level_up.to_level]
+			lines.append(text + (" and learned %s." % ", ".join(learned) if not learned.is_empty() else "."))
 		if report.rewards.runes.is_empty():
 			lines.append("No rune found.")
 		else:
@@ -75,20 +95,21 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 	return lines
 
 
-func _party_hp(profile: Profile) -> String:
+## One UnitInfo per hero of the run's party, for the HP chips.
+func _party_infos(profile: Profile) -> Array[UnitInfo]:
+	var infos: Array[UnitInfo] = []
 	if profile.run == null:
-		return ""
-	var parts: Array[String] = []
+		return infos
 	var records := profile.party_records()
 	for slot in records.size():
-		var hero_max := RunDirector.max_hp(profile, slot)
+		var info := UnitInfo.new()
+		info.display_name = records[slot].hero.display_name()
+		info.level = records[slot].level
+		info.max_hp = RunDirector.max_hp(profile, slot)
 		var hp: int = profile.run.hero_hp[slot] if slot < profile.run.hero_hp.size() else -1
-		parts.append("%s %d / %d HP" % [records[slot].hero.display_name(), hero_max if hp < 0 else mini(hp, hero_max), hero_max])
-	var boons := profile.run.boons.map(func(b: BoonData) -> String: return b.display_name)
-	var text := "   ".join(parts)
-	if not boons.is_empty():
-		text += "\nBoons: " + ", ".join(boons)
-	return text
+		info.hp = info.max_hp if hp < 0 else mini(hp, info.max_hp)
+		infos.append(info)
+	return infos
 
 
 func _choice_button(node_name: String, text: String, value: int) -> Button:
@@ -103,7 +124,6 @@ func _button(node_name: String, text: String, on_pressed: Callable) -> Button:
 	var button := Button.new()
 	button.name = node_name
 	button.text = text
-	button.focus_mode = Control.FOCUS_NONE
 	button.custom_minimum_size = Vector2(220, 44)
 	button.pressed.connect(on_pressed)
 	return button

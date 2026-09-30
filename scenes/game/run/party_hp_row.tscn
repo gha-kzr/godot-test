@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bffb8c0cwjfcs"]
+
+[ext_resource type="Script" uid="uid://jwdue5o5gr4s" path="res://scripts/game/run/party_hp_row.gd" id="1_row"]
+
+[node name="PartyHpRow" type="HBoxContainer"]
+theme_override_constants/separation = 10
+script = ExtResource("1_row")

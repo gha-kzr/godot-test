@@ -487,3 +487,23 @@ func test_the_overlay_ignores_wheel_ticks_and_builds_its_rows_when_opened() -> v
 	overlay.get_node("%Dim").gui_input.emit(click)
 	assert_false(overlay.visible)
 	hud.free()
+
+
+func test_enter_dismisses_a_shown_hint_and_space_does_not() -> void:
+	var hud := _hud()
+	var dismissals := {"count": 0}
+	hud.hint_dismissed.connect(func() -> void: dismissals.count += 1)
+	hud.show_hint("Place your heroes.")
+	var space := InputEventKey.new()
+	space.keycode = KEY_SPACE
+	space.pressed = true
+	hud._unhandled_input(space)
+	assert_eq(dismissals.count, 0, "Space is End turn")
+	var enter := InputEventKey.new()
+	enter.keycode = KEY_ENTER
+	enter.pressed = true
+	hud._unhandled_input(enter)
+	assert_eq(dismissals.count, 1)
+	assert_false((hud.get_node("%HintCard") as Control).visible)
+	assert_eq((hud.get_node("%HintCard/Rows/DismissButton") as Button).focus_mode, Control.FOCUS_NONE)
+	hud.free()

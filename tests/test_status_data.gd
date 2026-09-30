@@ -126,3 +126,14 @@ func test_short_labels_stay_short() -> void:
 	var status := _poison()
 	status.short_label = "PSN"
 	assert_has_error(status.get_validation_errors(), "short_label longer than 2 characters")
+
+
+func test_a_self_buff_counts_the_casters_next_turns() -> void:
+	var effect := ApplyStatusEffect.new()
+	effect.status = _poison()
+	effect.target_filter = EffectData.TargetFilter.CASTER
+	assert_eq(effect.describe(), "Poison for your next 3 turns (3-4 damage per turn)")
+	effect.status.duration = 1
+	assert_true(effect.describe().contains("for your next turn "), effect.describe())
+	effect.target_filter = EffectData.TargetFilter.ENEMIES
+	assert_true(effect.describe().contains("for 1 turn "), "others keep the plain wording")

@@ -54,12 +54,13 @@ Decisions: `decisions/2026-09-29-allies-and-placement.md`; plan: `plans/2026-09-
 
 Milestone 5 used to be one "Polish" milestone; it is split in three. Earlier decision records and plans that defer items "to M5" mean the matching part below: UI and UX items → 5, art and audio → 6, balance, exports and release checks → 7.
 
-### 5. UI and UX revamp
-Decisions: `decisions/2026-09-30-ui-revamp.md`. Split in **5a battle** (HUD, timeline, unit cards, status icons, damage preview, move costs, guidance) and **5b screens** (theme, title, hub, run screen, settings, first-run hints).
+### 5. UI and UX revamp — done
+Decisions: `decisions/2026-09-30-ui-revamp.md` and `decisions/2026-09-30-screens.md`; plans: `plans/2026-09-30-battle-ui.md` (5a) and `plans/2026-09-30-screens.md` (5b). Split in **5a battle** (HUD, timeline, unit cards, status icons, damage preview, move costs, guidance) and **5b screens** (theme, title, hub, run screen, settings, first-run hints).
 - UI theme, fonts and spell / status icons; title, hub (party screen), run screen and settings menus — the first-version screens from M2 and M4 are replaced.
 - Battle HUD: an event-driven refresh (events carrying "after" values, status countdowns mid-playback), the status display and unit inspection panels redone, the preset tag color, a lasting sudden-death tag, the placement phase's hints.
 - Readability: move costs on the hovered path (see "Clearer climbing cost" below), first-run hints, a hint when a unit has nothing left to do.
-- Small UX items from the reviews: rebindable click and spell keys, right click over the HUD cancels aiming, keeping the selected hero across screens, spells in the level-up summary, self-buff turns wording.
+- Small UX items from the reviews: rebindable spell keys (rebindable click is not built), right click over the HUD cancels aiming, keeping the selected hero across screens, spells in the level-up summary, self-buff turns wording.
+- Platforms: built for desktop and web first, then maybe Android, later gamepad (same platforms). Nothing is hover-only, layouts are anchored, and platform differences live in `SettingsApplier` / `OS.has_feature`; a web export must include `CREDITS.md` (shown in the settings) and `user://` persists as browser storage.
 
 *Why here:* the screens are placeholders over stable mechanics; independent of the art, so 5 and 6 can swap order.
 

@@ -52,7 +52,9 @@ A turn-based tactical roguelite (Dofus / Disgaea style). The game opens on the *
 - **Progression:** every enemy killed gives XP; a won battle gives each hero the full XP (fallen heroes too), levels (+HP, +Power; a 4th spell at level 3, +1 MP at level 6; cap 10) and the runes the enemies dropped. A lost battle ends the run and gives nothing for that fight; levels and runes are always kept.
 - **Runes:** 6 slots per hero. Click a rune in the stash to equip it on the selected hero, click a slot to unequip it. Common and rare runes stack; epic and legendary ones are one per hero.
 - **Stats:** Power raises damage and heals by a percentage; resistances reduce damage of one type (Physical, Fire, Poison), at most 50 %.
-- **Save:** automatic after each battle, boss choice and rune change, in `user://profile.json` (on macOS `~/Library/Application Support/Godot/app_userdata/godot-test/profile.json`). Delete it to start over.
+- **Save:** automatic after each battle, boss choice and rune change, in `user://profile.json` (on macOS `~/Library/Application Support/Godot/app_userdata/godot-test/profile.json`). Delete it to start over, or use **Reset save** in the settings.
+- **Screens:** the game opens on a **title** (Play, Settings, Quit; no Quit on web). **Play** opens the hub; `Esc` (or the Title button) goes back to the title. Every menu works with the keyboard (arrows, `Enter`, `Esc`).
+- **Settings** (title screen): window mode and UI scale, **key rebinding** (spell 1–5, End turn, camera, view, turn order; a key another action uses is refused), credits, show the hints again and reset the save. They are kept in `user://settings.cfg`, separate from the save. The first hub visit and the first battle show a dismissable tip.
 
 A battle opens on **placement**: your heroes stand in the start zone (teal cells), already placed by reach (melee in front). Click a hero, then a zone cell to move it there (a hero on that cell swaps places), and press **Ready** (`Space`) to fight. Enemies are visible meanwhile; hover them to plan.
 
@@ -63,7 +65,7 @@ In battle, units act in initiative order; each turn a unit has AP for spells and
 | Placement: left click a hero, then a teal cell | Move it there (swap if taken) |
 | Placement: `Space` | Ready: start the fight |
 | Left click on a highlighted (blue) cell | Move there |
-| `1`–`9` or click a spell button | Aim a spell (again to unselect) |
+| `1`–`9` or click a spell button | Aim a spell (again to unselect; spell keys 1–5 can be rebound in the settings) |
 | Left click on an orange cell (or a unit standing there) | Cast the aimed spell |
 | `Esc` / right click | Close the order overlay, else stop aiming, else unpin the card |
 | Left click a unit | Pin its card on the right (it stays until its ✕ or `Esc`; a click on a target cell still casts) |
@@ -131,7 +133,7 @@ scripts/          # .gd scripts (and their .uid files, commit these)
   view/           #   display: board, camera, units, event player, HUD (hud.gd facade, hud/ components, hud_model.gd), controller
   progression/    #   lasting progress: hero records, profile, save (no nodes)
   run/            #   run loop: tower and map generators, run state and director (no nodes)
-  game/           #   game root (profile, screens), hub (party screen) and run screen
+  game/           #   game root (profile, settings, screens): title, settings, hub (party screen, hub/ components), run screen (run/ components), hint card
 data/             # content .tres files (units, enemies, spells, statuses, damage types, runes, loot, presets, encounters, heroes, maps, AI profiles, tower, boons, stages)
 tests/            # headless tests: test_*.gd files extending TestCase
 tools/            # CLI helper scripts (fill_uid_refs.gd, build_theme.gd)

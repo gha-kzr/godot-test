@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://2olfi2jibme0"]
+
+[ext_resource type="Script" uid="uid://ddq73dm1vfuih" path="res://scripts/game/hub/hero_panel.gd" id="1_panel"]
+
+[node name="HeroPanel" type="VBoxContainer"]
+theme_override_constants/separation = 8
+script = ExtResource("1_panel")
+
+[node name="HeroTitle" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Hero"
+
+[node name="XpBar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="XpLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+
+[node name="Stats" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="SpellsTitle" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"PromptLabel"
+text = "Spells"
+
+[node name="Spells" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SpellInfo" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+autowrap_mode = 3
+
+[node name="NextReward" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+autowrap_mode = 3
+
+[node name="RunesTitle" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"PromptLabel"
+text = "Runes"
+
+[node name="RuneSlots" type="GridContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3

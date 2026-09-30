@@ -574,3 +574,16 @@ func test_end_turn_pulses_only_when_nothing_is_left_to_do() -> void:
 	var normal := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
 	assert_true(await _wait_for(normal, [BattleController.State.IDLE]))
 	assert_false(normal.hud.is_end_turn_pulsing(), "it can still move")
+
+
+func test_right_click_over_the_hud_stops_aiming() -> void:
+	var controller := _controller("0p 0e 0 0", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	assert_eq(controller.input_state, BattleController.State.TARGETING)
+	var right := InputEventMouseButton.new()
+	right.button_index = MOUSE_BUTTON_RIGHT
+	right.pressed = true
+	right.position = controller.hud.get_node("%EndTurnButton").get_global_rect().get_center()
+	controller.get_viewport().push_input(right)
+	assert_eq(controller.input_state, BattleController.State.IDLE, "the HUD didn't swallow the cancel")

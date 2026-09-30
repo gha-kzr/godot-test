@@ -19,7 +19,7 @@ func test_lists_heroes_and_shows_a_locked_one() -> void:
 	var profile := _profile()
 	profile.unlocked = [0, 1] as Array[int]
 	var screen := _screen(profile)
-	var heroes := screen.get_node("%HeroList").get_children()
+	var heroes := screen.get_node("%HeroTabs").get_children()
 	assert_eq(heroes.size(), 3)
 	assert_true((heroes[0] as Button).text.begins_with("Knight  Lv 1"))
 	assert_true((heroes[2] as Button).disabled, "a locked hero")
@@ -33,24 +33,22 @@ func test_details_show_level_xp_stats_spells_and_runes() -> void:
 	profile.heroes[0].level = 2
 	profile.heroes[0].runes[1] = load("res://data/runes/fire_ward.tres")
 	var screen := _screen(profile)
-	var details := screen.get_node("%Details")
-	assert_eq((details.get_node("XpLabel") as Label).text, "XP 30 / 50")
-	var stats := (details.get_node("Stats") as Label).text
+	assert_eq((screen.find_child("XpLabel", true, false) as Label).text, "XP 30 / 50")
+	var stats := (screen.find_child("Stats", true, false) as Label).text
 	assert_true(stats.contains("HP 44"), "40 + 4 from level 2: %s" % stats)
 	assert_true(stats.contains("Power +2%"), stats)
 	assert_true(stats.contains("Fire +25%"), stats)
-	var slot := screen.get_node("%RuneSlots").get_node("Slot1") as Button
+	var slot := screen.find_child("Slot1", true, false) as Button
 	assert_eq(slot.text, "Fire Ward Rune")
-	assert_true((screen.get_node("%RuneSlots").get_node("Slot0") as Button).disabled, "empty slot")
+	assert_true((screen.find_child("Slot0", true, false) as Button).disabled, "empty slot")
 	screen.free()
 
 
 func test_selecting_a_hero_switches_the_details() -> void:
 	var screen := _screen(_profile())
-	(screen.get_node("%HeroList").get_node("Hero1") as Button).pressed.emit()
+	(screen.find_child("Hero1", true, false) as Button).pressed.emit()
 	assert_eq(screen.selected_hero, 1)
-	await (Engine.get_main_loop() as SceneTree).process_frame
-	var title := screen.get_node("%Details").get_child(0) as Label
+	var title := screen.find_child("HeroTitle", true, false) as Label
 	assert_true(title.text.begins_with("Mage"), title.text)
 	screen.free()
 
@@ -64,8 +62,8 @@ func test_stash_and_slot_clicks_ask_the_game() -> void:
 	screen.equip_requested.connect(func(hero: int, index: int) -> void: requests.append(["equip", hero, index]))
 	screen.unequip_requested.connect(func(hero: int, slot: int) -> void: requests.append(["unequip", hero, slot]))
 	screen.select_hero(1)
-	(screen.get_node("%Stash").get_node("Stash1") as Button).pressed.emit()
-	(screen.get_node("%RuneSlots").get_node("Slot4") as Button).pressed.emit()
+	(screen.find_child("Stash1", true, false) as Button).pressed.emit()
+	(screen.find_child("Slot4", true, false) as Button).pressed.emit()
 	assert_eq(requests, [["equip", 1, 1], ["unequip", 1, 4]])
 	assert_eq(profile.stash.size(), 2, "the screen itself changes nothing")
 	screen.free()
@@ -116,5 +114,78 @@ func test_the_hub_offers_the_saved_run() -> void:
 	(screen.find_child("AbandonButton", true, false) as Button).pressed.emit()
 	assert_eq(requests, ["continue", "abandon"])
 	assert_eq(screen.find_child("TowerButton", true, false), null)
-	assert_true((screen.get_node("%Hub").get_child(0) as Label).text.contains("floor 7"))
+	assert_true((screen.get_node("%DestinationBar").get_child(0) as Label).text.contains("floor 7"))
+	screen.free()
+
+
+func _frame() -> void:
+	await (Engine.get_main_loop() as SceneTree).process_frame
+
+
+func test_every_hub_button_takes_keyboard_focus() -> void:
+	var profile := _profile()
+	profile.stash = [load("res://data/runes/might.tres")] as Array[RuneData]
+	profile.heroes[0].runes[0] = load("res://data/runes/vitality.tres")
+	var screen := PARTY_SCENE.instantiate() as PartyScreen
+	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
+	screen.show_profile(profile, "", "", _tower())
+	var nodes: Array[Node] = [screen]
+	var buttons := 0
+	while not nodes.is_empty():
+		var node: Node = nodes.pop_back()
+		nodes.append_array(node.get_children())
+		if node is BaseButton or node is OptionButton:
+			buttons += 1
+			assert_eq((node as Control).focus_mode, Control.FOCUS_ALL, "%s takes focus" % node.name)
+	assert_true(buttons > 10, "the hub's buttons were checked")
+	screen.free()
+
+
+func test_spells_are_listed_and_a_click_shows_the_description() -> void:
+	var screen := _screen(_profile())
+	var spells := screen.find_child("Spells", true, false)
+	assert_true(spells.get_child_count() >= 2, "the hero's spells")
+	var first := spells.get_child(0) as Button
+	assert_true(first.icon != null, "with its icon")
+	var info := screen.find_child("SpellInfo", true, false) as Label
+	assert_eq(info.text, "")
+	first.pressed.emit()
+	assert_true(info.text.contains("AP") and info.text.contains("Range"), info.text)
+	screen.free()
+
+
+func test_the_title_button_asks_to_go_back() -> void:
+	var screen := _screen(_profile())
+	var backs := {"count": 0}
+	screen.back_pressed.connect(func() -> void: backs.count += 1)
+	(screen.get_node("%MenuButton") as Button).pressed.emit()
+	assert_eq(backs.count, 1)
+	screen.free()
+
+
+func test_selecting_a_hero_keeps_focus_and_reports_it() -> void:
+	var screen := _screen(_profile())
+	var picks: Array[int] = []
+	screen.hero_selected.connect(func(index: int) -> void: picks.append(index))
+	var tab := screen.find_child("Hero1", true, false) as Button
+	tab.grab_focus()
+	tab.pressed.emit()
+	await _frame()
+	assert_eq(picks, [1] as Array[int])
+	assert_eq(screen.get_viewport().gui_get_focus_owner(), tab, "the tab isn't rebuilt under the player")
+	assert_true(tab.button_pressed)
+	screen.free()
+
+
+func test_focus_returns_to_the_rebuilt_button_after_a_change() -> void:
+	var profile := _profile()
+	profile.stash = [load("res://data/runes/might.tres"), load("res://data/runes/focus.tres")] as Array[RuneData]
+	var screen := _screen(profile)
+	(screen.find_child("Stash0", true, false) as Button).grab_focus()
+	profile.stash.remove_at(0)  # As after an equip.
+	screen.show_profile(profile)
+	await _frame()
+	await _frame()
+	var focused := screen.get_viewport().gui_get_focus_owner()
+	assert_true(focused != null and focused.name == &"Stash0", "focus is back on the list")
 	screen.free()

@@ -1,6 +1,11 @@
-[gd_scene format=3 uid="uid://dxrbdgordbuh6"]
+[gd_scene format=3 uid="uid://c1gtsdpp7fv27"]
 
 [ext_resource type="Script" uid="uid://bykym7jg47d1g" path="res://scripts/game/party_screen.gd" id="1_party"]
+[ext_resource type="PackedScene" uid="uid://bp2b2t251luc" path="res://scenes/game/hub/hero_tabs.tscn" id="2_tabs"]
+[ext_resource type="PackedScene" uid="uid://2olfi2jibme0" path="res://scenes/game/hub/hero_panel.tscn" id="3_panel"]
+[ext_resource type="PackedScene" uid="uid://c0d3q3yh87q0y" path="res://scenes/game/hub/rune_stash.tscn" id="4_stash"]
+[ext_resource type="PackedScene" uid="uid://cgugftdm3dh0a" path="res://scenes/game/hub/destination_bar.tscn" id="5_bar"]
+[ext_resource type="PackedScene" uid="uid://d05xe2ggt3vys" path="res://scenes/game/hint_card.tscn" id="6_hint"]
 
 [node name="PartyScreen" type="Control"]
 layout_mode = 3
@@ -18,6 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.1, 0.11, 0.14, 1)
 
 [node name="Rows" type="VBoxContainer" parent="."]
@@ -33,16 +39,31 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Rows"]
+[node name="TopBar" type="HBoxContainer" parent="Rows"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+
+[node name="MenuButton" type="Button" parent="Rows/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "Title"
+
+[node name="Title" type="Label" parent="Rows/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
 text = "Party"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Rows/TopBar"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
 
 [node name="Summary" type="Label" parent="Rows"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = &"PromptLabel"
 autowrap_mode = 3
 
 [node name="Main" type="HBoxContainer" parent="Rows"]
@@ -50,58 +71,34 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="HeroColumn" type="VBoxContainer" parent="Rows/Main"]
-custom_minimum_size = Vector2(220, 0)
-layout_mode = 2
-
-[node name="HeroesTitle" type="Label" parent="Rows/Main/HeroColumn"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Heroes"
-
-[node name="HeroList" type="VBoxContainer" parent="Rows/Main/HeroColumn"]
+[node name="HeroTabs" parent="Rows/Main" instance=ExtResource("2_tabs")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DetailColumn" type="VBoxContainer" parent="Rows/Main"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 10
-
-[node name="Details" type="VBoxContainer" parent="Rows/Main/DetailColumn"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="RunesTitle" type="Label" parent="Rows/Main/DetailColumn"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Runes"
-
-[node name="RuneSlots" type="GridContainer" parent="Rows/Main/DetailColumn"]
-unique_name_in_owner = true
-layout_mode = 2
-columns = 3
-
-[node name="StashColumn" type="VBoxContainer" parent="Rows/Main"]
-custom_minimum_size = Vector2(340, 0)
-layout_mode = 2
-
-[node name="StashTitle" type="Label" parent="Rows/Main/StashColumn"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Stash"
-
-[node name="StashScroll" type="ScrollContainer" parent="Rows/Main/StashColumn"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="Stash" type="VBoxContainer" parent="Rows/Main/StashColumn/StashScroll"]
+[node name="HeroPanel" parent="Rows/Main" instance=ExtResource("3_panel")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Hub" type="VBoxContainer" parent="Rows"]
+[node name="RuneStash" parent="Rows/Main" instance=ExtResource("4_stash")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 8
+
+[node name="DestinationBar" parent="Rows" instance=ExtResource("5_bar")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HintCard" parent="." instance=ExtResource("6_hint")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -364.0
+offset_top = -24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0

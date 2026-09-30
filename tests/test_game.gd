@@ -4,6 +4,7 @@ extends TestCase
 
 const GAME_SCENE := preload("res://scenes/game/game.tscn")
 const SAVE := "user://test_game/profile.json"
+const SETTINGS := "user://test_game/settings.cfg"
 
 
 func _tree() -> SceneTree:
@@ -13,19 +14,23 @@ func _tree() -> SceneTree:
 func _game() -> Game:
 	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
 	SaveStore.new(SAVE).delete()
+	SettingsStore.new(SETTINGS).delete()
 	return _open()
 
 
 func _open() -> Game:
 	var game := GAME_SCENE.instantiate() as Game
 	game.save_path = SAVE
+	game.settings_path = SETTINGS
 	game.rng_seed = 5
 	_tree().root.add_child(game)
+	_press(game.screen, "PlayButton")  # Title → hub.
 	return game
 
 
 func after_each_clean() -> void:
 	SaveStore.new(SAVE).delete()
+	SettingsStore.new(SETTINGS).delete()
 	DirAccess.remove_absolute(SAVE.get_base_dir())
 
 
@@ -252,3 +257,133 @@ func test_an_invalid_tower_keeps_the_hub_with_its_errors() -> void:
 	assert_true((game.screen.get_node("%Summary") as Label).text.contains("The tower is invalid"))
 	assert_eq(game.profile.run, null)
 	after_each_clean()
+
+
+func test_the_game_opens_on_the_title_and_play_opens_the_hub() -> void:
+	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
+	SaveStore.new(SAVE).delete()
+	var game := GAME_SCENE.instantiate() as Game
+	game.save_path = SAVE
+	game.settings_path = SETTINGS
+	_tree().root.add_child(game)
+	assert_true(game.screen is TitleScreen, "the title first")
+	assert_eq((game.screen.get_node("%TitleLabel") as Label).text, Game.TITLE)
+	assert_true((game.screen.get_node("%QuitButton") as Button).visible or OS.has_feature("web"))
+	_press(game.screen, "PlayButton")
+	assert_true(game.screen is PartyScreen, "Play opens the hub")
+	game.free()
+
+
+func test_esc_on_the_hub_goes_back_to_the_title_but_not_from_the_title() -> void:
+	var game := _game()
+	assert_true(game.screen is PartyScreen)
+	var escape := InputEventAction.new()
+	escape.action = &"ui_cancel"
+	escape.pressed = true
+	(game.screen as Screen)._unhandled_input(escape)
+	assert_true(game.screen is TitleScreen, "hub → title")
+	(game.screen as Screen)._unhandled_input(escape)
+	assert_true(game.screen is TitleScreen, "the title has no back")
+	game.free()
+
+
+func test_a_saved_run_waits_on_the_hub_after_the_title() -> void:
+	var game := _game()
+	_press(game.screen, "TowerButton")
+	game.free()
+	var reopened := _open()
+	assert_true(reopened.screen is PartyScreen, "the hub, not straight into the run")
+	assert_true(reopened.screen.find_child("ContinueButton", true, false) != null, "with Continue run")
+	reopened.free()
+
+
+func test_settings_open_from_the_title_save_on_change_and_go_back() -> void:
+	var game := _game()
+	var escape := InputEventAction.new()
+	escape.action = &"ui_cancel"
+	escape.pressed = true
+	(game.screen as Screen)._unhandled_input(escape)  # Hub → title.
+	_press(game.screen, "SettingsButton")
+	assert_true(game.screen is SettingsScreen)
+	(game.screen.get_node("%UiScale") as OptionButton).item_selected.emit(3)
+	assert_eq(game.get_window().content_scale_factor, 1.5, "applied at once")
+	assert_eq(SettingsStore.new(SETTINGS).load_or_default().ui_scale, 1.5, "and saved")
+	_press(game.screen, "BackButton")
+	assert_true(game.screen is TitleScreen)
+	game.get_window().content_scale_factor = 1.0
+	game.free()
+
+
+func test_resetting_the_save_keeps_the_settings() -> void:
+	var game := _game()
+	game.profile.heroes[0].level = 5
+	game.settings.ui_scale = 1.25
+	game._on_settings_changed()
+	game.show_settings()
+	(game.screen.get_node("%ResetSaveButton") as Button).pressed.emit()
+	(game.screen.get_node("%ConfirmYesButton") as Button).pressed.emit()
+	assert_eq(game.profile.heroes[0].level, 1, "a fresh profile")
+	assert_eq(_saved(game).heroes[0].level, 1, "saved")
+	assert_eq(SettingsStore.new(SETTINGS).load_or_default().ui_scale, 1.25, "settings untouched")
+	game.get_window().content_scale_factor = 1.0
+	game.free()
+
+
+func test_the_selected_hero_is_kept_across_screens() -> void:
+	var game := _game()
+	(game.screen.find_child("Hero1", true, false) as Button).pressed.emit()
+	(game.screen as Screen).back_pressed.emit()  # Title.
+	_press(game.screen, "PlayButton")
+	assert_eq((game.screen as PartyScreen).selected_hero, 1)
+	game.free()
+
+
+func _hub_hint(game: Game) -> Control:
+	return game.screen.get_node("%HintCard") as Control
+
+
+func test_the_hub_hint_shows_once_and_its_dismissal_is_saved() -> void:
+	var game := _game()
+	assert_true(_hub_hint(game).visible, "first visit")
+	(_hub_hint(game).get_node("%DismissButton") as Button).pressed.emit()
+	assert_true(SettingsStore.new(SETTINGS).load_or_default().dismissed_hints.has("hub_intro"), "saved")
+	game.show_party()
+	assert_false(_hub_hint(game).visible, "not again")
+	game.free()
+	var reopened := _open()
+	assert_false(_hub_hint(reopened).visible, "not after a restart either")
+	reopened.free()
+
+
+func test_show_hints_again_brings_the_hub_hint_back() -> void:
+	var game := _game()
+	(_hub_hint(game).get_node("%DismissButton") as Button).pressed.emit()
+	game.show_settings()
+	(game.screen.get_node("%ShowHintsButton") as Button).pressed.emit()
+	game.show_party()
+	assert_true(_hub_hint(game).visible)
+	game.free()
+
+
+func test_the_first_battle_hint_shows_on_the_hud_and_is_saved_when_dismissed() -> void:
+	var game := _game()
+	game.start_tower(1)
+	var battle := _battle(game)
+	var card := battle.hud.get_node("%HintCard") as Control
+	assert_true(card.visible, "the first battle opens with its hint")
+	(card.get_node("%DismissButton") as Button).pressed.emit()
+	assert_true(SettingsStore.new(SETTINGS).load_or_default().dismissed_hints.has("first_battle"))
+	game.start_tower(1)
+	assert_false((_battle(game).hud.get_node("%HintCard") as Control).visible, "not in the next battle")
+	game.free()
+
+
+func test_resetting_the_save_forgets_the_selected_hero() -> void:
+	var game := _game()
+	(game.screen.find_child("Hero1", true, false) as Button).pressed.emit()
+	game.show_settings()
+	(game.screen.get_node("%ResetSaveButton") as Button).pressed.emit()
+	(game.screen.get_node("%ConfirmYesButton") as Button).pressed.emit()
+	game.show_party()
+	assert_eq((game.screen as PartyScreen).selected_hero, 0)
+	game.free()

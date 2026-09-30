@@ -27,3 +27,18 @@ func test_every_file_and_reference_has_a_uid() -> void:
 			if line.begins_with("[ext_resource") and not line.contains(' uid="uid://'):
 				problems.append("%s: %s" % [path, line])
 	assert_eq(problems, [] as Array[String], "run tools/fill_uid_refs.gd")
+
+
+func test_every_reference_uid_matches_its_file() -> void:
+	var problems: Array[String] = []
+	var pattern := RegEx.create_from_string('^\\[ext_resource [^\\]]*uid="(uid://[^"]+)"[^\\]]*path="([^"]+)"')
+	for path in _files():
+		for line in FileAccess.get_file_as_string(path).split("\n"):
+			var found := pattern.search(line)
+			if found == null:
+				continue
+			var target := found.get_string(2)
+			var real := ResourceUID.id_to_text(ResourceLoader.get_resource_uid(target))
+			if real != found.get_string(1):
+				problems.append("%s: %s has %s, not %s" % [path, target, found.get_string(1), real])
+	assert_eq(problems, [] as Array[String], "a reference points at another UID than its file's")

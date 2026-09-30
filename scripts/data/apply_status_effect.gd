@@ -12,11 +12,14 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 	return [BattleEvents.StatusApplied.new(target_id, status, instance.turns_left)]
 
 
-## e.g. "Poison for 3 turns (3-4 damage per turn)".
+## e.g. "Poison for 3 turns (3-4 damage per turn)"; a status put on the caster counts the
+## caster's own turns: "Guard for your next 2 turns (...)" (a self-buff doesn't count the turn it is cast in).
 func describe() -> String:
 	if status == null:
 		return "no status"
 	var turns := "1 turn" if status.duration == 1 else "%d turns" % status.duration
+	if target_filter == TargetFilter.CASTER:
+		turns = "your next turn" if status.duration == 1 else "your next %d turns" % status.duration
 	return "%s for %s (%s)" % [status.display_name, turns, status.describe()]
 
 

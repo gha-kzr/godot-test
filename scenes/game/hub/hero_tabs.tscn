@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bp2b2t251luc"]
+
+[ext_resource type="Script" uid="uid://dvlkb67bn67fh" path="res://scripts/game/hub/hero_tabs.gd" id="1_tabs"]
+
+[node name="HeroTabs" type="VBoxContainer"]
+custom_minimum_size = Vector2(220, 0)
+theme_override_constants/separation = 8
+script = ExtResource("1_tabs")

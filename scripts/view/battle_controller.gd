@@ -15,6 +15,8 @@ extends Node3D
 ## The battle just ended (the result screen shows). The state is final: the caller applies
 ## and saves rewards now, so closing the game on the result screen loses nothing.
 signal battle_ended(state: BattleState)
+## The hint card on the HUD was dismissed.
+signal hint_dismissed
 ## A battle set up by setup() ended and the player chose to continue.
 signal battle_finished(state: BattleState)
 
@@ -44,6 +46,8 @@ var sudden_death_percent := 10
 var battle_title := ""
 ## The heroes' levels, parallel to `players` (shown in the HUD cards); empty: not shown.
 var player_levels: Array = []
+## A first-run hint shown when the battle opens ("" for none); `hint_dismissed` says it went.
+var hint_text := ""
 var _sudden_death_announced := false
 
 var battle: Battle
@@ -95,6 +99,7 @@ func _ready() -> void:
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
 	hud.restart_pressed.connect(_on_result_action)
 	hud.card_closed.connect(unpin)
+	hud.hint_dismissed.connect(hint_dismissed.emit)
 	hud.chip_hovered.connect(_on_chip_hovered)
 	hud.chip_unhovered.connect(_on_chip_unhovered)
 	hud.chip_pressed.connect(_on_chip_pressed)
@@ -142,6 +147,8 @@ func start_battle() -> bool:
 	_chip_unit = -1
 	_refresh_hud()
 	_set_state(State.PLACING)
+	if not hint_text.is_empty():
+		hud.show_hint(hint_text)
 	return true
 
 
@@ -239,6 +246,15 @@ func click_cell(cell: Vector2i) -> void:
 
 
 # --- Input ---
+
+## Right click over a HUD control stops aiming too: the control eats the click before
+## _unhandled_input would see it.
+func _input(event: InputEvent) -> void:
+	if input_state == State.TARGETING and event is InputEventMouseButton and event.pressed \
+			and event.button_index == MOUSE_BUTTON_RIGHT and get_viewport().gui_get_hovered_control() != null:
+		cancel()
+		get_viewport().set_input_as_handled()
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"cancel"):
