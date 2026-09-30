@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="3_qmcd3"]
 [ext_resource type="Resource" uid="uid://b12pstebg20f7" path="res://data/statuses/regeneration.tres" id="4_y8l52"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_pexgm"]
+[ext_resource type="Texture2D" uid="uid://cnht4hk13iefa" path="res://ui/icons/regeneration.svg" id="5_uug3b"]
 
 [sub_resource type="Resource" id="Resource_4rnt5"]
 script = ExtResource("1_28p66")
@@ -19,6 +20,7 @@ target_filter = 1
 [resource]
 script = ExtResource("5_pexgm")
 display_name = "Regeneration"
+icon = ExtResource("5_uug3b")
 ap_cost = 4
 min_range = 0
 max_range = 4

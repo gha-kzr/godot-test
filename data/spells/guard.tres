@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="3_c7tvn"]
 [ext_resource type="Resource" uid="uid://cu6cxdyh684h8" path="res://data/statuses/guarded.tres" id="4_6lefw"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_eprxx"]
+[ext_resource type="Texture2D" uid="uid://q42ohyvc1ly" path="res://ui/icons/guard.svg" id="5_rttsa"]
 
 [sub_resource type="Resource" id="Resource_h2kpa"]
 script = ExtResource("1_iggew")
@@ -17,6 +18,7 @@ target_filter = 3
 [resource]
 script = ExtResource("5_eprxx")
 display_name = "Guard"
+icon = ExtResource("5_rttsa")
 min_range = 0
 max_range = 0
 needs_line_of_sight = false

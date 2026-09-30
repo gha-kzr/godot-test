@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://dwd0srqca2oww"]
 
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_7kn5s"]
+[ext_resource type="Texture2D" uid="uid://gdifivnfudwv" path="res://ui/icons/status_crippled.svg" id="1_dodfg"]
 [ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_dodfg"]
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_b2hke"]
 
@@ -21,6 +22,7 @@ amount = 25
 [resource]
 script = ExtResource("2_dodfg")
 display_name = "Crippled"
+icon = ExtResource("1_dodfg")
 short_label = "C"
 color = Color(0.9, 0.5, 0.2, 1)
 modifiers = Array[ExtResource("1_7kn5s")]([SubResource("Resource_7kn5s"), SubResource("Resource_dodfg"), SubResource("Resource_b2hke")])

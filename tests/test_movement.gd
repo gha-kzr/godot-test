@@ -159,3 +159,12 @@ func test_distances_charge_climbing_on_the_way_to_the_goal() -> void:
 func test_the_origin_costs_nothing() -> void:
 	var reach := _reach("0p 0 0e", 3)
 	assert_eq(reach.cost_to(Vector2i(0, 0)), 0, "not an ally's cell to walk through")
+
+
+func test_climbing_steps_lists_each_climb_with_its_extra_cost() -> void:
+	var state := BattleFixtures.state("0p 1 2 1 0e", 8)
+	var reach := Movement.reach(state, 0)
+	var path := reach.path_to(Vector2i(3, 0))
+	assert_eq(Movement.climbing_steps(state.grid, reach.origin, path), {Vector2i(1, 0): 1, Vector2i(2, 0): 1} as Dictionary[Vector2i, int])
+	assert_eq(reach.cost_to(Vector2i(3, 0)), 5, "3 steps + 2 climbs")
+	assert_eq(Movement.climbing_steps(state.grid, reach.origin, [] as Array[Vector2i]).size(), 0)

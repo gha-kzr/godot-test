@@ -1,13 +1,10 @@
 [gd_scene format=3 uid="uid://cclqktq8mxis"]
 
 [ext_resource type="Script" uid="uid://bmy8ykl5jp7gt" path="res://scripts/view/hud.gd" id="1_hud"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
-bg_color = Color(0.35, 0.8, 0.4, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+[ext_resource type="PackedScene" uid="uid://hjqqf8xm60yy" path="res://scenes/battle/hud/turn_timeline.tscn" id="2_timeline"]
+[ext_resource type="PackedScene" uid="uid://daqdane2602db" path="res://scenes/battle/hud/unit_card.tscn" id="3_card"]
+[ext_resource type="PackedScene" uid="uid://cm7n7hrbt8twc" path="res://scenes/battle/hud/spell_bar.tscn" id="4_bar"]
+[ext_resource type="PackedScene" uid="uid://buxd8n6ocjo61" path="res://scenes/battle/hud/order_overlay.tscn" id="5_overlay"]
 
 [node name="Hud" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -34,16 +31,20 @@ alignment = 1
 [node name="RoundLabel" type="Label" parent="Root/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/outline_size = 6
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_type_variation = &"HeaderLabel"
 text = "Round 1"
 horizontal_alignment = 1
 
-[node name="TurnOrder" type="HBoxContainer" parent="Root/TopBar"]
+[node name="PromptLabel" type="Label" parent="Root/TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"PromptLabel"
+horizontal_alignment = 1
+
+[node name="TurnTimeline" parent="Root/TopBar" instance=ExtResource("2_timeline")]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
-alignment = 1
 
 [node name="Banner" type="Label" parent="Root"]
 unique_name_in_owner = true
@@ -53,96 +54,41 @@ anchor_right = 1.0
 offset_top = 96.0
 offset_bottom = 150.0
 grow_horizontal = 2
-theme_override_constants/outline_size = 10
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_type_variation = &"HeaderLabel"
 theme_override_font_sizes/font_size = 34
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="UnitPanel" type="PanelContainer" parent="Root"]
+[node name="ActiveCard" parent="Root" instance=ExtResource("3_card")]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 12.0
-offset_top = -118.0
-offset_right = 262.0
+offset_top = -12.0
+offset_right = 222.0
 offset_bottom = -12.0
 grow_vertical = 0
 
-[node name="Rows" type="VBoxContainer" parent="Root/UnitPanel"]
-layout_mode = 2
-
-[node name="NameRow" type="HBoxContainer" parent="Root/UnitPanel/Rows"]
-layout_mode = 2
-
-[node name="UnitSwatch" type="ColorRect" parent="Root/UnitPanel/Rows/NameRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(18, 18)
-layout_mode = 2
-size_flags_vertical = 4
-
-[node name="UnitName" type="Label" parent="Root/UnitPanel/Rows/NameRow"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Unit"
-
-[node name="HpBar" type="ProgressBar" parent="Root/UnitPanel/Rows"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
-layout_mode = 2
-theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
-show_percentage = false
-
-[node name="HpLabel" type="Label" parent="Root/UnitPanel/Rows"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "0 / 0 HP"
-
-[node name="PointsRow" type="HBoxContainer" parent="Root/UnitPanel/Rows"]
-layout_mode = 2
-theme_override_constants/separation = 24
-
-[node name="ApLabel" type="Label" parent="Root/UnitPanel/Rows/PointsRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "AP 0 / 0"
-
-[node name="MpLabel" type="Label" parent="Root/UnitPanel/Rows/PointsRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "MP 0 / 0"
-
-[node name="CombatStats" type="Label" parent="Root/UnitPanel/Rows"]
+[node name="InspectCard" parent="Root" instance=ExtResource("3_card")]
 unique_name_in_owner = true
 visible = false
-layout_mode = 2
-
-[node name="StatusList" type="VBoxContainer" parent="Root/UnitPanel/Rows"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="InspectPanel" type="PanelContainer" parent="Root"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -242.0
-offset_top = -140.0
+offset_left = -262.0
+offset_top = -60.0
 offset_right = -12.0
-offset_bottom = 60.0
+offset_bottom = -60.0
 grow_horizontal = 0
 grow_vertical = 2
+show_spells = true
 
-[node name="InspectRows" type="VBoxContainer" parent="Root/InspectPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="SpellBar" type="HBoxContainer" parent="Root"]
+[node name="SpellBar" parent="Root" instance=ExtResource("4_bar")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 7
@@ -150,14 +96,12 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -240.0
-offset_top = -72.0
-offset_right = 240.0
+offset_left = -190.0
+offset_top = -214.0
+offset_right = 190.0
 offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 0
-mouse_filter = 2
-alignment = 1
 
 [node name="Actions" type="VBoxContainer" parent="Root"]
 layout_mode = 1
@@ -188,6 +132,10 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 18
 text = "End turn (Space)"
+
+[node name="OrderOverlay" parent="Root" instance=ExtResource("5_overlay")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="ResultPanel" type="ColorRect" parent="Root"]
 unique_name_in_owner = true

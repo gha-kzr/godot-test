@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://8orjihkvj241"]
+
+[ext_resource type="Script" uid="uid://cd4vagq1qqh6y" path="res://scripts/view/hud/turn_timeline.gd" id="1_timeline"]
+
+[node name="TurnTimeline" type="HBoxContainer"]
+mouse_filter = 2
+alignment = 1
+script = ExtResource("1_timeline")
+
+[node name="Chips" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="OrderButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "All (Tab)"

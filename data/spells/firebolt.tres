@@ -5,6 +5,7 @@
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_64poo"]
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_lotta"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_sxol3"]
+[ext_resource type="Texture2D" uid="uid://dscb5nidv2xbs" path="res://ui/icons/firebolt.svg" id="5_lotta"]
 
 [sub_resource type="Resource" id="Resource_ct23v"]
 script = ExtResource("1_yx4ma")
@@ -18,6 +19,7 @@ damage_type = ExtResource("3_64poo")
 [resource]
 script = ExtResource("4_sxol3")
 display_name = "Firebolt"
+icon = ExtResource("5_lotta")
 min_range = 2
 max_range = 6
 height_extends_range = true

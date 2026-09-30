@@ -32,6 +32,19 @@ func set_active(unit_id: int) -> void:
 		_views[id].set_active(id == unit_id)
 
 
+## Shows a damage preview badge on each entry's unit and none on the others.
+func show_previews(entries: Array[DamagePreview.Entry]) -> void:
+	clear_previews()
+	for entry in entries:
+		if _views.has(entry.unit_id):
+			_views[entry.unit_id].show_preview(entry)
+
+
+func clear_previews() -> void:
+	for id in _views:
+		_views[id].clear_preview()
+
+
 ## The view of a unit, or null (without an error) for -1 or an unknown id.
 func find_view(unit_id: int) -> UnitView:
 	return _views.get(unit_id)

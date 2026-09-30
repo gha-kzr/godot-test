@@ -15,6 +15,11 @@ godot --version   # 4.7.2.stable...
 
 (`~/.local/bin` must be on your `PATH`.)
 
+### After cloning (each machine)
+
+1. `godot --headless --import` — builds the `.godot/` cache (class names, imported icons).
+2. `godot --headless --script res://tests/run_tests.gd` — all tests should pass.
+
 Running from the editor (F5): by default Godot embeds the game in the editor's **Game** tab, where the editor sets its size and it can look blurry on a non-Retina second monitor. For a real window, turn off "Embed Game on Next Play" in the Game tab's ⋮ menu (or set Editor Settings → Run → Window Placement → Game Embed Mode to Disabled). Turn it back on when you want the Game tab's runtime tools (clicking nodes in the running game, frame stepping, free camera).
 
 ## CLI usage
@@ -31,6 +36,7 @@ Run these from the repo root:
 | Run all tests (exit code 1 on failure) | `godot --headless --script res://tests/run_tests.gd` |
 | Run tests whose file name matches | `godot --headless --script res://tests/run_tests.gd -- movement` |
 | Add missing UIDs / `uid=` references to `.tres` / `.tscn` made from the CLI | `godot --headless --script res://tools/fill_uid_refs.gd` |
+| Rebuild the UI theme (`ui/theme.tres`) | `godot --headless --script res://tools/build_theme.gd` |
 | Render frames to PNG (visual check; needs a window, not `--headless`) | `godot --write-movie /tmp/shot.png --fixed-fps 10 --quit-after 30 scenes/battle/battle.tscn` |
 | Open the editor | `godot -e` |
 | Export (needs `export_presets.cfg`) | `godot --headless --export-release "<preset>" build/<file>` |
@@ -59,13 +65,15 @@ In battle, units act in initiative order; each turn a unit has AP for spells and
 | Left click on a highlighted (blue) cell | Move there |
 | `1`–`9` or click a spell button | Aim a spell (again to unselect) |
 | Left click on an orange cell (or a unit standing there) | Cast the aimed spell |
-| `Esc` / right click | Stop aiming |
+| `Esc` / right click | Close the order overlay, else stop aiming, else unpin the card |
+| Left click a unit | Pin its card on the right (it stays until its ✕ or `Esc`; a click on a target cell still casts) |
+| `Tab` | Open / close the full turn order (every unit, with HP and statuses) |
 | `Space` | End turn |
 | `Q` / `E` (`A` / `E` on AZERTY) | Turn the camera 90° |
 | Mouse wheel | Zoom |
 | `T` | Toggle the near-overhead view |
 
-Hover a spell button for its range, area and effect; hover any other unit on the board to see its HP, AP / MP, statuses and spells in the panel on the right. Statuses show as colored tags above units (e.g. `P3`: Poison, 3 turns left) and in the unit panels: damage or heal over time ticks at the carrier's turn start, AP / MP and damage-taken changes last for the status's turns. While aiming, orange cells can be targeted and darker cells are in range but out of line of sight. The unit whose turn it is has a pulsing ring. The result screen shows the battle seed: set it as `rng_seed` on the `Battle` node to replay that battle.
+The top bar shows the next 5 turns (name and HP bar; hover a chip to highlight its unit, click it to move the camera there) and a line telling you what to do next; **End turn** pulses when the active hero can neither move nor afford a spell. Hover a spell slot (icon, AP cost, key) to see its range, area and effects in the panel above the bar; hover any unit on the board to see its card (level, HP, AP / MP, power and resistances, statuses, spells) on the right. Statuses show as icons with their turns left above units (e.g. a poison drop with `3`): damage or heal over time ticks at the carrier's turn start, AP / MP and damage-taken changes last for the status's turns. While aiming, orange cells can be targeted and darker cells are in range but out of line of sight, and each unit in the hovered area shows the damage or heal range the spell would do (a skull when it can kill, icons for the statuses it would apply). Hovering a reachable cell shows the path's MP total and `+1` on every climbing step. The unit whose turn it is has a pulsing ring. The result screen shows the battle seed: set it as `rng_seed` on the `Battle` node to replay that battle.
 
 ## Design tools (editor plugin)
 
@@ -81,7 +89,7 @@ Hover a spell button for its range, area and effect; hover any other unit on the
 Content is data (`.tres` resources), edited in the Inspector or as text; no code changes. The headless tests load and validate every file under `data/`, so run them after any change.
 
 - **A spell** — `data/spells/<name>.tres`, a `SpellData`: `display_name`, `ap_cost`, `min_range` / `max_range` (Manhattan; `min_range = 0` allows the caster's own cell), `needs_line_of_sight`, `height_extends_range`, an `area` (`AreaShape`: SINGLE, CROSS, CIRCLE or LINE with a `size`) and `effects`, applied one after another: `DamageEffect` / `HealEffect` (`min_amount` / `max_amount`, `power_scaling`: how much of the caster's Power applies, 100 % by default) or `ApplyStatusEffect` (`status`). Each effect has a `target_filter`: ALL units in the area (default), ALLIES, ENEMIES, or the CASTER only (even outside the area). New effect kinds are `EffectData` subclasses implementing `apply()` and `describe()`.
-- **A status** — `data/statuses/<name>.tres`, a `StatusData`: `display_name`, `short_label` (tag text), `color`, `is_positive`, `duration` (the carrier's turns), `tick_effects` (fired at each of its turn starts, e.g. a `DamageEffect` for poison) and `modifiers` (`StatModifier`: AP, MP or DAMAGE_TAKEN_PERCENT with an `amount`). Recasting a status refreshes it; it keeps running if its caster dies. A spell applies it through an `ApplyStatusEffect`.
+- **A status** — `data/statuses/<name>.tres`, a `StatusData`: `display_name`, `icon` (optional; a default one otherwise), `short_label` (no longer drawn), `color` (tints the icon), `is_positive`, `duration` (the carrier's turns), `tick_effects` (fired at each of its turn starts, e.g. a `DamageEffect` for poison) and `modifiers` (`StatModifier`: AP, MP or DAMAGE_TAKEN_PERCENT with an `amount`). Recasting a status refreshes it; it keeps running if its caster dies. A spell applies it through an `ApplyStatusEffect`.
 - **A unit** — `data/units/<name>.tres`, a `UnitData`: `display_name`, `max_hp`, `ap`, `mp`, `initiative` (higher acts first), `spells` (2–4 spell files), `innate_modifiers` (always-on stats, e.g. an enemy's resistances), and a placeholder `color` (or a `model_scene` from an asset pack). A spell costing more AP than the unit has is a validation error.
 - **A map** — `data/maps/<name>.tres`, a `MapData` whose `layout` is text, one row per line, one token per cell: a height (`0`, `1`, `2`…), `<height>p` / `<height>e` for the player start zone / enemy spawns (enemies use them in reading order; with more `p` cells than heroes, heroes are placed by reach and the player can rearrange them), `#` for an obstacle, `.` for a hole. A step can climb 1 level and drop 2; keep every floor cell reachable from the spawns (the slice map test checks this for its map).
 - **A damage type** — `data/damage_types/<name>.tres`, a `DamageType` (`display_name`, `color`); set it as a `DamageEffect`'s `damage_type` and in resistance modifiers.
@@ -105,6 +113,8 @@ Instructions for AI agents working on this repo:
 - **No `assert()` in game or test code:** a failed assert hangs headless runs instead of failing. Use `push_error()` with a safe fallback in game code, and `TestCase` assertions in tests. Any error logged during a test fails it; a test that triggers one on purpose declares it with `expect_error()`.
 - **Review with `godot-code-review`** before calling a mechanic done.
 - **Keep resource files in the editor's format.** After generating or hand-editing `.tres` / `.tscn` files from the CLI, run `tools/fill_uid_refs.gd` (a test fails otherwise), so opening the editor doesn't rewrite them into formatting-only diffs. Commit any editor re-save on its own.
+- **Milestones live on a branch until done.** Work on `milestone-<n>` (e.g. `milestone-5a`), committing task by task; push the branch as a backup if needed. `main` only receives a finished milestone, squashed into one commit, when the user asks.
+- **Credit every external asset.** Anything downloaded, bought or copied (icons, fonts, models, sounds, UI packs) gets a row in `CREDITS.md` (files, source URL, author, license) in the same commit, with the license file next to the asset when it has one.
 - **Design decisions are recorded in `docs/decisions/`.** Read them before designing; don't re-ask what's settled. The milestone order is in `docs/roadmap.md`.
 
 Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://github.com/jame581/GodotPrompter) and [awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) and trimmed to stand alone.
@@ -118,13 +128,14 @@ scenes/           # .tscn scene files
 scripts/          # .gd scripts (and their .uid files, commit these)
   battle/         #   rules: state, movement, targeting, actions, AI (no nodes)
   data/           #   content resource classes (units, spells, effects, maps, AI profiles)
-  view/           #   display: board, camera, units, event player, HUD, controller
+  view/           #   display: board, camera, units, event player, HUD (hud.gd facade, hud/ components, hud_model.gd), controller
   progression/    #   lasting progress: hero records, profile, save (no nodes)
   run/            #   run loop: tower and map generators, run state and director (no nodes)
   game/           #   game root (profile, screens), hub (party screen) and run screen
 data/             # content .tres files (units, enemies, spells, statuses, damage types, runes, loot, presets, encounters, heroes, maps, AI profiles, tower, boons, stages)
 tests/            # headless tests: test_*.gd files extending TestCase
-tools/            # CLI helper scripts (fill_uid_refs.gd)
+tools/            # CLI helper scripts (fill_uid_refs.gd, build_theme.gd)
+ui/               # UI theme, fonts, icons (third-party files credited in CREDITS.md)
 docs/roadmap.md   # milestones toward the full game
 docs/decisions/   # design decision records
 docs/plans/       # implementation plans

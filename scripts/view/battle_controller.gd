@@ -42,6 +42,8 @@ var sudden_death_round := 0
 var sudden_death_percent := 10
 ## Shown before the round number in the HUD (e.g. "Floor 3").
 var battle_title := ""
+## The heroes' levels, parallel to `players` (shown in the HUD cards); empty: not shown.
+var player_levels: Array = []
 var _sudden_death_announced := false
 
 var battle: Battle
@@ -55,6 +57,12 @@ var _reach: Movement.Reach
 var _targetable: Dictionary[Vector2i, bool] = {}
 ## The hero selected for placement (a unit id), or -1.
 var _placing_hero := -1
+## The unit whose card is pinned (a unit id), or -1; only the card's ✕ or Esc unpins.
+var _pinned_unit := -1
+## What the HUD displays, following the played events (see HudModel).
+var _hud_model: HudModel
+## The unit whose turn-order chip the mouse is over, or -1: its cell counts as hovered.
+var _chip_unit := -1
 ## Bumped by each new battle; coroutines of an abandoned battle stop after their awaits.
 var _battle_generation := 0
 
@@ -68,7 +76,7 @@ var _battle_generation := 0
 ## Injects a battle. Call before the controller enters the tree (its _ready starts it).
 ## `hero_hp`: starting HP per player (-1: full); `title`: shown in the HUD (e.g. "Floor 3").
 func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers: Array, battle_rng_seed := 0,
-		hero_hp: Array = [], death_round := 0, death_percent := 10, title := "") -> void:
+		hero_hp: Array = [], death_round := 0, death_percent := 10, title := "", levels: Array = []) -> void:
 	encounter = battle_encounter
 	players = player_units
 	player_modifiers = modifiers
@@ -77,6 +85,7 @@ func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers
 	sudden_death_round = death_round
 	sudden_death_percent = death_percent
 	battle_title = title
+	player_levels = levels
 	standalone = false
 
 
@@ -85,6 +94,10 @@ func _ready() -> void:
 	hud.end_turn_pressed.connect(end_turn)
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
 	hud.restart_pressed.connect(_on_result_action)
+	hud.card_closed.connect(unpin)
+	hud.chip_hovered.connect(_on_chip_hovered)
+	hud.chip_unhovered.connect(_on_chip_unhovered)
+	hud.chip_pressed.connect(_on_chip_pressed)
 	hud.set_result_action_text("Play again" if standalone else "Continue")
 	camera_rig.overhead_changed.connect(hud.set_overhead_view)
 	event_player.event_played.connect(_on_event_played)
@@ -125,9 +138,10 @@ func start_battle() -> bool:
 	camera_rig.face_toward(_spawn_center(parsed.player_spawns) - board_view.center())
 	hud.hide_result()
 	_placing_hero = -1
+	_pinned_unit = -1
+	_chip_unit = -1
 	_refresh_hud()
 	_set_state(State.PLACING)
-	hud.show_banner("Place your heroes: click one, then a cell. Ready (Space) to fight")
 	return true
 
 
@@ -157,12 +171,32 @@ func select_spell(index: int) -> void:
 	_set_state(State.TARGETING)
 
 
+## Esc / right click: closes the order overlay, else stops aiming, else deselects the hero
+## being placed, else unpins the card.
 func cancel() -> void:
+	if hud.close_order_overlay():
+		return
 	if input_state == State.TARGETING:
 		_enter_idle()
 	elif input_state == State.PLACING and _placing_hero != -1:
 		_placing_hero = -1
 		_set_state(State.PLACING)
+	else:
+		unpin()
+
+
+## Pins a unit's card on the right; it stays until unpinned, even when the mouse leaves.
+func pin(unit_id: int) -> void:
+	if unit_id == _pinned_unit:
+		return
+	_pinned_unit = unit_id
+	_update_inspected()
+
+
+func unpin() -> void:
+	if _pinned_unit != -1:
+		_pinned_unit = -1
+		_update_inspected()
 
 
 ## Ends the turn, or ends placement and starts the fight.
@@ -177,6 +211,10 @@ func end_turn() -> void:
 ## A click on a board cell (or on a unit standing there).
 func click_cell(cell: Vector2i) -> void:
 	var unit_id := battle.state.current_unit().id if battle != null else -1
+	var clicked := battle.state.unit_at(cell) if battle != null else null
+	var selecting_hero := input_state == State.PLACING and clicked != null and clicked.team == UnitState.Team.PLAYER
+	if clicked != null and clicked.id != _active_card_unit_id() and not selecting_hero:
+		pin(clicked.id)  # The click still acts below (a cast on a target cell, a placement).
 	match input_state:
 		State.PLACING:
 			# Select a hero, then a zone cell (a hero there swaps); the selected hero again deselects.
@@ -227,9 +265,25 @@ func _physics_process(_delta: float) -> void:
 ## The cell the mouse designates: none over the HUD, except over the inspect panel, where
 ## the hover sticks (so the panel stays up and its tooltips can be read).
 func _hover_cell(hovered_control: Control, mouse_position: Vector2) -> Vector2i:
+	if _chip_unit != -1 and battle != null:
+		return battle.state.units[_chip_unit].cell
 	if hovered_control != null:
 		return _hovered_cell if hud.is_inspect_control(hovered_control) else BoardView.NO_CELL
 	return board_view.pick_cell(camera_rig.camera, mouse_position)
+
+
+func _on_chip_hovered(unit_id: int) -> void:
+	_chip_unit = unit_id if battle != null and unit_id >= 0 and unit_id < battle.state.units.size() else -1
+
+
+func _on_chip_unhovered() -> void:
+	_chip_unit = -1
+
+
+## Clicking a turn-order chip moves the camera to its unit.
+func _on_chip_pressed(unit_id: int) -> void:
+	if battle != null and unit_id >= 0 and unit_id < battle.state.units.size():
+		camera_rig.focus(board_view.cell_to_world(battle.state.units[unit_id].cell))
 
 
 # --- Turn loop ---
@@ -286,9 +340,6 @@ func _run_enemy_action() -> void:
 	_play(result.events)
 
 
-## The HUD is refreshed after a whole playback (in _begin_next), not per event: the
-## battle state is already final while events play, so a per-event refresh would jump
-## ahead of the animations. Unit views show HP live; an event-driven HUD is milestone 5.
 ## The unit's own profile (its preset), else the encounter's, else the fallback.
 func _ai_profile_for(unit: UnitState) -> AIProfile:
 	if unit.ai_profile != null:
@@ -297,6 +348,8 @@ func _ai_profile_for(unit: UnitState) -> AIProfile:
 
 
 func _on_event_played(event: BattleEvents.Event) -> void:
+	_hud_model.apply(event)
+	_show_turn()
 	if event is BattleEvents.TurnStarted and battle.is_sudden_death() and not _sudden_death_announced:
 		_sudden_death_announced = true
 		hud.show_banner("Sudden death: the party loses %d%% HP every turn" % sudden_death_percent)
@@ -320,6 +373,7 @@ func _set_state(new_state: State) -> void:
 	hud.set_placing(new_state == State.PLACING)
 	hud.set_selected_spell(selected_spell if new_state == State.TARGETING else -1)
 	board_view.clear_highlights()
+	units_view.clear_previews()
 	_reach = null
 	_targetable.clear()
 	var unit_id := battle.state.current_unit().id if battle != null and not battle.state.is_over() else -1
@@ -338,7 +392,39 @@ func _set_state(new_state: State) -> void:
 			board_view.show_highlight(BoardView.Highlight.RANGE, cells)
 			board_view.show_highlight(BoardView.Highlight.RANGE_BLOCKED,
 					Targeting.blocked_cells(battle.state, unit_id, spell))
+	hud.set_prompt(_prompt_text())
+	hud.set_end_turn_pulse(new_state == State.IDLE and _nothing_left_to_do())
 	_update_hover()
+
+
+## The guidance line for the current step.
+func _prompt_text() -> String:
+	match input_state:
+		State.PLACING:
+			if _placing_hero == -1:
+				return "Place your heroes: click one, then a teal cell. Ready (Space) to fight"
+			return "Click a teal cell to place %s (Esc to deselect)" % battle.state.units[_placing_hero].label
+		State.IDLE:
+			if _nothing_left_to_do():
+				return "Nothing left to do: end your turn (Space)"
+			return "Move to a blue cell or pick a spell (1-%d)" % maxi(1, battle.state.current_unit().data.spells.size())
+		State.TARGETING:
+			return "Choose a target for %s (orange cells). Esc to cancel" % \
+					battle.state.current_unit().data.spells[selected_spell].display_name
+		State.ENEMY_TURN:
+			return "%s is acting..." % battle.state.current_unit().label
+	return ""
+
+
+## The acting hero can neither move nor afford any spell.
+func _nothing_left_to_do() -> bool:
+	if _reach != null and not _reach.cells().is_empty():
+		return false
+	var unit := battle.state.current_unit()
+	for slot in unit.data.spells.size():
+		if BattleActions.CastSpell.can_afford(unit, slot):
+			return false
+	return true
 
 
 ## Path to the hovered cell while moving, or the spell's area while aiming; in any state,
@@ -354,42 +440,74 @@ func _update_hover() -> void:
 					cells.append(_hovered_cell)
 			board_view.show_highlight(BoardView.Highlight.PATH, cells)
 		State.IDLE:
+			board_view.clear_path_cost()
 			if _reach != null and _reach.can_reach(_hovered_cell):
 				cells = _reach.path_to(_hovered_cell)
+				board_view.show_path_cost(_hovered_cell, _reach.cost_to(_hovered_cell),
+						Movement.climbing_steps(battle.state.grid, _reach.origin, cells))
 			board_view.show_highlight(BoardView.Highlight.PATH, cells)
 		State.TARGETING:
 			if _targetable.has(_hovered_cell):
 				var caster := battle.state.current_unit()
 				var spell := caster.data.spells[selected_spell]
 				cells = Targeting.area_cells(battle.state.grid, spell.area, caster.cell, _hovered_cell)
+				units_view.show_previews(DamagePreview.for_cast(battle.state, caster.id, selected_spell, _hovered_cell))
+			else:
+				units_view.clear_previews()
 			board_view.show_highlight(BoardView.Highlight.AREA, cells)
 		# Other states: _set_state already cleared the hover highlights, and the AREA layer
 		# may be showing a cast's flash from the EventPlayer, which hover must not touch.
+	if _chip_unit != -1 and input_state in [State.PLACING, State.IDLE, State.TARGETING]:
+		board_view.show_highlight(BoardView.Highlight.PATH, [battle.state.units[_chip_unit].cell] as Array[Vector2i])
 
 
+## The right-hand card: the hovered unit, else the pinned one (with its ✕). The unit on
+## the active card is never repeated there.
 func _update_inspected() -> void:
-	var hovered: UnitState = null
-	if battle != null and _hovered_cell != BoardView.NO_CELL:
-		hovered = battle.state.unit_at(_hovered_cell)
-	if hovered == null or (battle.state.started and hovered == battle.state.current_unit()):
+	var shown: UnitInfo = null
+	var pinned := false
+	if battle != null and _pinned_unit != -1 and _hud_model.infos[_pinned_unit].hp <= 0:
+		_pinned_unit = -1  # A fallen unit's card goes away.
+	if battle != null:
+		var active_id := _active_card_unit_id()
+		if _hovered_cell != BoardView.NO_CELL:
+			var hovered := battle.state.unit_at(_hovered_cell)
+			if hovered != null and hovered.id != active_id:
+				shown = _hud_model.infos[hovered.id]
+		if shown == null and _pinned_unit != -1 and _pinned_unit != active_id:
+			shown = _hud_model.infos[_pinned_unit]
+		pinned = shown != null and shown.unit_id == _pinned_unit
+	if shown == null:
 		hud.hide_inspected()
 	else:
-		hud.show_inspected(Hud.UnitInfo.from_unit(hovered))
+		hud.show_inspected(shown, pinned)
 
 
-## Shows the current turn in the HUD. The HUD gets plain UnitInfo values, never state.
+## The unit shown on the active card: the acting one, or (placing) the selected hero, else the first.
+func _active_card_unit_id() -> int:
+	if battle.state.started:
+		return _hud_model.current_id
+	return _placing_hero if _placing_hero != -1 else battle.state.units[0].id
+
+
+## Re-syncs the HUD from the battle state: the source of truth, after a playback (or a
+## new battle, or a placement) while the events in between only updated the model.
 func _refresh_hud() -> void:
-	var battle_state := battle.state
-	var order: Array[Hud.UnitInfo] = []
-	for id in battle_state.turn_order.upcoming():
-		order.append(Hud.UnitInfo.from_unit(battle_state.units[id]))
-	hud.show_turn_order(order, battle_state.turn_order.round_number, battle_title)
-	var current := battle_state.current_unit()
-	if not battle_state.started:  # Placing: the selected hero, else the first one.
-		current = battle_state.units[_placing_hero] if _placing_hero != -1 else battle_state.units[0]
-	if current != null:
-		hud.show_unit(Hud.UnitInfo.from_unit(current))
-		hud.show_spells(current.data.spells, current.ap)
+	_hud_model = HudModel.from_state(battle.state, player_levels)
+	_show_turn()
+	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
+	if active != null:
+		hud.show_spells(active.spells, active.ap)
+
+
+## Shows the model's turn in the HUD: order, active card, AP for the spell bar, inspect
+## card. The HUD gets plain UnitInfo values, never state.
+func _show_turn() -> void:
+	hud.show_turn_order(_hud_model.upcoming(), _hud_model.round_number, battle_title)
+	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
+	if active != null:
+		hud.show_unit(active)
+		hud.set_spell_ap(active.ap)
 	_update_inspected()
 
 

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://cu6cxdyh684h8"]
 
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_4n73f"]
+[ext_resource type="Texture2D" uid="uid://cfh3vr1fh0dcp" path="res://ui/icons/status_guarded.svg" id="1_exbst"]
 [ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_exbst"]
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_evuj6"]
 
@@ -16,6 +17,7 @@ amount = 1
 [resource]
 script = ExtResource("2_exbst")
 display_name = "Guarded"
+icon = ExtResource("1_exbst")
 short_label = "G"
 color = Color(0.45, 0.75, 1, 1)
 is_positive = true

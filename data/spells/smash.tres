@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_17wf5"]
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_rgwqt"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_m7vfp"]
+[ext_resource type="Texture2D" uid="uid://bn0afgwjcadfu" path="res://ui/icons/smash.svg" id="5_17wf5"]
 
 [sub_resource type="Resource" id="Resource_6ljn6"]
 script = ExtResource("1_pe0po")
@@ -18,6 +19,7 @@ damage_type = ExtResource("3_rgwqt")
 [resource]
 script = ExtResource("4_m7vfp")
 display_name = "Smash"
+icon = ExtResource("5_17wf5")
 needs_line_of_sight = false
 area = SubResource("Resource_6ljn6")
 effects = Array[ExtResource("2_rgwqt")]([SubResource("Resource_2j2jj")])

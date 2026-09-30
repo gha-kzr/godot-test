@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_w1d03"]
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_5dvkl"]
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_t0icf"]
+[ext_resource type="Texture2D" uid="uid://c2j77an3so0dn" path="res://ui/icons/whirlwind.svg" id="5_w1d03"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_xxcw0"]
 
 [sub_resource type="Resource" id="Resource_6vqqv"]
@@ -21,6 +22,7 @@ target_filter = 2
 [resource]
 script = ExtResource("5_xxcw0")
 display_name = "Whirlwind"
+icon = ExtResource("5_w1d03")
 min_range = 0
 max_range = 0
 needs_line_of_sight = false

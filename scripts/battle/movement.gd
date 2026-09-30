@@ -58,6 +58,19 @@ class Reach:
 		return path
 
 
+## The steps of `path` (from `origin`) that climb, each with its extra MP: cell → MP above
+## the base step cost. For showing why a path costs what it does.
+static func climbing_steps(grid: Grid, origin: Vector2i, path: Array[Vector2i]) -> Dictionary[Vector2i, int]:
+	var steps: Dictionary[Vector2i, int] = {}
+	var previous := origin
+	for cell in path:
+		var rise := grid.height_at(cell) - grid.height_at(previous)
+		if rise > 0:
+			steps[cell] = rise * CLIMB_COST_PER_LEVEL
+		previous = cell
+	return steps
+
+
 ## MP cost of stepping between two adjacent cells, or -1 if the step is impossible
 ## because of terrain. Units are not considered here.
 static func step_cost(grid: Grid, from: Vector2i, to: Vector2i) -> int:

@@ -10,8 +10,8 @@ func _hud() -> Hud:
 	return hud
 
 
-func _info(unit_name: String, is_player := true, hp := 20) -> Hud.UnitInfo:
-	var info := Hud.UnitInfo.new()
+func _info(unit_name: String, is_player := true, hp := 20) -> UnitInfo:
+	var info := UnitInfo.new()
 	info.display_name = unit_name
 	info.is_player = is_player
 	info.hp = hp
@@ -28,38 +28,110 @@ func _spells() -> Array[SpellData]:
 
 
 func _spell_button(hud: Hud, index: int) -> Button:
-	return hud.get_node("%SpellBar").get_child(index)
+	return (hud.get_node("%SpellBar") as SpellBar).slot(index)
+
+
+func _card_label(card: Node, path: String) -> Label:
+	return card.get_node(path) as Label
+
+
+func _active(hud: Hud, path: String) -> Label:
+	return _card_label(hud.get_node("%ActiveCard"), path)
+
+
+func _chips(hud: Hud) -> Array[Node]:
+	return hud.get_node("%TurnTimeline/Chips").get_children()
 
 
 func test_unit_panel_shows_the_unit() -> void:
 	var hud := _hud()
 	hud.show_unit(_info("Knight"))
-	assert_eq((hud.get_node("%UnitName") as Label).text, "Knight")
-	assert_eq((hud.get_node("%HpLabel") as Label).text, "20 / 30 HP")
-	assert_eq((hud.get_node("%ApLabel") as Label).text, "AP 4 / 6")
-	assert_eq((hud.get_node("%MpLabel") as Label).text, "MP 1 / 3")
-	assert_eq((hud.get_node("%HpBar") as ProgressBar).value, 20.0)
+	assert_eq(_active(hud, "Rows/Header/NameLabel").text, "Knight")
+	assert_eq(_active(hud, "Rows/HpLabel").text, "20 / 30 HP")
+	assert_eq(_active(hud, "Rows/PointsRow/ApLabel").text, "AP 4 / 6")
+	assert_eq(_active(hud, "Rows/PointsRow/MpLabel").text, "MP 1 / 3")
+	assert_eq((hud.get_node("%ActiveCard/Rows/HpBar") as ProgressBar).value, 20.0)
 	hud.free()
 
 
 func test_unit_info_copies_the_unit_state() -> void:
 	var state := BattleFixtures.state("0p 0e")
 	state.units[0].hp = 7
-	var info := Hud.UnitInfo.from_unit(state.units[0])
+	var info := UnitInfo.from_unit(state.units[0])
 	assert_eq([info.display_name, info.hp, info.max_hp, info.ap, info.mp, info.is_player], ["P0", 7, 20, 6, 3, true])
 
 
-func test_turn_order_lists_units_and_marks_the_current_one() -> void:
+func test_timeline_shows_the_next_five_turns_with_name_and_hp_bar_only() -> void:
 	var hud := _hud()
-	hud.show_turn_order([_info("Knight"), _info("Brute", false)] as Array[Hud.UnitInfo], 3)
-	var chips := hud.get_node("%TurnOrder").get_children()
-	assert_eq(chips.size(), 2)
-	var current := (chips[0] as PanelContainer).get_theme_stylebox("panel") as StyleBoxFlat
-	var next := (chips[1] as PanelContainer).get_theme_stylebox("panel") as StyleBoxFlat
-	assert_true(current.border_width_top > 0 and next.border_width_top == 0, "only the current unit is outlined")
+	var units: Array[UnitInfo] = []
+	for i in 7:
+		var info := _info("Unit%d" % i, i % 2 == 0, 10 + i)
+		info.unit_id = i
+		units.append(info)
+	hud.show_turn_order(units, 3)
+	var chips := _chips(hud)
+	assert_eq(chips.size(), 5, "capped at the next 5 turns")
+	assert_eq(chips[0].theme_type_variation, &"ChipActive", "only the acting unit is marked")
+	assert_eq(chips[1].theme_type_variation, &"Chip")
+	assert_eq(_card_label(chips[2], "Rows/NameLabel").text, "Unit2", "a name, no number or level")
+	assert_eq((chips[2].get_node("Rows/HpBar") as ProgressBar).value, 12.0)
+	assert_eq(chips[2].get_node("Rows").get_child_count(), 2, "name and bar, nothing else")
 	assert_eq((hud.get_node("%RoundLabel") as Label).text, "Round 3")
-	hud.show_turn_order([_info("Knight")] as Array[Hud.UnitInfo], 3)
-	assert_eq(hud.get_node("%TurnOrder").get_child_count(), 1, "replaced, not added")
+	hud.show_turn_order([units[0]] as Array[UnitInfo], 3, "Floor 2")
+	assert_eq(_chips(hud).size(), 1, "replaced, not added")
+	assert_eq((hud.get_node("%RoundLabel") as Label).text, "Floor 2 · Round 3")
+	hud.free()
+
+
+func test_timeline_chips_report_hover_and_click() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	info.unit_id = 4
+	hud.show_turn_order([info] as Array[UnitInfo], 1)
+	var received: Array = []
+	hud.chip_hovered.connect(func(id: int) -> void: received.append(["in", id]))
+	hud.chip_unhovered.connect(func() -> void: received.append(["out"]))
+	hud.chip_pressed.connect(func(id: int) -> void: received.append(["press", id]))
+	var chip := _chips(hud)[0] as Control
+	chip.mouse_entered.emit()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	chip.gui_input.emit(click)
+	chip.mouse_exited.emit()
+	assert_eq(received, [["in", 4], ["press", 4], ["out"]])
+	hud.free()
+
+
+func test_order_overlay_lists_every_unit_and_toggles() -> void:
+	var hud := _hud()
+	var units: Array[UnitInfo] = []
+	for i in 7:
+		var info := _info("Unit%d" % i)
+		info.level = 3 if i == 0 else 0
+		units.append(info)
+	units[1].statuses = [_status_info("Poison", 2, "")] as Array[StatusInfo]
+	hud.show_turn_order(units, 1)
+	var overlay := hud.get_node("%OrderOverlay") as OrderOverlay
+	assert_false(overlay.visible, "closed at first")
+	overlay.open()
+	var rows := overlay.get_node("%Rows").get_children()
+	assert_eq(rows.size(), 7, "not capped")
+	assert_eq(_card_label(rows[0], "Line/NameLabel").text, "Unit0 · Lv 3")
+	assert_eq(_card_label(rows[0], "Line/HpBox/HpLabel").text, "20 / 30 HP")
+	assert_eq(rows[1].get_node("Line/Statuses").get_child_count(), 2, "an icon and its turns")
+	overlay.close()
+	var press := InputEventAction.new()
+	press.action = &"show_order"
+	press.pressed = true
+	Input.parse_input_event(press)
+	hud._unhandled_input(press)
+	assert_true(overlay.visible, "Tab opens it")
+	assert_true(hud.close_order_overlay(), "Esc closes it")
+	assert_false(overlay.visible)
+	assert_false(hud.close_order_overlay(), "nothing to close")
+	(hud.get_node("%TurnTimeline/OrderButton") as Button).pressed.emit()
+	assert_true(overlay.visible, "the button opens it")
 	hud.free()
 
 
@@ -68,7 +140,7 @@ func test_spells_are_disabled_without_enough_ap() -> void:
 	hud.show_spells(_spells(), 4)
 	assert_false(_spell_button(hud, 0).disabled, "3 AP spell with 4 AP")
 	assert_true(_spell_button(hud, 1).disabled, "5 AP spell with 4 AP")
-	assert_true(_spell_button(hud, 0).tooltip_text.contains("5 damage"), _spell_button(hud, 0).tooltip_text)
+	assert_eq(_spell_button(hud, 0).tooltip_text, "", "details show in a panel, not a tooltip")
 	hud.free()
 
 
@@ -159,17 +231,16 @@ func test_banner_fades_in_and_out() -> void:
 func test_hud_lets_clicks_through_to_the_board_and_never_takes_focus() -> void:
 	var hud := _hud()
 	hud.show_spells(_spells(), 10)
-	hud.show_turn_order([_info("Knight")] as Array[Hud.UnitInfo], 1)
+	hud.show_turn_order([_info("Knight")] as Array[UnitInfo], 1)
+	hud.show_inspected(_info("Brute", false), true)
 	var nodes: Array[Node] = [hud]
 	while not nodes.is_empty():
 		var node: Node = nodes.pop_back()
 		nodes.append_array(node.get_children())
 		if node is Button:
 			assert_eq((node as Button).focus_mode, Control.FOCUS_NONE, "%s takes no focus" % node.name)
-	for path in ["Root", "Root/TopBar", "%TurnOrder", "%SpellBar", "Root/Actions", "%Banner"]:
+	for path in ["Root", "Root/TopBar", "%TurnTimeline", "%TurnTimeline/Chips", "%SpellBar", "Root/Actions", "%Banner"]:
 		assert_eq((hud.get_node(path) as Control).mouse_filter, Control.MOUSE_FILTER_IGNORE, "%s ignores the mouse" % path)
-	for chip in hud.get_node("%TurnOrder").get_children():
-		assert_eq((chip as Control).mouse_filter, Control.MOUSE_FILTER_IGNORE, "turn chips ignore the mouse")
 	hud.free()
 
 
@@ -188,13 +259,13 @@ func test_spells_can_be_rebuilt_from_inside_a_button_press() -> void:
 	hud.show_spells(_spells(), 10)
 	hud.spell_selected.connect(func(_index: int) -> void: hud.show_spells(_spells(), 2))
 	_spell_button(hud, 0).pressed.emit()
-	assert_eq(hud.get_node("%SpellBar").get_child_count(), 2, "rebuilt")
+	assert_eq((hud.get_node("%SpellBar") as SpellBar).slot_count(), 2, "rebuilt")
 	assert_true(_spell_button(hud, 0).disabled, "with the new AP")
 	hud.free()
 
 
-func _status_info(status_name: String, turns: int, description: String) -> Hud.StatusInfo:
-	var info := Hud.StatusInfo.new()
+func _status_info(status_name: String, turns: int, description: String) -> StatusInfo:
+	var info := StatusInfo.new()
 	info.display_name = status_name
 	info.turns_left = turns
 	info.description = description
@@ -204,16 +275,16 @@ func _status_info(status_name: String, turns: int, description: String) -> Hud.S
 func test_unit_panel_lists_statuses_with_tooltips() -> void:
 	var hud := _hud()
 	var info := _info("Knight")
-	info.statuses = [_status_info("Poison", 2, "3-4 damage per turn"), _status_info("Guarded", 1, "-30% damage taken")] as Array[Hud.StatusInfo]
+	info.statuses = [_status_info("Poison", 2, "3-4 damage per turn"), _status_info("Guarded", 1, "-30% damage taken")] as Array[StatusInfo]
 	hud.show_unit(info)
-	var rows := hud.get_node("%StatusList").get_children()
+	var rows := hud.get_node("%ActiveCard/Rows/StatusList").get_children()
 	assert_eq(rows.size(), 2)
 	assert_eq(((rows[0] as Control).get_child(1) as Label).text, "Poison, 2 turns")
 	assert_eq(((rows[1] as Control).get_child(1) as Label).text, "Guarded, 1 turn")
 	assert_eq((rows[0] as Control).tooltip_text, "3-4 damage per turn")
-	info.statuses = [] as Array[Hud.StatusInfo]
+	info.statuses = [] as Array[StatusInfo]
 	hud.show_unit(info)
-	assert_eq(hud.get_node("%StatusList").get_child_count(), 0, "replaced")
+	assert_eq(hud.get_node("%ActiveCard/Rows/StatusList").get_child_count(), 0, "replaced")
 	hud.free()
 
 
@@ -225,32 +296,104 @@ func test_modified_ap_and_mp_are_tinted() -> void:
 	info.max_mp = 4
 	info.base_mp = 3
 	hud.show_unit(info)
-	assert_eq((hud.get_node("%ApLabel") as Label).modulate, Color.WHITE)
-	assert_eq((hud.get_node("%MpLabel") as Label).modulate, Hud.BUFFED_COLOR)
+	assert_eq(_active(hud, "Rows/PointsRow/ApLabel").modulate, Color.WHITE)
+	assert_eq(_active(hud, "Rows/PointsRow/MpLabel").modulate, UnitCard.BUFFED_COLOR)
 	info.max_mp = 1
 	hud.show_unit(info)
-	assert_eq((hud.get_node("%MpLabel") as Label).modulate, Hud.DEBUFFED_COLOR)
+	assert_eq(_active(hud, "Rows/PointsRow/MpLabel").modulate, UnitCard.DEBUFFED_COLOR)
 	hud.free()
 
 
-func test_inspect_panel_shows_a_unit_and_hides() -> void:
+func test_inspect_card_shows_a_unit_lists_spells_and_hides() -> void:
 	var hud := _hud()
-	var panel := hud.get_node("%InspectPanel") as Control
-	assert_false(panel.visible, "hidden at first")
+	var card := hud.get_node("%InspectCard") as UnitCard
+	assert_false(card.visible, "hidden at first")
 	var info := _info("Brute", false)
-	info.statuses = [_status_info("Crippled", 2, "-2 MP")] as Array[Hud.StatusInfo]
+	info.statuses = [_status_info("Crippled", 2, "-2 MP")] as Array[StatusInfo]
 	info.spells = _spells()
 	hud.show_inspected(info)
-	assert_true(panel.visible)
-	var rows := hud.get_node("%InspectRows")
-	assert_eq((rows.get_child(0).get_child(1) as Label).text, "Brute (enemy)")
-	assert_eq(rows.get_node("Statuses").get_child_count(), 1)
-	var spells := rows.get_node("Spells").get_children()
+	assert_true(card.visible)
+	assert_false(card.is_closable(), "hovering: no ✕")
+	assert_eq(_card_label(card, "Rows/Header/NameLabel").text, "Brute")
+	assert_eq(card.get_node("Rows/StatusList").get_child_count(), 1)
+	var spells := card.get_node("Rows/SpellList").get_children()
 	assert_eq(spells.size(), 2)
-	assert_eq((spells[0] as Label).text, "Hit (3 AP)")
-	assert_true((spells[0] as Label).tooltip_text.contains("5 damage"))
+	assert_eq((spells[0].get_child(1) as Label).text, "Hit (3 AP)")
 	hud.hide_inspected()
-	assert_false(panel.visible)
+	assert_false(card.visible)
+	hud.free()
+
+
+func test_the_active_card_lists_no_spells_but_the_inspect_card_does() -> void:
+	var hud := _hud()
+	var info := _info("Mage")
+	info.spells = _spells()
+	hud.show_unit(info)
+	assert_eq(hud.get_node("%ActiveCard/Rows/SpellList").get_child_count(), 0, "the spell bar has them")
+	hud.free()
+
+
+func test_pinned_card_shows_a_close_button_that_signals_up() -> void:
+	var hud := _hud()
+	var closes := {"count": 0}
+	hud.card_closed.connect(func() -> void: closes.count += 1)
+	hud.show_inspected(_info("Brute", false), true)
+	var close := hud.get_node("%InspectCard/Rows/Header/CloseButton") as Button
+	assert_true(close.visible, "pinned: ✕")
+	assert_eq(close.theme_type_variation, &"CloseButton")
+	close.pressed.emit()
+	assert_eq(closes.count, 1)
+	hud.show_inspected(_info("Brute", false))
+	assert_false(close.visible, "just hovering: no ✕")
+	hud.free()
+
+
+func test_a_title_shows_the_heroes_level() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	info.level = 7
+	hud.show_unit(info)
+	assert_eq(_active(hud, "Rows/Header/NameLabel").text, "Knight · Lv 7")
+	info.level = 0
+	hud.show_unit(info)
+	assert_eq(_active(hud, "Rows/Header/NameLabel").text, "Knight", "no level: just the name")
+	hud.free()
+
+
+func test_hovering_a_spell_shows_its_details_in_a_panel_above_the_bar() -> void:
+	var hud := _hud()
+	var bar := hud.get_node("%SpellBar") as SpellBar
+	var fireball := load("res://data/spells/fireball.tres") as SpellData
+	hud.show_spells([fireball, BattleFixtures.damage_spell(3)] as Array[SpellData], 10)
+	var details := bar.get_node("%Details") as Control
+	assert_false(details.visible, "hidden until hovered")
+	bar.slot(0).mouse_entered.emit()
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_true(details.visible)
+	assert_eq((bar.get_node("%DetailsName") as Label).text, fireball.display_name)
+	assert_eq((bar.get_node("%DetailsCost") as Label).text, "%d AP" % fireball.ap_cost)
+	var body := (bar.get_node("%DetailsBody") as Label).text
+	assert_true(body.contains("Range 3-5, line of sight") and body.contains("Circle area 1") and body.contains("fire damage"), body)
+	assert_true(details.get_global_rect().end.y <= bar.slot(0).get_global_rect().position.y + 1.0, "above the slots")
+	bar.slot(0).mouse_exited.emit()
+	assert_false(details.visible)
+	hud.free()
+
+
+func test_spell_slots_are_square_icons_with_cost_and_key() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10)
+	var slot := _spell_button(hud, 1)
+	assert_eq(slot.theme_type_variation, &"SlotButton")
+	assert_eq(slot.custom_minimum_size.x, slot.custom_minimum_size.y, "square")
+	assert_eq((slot.get_node("Icon") as TextureRect).texture, _spells()[1].display_icon())
+	assert_eq((slot.get_node("Cost") as Label).text, "5 AP")
+	assert_eq((slot.get_node("Key") as Label).text, "2")
+	hud.set_selected_spell(1)
+	assert_eq(slot.theme_type_variation, &"SelectedSlotButton")
+	assert_eq(_spell_button(hud, 0).theme_type_variation, &"SlotButton")
+	hud.set_selected_spell(-1)
+	assert_eq(slot.theme_type_variation, &"SlotButton")
 	hud.free()
 
 
@@ -260,7 +403,7 @@ func test_unit_info_carries_statuses_modified_maxima_and_spells() -> void:
 	unit.data.spells = _spells()
 	unit.add_status(BattleFixtures.status("Haste", 2, 0,
 			[BattleFixtures.modifier(StatModifier.Stat.MP, 2)] as Array[StatModifier], true), 1)
-	var info := Hud.UnitInfo.from_unit(unit)
+	var info := UnitInfo.from_unit(unit)
 	assert_eq([info.max_mp, info.base_mp, info.mp], [5, 3, 5])
 	assert_eq(info.statuses.size(), 1)
 	assert_eq([info.statuses[0].display_name, info.statuses[0].turns_left, info.statuses[0].description], ["Haste", 2, "+2 MP"])
@@ -271,14 +414,14 @@ func test_power_and_resistances_always_show() -> void:
 	var hud := _hud()
 	var info := _info("Knight")
 	hud.show_unit(info)
-	assert_true((hud.get_node("%CombatStats") as Label).visible, "always shown")
-	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power: All +0%\nResist: none")
+	assert_true(_active(hud, "Rows/CombatStats").visible, "always shown")
+	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +0%\nResist: none")
 	info.power = 8
 	info.resistances = {"Physical": 0, "Fire": 20, "Poison": -10}
 	hud.show_unit(info)
-	assert_eq((hud.get_node("%CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
 	hud.show_inspected(info)
-	assert_eq((hud.get_node("%InspectRows").get_node("CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	assert_eq((hud.get_node("%InspectCard/Rows/CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
 	hud.free()
 
 
@@ -291,8 +434,56 @@ func test_unit_info_reads_power_and_resistances() -> void:
 	map.layout = "0p 0e"
 	var state := BattleState.create(map.parse(), [BattleFixtures.unit("P0")] as Array[UnitData],
 			[BattleFixtures.unit("E0")] as Array[UnitData], 1, [[ward, BattleFixtures.modifier(StatModifier.Stat.POWER, 9)] as Array[StatModifier]])
-	var info := Hud.UnitInfo.from_unit(state.units[0])
+	var info := UnitInfo.from_unit(state.units[0])
 	assert_eq(info.power, 9)
 	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Ice"], "every game type in order, then the unit's own")
 	assert_eq(info.resistances["Physical"], 0, "zeros included")
 	assert_eq(info.resistances["Ice"], 25)
+
+
+func test_a_rebuilt_timeline_releases_a_hovered_chip() -> void:
+	var hud := _hud()
+	var info := _info("Knight")
+	info.unit_id = 2
+	hud.show_turn_order([info] as Array[UnitInfo], 1)
+	var events: Array = []
+	hud.chip_hovered.connect(func(id: int) -> void: events.append(["in", id]))
+	hud.chip_unhovered.connect(func() -> void: events.append(["out"]))
+	_chips(hud)[0].mouse_entered.emit()
+	hud.show_turn_order([info] as Array[UnitInfo], 1)
+	assert_eq(events, [["in", 2], ["out"]], "the old chip never reports leaving, so the rebuild does")
+	hud.show_turn_order([info] as Array[UnitInfo], 1)
+	assert_eq(events.size(), 2, "nothing hovered: nothing to release")
+	hud.free()
+
+
+func test_shortcut_buttons_are_locked_while_the_order_overlay_is_open() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10)
+	(hud.get_node("%OrderOverlay") as OrderOverlay).open()
+	assert_true(_spell_button(hud, 0).disabled)
+	assert_true((hud.get_node("%EndTurnButton") as Button).disabled)
+	hud.close_order_overlay()
+	assert_false(_spell_button(hud, 0).disabled)
+	assert_false((hud.get_node("%EndTurnButton") as Button).disabled)
+	hud.free()
+
+
+func test_the_overlay_ignores_wheel_ticks_and_builds_its_rows_when_opened() -> void:
+	var hud := _hud()
+	var overlay := hud.get_node("%OrderOverlay") as OrderOverlay
+	hud.show_turn_order([_info("Knight")] as Array[UnitInfo], 1)
+	assert_eq(overlay.get_node("%Rows").get_child_count(), 0, "hidden: not built yet")
+	overlay.open()
+	assert_eq(overlay.get_node("%Rows").get_child_count(), 1)
+	var wheel := InputEventMouseButton.new()
+	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
+	wheel.pressed = true
+	overlay.get_node("%Dim").gui_input.emit(wheel)
+	assert_true(overlay.visible, "zooming doesn't close it")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	overlay.get_node("%Dim").gui_input.emit(click)
+	assert_false(overlay.visible)
+	hud.free()

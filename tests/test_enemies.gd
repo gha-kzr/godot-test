@@ -128,7 +128,7 @@ func test_a_preset_enemy_shows_its_label_in_battle() -> void:
 	(Engine.get_main_loop() as SceneTree).root.add_child(controller)
 	var ogre := controller.battle.state.units[1]
 	assert_eq(ogre.label, "Ogre Lv 1 · Elite")
-	assert_eq(Hud.UnitInfo.from_unit(ogre).display_name, "Ogre Lv 1 · Elite")
+	assert_eq(UnitInfo.from_unit(ogre).display_name, "Ogre Lv 1 · Elite")
 	assert_true(is_equal_approx((controller.units_view.view(1).get_node("Body") as Node3D).scale.x, 1.1), "bigger")
 	controller.free()
 

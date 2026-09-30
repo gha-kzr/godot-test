@@ -5,6 +5,7 @@
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_8a0t4"]
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_74hn8"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_awjva"]
+[ext_resource type="Texture2D" uid="uid://1lh1fdgckijk" path="res://ui/icons/arrow.svg" id="5_74hn8"]
 
 [sub_resource type="Resource" id="Resource_knx6w"]
 script = ExtResource("1_6p22i")
@@ -18,6 +19,7 @@ damage_type = ExtResource("3_8a0t4")
 [resource]
 script = ExtResource("4_awjva")
 display_name = "Arrow"
+icon = ExtResource("5_74hn8")
 min_range = 2
 max_range = 7
 height_extends_range = true

@@ -120,7 +120,7 @@ func _show_rune_slots(record: HeroRecord) -> void:
 		if rune == null:
 			button.disabled = true
 		else:
-			button.modulate = rune.color()
+			_tint(button, rune.color())
 			button.tooltip_text = "%s %s: %s. Click to unequip." % [rune.rarity_name(), rune.display_name, rune.describe()]
 			button.pressed.connect(func() -> void: unequip_requested.emit(selected_hero, slot))
 		_rune_slots.add_child(button)
@@ -137,7 +137,7 @@ func _show_stash() -> void:
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.clip_text = true  # The tooltip has the full text.
 		button.custom_minimum_size.x = 1
-		button.modulate = rune.color()
+		_tint(button, rune.color())
 		button.tooltip_text = "%s: %s.\n%s rune%s. Click to equip on the selected hero." % [
 				rune.display_name, rune.describe(), rune.rarity_name(), " (one per hero)" if rune.is_unique() else ""]
 		button.pressed.connect(func() -> void: equip_requested.emit(selected_hero, index))
@@ -210,6 +210,15 @@ func _battle_view(record: HeroRecord) -> UnitState:
 	var unit := UnitState.new(0, record.battle_unit_data(), UnitState.Team.PLAYER, Vector2i.ZERO)
 	unit.permanent_modifiers = record.modifiers()
 	return unit
+
+
+## Colors a button's background (a rune's rarity), keeping the theme's shape.
+static func _tint(button: Button, color: Color) -> void:
+	for state in ["normal", "hover", "pressed", "hover_pressed"]:
+		var box := button.get_theme_stylebox(state).duplicate() as StyleBox
+		if box is StyleBoxFlat:
+			(box as StyleBoxFlat).bg_color = color.lightened(0.15) if state == "hover" else color
+		button.add_theme_stylebox_override(state, box)
 
 
 func _button(text: String) -> Button:

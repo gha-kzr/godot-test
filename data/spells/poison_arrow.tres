@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="4_vl7h8"]
 [ext_resource type="Resource" uid="uid://e4wboajbl3pi" path="res://data/statuses/poison.tres" id="5_27co1"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_glmtx"]
+[ext_resource type="Texture2D" uid="uid://bmmi05qrqjp0g" path="res://ui/icons/poison_arrow.svg" id="7_k24g2"]
 
 [sub_resource type="Resource" id="Resource_w3p2o"]
 script = ExtResource("1_xtndy")
@@ -24,6 +25,7 @@ status = ExtResource("5_27co1")
 [resource]
 script = ExtResource("6_glmtx")
 display_name = "Poison Arrow"
+icon = ExtResource("7_k24g2")
 min_range = 2
 max_range = 6
 height_extends_range = true

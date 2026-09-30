@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_ag3yy"]
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_jw1x3"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_pdlt8"]
+[ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="5_ag3yy"]
 
 [sub_resource type="Resource" id="Resource_nqnep"]
 script = ExtResource("1_ecc7m")
@@ -20,6 +21,7 @@ damage_type = ExtResource("3_jw1x3")
 [resource]
 script = ExtResource("4_pdlt8")
 display_name = "Fireball"
+icon = ExtResource("5_ag3yy")
 ap_cost = 4
 min_range = 3
 max_range = 5

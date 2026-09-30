@@ -322,7 +322,7 @@ func test_aiming_shows_cells_hidden_from_sight_faded() -> void:
 func test_hovering_another_unit_inspects_it() -> void:
 	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
-	var panel := controller.hud.get_node("%InspectPanel") as Control
+	var panel := controller.hud.get_node("%InspectCard") as Control
 	controller._hovered_cell = Vector2i(3, 0)
 	controller._update_hover()
 	assert_true(panel.visible, "the enemy is shown")
@@ -342,16 +342,16 @@ func test_the_hud_never_runs_ahead_of_the_animations() -> void:
 	var panel_after_first_event := {}
 	controller.event_player.event_played.connect(func(event: BattleEvents.Event) -> void:
 		if panel_after_first_event.is_empty():
-			panel_after_first_event["name"] = (controller.hud.get_node("%UnitName") as Label).text)
+			panel_after_first_event["name"] = (controller.hud.get_node("%ActiveCard/Rows/Header/NameLabel") as Label).text)
 	controller.end_turn()
 	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.IDLE]))
 	assert_eq(panel_after_first_event.get("name"), "P0", "still P0 while its turn end plays")
-	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "E1 Lv 1", "E1 once the playback is over")
-	var chips := controller.hud.get_node("%TurnOrder").get_child_count()
+	assert_eq((controller.hud.get_node("%ActiveCard/Rows/Header/NameLabel") as Label).text, "E1 Lv 1", "E1 once the playback is over")
+	var chips := controller.hud.get_node("%TurnTimeline/Chips").get_child_count()
 	assert_eq(chips, 2, "E0 left the turn order")
 	controller._hovered_cell = Vector2i(3, 0)
 	controller._update_hover()
-	assert_false((controller.hud.get_node("%InspectPanel") as Control).visible, "E1 is acting, no inspect")
+	assert_false((controller.hud.get_node("%InspectCard") as Control).visible, "E1 is acting, no inspect")
 
 
 func test_the_inspect_panel_stays_while_the_mouse_is_on_it() -> void:
@@ -359,8 +359,8 @@ func test_the_inspect_panel_stays_while_the_mouse_is_on_it() -> void:
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 	controller._hovered_cell = Vector2i(3, 0)
 	controller._update_hover()
-	var panel := controller.hud.get_node("%InspectPanel") as Control
-	var inside := controller.hud.get_node("%InspectRows").get_child(0) as Control
+	var panel := controller.hud.get_node("%InspectCard") as Control
+	var inside := controller.hud.get_node("%InspectCard/Rows/Header") as Control
 	assert_eq(controller._hover_cell(inside, Vector2.ZERO), Vector2i(3, 0), "sticks over the panel")
 	assert_eq(controller._hover_cell(controller.hud.get_node("%EndTurnButton"), Vector2.ZERO), BoardView.NO_CELL,
 			"other HUD controls clear the hover")
@@ -378,9 +378,9 @@ func test_a_battle_opens_on_placement_and_ready_starts_it() -> void:
 	assert_false(end_turn.disabled)
 	var a := controller.battle.state.units[0]
 	var b := controller.battle.state.units[1]
-	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "A", "the first hero, not the first to act")
+	assert_eq((controller.hud.get_node("%ActiveCard/Rows/Header/NameLabel") as Label).text, "A", "the first hero, not the first to act")
 	controller.click_cell(b.cell)
-	assert_eq((controller.hud.get_node("%UnitName") as Label).text, "B", "the selected hero")
+	assert_eq((controller.hud.get_node("%ActiveCard/Rows/Header/NameLabel") as Label).text, "B", "the selected hero")
 	controller.cancel()
 	controller.click_cell(a.cell)  # Select A...
 	controller.click_cell(Vector2i(3, 0))  # ...and place it.
@@ -413,3 +413,164 @@ func test_placement_swaps_heroes_and_cancel_deselects() -> void:
 	controller.click_cell(b_cell)  # ...then B's cell: they swap.
 	assert_true(await _wait_for(controller, [BattleController.State.PLACING]))
 	assert_eq([a.cell, b.cell], [b_cell, a_cell], "swapped")
+
+
+func _inspect_card(controller: BattleController) -> Control:
+	return controller.hud.get_node("%InspectCard") as Control
+
+
+func test_clicking_a_unit_pins_its_card_until_the_close_button_or_esc() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var card := _inspect_card(controller)
+	controller.click_cell(Vector2i(3, 0))
+	assert_true(card.visible, "pinned")
+	assert_true((card.get_node("Rows/Header/CloseButton") as Button).visible, "with its ✕")
+	controller._hovered_cell = Vector2i(0, 0)  # The mouse leaves the unit (and rests on the active one).
+	controller._update_hover()
+	assert_true(card.visible, "it stays")
+	controller.click_cell(Vector2i(3, 0))
+	assert_true(card.visible, "clicking the pinned unit again does nothing")
+	(card.get_node("Rows/Header/CloseButton") as Button).pressed.emit()
+	assert_false(card.visible, "✕ unpins")
+	controller.click_cell(Vector2i(3, 0))
+	assert_true(card.visible)
+	controller.cancel()
+	assert_false(card.visible, "Esc unpins")
+
+
+func test_esc_stops_aiming_before_it_unpins() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.click_cell(Vector2i(3, 0))
+	controller.select_spell(0)
+	controller.cancel()
+	assert_eq(controller.input_state, BattleController.State.IDLE, "aim stopped")
+	assert_true(_inspect_card(controller).visible, "still pinned")
+	controller.cancel()
+	assert_false(_inspect_card(controller).visible)
+
+
+func test_clicking_another_unit_moves_the_pin_and_a_click_still_casts() -> void:
+	var controller := _controller("0p 0e 0e 0", [_fighter("P0", 200)], [_fighter("E0", 100), _fighter("E1", 90)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var name_path := "Rows/Header/NameLabel"
+	controller.click_cell(Vector2i(2, 0))
+	assert_eq((_inspect_card(controller).get_node(name_path) as Label).text, "E1 Lv 1")
+	controller.select_spell(0)
+	var hp_before := controller.battle.state.units[1].hp
+	controller.click_cell(Vector2i(1, 0))
+	assert_eq((_inspect_card(controller).get_node(name_path) as Label).text, "E0 Lv 1", "the pin moved")
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_true(controller.battle.state.units[1].hp < hp_before, "the same click cast the spell")
+
+
+func test_a_pinned_unit_that_dies_unpins() -> void:
+	var controller := _controller("0p 0 0e", [_fighter("P0", 200)], [_fighter("E0", 1)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.click_cell(Vector2i(2, 0))
+	assert_true(_inspect_card(controller).visible)
+	controller._hud_model.apply(BattleEvents.UnitDied.new(1))
+	controller._update_inspected()
+	assert_false(_inspect_card(controller).visible, "a fallen unit's card goes away")
+
+
+func test_heroes_levels_show_in_the_cards() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.player_levels = [7]
+	controller._refresh_hud()
+	assert_eq((controller.hud.get_node("%ActiveCard/Rows/Header/NameLabel") as Label).text, "P0 · Lv 7")
+
+
+func test_a_turn_order_chip_hovers_its_unit_and_a_click_focuses_the_camera() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.hud.chip_hovered.emit(1)
+	assert_eq(controller._hover_cell(controller.hud.get_node("%TurnTimeline"), Vector2.ZERO), Vector2i(3, 0), "the unit's cell counts as hovered")
+	controller.hud.chip_unhovered.emit()
+	assert_eq(controller._hover_cell(controller.hud.get_node("%TurnTimeline"), Vector2.ZERO), BoardView.NO_CELL)
+	controller.hud.chip_pressed.emit(1)
+	assert_eq(controller.camera_rig.position, controller.board_view.cell_to_world(Vector2i(3, 0)))
+
+
+func test_esc_closes_the_order_overlay_first() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.click_cell(Vector2i(3, 0))
+	(controller.hud.get_node("%TurnTimeline/OrderButton") as Button).pressed.emit()
+	var overlay := controller.hud.get_node("%OrderOverlay") as Control
+	assert_true(overlay.visible)
+	controller.cancel()
+	assert_false(overlay.visible)
+	assert_true(_inspect_card(controller).visible, "the pin waits for the next Esc")
+
+
+func test_aiming_at_a_unit_previews_its_damage_and_leaving_clears_it() -> void:
+	var controller := _controller("0p 0e 0 0", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var enemy_view := controller.units_view.view(1)
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	assert_false(enemy_view.has_preview(), "not aiming: no preview")
+	controller.select_spell(0)
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	assert_true(enemy_view.has_preview(), "aiming at the enemy")
+	assert_eq(enemy_view.preview_text(), "5", "the fighter's 5 damage")
+	controller._hovered_cell = Vector2i(2, 0)
+	controller._update_hover()
+	assert_false(enemy_view.has_preview(), "the mouse moved off")
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	controller.cancel()
+	assert_false(enemy_view.has_preview(), "aiming stopped")
+
+
+func test_hovering_a_reachable_cell_labels_the_path_cost_with_its_climbs() -> void:
+	var controller := _controller("0p 1 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller._hovered_cell = Vector2i(2, 0)
+	controller._update_hover()
+	assert_eq(controller.board_view.path_cost_texts(), ["3 MP", "+1"] as Array[String], "2 steps + 1 climb")
+	controller._hovered_cell = Vector2i(3, 0)  # The enemy's cell: not reachable.
+	controller._update_hover()
+	assert_eq(controller.board_view.path_cost_texts().size(), 0)
+	controller._hovered_cell = Vector2i(2, 0)
+	controller._update_hover()
+	controller.select_spell(0)
+	assert_eq(controller.board_view.path_cost_texts().size(), 0, "aiming clears it")
+
+
+func test_the_prompt_line_follows_the_step() -> void:
+	var controller := _controller("0p 0p 0 0e", [_fighter("A", 200), _fighter("B", 190)] as Array[UnitData],
+			[_fighter("E", 100)] as Array[UnitData], false)
+	var prompt := controller.hud.get_node("%PromptLabel") as Label
+	assert_true(prompt.visible)
+	assert_true(prompt.text.begins_with("Place your heroes"), prompt.text)
+	controller.click_cell(controller.battle.state.units[0].cell)
+	assert_true(prompt.text.contains("place A"), prompt.text)
+	controller.cancel()
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_true(prompt.text.begins_with("Move to a blue cell"), prompt.text)
+	controller.select_spell(0)
+	assert_true(prompt.text.contains("Choose a target for Hit"), prompt.text)
+	controller.cancel()
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.IDLE]))
+	if controller.input_state == BattleController.State.ENEMY_TURN:
+		assert_true(prompt.text.ends_with("is acting..."), prompt.text)
+
+
+func test_end_turn_pulses_only_when_nothing_is_left_to_do() -> void:
+	var boxed := _fighter("P0", 200)
+	boxed.mp = 0
+	boxed.ap = 2  # The 3 AP spell is out of reach.
+	var controller := _controller("0p 0 0 0e", [boxed], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_true(controller.hud.is_end_turn_pulsing(), "no MP, no affordable spell")
+	assert_true((controller.hud.get_node("%PromptLabel") as Label).text.begins_with("Nothing left"))
+	var normal := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(normal, [BattleController.State.IDLE]))
+	assert_false(normal.hud.is_end_turn_pulsing(), "it can still move")

@@ -4,6 +4,8 @@ extends RefCounted
 ## Everything that changes during a battle. The rules read and mutate it; views only read it.
 ## clone() gives an independent copy for AI simulation (Grid and UnitData are shared, read-only).
 
+enum RollBound { NONE, LOWEST, HIGHEST }
+
 ## A mutual wipe is a DRAW; the game shows it as a defeat (decision record).
 enum Outcome { ONGOING, PLAYER_WON, ENEMY_WON, DRAW }
 
@@ -13,6 +15,8 @@ var turn_order: TurnOrder
 var rng := RandomNumberGenerator.new()
 ## Simulations (AI) set this so effects use the average roll instead of the dice.
 var use_average_rolls := false
+## Previews set this to roll every effect at its lowest or highest value (exact bounds).
+var roll_bound := RollBound.NONE
 ## The cells players may start on (the map's player spawns); heroes can be rearranged in
 ## it until the battle starts.
 var zone: Array[Vector2i] = []
@@ -73,6 +77,10 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 ## Rolls an amount in [low, high] for an effect. With use_average_rolls, returns the
 ## average rounded down (conservative: a kill only counts if the average roll kills).
 func roll(low: int, high: int) -> int:
+	if roll_bound == RollBound.LOWEST:
+		return low
+	if roll_bound == RollBound.HIGHEST:
+		return high
 	if use_average_rolls:
 		return floori((low + high) / 2.0)
 	return rng.randi_range(low, high)
@@ -123,6 +131,7 @@ func clone() -> BattleState:
 	copy.rng.seed = rng.seed
 	copy.rng.state = rng.state
 	copy.use_average_rolls = use_average_rolls
+	copy.roll_bound = roll_bound
 	copy.zone = zone.duplicate()
 	copy.started = started
 	return copy

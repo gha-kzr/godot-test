@@ -24,6 +24,11 @@ const OBSTACLE_SIZE := Vector3(0.8, 0.9, 0.8)
 const HIGHLIGHT_LIFT := 0.02
 const HIGHLIGHT_LAYER_GAP := 0.01
 const PIT_DEPTH := 2.0
+## Path cost labels: height above the cell, size, and colors (total, climbing steps).
+const PATH_LABEL_HEIGHT := 0.9
+const PATH_LABEL_PIXEL_SIZE := 0.008
+const PATH_TOTAL_COLOR := Color(1.0, 1.0, 1.0)
+const PATH_CLIMB_COLOR := Color(1.0, 0.75, 0.25)
 
 @export var board_theme: BoardTheme
 ## Editor only: a map drawn in the 3D viewport so the scene isn't empty, rebuilt live when
@@ -48,6 +53,7 @@ var _highlight_groups: Dictionary[Highlight, Node3D] = {}
 var _materials: Dictionary[Color, StandardMaterial3D] = {}
 var _overlay_materials: Dictionary[Color, StandardMaterial3D] = {}
 var _highlight_mesh := PlaneMesh.new()
+var _path_labels := Node3D.new()
 
 
 func _init() -> void:
@@ -55,6 +61,8 @@ func _init() -> void:
 	_highlights.name = "Highlights"
 	add_child(_cells)
 	add_child(_highlights)
+	_path_labels.name = "PathLabels"
+	add_child(_path_labels)
 	for kind: Highlight in Highlight.values():
 		var group := Node3D.new()
 		group.name = Highlight.keys()[kind].to_pascal_case()
@@ -91,6 +99,7 @@ func build(board_grid: Grid) -> void:
 	for child in _cells.get_children():
 		child.free()
 	clear_highlights()
+	clear_path_cost()
 	for y in grid.size.y:
 		for x in grid.size.x:
 			var cell := Vector2i(x, y)
@@ -155,9 +164,48 @@ func clear_highlight(kind: Highlight) -> void:
 		child.free()
 
 
+## Labels the hovered path: its total MP over the destination and "+n" over each climbing
+## step (`climbs`: cell → extra MP). Replaces the previous labels.
+func show_path_cost(destination: Vector2i, total_mp: int, climbs: Dictionary[Vector2i, int]) -> void:
+	clear_path_cost()
+	_path_labels.add_child(_cost_label("Total", "%d MP" % total_mp, destination, PATH_TOTAL_COLOR, PATH_LABEL_HEIGHT))
+	for cell in climbs:
+		_path_labels.add_child(_cost_label("Climb", "+%d" % climbs[cell], cell, PATH_CLIMB_COLOR, PATH_LABEL_HEIGHT * 0.6))
+
+
+func clear_path_cost() -> void:
+	for child in _path_labels.get_children():
+		child.free()
+
+
+## The path labels' texts, total first ("" parts omitted), e.g. ["4 MP", "+1"].
+func path_cost_texts() -> Array[String]:
+	var texts: Array[String] = []
+	for child in _path_labels.get_children():
+		texts.append((child as Label3D).text)
+	return texts
+
+
+func _cost_label(label_name: String, text: String, cell: Vector2i, color: Color, height: float) -> Label3D:
+	var label := Label3D.new()
+	label.name = label_name
+	label.text = text
+	label.modulate = color
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.no_depth_test = true
+	label.fixed_size = false
+	label.pixel_size = PATH_LABEL_PIXEL_SIZE
+	label.font_size = 48
+	label.outline_size = 14
+	label.render_priority = 2
+	label.position = cell_to_world(cell) + Vector3.UP * height
+	return label
+
+
 func clear_highlights() -> void:
 	for kind: Highlight in Highlight.values():
 		clear_highlight(kind)
+	clear_path_cost()
 
 
 func highlighted_count(kind: Highlight) -> int:

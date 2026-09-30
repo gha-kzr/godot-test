@@ -181,18 +181,20 @@ func test_status_events_play_and_tags_follow() -> void:
 	var stage := _stage()
 	var view := stage.units.view(1)
 	var poison := BattleFixtures.status("Poison", 3, 2)
+	poison.icon = load("res://ui/icons/fireball.svg") as Texture2D
 	await view.play_status_applied(poison, 3)
-	assert_eq(view.status_tag_texts(), ["P3"] as Array[String])
+	assert_eq(view.status_turns_texts(), ["3"] as Array[String])
 	assert_true(view.has_node("FloatingNumber"), "the status name floats up")
+	assert_eq(view.status_icon_textures(), [poison.icon] as Array[Texture2D], "an icon, not a text tag")
 	var guard := BattleFixtures.status("Guard", 2, 0, [BattleFixtures.modifier(StatModifier.Stat.MP, 1)] as Array[StatModifier], true)
 	await view.play_status_applied(guard, 2)
-	assert_eq(view.status_tag_texts(), ["P3", "G2"] as Array[String], "in status order")
+	assert_eq(view.status_turns_texts(), ["3", "2"] as Array[String], "in status order")
 	await view.play_status_applied(poison, 3)
-	assert_eq(view.status_tag_texts(), ["P3", "G2"] as Array[String], "a refresh updates in place")
+	assert_eq(view.status_turns_texts(), ["3", "2"] as Array[String], "a refresh updates in place")
 	await view.play_status_ticked(poison)
 	await view.play_status_expired(poison)
 	await (Engine.get_main_loop() as SceneTree).process_frame
-	assert_eq(view.status_tag_texts(), ["G2"] as Array[String])
+	assert_eq(view.status_turns_texts(), ["2"] as Array[String])
 	_done(stage)
 
 
@@ -203,11 +205,11 @@ func test_sync_rebuilds_status_tags_from_the_state() -> void:
 	unit.add_status(poison, 0)
 	unit.statuses[0].turns_left = 1
 	stage.units.sync(stage.battle.state)
-	assert_eq(stage.units.view(1).status_tag_texts(), ["P1"] as Array[String], "turns left from the state")
+	assert_eq(stage.units.view(1).status_turns_texts(), ["1"] as Array[String], "turns left from the state")
 	unit.statuses.clear()
 	stage.units.sync(stage.battle.state)
 	await (Engine.get_main_loop() as SceneTree).process_frame
-	assert_eq(stage.units.view(1).status_tag_texts(), [] as Array[String])
+	assert_eq(stage.units.view(1).status_turns_texts(), [] as Array[String])
 	_done(stage)
 
 
@@ -227,13 +229,13 @@ func test_event_player_plays_status_turns_end_to_end() -> void:
 	stage.player.event_played.connect(func(event: BattleEvents.Event) -> void:
 		played.append(event)
 		if event is BattleEvents.StatusApplied or event is BattleEvents.StatusExpired:
-			tags_seen.append(stage.units.view(1).status_tag_texts()))
+			tags_seen.append(stage.units.view(1).status_turns_texts()))
 	await stage.player.play(events)
 	assert_eq(played, events, "applied, ticked, hit, expired: all played in order")
-	assert_eq(tags_seen, [["P1"], []], "the player itself updates the tags")
+	assert_eq(tags_seen, [["1"], []], "the player itself updates the tags")
 	stage.units.sync(stage.battle.state)
 	await (Engine.get_main_loop() as SceneTree).process_frame
-	assert_eq(stage.units.view(1).status_tag_texts(), [] as Array[String], "expired")
+	assert_eq(stage.units.view(1).status_turns_texts(), [] as Array[String], "expired")
 	_assert_in_sync(stage)
 	_done(stage)
 
@@ -245,4 +247,26 @@ func test_zero_changes_float_no_number() -> void:
 	assert_false(view.has_node("FloatingNumber"), "no +0")
 	await view.play_hit(0, 20)
 	assert_false(view.has_node("FloatingNumber"), "no -0")
+	_done(stage)
+
+
+func test_preview_badge_shows_amount_skull_and_status_icons() -> void:
+	var stage := _stage()
+	var view := stage.units.view(1)
+	var entry := DamagePreview.Entry.new()
+	entry.unit_id = 1
+	entry.min_damage = 8
+	entry.max_damage = 11
+	entry.can_kill = true
+	entry.statuses = [BattleFixtures.status("Poison", 3, 2)] as Array[StatusData]
+	stage.units.show_previews([entry] as Array[DamagePreview.Entry])
+	assert_true(view.has_preview())
+	assert_eq(view.preview_text(), "8-11")
+	assert_eq(view.preview_icon_count(), 2, "a skull and a status")
+	assert_false(stage.units.view(0).has_preview(), "only the listed units")
+	stage.units.show_previews([] as Array[DamagePreview.Entry])
+	assert_false(view.has_preview(), "replaced")
+	stage.units.show_previews([entry] as Array[DamagePreview.Entry])
+	stage.units.clear_previews()
+	assert_false(view.has_preview())
 	_done(stage)

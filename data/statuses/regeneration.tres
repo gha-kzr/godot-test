@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://b12pstebg20f7"]
 
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_a33sc"]
+[ext_resource type="Texture2D" uid="uid://dvrvw6nw2eg2p" path="res://ui/icons/status_regeneration.svg" id="1_djbyj"]
 [ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_djbyj"]
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_5p2x0"]
 [ext_resource type="Script" uid="uid://dqic6ten54j2t" path="res://scripts/data/heal_effect.gd" id="4_43wbt"]
@@ -13,6 +14,7 @@ max_amount = 5
 [resource]
 script = ExtResource("2_djbyj")
 display_name = "Regeneration"
+icon = ExtResource("1_djbyj")
 short_label = "R"
 color = Color(0.35, 1, 0.6, 1)
 is_positive = true

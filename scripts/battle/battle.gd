@@ -87,7 +87,7 @@ func _start_turns(advance_first: bool) -> Array[BattleEvents.Event]:
 			state.turn_order.advance()
 		advance = true
 		var unit := state.current_unit()
-		events.append(BattleEvents.TurnStarted.new(unit.id, state.turn_order.round_number))
+		events.append(BattleEvents.TurnStarted.new(unit.id, state.turn_order.round_number, unit.max_ap(), unit.max_mp()))
 		var alive_before := _alive_ids()
 		events.append_array(_sudden_death(unit))
 		events.append_array(_tick_statuses(unit))
@@ -120,7 +120,7 @@ func _tick_statuses(unit: UnitState) -> Array[BattleEvents.Event]:
 		status.counting = true
 		if status.data.tick_effects.is_empty() or not unit.is_alive():
 			continue
-		events.append(BattleEvents.StatusTicked.new(unit.id, status.data))
+		events.append(BattleEvents.StatusTicked.new(unit.id, status.data, status.turns_left))
 		for effect in status.data.tick_effects:
 			if unit.is_alive():
 				events.append_array(effect.apply(state, status.caster_id, unit.id))

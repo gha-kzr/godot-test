@@ -21,12 +21,17 @@ extends RefCounted
 		return unit_id
 
 
+## `ap` and `mp` are what the unit has for this turn (refilled, modifiers included).
 class TurnStarted extends UnitEvent:
 	var round_number: int
+	var ap: int
+	var mp: int
 
-	func _init(unit: int, round_value: int) -> void:
+	func _init(unit: int, round_value: int, turn_ap := 0, turn_mp := 0) -> void:
 		unit_id = unit
 		round_number = round_value
+		ap = turn_ap
+		mp = turn_mp
 
 
 class TurnEnded extends UnitEvent:
@@ -104,10 +109,13 @@ class StatusApplied extends UnitEvent:
 ## At the carrier's turn start; the tick effects' own events (damage, heal) follow.
 class StatusTicked extends UnitEvent:
 	var status: StatusData
+	## The turns the status has left, this one included.
+	var turns_left: int
 
-	func _init(unit: int, ticked: StatusData) -> void:
+	func _init(unit: int, ticked: StatusData, turns := 0) -> void:
 		unit_id = unit
 		status = ticked
+		turns_left = turns
 
 
 ## At the carrier's turn end, after its last counted turn.

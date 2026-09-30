@@ -88,7 +88,7 @@ func start_battle() -> void:
 		return
 	var battle := BATTLE_SCENE.instantiate() as BattleController
 	battle.setup(setup.encounter, setup.units, setup.modifiers, rng_seed, setup.hero_hp,
-			setup.sudden_death_round, setup.sudden_death_percent, setup.title)
+			setup.sudden_death_round, setup.sudden_death_percent, setup.title, setup.levels)
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
 	_battle_title = setup.title

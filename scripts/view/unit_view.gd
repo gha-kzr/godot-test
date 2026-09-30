@@ -1,7 +1,7 @@
 class_name UnitView
 extends Node3D
 ## One unit on the board: a placeholder capsule (or UnitData.model_scene), a team ring,
-## an HP label, a row of status tags ("P3": Poison, 3 turns) and a pick collider that
+## an HP label, a row of status icons (each with its turns left) and a pick collider that
 ## clicks through to the unit's cell (see BoardView).
 ## Every play_* method returns once its animation is over, so callers can await them one
 ## after another.
@@ -20,9 +20,17 @@ const LUNGE_DISTANCE := 0.3
 ## The active unit's ring pulses between these scales.
 const ACTIVE_PULSE_SCALE := 1.25
 const ACTIVE_PULSE_DURATION := 0.5
-## Status tags: world spacing between tags, and the beats of their animations.
-const STATUS_TAG_SPACING := 0.42
+## Status icons: world size and spacing, and the beats of their animations.
+const STATUS_ICON_SIZE := 0.46
+const STATUS_TAG_SPACING := 0.62
 const STATUS_TAG_PIXEL_SIZE := 0.009
+## Damage preview badge: height above the unit, number size relative to the HP label, and
+## the world size and spacing of its skull and status icons.
+const SKULL_ICON := preload("res://ui/icons/skull.svg")
+const PREVIEW_HEIGHT := 2.5
+const PREVIEW_FONT_SCALE := 1.4
+const PREVIEW_ICON_SIZE := 0.42
+const PREVIEW_ICON_SPACING := 0.5
 const STATUS_APPLIED_DURATION := 0.35
 const STATUS_TICK_DURATION := 0.25
 const STATUS_EXPIRED_DURATION := 0.3
@@ -33,8 +41,11 @@ var _max_hp := 1
 var _material: StandardMaterial3D  ## Placeholder only; models keep their own look.
 var _pulse_tween: Tween
 var _visual_scale := 1.0
-## Tags in status order (the tick order).
-var _status_tags: Dictionary[StatusData, Label3D] = {}
+## One tag per status, in status order (the tick order): a Node3D with an "Icon" Sprite3D
+## and a "Turns" Label3D.
+var _status_tags: Dictionary[StatusData, Node3D] = {}
+## The damage preview badge (see show_preview), or null.
+var _preview: Node3D
 
 @onready var _body: Node3D = $Body
 @onready var _placeholder: MeshInstance3D = $Body/Placeholder
@@ -151,7 +162,7 @@ func play_status_applied(status: StatusData, turns_left: int) -> void:
 
 ## Pulses the tag; the tick's damage or heal numbers come with the events that follow.
 func play_status_ticked(status: StatusData) -> void:
-	var tag: Label3D = _status_tags.get(status)
+	var tag: Node3D = _status_tags.get(status)
 	if tag == null:
 		await create_tween().tween_interval(STATUS_TICK_DURATION).finished
 		return
@@ -163,21 +174,93 @@ func play_status_ticked(status: StatusData) -> void:
 
 ## Fades the tag out and removes it.
 func play_status_expired(status: StatusData) -> void:
-	var tag: Label3D = _status_tags.get(status)
+	var tag: Node3D = _status_tags.get(status)
 	if tag == null:
 		return
-	var tween := create_tween()
-	tween.tween_property(tag, "modulate:a", 0.0, STATUS_EXPIRED_DURATION)
+	var tween := create_tween().set_parallel()
+	tween.tween_property(tag.get_node("Icon"), "modulate:a", 0.0, STATUS_EXPIRED_DURATION)
+	tween.tween_property(tag.get_node("Turns"), "modulate:a", 0.0, STATUS_EXPIRED_DURATION)
 	await tween.finished
 	_remove_status_tag(status)
 
 
-## Tag texts in order, e.g. ["P3", "G1"].
-func status_tag_texts() -> Array[String]:
+## Shows what a cast would do to this unit: the damage / heal range, a skull when it can
+## kill, and the statuses it would apply. Replaces any previous badge.
+func show_preview(entry: DamagePreview.Entry) -> void:
+	clear_preview()
+	_preview = Node3D.new()
+	_preview.name = "Preview"
+	_preview.position = Vector3(0.0, PREVIEW_HEIGHT, 0.0)
+	var amount := Label3D.new()
+	amount.name = "Amount"
+	amount.text = entry.amount_text()
+	amount.modulate = DAMAGE_COLOR if entry.max_damage > 0 else (HEAL_COLOR if entry.max_heal > 0 else Color.WHITE)
+	amount.font_size = int(_hp_label.font_size * PREVIEW_FONT_SCALE)
+	amount.outline_size = _hp_label.outline_size
+	amount.pixel_size = STATUS_TAG_PIXEL_SIZE
+	amount.no_depth_test = true
+	amount.render_priority = 3
+	amount.position = Vector3(0.0, 0.3, 0.0)
+	_preview.add_child(amount)
+	var icons: Array[Sprite3D] = []
+	if entry.can_kill:
+		icons.append(_preview_icon(SKULL_ICON, Color.WHITE, "Skull"))
+	for status in entry.statuses:
+		icons.append(_preview_icon(status.display_icon(), status.color, "Status"))
+	for i in icons.size():
+		icons[i].position = Vector3((i - (icons.size() - 1) / 2.0) * PREVIEW_ICON_SPACING, -0.15, 0.0)
+		_preview.add_child(icons[i])
+	add_child(_preview)
+	set_process(true)
+
+
+func clear_preview() -> void:
+	if _preview != null:
+		remove_child(_preview)
+		_preview.queue_free()
+		_preview = null
+		set_process(not _status_tags.is_empty())
+
+
+func has_preview() -> bool:
+	return _preview != null
+
+
+## The badge's amount text ("" without a badge).
+func preview_text() -> String:
+	return (_preview.get_node("Amount") as Label3D).text if _preview != null else ""
+
+
+## How many skull and status icons the badge shows.
+func preview_icon_count() -> int:
+	return _preview.get_child_count() - 1 if _preview != null else 0
+
+
+func _preview_icon(texture: Texture2D, color: Color, icon_name: String) -> Sprite3D:
+	var icon := Sprite3D.new()
+	icon.name = icon_name
+	icon.texture = texture
+	icon.modulate = color
+	icon.pixel_size = PREVIEW_ICON_SIZE / maxf(texture.get_width(), 1.0)
+	icon.no_depth_test = true
+	icon.render_priority = 3
+	return icon
+
+
+## The turns shown next to each status icon, in order, e.g. ["3", "1"].
+func status_turns_texts() -> Array[String]:
 	var texts: Array[String] = []
 	for status in _status_tags:
-		texts.append(_status_tags[status].text)
+		texts.append((_status_tags[status].get_node("Turns") as Label3D).text)
 	return texts
+
+
+## The icon textures shown, in order.
+func status_icon_textures() -> Array[Texture2D]:
+	var textures: Array[Texture2D] = []
+	for status in _status_tags:
+		textures.append((_status_tags[status].get_node("Icon") as Sprite3D).texture)
+	return textures
 
 
 func play_death() -> void:
@@ -248,40 +331,53 @@ func _spawn_floating_number(text: String, color: Color) -> void:
 	tween.chain().tween_callback(label.queue_free)
 
 
-## Keeps the tag row facing the camera; runs only while the unit has tags.
+## Keeps the tag row and the preview badge facing the camera; runs only while there are any.
 func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera != null:
 		_status_row.global_basis = camera.global_basis
+		if _preview != null:
+			_preview.global_basis = camera.global_basis
 
 
 func _set_status_tag(status: StatusData, turns_left: int) -> void:
-	var tag: Label3D = _status_tags.get(status)
+	var tag: Node3D = _status_tags.get(status)
 	if tag == null:
-		tag = Label3D.new()
+		tag = Node3D.new()
 		tag.name = "Tag"
-		tag.no_depth_test = true
-		# World-sized (unlike the HP label), so the spacing between tags holds at any zoom.
-		tag.pixel_size = STATUS_TAG_PIXEL_SIZE
-		tag.font_size = _hp_label.font_size
-		tag.outline_size = _hp_label.outline_size
-		tag.render_priority = 1
+		var icon := Sprite3D.new()
+		icon.name = "Icon"
+		icon.texture = status.display_icon()
+		# World-sized (unlike the HP label), so the spacing between icons holds at any zoom.
+		icon.pixel_size = STATUS_ICON_SIZE / maxf(icon.texture.get_width(), 1.0)
+		icon.no_depth_test = true
+		icon.render_priority = 1
+		icon.modulate = status.color
+		tag.add_child(icon)
+		var turns := Label3D.new()
+		turns.name = "Turns"
+		turns.no_depth_test = true
+		turns.pixel_size = STATUS_TAG_PIXEL_SIZE
+		turns.font_size = _hp_label.font_size
+		turns.outline_size = _hp_label.outline_size
+		turns.render_priority = 2
+		turns.position = Vector3(STATUS_ICON_SIZE * 0.35, -STATUS_ICON_SIZE * 0.4, 0.0)
+		tag.add_child(turns)
 		_status_row.add_child(tag)
 		_status_tags[status] = tag
-	tag.text = "%s%d" % [status.short_label, turns_left]
-	tag.modulate = status.color
+	(tag.get_node("Turns") as Label3D).text = str(turns_left)
 	_layout_status_tags()
 	set_process(true)
 
 
 func _remove_status_tag(status: StatusData) -> void:
-	var tag: Label3D = _status_tags.get(status)
+	var tag: Node3D = _status_tags.get(status)
 	if tag == null:
 		return
 	_status_tags.erase(status)
 	tag.queue_free()
 	_layout_status_tags()
-	set_process(not _status_tags.is_empty())
+	set_process(not _status_tags.is_empty() or _preview != null)
 
 
 func _clear_status_tags() -> void:

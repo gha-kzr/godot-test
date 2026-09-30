@@ -20,6 +20,8 @@ class Setup:
 	var units: Array[UnitData] = []
 	var modifiers: Array = []
 	var hero_hp: Array = []
+	## The heroes' levels, parallel to `units`.
+	var levels: Array = []
 	var sudden_death_round := 0
 	var sudden_death_percent := 10
 
@@ -75,6 +77,8 @@ static func battle_setup(profile: Profile, config: TowerConfig) -> Setup:
 	setup.units = profile.battle_units()
 	setup.modifiers = _party_modifiers(profile)
 	setup.hero_hp.assign(run.hero_hp)
+	for record in profile.party_records():
+		setup.levels.append(record.level)
 	setup.sudden_death_round = config.sudden_death_round
 	setup.sudden_death_percent = config.sudden_death_percent
 	return setup

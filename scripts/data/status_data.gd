@@ -13,6 +13,8 @@ const UNSUPPORTED_STATS: Array[StatModifier.Stat] = [StatModifier.Stat.MAX_HP, S
 const MAX_SHORT_LABEL := 2
 
 @export var display_name := ""
+## Shown above units and in cards (a white icon, tinted with `color`); a default one when empty.
+@export var icon: Texture2D
 ## Icon text until there's art, e.g. "P" for Poison.
 @export var short_label := ""
 @export var color := Color.WHITE
@@ -69,3 +71,8 @@ func get_validation_errors() -> PackedStringArray:
 		for error in modifier.get_validation_errors():
 			errors.append("%s: %s" % [display_name, error])
 	return errors
+
+
+## The icon to show: its own, else the default status icon.
+func display_icon() -> Texture2D:
+	return icon if icon != null else load("res://ui/icons/status_default.svg") as Texture2D

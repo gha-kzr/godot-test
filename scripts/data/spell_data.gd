@@ -3,6 +3,8 @@ class_name SpellData
 extends Resource
 
 @export var display_name := ""
+## Shown on the spell bar and cards (a white icon, tinted); a default one when empty.
+@export var icon: Texture2D
 @export_range(0, 12) var ap_cost := 3
 ## Manhattan distance from the caster. 0 allows targeting the caster's own cell.
 @export_range(0, 20) var min_range := 1
@@ -34,3 +36,8 @@ func get_validation_errors() -> PackedStringArray:
 		for error in effect.get_validation_errors():
 			errors.append("%s: %s" % [display_name, error])
 	return errors
+
+
+## The icon to show: its own, else the default spell icon.
+func display_icon() -> Texture2D:
+	return icon if icon != null else load("res://ui/icons/spell_default.svg") as Texture2D

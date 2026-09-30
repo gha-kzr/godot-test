@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_caf0i"]
 [ext_resource type="Script" uid="uid://dqic6ten54j2t" path="res://scripts/data/heal_effect.gd" id="3_3xsty"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_4rf4a"]
+[ext_resource type="Texture2D" uid="uid://b1bfphxsrn3m8" path="res://ui/icons/mend.svg" id="4_caf0i"]
 
 [sub_resource type="Resource" id="Resource_c4cgp"]
 script = ExtResource("1_r5raa")
@@ -16,6 +17,7 @@ max_amount = 10
 [resource]
 script = ExtResource("4_4rf4a")
 display_name = "Mend"
+icon = ExtResource("4_caf0i")
 min_range = 0
 max_range = 3
 needs_line_of_sight = false

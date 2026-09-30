@@ -55,6 +55,7 @@ Decisions: `decisions/2026-09-29-allies-and-placement.md`; plan: `plans/2026-09-
 Milestone 5 used to be one "Polish" milestone; it is split in three. Earlier decision records and plans that defer items "to M5" mean the matching part below: UI and UX items → 5, art and audio → 6, balance, exports and release checks → 7.
 
 ### 5. UI and UX revamp
+Decisions: `decisions/2026-09-30-ui-revamp.md`. Split in **5a battle** (HUD, timeline, unit cards, status icons, damage preview, move costs, guidance) and **5b screens** (theme, title, hub, run screen, settings, first-run hints).
 - UI theme, fonts and spell / status icons; title, hub (party screen), run screen and settings menus — the first-version screens from M2 and M4 are replaced.
 - Battle HUD: an event-driven refresh (events carrying "after" values, status countdowns mid-playback), the status display and unit inspection panels redone, the preset tag color, a lasting sudden-death tag, the placement phase's hints.
 - Readability: move costs on the hovered path (see "Clearer climbing cost" below), first-run hints, a hint when a unit has nothing left to do.
@@ -82,6 +83,12 @@ Some early placeholder art (one model, one spell effect) can slot in anywhere; i
 Ideas to schedule into a milestone (grill them first):
 
 - **Clearer climbing cost** — a climb costs 1 extra MP per level, so a 3-cell move can spend 4 MP, and players can't tell why (playtest feedback). Either drop the extra cost (climbing costs a normal step; the climb and drop limits stay), or make it readable: the MP cost shown next to the hovered path (e.g. "4 MP"), climbing steps marked on the path, and the reachable area shaded by cost. Deciding means weighing height as a tactical lever against readability; the AI and balance follow the rule either way.
+
+- **Choosing active spells** — heroes will know more spells than they can bring: the player picks up to **5 active spells** per hero (a loadout, e.g. on the hub), the rest stay inactive. Touches `HeroRecord` (saved loadout), level rewards (a new spell goes to the loadout if there's room), the party screen and the HUD's spell bar (5 slots).
+- **Obstacles block line of sight only up to their top** — today an obstacle always blocks, even when the caster stands higher and visibly sees over it (playtest: the Ranger on a raised cell couldn't shoot past a block below it, floor 6). An obstacle should block like terrain rising to its drawn top (its cell height + its block height), so high ground sees over low blocks. Reopens the slice's line-of-sight rule (`decisions/2026-09-27-tactical-rpg-slice.md`); the AI and targeting previews follow the rule.
+- **Undo a move** — a hero can take back its move(s) as long as it hasn't cast anything this turn (Disgaea-style). The slice already kept actions as commands and views re-syncing from state so undo stays cheap (`decisions/2026-09-27-tactical-rpg-slice.md`, "Undo"); needs a snapshot of the unit before its first move, an Undo button / key, and the AI never using it.
+- **Localization** — translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
+- **Runes during a run** — today runes can't be changed between floors, but the player can leave to the hub, re-equip, and continue the run: a workaround that makes the rule meaningless. Pick one, consistently: (a) **allow** equipping between floors (a Party button on the run screen) — found loot is usable right away; or (b) **lock** rune changes while a run is saved (the hub shows them read-only until the run ends or is abandoned). Recommended: (a), since players already can and fresh loot is part of the fun.
 
 ## Open questions
 

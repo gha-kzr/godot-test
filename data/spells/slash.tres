@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_330tk"]
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_vdsym"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_psooy"]
+[ext_resource type="Texture2D" uid="uid://83tmlle3hp07" path="res://ui/icons/slash.svg" id="5_330tk"]
 
 [sub_resource type="Resource" id="Resource_madm1"]
 script = ExtResource("1_ukuvu")
@@ -18,6 +19,7 @@ damage_type = ExtResource("3_vdsym")
 [resource]
 script = ExtResource("4_psooy")
 display_name = "Slash"
+icon = ExtResource("5_330tk")
 needs_line_of_sight = false
 area = SubResource("Resource_madm1")
 effects = Array[ExtResource("2_vdsym")]([SubResource("Resource_cdp04")])

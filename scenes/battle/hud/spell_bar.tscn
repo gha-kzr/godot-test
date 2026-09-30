@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bv3003qifvei0"]
+
+[ext_resource type="Script" uid="uid://d0nrofk2p0sny" path="res://scripts/view/hud/spell_bar.gd" id="1_bar"]
+
+[node name="SpellBar" type="VBoxContainer"]
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 2
+script = ExtResource("1_bar")
+
+[node name="DetailsSlot" type="Control" parent="."]
+custom_minimum_size = Vector2(380, 130)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Details" type="PanelContainer" parent="DetailsSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Box" type="VBoxContainer" parent="DetailsSlot/Details"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="HBoxContainer" parent="DetailsSlot/Details/Box"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="DetailsName" type="Label" parent="DetailsSlot/Details/Box/Title"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Spell"
+
+[node name="DetailsCost" type="Label" parent="DetailsSlot/Details/Box/Title"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 AP"
+
+[node name="DetailsBody" type="Label" parent="DetailsSlot/Details/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+autowrap_mode = 3
+
+[node name="Slots" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
