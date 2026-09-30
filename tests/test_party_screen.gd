@@ -95,7 +95,7 @@ func test_the_hub_asks_for_a_tower_run_or_a_stage() -> void:
 	(screen.find_child("TowerButton", true, false) as Button).pressed.emit()
 	(screen.find_child("Stage1", true, false) as Button).pressed.emit()
 	assert_eq(requests, [["tower", 11], ["stage", 1]], "the highest starting floor by default")
-	assert_true((screen.find_child("Stage0", true, false) as Button).text.ends_with("✓"), "cleared")
+	assert_true((screen.find_child("Stage0", true, false) as Button).text.ends_with("(cleared)"), "cleared")
 	assert_true((screen.find_child("Stage2", true, false) as Button).disabled, "locked")
 	screen.free()
 

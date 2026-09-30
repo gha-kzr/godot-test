@@ -12,8 +12,8 @@ const MAX_SCREEN_FRACTION := 0.9
 func _ready() -> void:
 	var window := get_window()
 	# Headless runs have no real window; a game embedded in the editor's Game tab is sized
-	# by the editor.
-	if DisplayServer.get_name() == "headless" or Engine.is_embedded_in_editor() \
+	# by the editor; in a browser the page sizes the canvas (resizing it offsets it).
+	if DisplayServer.get_name() == "headless" or Engine.is_embedded_in_editor() or OS.has_feature("web") \
 			or window.mode != Window.MODE_WINDOWED:
 		return
 	var base := Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"),

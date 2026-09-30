@@ -40,6 +40,11 @@ Run these from the repo root:
 | Render frames to PNG (visual check; needs a window, not `--headless`) | `godot --write-movie /tmp/shot.png --fixed-fps 10 --quit-after 30 scenes/battle/battle.tscn` |
 | Open the editor | `godot -e` |
 | Export (needs `export_presets.cfg`) | `godot --headless --export-release "<preset>" build/<file>` |
+| Web build into `build/web` (needs the 4.7.2 export templates); `--publish` also commits it to the local `gh-pages` branch | `tools/export_web.sh [--publish]` |
+
+## Web build (GitHub Pages)
+
+The `Web` preset (`export_presets.cfg`) exports single-threaded, so it runs on GitHub Pages, which can't send the headers threads need; the web build uses the Compatibility renderer (`rendering_method.web` in `project.godot`). `tools/export_web.sh --publish` builds and commits it to an orphan `gh-pages` branch; push that branch (`git push origin gh-pages`) and set **Settings → Pages → Deploy from a branch → `gh-pages` / root**. Saves and settings live in the browser's storage (per browser and address).
 
 ## Playing
 

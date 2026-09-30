@@ -36,7 +36,7 @@ layout_mode = 2
 size_flags_vertical = 0
 focus_mode = 0
 theme_type_variation = &"CloseButton"
-text = "✕"
+text = "X"
 
 [node name="HpBar" type="ProgressBar" parent="Rows"]
 unique_name_in_owner = true

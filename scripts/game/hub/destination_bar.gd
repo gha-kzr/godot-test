@@ -38,7 +38,7 @@ func show_destinations(profile: Profile, tower: TowerConfig) -> void:
 	var stages: Array[Control] = []
 	for index in tower.stages.size():
 		var stage := tower.stages[index]
-		var button := _action("Stage%d" % index, stage.display_name + (" ✓" if stage in profile.cleared_stages else ""),
+		var button := _action("Stage%d" % index, stage.display_name + (" (cleared)" if stage in profile.cleared_stages else ""),
 				stage_pressed.emit.bind(index))
 		if not profile.is_stage_available(tower, stage):
 			button.text = LOCKED_TEXT % stage.display_name

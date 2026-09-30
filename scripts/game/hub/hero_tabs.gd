@@ -1,6 +1,6 @@
 class_name HeroTabs
 extends VBoxContainer
-## One toggle button per hero of the roster (name, level, ★ when in the party); locked
+## One toggle button per hero of the roster (name, level); locked
 ## heroes are disabled. Selecting one is reported as a signal up.
 
 signal hero_selected(hero_index: int)
@@ -22,8 +22,7 @@ func show_heroes(profile: Profile, selected: int) -> void:
 		var tab := HubStyle.button("", "Hero%d" % index)
 		tab.custom_minimum_size = Vector2(0, 48)
 		if profile.is_unlocked(index):
-			var in_party := " ★" if index in profile.party else ""
-			tab.text = "%s  Lv %d%s" % [record.hero.display_name(), record.level, in_party]
+			tab.text = "%s  Lv %d" % [record.hero.display_name(), record.level]
 			tab.toggle_mode = true
 			tab.button_pressed = index == selected
 			tab.pressed.connect(hero_selected.emit.bind(index))

@@ -23,6 +23,10 @@ signal battle_finished(state: BattleState)
 ## PLACING: before the first turn, heroes are rearranged in the start zone until Ready.
 enum State { PLACING, IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
 
+## The web build's Compatibility renderer lights the same scene brighter than Forward+
+## (no filmic tonemapping), so its lights are scaled down.
+const WEB_LIGHT_SCALE := 0.6
+
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
 
@@ -94,6 +98,9 @@ func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers
 
 
 func _ready() -> void:
+	if OS.has_feature("web"):
+		$DirectionalLight3D.light_energy *= WEB_LIGHT_SCALE
+		$WorldEnvironment.environment.ambient_light_energy *= WEB_LIGHT_SCALE
 	hud.spell_selected.connect(select_spell)
 	hud.end_turn_pressed.connect(end_turn)
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
