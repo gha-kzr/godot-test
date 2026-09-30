@@ -79,11 +79,14 @@ class SpellCast extends Event:
 class DamageDealt extends UnitEvent:
 	var amount: int
 	var hp_after: int
+	## What kind of damage it was (null: untyped), for the view to pick its effect.
+	var damage_type: DamageType
 
-	func _init(unit: int, damage: int, hp: int) -> void:
+	func _init(unit: int, damage: int, hp: int, type: DamageType = null) -> void:
 		unit_id = unit
 		amount = damage
 		hp_after = hp
+		damage_type = type
 
 
 class Healed extends UnitEvent:

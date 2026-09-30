@@ -24,10 +24,21 @@ const ACTIVE_PULSE_DURATION := 0.5
 const STATUS_ICON_SIZE := 0.46
 const STATUS_TAG_SPACING := 0.62
 const STATUS_TAG_PIXEL_SIZE := 0.009
-## Damage preview badge: height above the unit, number size relative to the HP label, and
-## the world size and spacing of its skull and status icons.
+## The placeholder capsule's height, and how far above a unit's head its HP label, status
+## icons and damage preview float (they follow the model's height and the elite / boss scale).
+const PLACEHOLDER_HEIGHT := 0.9
+const HP_LABEL_ABOVE := 0.35
+const STATUS_ROW_ABOVE := 1.0
+const PREVIEW_ABOVE := 1.6
+## A dying model gets this long to fall before it shrinks away (seconds). Other actions don't
+## hold the event queue at all: an animation plays out on its own (the model returns to Idle
+## when it ends, or the next action replaces it), so the turn isn't slowed and the player can
+## act at once.
+const MODEL_DEATH_TIME := 0.5
+const MODEL_DEATH_SHRINK := 0.25
+## Damage preview badge: number size relative to the HP label, and the world size and
+## spacing of its skull and status icons.
 const SKULL_ICON := preload("res://ui/icons/skull.svg")
-const PREVIEW_HEIGHT := 2.5
 const PREVIEW_FONT_SCALE := 1.4
 const PREVIEW_ICON_SIZE := 0.42
 const PREVIEW_ICON_SPACING := 0.5
@@ -46,6 +57,12 @@ var _visual_scale := 1.0
 var _status_tags: Dictionary[StatusData, Node3D] = {}
 ## The damage preview badge (see show_preview), or null.
 var _preview: Node3D
+## The pack model, or null for the placeholder capsule.
+var _model: UnitModel
+## How tall the unit stands before the elite / boss scale (the model's or the capsule's).
+var _head_height := PLACEHOLDER_HEIGHT
+## Where the damage preview floats (above the head, set by _layout_anchors).
+var _preview_y := PLACEHOLDER_HEIGHT + PREVIEW_ABOVE
 
 @onready var _body: Node3D = $Body
 @onready var _placeholder: MeshInstance3D = $Body/Placeholder
@@ -71,7 +88,9 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	if unit.data.model_scene != null:
 		_placeholder.queue_free()
 		_placeholder = null
-		_body.add_child(unit.data.model_scene.instantiate())
+		_model = UnitModel.new()
+		_body.add_child(_model)
+		_model.setup(unit.data.model_scene, unit.data.model_scale, unit.data.skin_color)
 	else:
 		_material = StandardMaterial3D.new()
 		_material.albedo_color = unit.data.color
@@ -80,7 +99,24 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	ring_material.albedo_color = PLAYER_RING_COLOR if unit.team == UnitState.Team.PLAYER else ENEMY_RING_COLOR
 	ring_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_ring.material_override = ring_material
+	_head_height = unit.data.model_height if _model != null else PLACEHOLDER_HEIGHT
+	_layout_anchors(_head_height)
 	sync(unit)
+
+
+## Puts the HP label, status icons, damage preview and click target around a unit `height`
+## tall (scaled by the elite / boss visual scale).
+func _layout_anchors(height: float) -> void:
+	var head := height * _visual_scale
+	_hp_label.position.y = head + HP_LABEL_ABOVE
+	_status_row.position.y = head + STATUS_ROW_ABOVE
+	_preview_y = head + PREVIEW_ABOVE
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.3 * _visual_scale
+	capsule.height = maxf(head, capsule.radius * 2.0 + 0.01)
+	var collision := _pick_body.get_node("Collision") as CollisionShape3D
+	collision.shape = capsule
+	collision.position.y = head / 2.0
 
 
 ## Snaps the view to the unit's state: cell, HP, alive or not. Called after every
@@ -96,6 +132,8 @@ func sync(unit: UnitState) -> void:
 	if alive:  # Undo a death squash (e.g. after undo or a desync).
 		_body.scale = Vector3.ONE * _visual_scale
 		_ring.scale = Vector3.ONE * _visual_scale
+		if _model != null:
+			_model.reset()
 	_clear_status_tags()
 	for status in unit.statuses:
 		_set_status_tag(status.data, status.turns_left)
@@ -103,6 +141,7 @@ func sync(unit: UnitState) -> void:
 
 ## Walks the path cell by cell. Climbs go up then across, drops go across then down.
 func play_move(path: Array[Vector2i]) -> void:
+	_play_model(&"Walk")
 	for cell in path:
 		var target := _board.cell_to_world(cell)
 		_face(target)
@@ -115,6 +154,7 @@ func play_move(path: Array[Vector2i]) -> void:
 		await tween.finished
 		position = target
 		_pick_body.set_meta(BoardView.CELL_META, cell)
+	_play_model(&"Idle")
 
 
 ## Before the battle: a quick hop to another start cell.
@@ -131,7 +171,8 @@ func play_place(cell: Vector2i) -> void:
 
 
 ## A short lunge toward the target cell (a hop when casting on its own cell).
-func play_cast(target_cell: Vector2i) -> void:
+func play_cast(target_cell: Vector2i, spell: SpellData = null) -> void:
+	_play_model(_cast_animation(spell))
 	var target := _board.cell_to_world(target_cell)
 	var offset := Vector3(target.x - position.x, 0.0, target.z - position.z)
 	var start := position
@@ -146,6 +187,8 @@ func play_cast(target_cell: Vector2i) -> void:
 
 
 func play_hit(amount: int, hp_after: int) -> void:
+	if amount > 0:
+		_play_model(&"Hit")  # Plays on while the queue moves on; Idle follows by itself.
 	await _play_hp_change("-%d" % amount, DAMAGE_COLOR, hp_after)
 
 
@@ -190,7 +233,7 @@ func show_preview(entry: DamagePreview.Entry) -> void:
 	clear_preview()
 	_preview = Node3D.new()
 	_preview.name = "Preview"
-	_preview.position = Vector3(0.0, PREVIEW_HEIGHT, 0.0)
+	_preview.position = Vector3(0.0, _preview_y, 0.0)
 	var amount := Label3D.new()
 	amount.name = "Amount"
 	amount.text = entry.amount_text()
@@ -267,9 +310,13 @@ func play_death() -> void:
 	set_active(false)
 	_hp_label.hide()
 	_pick_body.collision_layer = 0  # Hidden nodes still collide; dead units can't be clicked.
+	var length := _play_model(&"Death")
+	if length > 0.0:
+		await create_tween().tween_interval(minf(length, MODEL_DEATH_TIME)).finished
 	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tween.tween_property(_body, "scale", Vector3(1.2, 0.05, 1.2), DEATH_DURATION)
-	tween.tween_property(_ring, "scale", Vector3.ZERO, DEATH_DURATION)
+	var shrink := MODEL_DEATH_SHRINK if length > 0.0 else DEATH_DURATION
+	tween.tween_property(_body, "scale", Vector3(1.2, 0.05, 1.2), shrink)
+	tween.tween_property(_ring, "scale", Vector3.ZERO, shrink)
 	await tween.finished
 	hide()
 
@@ -314,6 +361,8 @@ func _play_hp_change(text: String, color: Color, hp_after: int) -> void:
 		tween.tween_property(_material, "albedo_color", color, HIT_DURATION * 0.3)
 		tween.tween_property(_material, "albedo_color", base, HIT_DURATION * 0.7)
 	else:
+		if _model != null:
+			_model.flash(color, HIT_DURATION)
 		tween.tween_interval(HIT_DURATION)
 	await tween.finished
 
@@ -392,6 +441,48 @@ func _layout_status_tags() -> void:
 	for status in _status_tags:
 		_status_tags[status].position = Vector3((index - (count - 1) / 2.0) * STATUS_TAG_SPACING, 0.0, 0.0)
 		index += 1
+
+
+## Plays a logical animation on the model; returns its length (0 for a placeholder or a model
+## without it).
+func _play_model(logical: StringName) -> float:
+	return _model.play(logical) if _model != null else 0.0
+
+
+## Attack for a melee damage spell, Cast otherwise, unless the spell names its own animation.
+func _cast_animation(spell: SpellData) -> StringName:
+	if spell == null:
+		return &"Attack"
+	if not spell.cast_animation.is_empty():
+		return spell.cast_animation
+	var damages := spell.effects.any(func(effect: EffectData) -> bool: return effect is DamageEffect)
+	return &"Attack" if damages and spell.max_range <= 1 else &"Cast"  # A buff or a heal is not a sword swing.
+
+
+## Plays an effect scene on the unit (at chest height, scaled with the unit); it frees itself.
+## A null scene does nothing.
+func spawn_fx(scene: PackedScene, tint := Color.WHITE) -> void:
+	if scene == null:
+		return
+	var effect := scene.instantiate() as Node3D
+	if effect is Fx and tint != Color.WHITE:
+		(effect as Fx).set_tint(tint)
+	effect.position.y = _head_height * _visual_scale * 0.6
+	effect.scale = Vector3.ONE * _visual_scale
+	add_child(effect)
+
+
+## Turns toward a board cell (the model faces where it is going or what it targets).
+func face_cell(cell: Vector2i) -> void:
+	_face(_board.cell_to_world(cell))
+
+
+func has_model() -> bool:
+	return _model != null
+
+
+func model() -> UnitModel:
+	return _model
 
 
 func _set_hp(hp: int) -> void:

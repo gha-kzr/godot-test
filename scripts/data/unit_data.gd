@@ -17,8 +17,17 @@ extends Resource
 @export_group("Visuals")
 ## Placeholder color used when no model_scene is set.
 @export var color := Color.WHITE
-## Optional model from an asset pack; replaces the placeholder capsule.
+## Optional model from an asset pack; replaces the placeholder capsule. Its animations are
+## found by name (see UnitModel), so models from any pack work; a new hero or enemy is a model
+## file plus these fields.
 @export var model_scene: PackedScene
+## Scales the model to the board (a cell is one world unit wide).
+@export_range(0.05, 5.0) var model_scale := 1.0
+## How tall the scaled model stands, in world units: where the HP label, status icons and
+## damage preview float, and how tall the click target is.
+@export_range(0.3, 4.0) var model_height := 1.1
+## Replaces the model's "Skin" material color; alpha 0 keeps the pack's own.
+@export var skin_color := Color(0, 0, 0, 0)
 
 
 func get_validation_errors() -> PackedStringArray:

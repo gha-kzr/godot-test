@@ -270,3 +270,160 @@ func test_preview_badge_shows_amount_skull_and_status_icons() -> void:
 	stage.units.clear_previews()
 	assert_false(view.has_preview())
 	_done(stage)
+
+
+# --- Models ---
+
+const KNIGHT_MODEL := preload("res://assets/quaternius/characters/Knight_Male.fbx")
+
+
+func _model_unit(unit_name: String, initiative: int, height := 1.4) -> UnitData:
+	var data := BattleFixtures.unit(unit_name, initiative, 3, 6, 20)
+	data.spells = [BattleFixtures.damage_spell()] as Array[SpellData]
+	data.model_scene = KNIGHT_MODEL
+	data.model_scale = 0.5
+	data.model_height = height
+	return data
+
+
+func _model_stage(layout := "0p 0 0 0e", enemy_scale := 1.0) -> Stage:
+	Engine.time_scale = TIME_SCALE
+	var state := BattleFixtures.state_with(layout, [_model_unit("P0", 200)], [_model_unit("E0", 100, 1.4)])
+	state.units[1].visual_scale = enemy_scale
+	var battle := Battle.new(state)
+	battle.start()
+	return Stage.new(battle)
+
+
+func _animation_of(view: UnitView) -> String:
+	return (view.model().find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer).current_animation
+
+
+func test_a_unit_with_a_model_replaces_the_capsule_and_starts_idle() -> void:
+	var stage := _model_stage()
+	var view := stage.units.view(0)
+	assert_true(view.has_model())
+	var capsule := view.get_node("Body").find_child("Placeholder", true, false)
+	assert_true(capsule == null or capsule.is_queued_for_deletion(), "the capsule is on its way out")
+	assert_true(_animation_of(view).ends_with("|Idle"), _animation_of(view))
+	_done(stage)
+
+
+func test_labels_icons_preview_and_click_target_follow_the_model_height_and_scale() -> void:
+	var stage := _model_stage("0p 0 0 0e", 1.5)
+	var hero := stage.units.view(0)
+	var boss := stage.units.view(1)
+	assert_true(is_equal_approx(hero.get_node("HpLabel").position.y, 1.4 + UnitView.HP_LABEL_ABOVE))
+	assert_true(is_equal_approx(hero.get_node("StatusRow").position.y, 1.4 + UnitView.STATUS_ROW_ABOVE))
+	assert_true(is_equal_approx(boss.get_node("HpLabel").position.y, 1.4 * 1.5 + UnitView.HP_LABEL_ABOVE), "scaled with the boss")
+	assert_true(is_equal_approx(boss.get_node("StatusRow").position.y, 1.4 * 1.5 + UnitView.STATUS_ROW_ABOVE))
+	var shape := (boss.get_node("PickBody/Collision") as CollisionShape3D).shape as CapsuleShape3D
+	assert_true(is_equal_approx(shape.height, 1.4 * 1.5) and is_equal_approx(shape.radius, 0.3 * 1.5), "the click target grows too")
+	var entry := DamagePreview.Entry.new()
+	entry.max_damage = 5
+	boss.show_preview(entry)
+	assert_true(is_equal_approx(boss.get_node("Preview").position.y, 1.4 * 1.5 + UnitView.PREVIEW_ABOVE), "and the damage preview")
+	_done(stage)
+
+
+func test_a_placeholder_keeps_its_old_anchors() -> void:
+	var stage := _stage()
+	var view := stage.units.view(0)
+	assert_false(view.has_model())
+	assert_true(is_equal_approx(view.get_node("HpLabel").position.y, 1.25), "0.9 + 0.35, as before")
+	_done(stage)
+
+
+func test_melee_spells_attack_ranged_ones_cast_and_a_spell_can_name_its_animation() -> void:
+	var stage := _model_stage()
+	var view := stage.units.view(0)
+	assert_eq(view._cast_animation(BattleFixtures.damage_spell(3, 1, 1)), &"Attack")
+	assert_eq(view._cast_animation(BattleFixtures.damage_spell(3, 1, 4)), &"Cast")
+	assert_eq(view._cast_animation(null), &"Attack")
+	var special := BattleFixtures.damage_spell(3, 1, 4)
+	special.cast_animation = &"Victory"
+	assert_eq(view._cast_animation(special), &"Victory")
+	_done(stage)
+
+
+func test_walking_hitting_casting_and_dying_play_their_animations() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	var view := stage.units.view(0)
+	var wait := func(seconds: float) -> void:
+		await (Engine.get_main_loop() as SceneTree).create_timer(seconds).timeout
+	(func() -> void: await view.play_move([Vector2i(1, 0)] as Array[Vector2i])).call()  # Runs until its first await.
+	assert_true(_animation_of(view).ends_with("|Walk"), "walking: %s" % _animation_of(view))
+	await wait.call(2.0)
+	assert_true(_animation_of(view).ends_with("|Idle"), "idle again")
+	(func() -> void: await view.play_cast(Vector2i(2, 0), BattleFixtures.damage_spell(3, 1, 1))).call()
+	assert_true(_animation_of(view).ends_with("|SwordSlash"), "a melee spell slashes: %s" % _animation_of(view))
+	await wait.call(2.0)
+	var victim := stage.units.view(1)
+	(func() -> void: await victim.play_hit(3, 10)).call()
+	assert_true(_animation_of(victim).ends_with("|RecieveHit"), "hit: %s" % _animation_of(victim))
+	await wait.call(2.0)
+	assert_true(_animation_of(victim).ends_with("|Idle"), "back to idle when it survives")
+	(func() -> void: await victim.play_death()).call()
+	assert_true(_animation_of(victim).ends_with("|Death"), "death: %s" % _animation_of(victim))
+	await wait.call(3.0)
+	assert_false(victim.visible)
+	_done(stage)
+
+
+func test_units_start_facing_the_nearest_enemy() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	# The hero at (0, 0) looks along +x toward the enemy at (3, 0): a yaw of a quarter turn.
+	assert_true(is_equal_approx(stage.units.view(0).get_node("Body").rotation.y, PI / 2.0), "hero faces +x")
+	assert_true(is_equal_approx(stage.units.view(1).get_node("Body").rotation.y, -PI / 2.0), "enemy faces -x")
+	_done(stage)
+
+
+func test_the_shipped_roster_has_models() -> void:
+	for unit_name in ["knight", "mage", "ranger", "archer", "brute"]:
+		var data := load("res://data/units/%s.tres" % unit_name) as UnitData
+		assert_true(data.model_scene != null, "%s has a model" % unit_name)
+		assert_true(data.model_scale > 0.0 and data.model_height > 0.0, "%s has a scale and a height" % unit_name)
+
+
+func test_a_synced_dead_then_alive_unit_stands_again() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	var victim := stage.units.view(1)
+	(func() -> void: await victim.play_death()).call()
+	await (Engine.get_main_loop() as SceneTree).create_timer(3.0).timeout
+	assert_false(victim.visible)
+	stage.units.sync(stage.battle.state)  # The state says it is alive (a desync or an undo).
+	assert_true(victim.visible)
+	assert_true(_animation_of(victim).ends_with("|Idle"), "not left in the Death pose: %s" % _animation_of(victim))
+	_done(stage)
+
+
+func test_a_hit_that_did_no_damage_plays_no_hit_animation() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	var victim := stage.units.view(1)
+	victim.model().play(&"Walk")  # Mid-walk, say: a hit that does nothing must not touch its animation.
+	(func() -> void: await victim.play_hit(0, 20)).call()
+	await (Engine.get_main_loop() as SceneTree).create_timer(0.8).timeout
+	assert_true(_animation_of(victim).ends_with("|Walk"), "untouched: %s" % _animation_of(victim))
+	await (Engine.get_main_loop() as SceneTree).create_timer(1.0).timeout
+	_done(stage)
+
+
+func test_casting_and_hitting_dont_hold_the_queue_for_the_whole_animation() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	var hero := stage.units.view(0)
+	await hero.play_cast(Vector2i(1, 0), BattleFixtures.damage_spell(3, 1, 1))
+	assert_true(_animation_of(hero).ends_with("|SwordSlash"), "the queue moved on while the slash goes on: %s" % _animation_of(hero))
+	var victim := stage.units.view(1)
+	await victim.play_hit(3, 10)
+	assert_true(_animation_of(victim).ends_with("|RecieveHit"), "same for the flinch: %s" % _animation_of(victim))
+	_done(stage)
+
+
+func test_a_buff_or_a_heal_is_cast_not_swung() -> void:
+	var stage := _model_stage("0p 0 0 0e")
+	var view := stage.units.view(0)
+	var heal := HealEffect.new()
+	var mend := BattleFixtures.effect_spell([heal] as Array[EffectData], 3, 0, 1)
+	assert_eq(view._cast_animation(mend), &"Cast", "a heal of range 1 isn't a sword swing")
+	assert_eq(view._cast_animation(BattleFixtures.damage_spell(3, 1, 1)), &"Attack", "a melee damage spell still is")
+	_done(stage)

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://0cdbhoqsxges"]
+
+[ext_resource type="Script" uid="uid://cswcnbx4c84lq" path="res://scripts/view/fx.gd" id="1_fx"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 0.8, 0.25, 1, 1, 0.2, 0.05, 0)
+
+[sub_resource type="StandardMaterial3D" id="Material_1"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="SphereMesh" id="Mesh_1"]
+material = SubResource("Material_1")
+radius = 0.06
+height = 0.12
+radial_segments = 6
+rings = 3
+
+[node name="ImpactFire" type="Node3D"]
+script = ExtResource("1_fx")
+duration = 1.0
+
+[node name="Burst" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 22
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("Mesh_1")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 1.2
+initial_velocity_max = 3.0
+gravity = Vector3(0, 2.5, 0)
+scale_amount_min = 0.7
+scale_amount_max = 1.4
+color_ramp = SubResource("Gradient_1")

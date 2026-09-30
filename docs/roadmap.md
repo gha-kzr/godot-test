@@ -75,9 +75,9 @@ Decisions: `decisions/2026-09-30-playtest-polish.md`; plan: `plans/2026-09-30-pl
 - The floor-cleared screen shows XP text and a two-tone bar (lighter gold for the XP just gained); a rune can be dropped from the stash (inline confirm).
 
 ### 6. Art and audio
-- Replace the placeholder capsules and boxes: unit models and animations (idle, walk, cast, hit, death) through `UnitData.model_scene`, board tiles and props through `BoardTheme` — slice plan item 4 (display polish and asset integration).
-- Spell VFX and particles, hit and heal feedback; sound effects and music.
-- Visual scale for elites and bosses carried to labels, pick colliders and status tags.
+Split in **6a art** (done) and **6b audio**. Decisions: `decisions/2026-10-01-art.md`; plan: `plans/2026-10-01-art.md`.
+- **6a — done:** Quaternius CC0 character models with one shared animation set (idle, walk, attack / cast, hit, death) for the three heroes and two enemies, carried to elite and boss scale (labels, click targets, status icons); a toon-shaded, speckled board with rock obstacles fitted to the cube; particle effects per damage type and for heals, with data fields for heavier per-spell effects later. More heroes and enemies are a model file plus data (the pack has 50+ characters).
+- **6b — next:** sound effects (UI, hits, heals, spells, footsteps, deaths, turn start), music (hub, battle, victory / defeat), volume settings (master / music / effects, mute) in the settings screen, CC0 sources credited. Grill first.
 
 *Why here:* the display already reads everything from data (`model_scene`, `BoardTheme`), so assets slot in without rule changes; independent of the UI revamp.
 
@@ -100,6 +100,10 @@ Ideas to schedule into a milestone (grill them first):
 - **Localization** — translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
 
 - **Managing accumulating runes, beyond dropping** — dropping a rune is done (5d), but the stash can still grow large, and a dropped rune is just gone. Options to grill: (b) **sell** runes for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions: is a currency wanted in the game at all, what would it buy, and is the stash a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` and the drop rules (`LootTable`).
+
+- **Settings credits show contributor rules** — the Credits section of the settings screen prints `CREDITS.md` line by line, including its intro and the "add a row whenever an external file is added" rule, which are for contributors, not players. Show only the credit rows (asset, author, license, source), e.g. by keeping the contributor rules out of the file the screen reads (a separate `docs/` note) or by reading only the table. To do with the credits work of milestone 6 (it grows with every asset).
+
+- **Camera follows a walking unit** — the camera now slides to the acting unit at the start of each turn, but stays put while that unit walks, so a long move can leave the screen. Follow the unit along its path (the view position is already animated cell by cell in `UnitView.play_move`), probably by easing the focus point toward the unit during a move and stopping when the player pans; decide whether it applies to enemy moves too (likely yes) and whether to skip it for short moves that stay on screen. Touches `CameraRig` (a follow target) and `BattleController` / `EventPlayer` (start and stop around `UnitMoved`).
 
 ## Open questions
 

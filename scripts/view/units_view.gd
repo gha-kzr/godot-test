@@ -17,6 +17,14 @@ func build(state: BattleState, board: BoardView) -> void:
 		add_child(view)  # Before setup(), so its @onready nodes are set.
 		view.setup(unit, board)
 		_views[unit.id] = view
+	# Everyone starts facing the nearest unit of the other team.
+	for unit in state.units:
+		var nearest: UnitState = null
+		for other in state.units:
+			if other.team != unit.team and (nearest == null or Targeting.distance(unit.cell, other.cell) < Targeting.distance(unit.cell, nearest.cell)):
+				nearest = other
+		if nearest != null:
+			_views[unit.id].face_cell(nearest.cell)
 
 
 ## Snaps every view to the state (see UnitView.sync).
@@ -43,6 +51,14 @@ func show_previews(entries: Array[DamagePreview.Entry]) -> void:
 func clear_previews() -> void:
 	for id in _views:
 		_views[id].clear_preview()
+
+
+## Whether a living unit is drawn on the cell.
+func has_unit_at(cell: Vector2i) -> bool:
+	for id in _views:
+		if _views[id].picked_cell() == cell:
+			return true
+	return false
 
 
 ## The view of a unit, or null (without an error) for -1 or an unknown id.

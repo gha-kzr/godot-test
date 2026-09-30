@@ -554,7 +554,18 @@ func _update_inspected() -> void:
 	if shown == null:
 		hud.hide_inspected()
 	else:
+		hud.set_inspect_side(_unit_is_right_of_center(shown.unit_id))
 		hud.show_inspected(shown, pinned)
+
+
+## Whether a unit is drawn in the right half of the screen, where the inspect card would
+## sit on top of it: the card goes to the left edge then (and to the right otherwise).
+func _unit_is_right_of_center(unit_id: int) -> bool:
+	var view := units_view.find_view(unit_id)
+	if view == null:
+		return false
+	var screen_x := camera_rig.camera.unproject_position(units_view.to_global(view.position)).x
+	return screen_x > get_viewport().get_visible_rect().size.x * 0.5
 
 
 ## The unit shown on the active card: the acting one, or (placing) the selected hero, else the first.

@@ -14,6 +14,10 @@ extends Resource
 @export_range(0.0, 0.3) var lighten_per_level := 0.08
 @export var obstacle_color := Color(0.48, 0.44, 0.4)
 @export var pit_color := Color(0.04, 0.04, 0.06)
+## Cartoon shading for the terrain: a hard light / shadow step instead of a smooth gradient.
+@export var toon := true
+## Speckle on the terrain, as a fraction of brightness (0 for flat colors).
+@export_range(0.0, 0.3) var noise_strength := 0.05
 
 @export_group("Highlights")
 ## The start zone while placing heroes.
@@ -29,5 +33,8 @@ extends Resource
 ## Replaces a floor cell's placeholder column. Instanced with its origin at the cell's
 ## top center; the model should extend downward to the base.
 @export var floor_scene: PackedScene
-## Replaces the placeholder block standing on an obstacle cell. Origin at the cell's top center.
-@export var obstacle_scene: PackedScene
+## Models replacing the placeholder block on an obstacle cell, one picked per cell. Each is
+## stretched to fill the obstacle's cube exactly (one cell wide and deep, `Grid.obstacle_levels`
+## levels tall) and stands on the cell's top: rocks, crates, statues fit; what is drawn is
+## what blocks line of sight. Static models only.
+@export var obstacle_scenes: Array[PackedScene] = []

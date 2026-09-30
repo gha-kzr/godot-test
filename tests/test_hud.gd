@@ -610,3 +610,18 @@ func test_clicking_a_row_of_the_full_order_looks_at_that_unit_and_closes_the_ove
 	for control: Control in [rows[0], rows[0].get_node("Line"), rows[0].get_node("Line/HpBox")]:
 		assert_true(control == rows[0] and control.mouse_filter == Control.MOUSE_FILTER_STOP or control != rows[0] and control.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: only the row takes the click" % control.name)
 	hud.free()
+
+
+func test_the_inspect_card_can_sit_on_either_edge() -> void:
+	var hud := _hud()
+	var card := hud.get_node("%InspectCard") as Control
+	hud.show_inspected(_info("Brute", false))
+	assert_false(hud.is_inspect_on_left(), "right by default")
+	hud.set_inspect_side(true)
+	assert_true(hud.is_inspect_on_left())
+	assert_eq([card.anchor_left, card.anchor_right, card.offset_left, card.offset_right], [0.0, 0.0, 12.0, 262.0])
+	assert_eq(card.grow_horizontal, Control.GROW_DIRECTION_END)
+	hud.set_inspect_side(false)
+	assert_eq([card.anchor_left, card.anchor_right, card.offset_left, card.offset_right], [1.0, 1.0, -262.0, -12.0])
+	assert_eq(card.grow_horizontal, Control.GROW_DIRECTION_BEGIN)
+	hud.free()

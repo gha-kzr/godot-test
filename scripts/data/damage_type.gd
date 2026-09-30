@@ -8,6 +8,9 @@ const DIRECTORY := "res://data/damage_types"
 
 @export var display_name := ""
 @export var color := Color.WHITE
+## The effect shown on a unit hit by this damage (a scene with a script `Fx` root, e.g. a particle
+## burst); a spell can override it (`SpellData.impact_effect`). Empty: the default one.
+@export var impact_effect: PackedScene
 ## Display order (lower first), e.g. in the HUD's resistance list.
 @export var sort_order := 0
 

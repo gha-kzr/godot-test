@@ -23,6 +23,7 @@ const CELL_META := &"cell"
 const HIGHLIGHT_LIFT := 0.02
 const HIGHLIGHT_LAYER_GAP := 0.01
 const PIT_DEPTH := 2.0
+const NOISE_SIZE := 16
 ## Path cost labels: height above the cell, size, and colors (total, climbing steps).
 const PATH_LABEL_HEIGHT := 0.9
 const PATH_LABEL_PIXEL_SIZE := 0.008
@@ -52,6 +53,8 @@ var _highlight_groups: Dictionary[Highlight, Node3D] = {}
 var _materials: Dictionary[Color, StandardMaterial3D] = {}
 var _overlay_materials: Dictionary[Color, StandardMaterial3D] = {}
 var _highlight_mesh := PlaneMesh.new()
+var _noise: ImageTexture
+var _noise_strength := -1.0
 var _path_labels := Node3D.new()
 
 
@@ -237,10 +240,9 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 		# The rules' own height (Grid.obstacle_levels): what is drawn is what blocks sight.
 		var block_height := grid.obstacle_levels(cell) * active_theme().level_height
 		var fill_width := CELL_SIZE * active_theme().block_fill
-		if active_theme().obstacle_scene != null:
-			var model := active_theme().obstacle_scene.instantiate() as Node3D
-			model.position.y = top
-			body.add_child(model)
+		if not active_theme().obstacle_scenes.is_empty():
+			var scenes := active_theme().obstacle_scenes
+			body.add_child(_fitted_model(scenes[posmod(hash(cell), scenes.size())], top, fill_width, block_height))
 		else:
 			var block := _box(Vector3(fill_width, block_height, fill_width), top + block_height / 2.0, active_theme().obstacle_color)
 			block.name = "Obstacle"
@@ -255,6 +257,40 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 	collision.shape = shape
 	collision.position.y = (collider_top + bottom) / 2.0
 	body.add_child(collision)
+
+
+## `scene` stretched to exactly `width` × `height` × `width`, standing with its base centered at
+## height `base` on the cell.
+func _fitted_model(scene: PackedScene, base: float, width: float, height: float) -> Node3D:
+	var wrapper := Node3D.new()
+	wrapper.name = "Obstacle"
+	var model := scene.instantiate() as Node3D
+	wrapper.add_child(model)
+	var bounds := model_bounds(model)
+	var size := Vector3(maxf(bounds.size.x, 0.0001), maxf(bounds.size.y, 0.0001), maxf(bounds.size.z, 0.0001))
+	model.position -= Vector3(bounds.get_center().x, bounds.position.y, bounds.get_center().z)  # Keeps the model's own origin.
+	wrapper.scale = Vector3(width / size.x, height / size.y, width / size.z)
+	wrapper.position.y = base
+	return wrapper
+
+
+## The box around every mesh of a static model, in the model's parent space.
+static func model_bounds(root: Node3D) -> AABB:
+	var box := AABB()
+	var first := true
+	var stack: Array = [[root, root.transform]]
+	while not stack.is_empty():
+		var entry: Array = stack.pop_back()
+		var node := entry[0] as Node3D
+		var xform := entry[1] as Transform3D
+		if node is MeshInstance3D:
+			var mesh_box := xform * (node as MeshInstance3D).get_aabb()
+			box = mesh_box if first else box.merge(mesh_box)
+			first = false
+		for child in node.get_children():
+			if child is Node3D:
+				stack.append([child, xform * (child as Node3D).transform])
+	return box
 
 
 func _add_pit() -> void:
@@ -291,12 +327,36 @@ func _highlight_color(kind: Highlight) -> Color:
 
 
 ## One shared material per color (and kind), so the board batches well.
+## A small grayscale speckle around white, multiplied with the terrain colors (one per strength).
+func _noise_texture(strength: float) -> ImageTexture:
+	if _noise != null and is_equal_approx(_noise_strength, strength):
+		return _noise
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11  # The same speckle on every run.
+	var image := Image.create(NOISE_SIZE, NOISE_SIZE, false, Image.FORMAT_RGB8)
+	for y in NOISE_SIZE:
+		for x in NOISE_SIZE:
+			var shade := 1.0 - rng.randf() * strength
+			image.set_pixel(x, y, Color(shade, shade, shade))
+	_noise = ImageTexture.create_from_image(image)
+	_noise_strength = strength
+	return _noise
+
+
+## One shared material per color (and kind), so the board batches well.
 func _material(color: Color, overlay: bool) -> StandardMaterial3D:
 	var cache := _overlay_materials if overlay else _materials
 	if cache.has(color):
 		return cache[color]
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
+	if not overlay:
+		if active_theme().toon:
+			material.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
+			material.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
+		if active_theme().noise_strength > 0.0:
+			material.albedo_texture = _noise_texture(active_theme().noise_strength)
+			material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	if overlay:
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

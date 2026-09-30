@@ -198,3 +198,124 @@ func test_the_drawn_obstacle_is_the_rules_cube() -> void:
 	assert_true(is_equal_approx(size.x, BoardView.CELL_SIZE * theme.block_fill), "a full cell wide, like the terrain blocks")
 	assert_true(is_equal_approx(size.y, 1.0), "two half-cell levels: a cube of one cell")
 	board.free()
+
+
+# --- Look: toon terrain and fitted obstacle models ---
+
+const STONE := preload("res://data/board/stone.tres")
+
+
+func _themed_board(theme: BoardTheme, layout := "0p # # #\n0 # 0 0e") -> BoardView:
+	var map := MapData.new()
+	map.layout = layout
+	var board := BoardView.new()
+	board.board_theme = theme
+	board.build(map.parse().grid)
+	return board
+
+
+func _column_material(board: BoardView) -> StandardMaterial3D:
+	var column := board.find_child("Column", true, false) as MeshInstance3D
+	return column.material_override as StandardMaterial3D
+
+
+func test_the_terrain_is_toon_shaded_with_a_speckle_by_default() -> void:
+	var board := _board()
+	var material := _column_material(board)
+	assert_eq(material.diffuse_mode, BaseMaterial3D.DIFFUSE_TOON)
+	assert_eq(material.specular_mode, BaseMaterial3D.SPECULAR_DISABLED)
+	assert_true(material.albedo_texture != null, "a subtle texture")
+	assert_eq(material.texture_filter, BaseMaterial3D.TEXTURE_FILTER_NEAREST)
+	board.free()
+
+
+func test_the_look_can_be_switched_off_in_the_theme() -> void:
+	var flat := BoardTheme.new()
+	flat.toon = false
+	flat.noise_strength = 0.0
+	var board := _themed_board(flat)
+	var material := _column_material(board)
+	assert_eq(material.diffuse_mode, BaseMaterial3D.DIFFUSE_BURLEY, "the default shading")
+	assert_true(material.albedo_texture == null, "no speckle")
+	board.free()
+
+
+func test_highlights_stay_flat_and_untextured() -> void:
+	var board := _board()
+	board.show_highlight(BoardView.Highlight.REACH, [Vector2i(0, 0)] as Array[Vector2i])
+	var overlay := board.get_node("Highlights/Reach").get_child(0) as MeshInstance3D
+	var material := overlay.material_override as StandardMaterial3D
+	assert_eq(material.shading_mode, BaseMaterial3D.SHADING_MODE_UNSHADED)
+	assert_true(material.albedo_texture == null)
+	board.free()
+
+
+func test_obstacle_models_fill_the_cube_exactly_and_stand_on_the_cell() -> void:
+	var board := _themed_board(STONE)
+	var theme := board.active_theme()
+	var expected_height := board.grid.obstacle_levels(Vector2i(1, 0)) * theme.level_height
+	var expected_width := BoardView.CELL_SIZE * theme.block_fill
+	var checked := 0
+	for obstacle in board.find_children("Obstacle", "Node3D", true, false):
+		var wrapper := obstacle as Node3D
+		var bounds := BoardView.model_bounds(wrapper.get_child(0) as Node3D)
+		var size := bounds.size * wrapper.scale
+		assert_true(is_equal_approx(size.x, expected_width) and is_equal_approx(size.z, expected_width), "a cell wide and deep: %s" % size)
+		assert_true(is_equal_approx(size.y, expected_height), "as tall as the cube the rules block with: %f" % size.y)
+		var bottom := wrapper.position.y + bounds.position.y * wrapper.scale.y  # The bounds already include the model's offset.
+		var cell_top := board.cell_to_world(board.cell_from_collider(wrapper.get_parent())).y
+		assert_true(is_equal_approx(bottom, cell_top), "standing on the cell's top")
+		checked += 1
+	assert_eq(checked, 4, "every obstacle cell got a model")
+	board.free()
+
+
+func test_obstacle_variants_are_picked_by_cell_and_the_theme_has_more_than_one() -> void:
+	assert_true(STONE.obstacle_scenes.size() >= 3, "a few rocks for variety")
+	var board := _themed_board(STONE)
+	var used: Dictionary[String, bool] = {}
+	for obstacle in board.find_children("Obstacle", "Node3D", true, false):
+		used[(obstacle.get_child(0) as Node3D).scene_file_path] = true
+	assert_true(used.size() >= 2, "different cells show different rocks: %s" % [used.keys()])
+	board.free()
+
+
+func test_the_battle_scene_uses_the_stone_theme_and_a_theme_without_models_keeps_the_cubes() -> void:
+	var battle := load("res://scenes/battle/battle.tscn") as PackedScene
+	var node := battle.instantiate()
+	assert_eq((node.get_node("BoardView") as BoardView).board_theme, STONE)
+	node.free()
+	var board := _board()  # The default theme has no obstacle models.
+	var block := board.find_child("Obstacle", true, false) as MeshInstance3D
+	assert_true(block != null and block.mesh is BoxMesh, "a plain cube")
+	board.free()
+
+
+func test_a_model_whose_root_is_off_the_origin_still_stands_centered_on_the_cell() -> void:
+	var root := Node3D.new()
+	root.position = Vector3(2.0, 3.0, 1.0)  # A pack with an offset root.
+	var mesh := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(0.5, 0.2, 0.4)
+	mesh.mesh = box
+	root.add_child(mesh)
+	mesh.owner = root
+	var scene := PackedScene.new()
+	scene.pack(root)
+	root.free()
+	var board := _board()
+	var fitted := board._fitted_model(scene, 1.5, 0.96, 1.0)
+	var bounds := BoardView.model_bounds(fitted.get_child(0) as Node3D)
+	assert_true(is_equal_approx(fitted.position.y + bounds.position.y * fitted.scale.y, 1.5), "its bottom on the cell's top")
+	assert_true(is_equal_approx(bounds.get_center().x * fitted.scale.x, 0.0) and is_equal_approx(bounds.get_center().z * fitted.scale.z, 0.0), "centered")
+	assert_true(is_equal_approx(bounds.size.y * fitted.scale.y, 1.0), "as tall as asked")
+	fitted.free()
+	board.free()
+
+
+func test_the_speckle_texture_is_shared_between_terrain_colors() -> void:
+	var board := _board()
+	var a := board._material(Color(0.2, 0.4, 0.2), false)
+	var b := board._material(Color(0.5, 0.3, 0.2), false)
+	assert_true(a.albedo_texture == b.albedo_texture and a.albedo_texture != null, "one texture, not one per color")
+	board.free()

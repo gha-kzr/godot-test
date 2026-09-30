@@ -129,6 +129,20 @@ func show_inspected(info: UnitInfo, pinned := false) -> void:
 	_inspect_card.show()
 
 
+## Puts the inspect card on the left or the right edge, so it never covers the unit it shows
+## (the controller picks the side away from the unit).
+func set_inspect_side(left: bool) -> void:
+	_inspect_card.anchor_left = 0.0 if left else 1.0
+	_inspect_card.anchor_right = 0.0 if left else 1.0
+	_inspect_card.offset_left = 12.0 if left else -262.0
+	_inspect_card.offset_right = 262.0 if left else -12.0
+	_inspect_card.grow_horizontal = Control.GROW_DIRECTION_END if left else Control.GROW_DIRECTION_BEGIN
+
+
+func is_inspect_on_left() -> bool:
+	return _inspect_card.anchor_left == 0.0
+
+
 func hide_inspected() -> void:
 	_inspect_card.hide()
 	_spell_bar.hide_details()

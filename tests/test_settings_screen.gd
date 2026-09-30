@@ -132,15 +132,22 @@ func test_show_hints_again_forgets_the_dismissed_ones() -> void:
 	screen.free()
 
 
-func test_credits_turn_table_rows_into_lines() -> void:
+func test_credits_show_tables_and_headings_but_not_contributor_prose() -> void:
 	DirAccess.make_dir_recursive_absolute(CREDITS.get_base_dir())
 	var file := FileAccess.open(CREDITS, FileAccess.WRITE)
-	file.store_string("# Credits\n\n| Asset | Author |\n|---|---|\n| Icons | Lorc |\n")
+	file.store_string("# Credits\n\nAdd a row whenever a file is added.\n\n| Asset | Files | Source | Author | License |\n|---|---|---|---|---|\n| Icons | `ui/icons/*.svg` | [site](https://x.y) | Lorc | [CC BY 3.0](https://z) |\n\n## By author\n\n| Author | Icons |\n|---|---|\n| Lorc | `arrow` |\n\n- Thanks to [a friend](https://x)\n")
 	file.close()
-	var text := SettingsScreen.credits_text(CREDITS)
-	assert_eq(text.split("\n"), PackedStringArray(["Credits", "", "Asset — Author", "Icons — Lorc", ""]))
+	var lines := SettingsScreen.credits_text(CREDITS).split("\n")
+	assert_eq(lines, PackedStringArray(["Credits", "Asset — Source — Author — License", "Icons — site — Lorc — CC BY 3.0", "", "By author", "Author — Icons", "Lorc — arrow", "Thanks to a friend"]))
 	assert_eq(SettingsScreen.credits_text("user://nope.md"), SettingsScreen.CREDITS_FALLBACK)
-	assert_true(SettingsScreen.credits_text().contains("game-icons.net"), "the real credits load")
+
+
+func test_the_real_credits_list_the_assets_without_the_rules() -> void:
+	var text := SettingsScreen.credits_text()
+	assert_true(text.contains("Quaternius") and text.contains("Lorc") and text.contains("CC0 1.0") and text.contains("game-icons.net"), text)
+	assert_false(text.contains("Add a row"), "contributor rules stay out of the game")
+	assert_false(text.contains("http"), "no raw links")
+	assert_false(text.contains("`"), "no markdown marks")
 
 
 func test_a_key_reported_only_by_its_logical_code_still_binds() -> void:

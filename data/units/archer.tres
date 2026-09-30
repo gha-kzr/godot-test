@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://dn5jxbiiomuku" path="res://data/spells/arrow.tres" id="3_34fyh"]
 [ext_resource type="Resource" uid="uid://mm2oow61uiin" path="res://data/spells/volley.tres" id="4_0fivp"]
 [ext_resource type="Resource" uid="uid://c0lpi0wcttyeh" path="res://data/spells/poison_arrow.tres" id="5_4sx6m"]
+[ext_resource type="PackedScene" uid="uid://cwh4h2eioxah" path="res://assets/quaternius/characters/Goblin_Male.fbx" id="99_model"]
 
 [sub_resource type="Resource" id="Resource_chh7w"]
 script = ExtResource("1_30gr4")
@@ -23,3 +24,6 @@ initiative = 115
 spells = Array[ExtResource("2_4sx6m")]([ExtResource("3_34fyh"), ExtResource("4_0fivp"), ExtResource("5_4sx6m")])
 innate_modifiers = Array[ExtResource("1_30gr4")]([SubResource("Resource_chh7w")])
 color = Color(0.9, 0.55, 0.2, 1)
+model_scene = ExtResource("99_model")
+model_scale = 0.5
+model_height = 1.3

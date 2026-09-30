@@ -5,6 +5,14 @@ extends Resource
 @export var display_name := ""
 ## Shown on the spell bar and cards (a white icon, tinted); a default one when empty.
 @export var icon: Texture2D
+## The animation the caster plays: a logical name from UnitModel ("Attack", "Cast", "Hit"…);
+## empty picks Attack for a melee spell (range 1) and Cast otherwise.
+@export var cast_animation: StringName
+## Effect spawned on the caster when the spell is cast, and effect spawned on each unit it
+## damages instead of the damage type's own (both optional, empty for now: per-spell effects
+## are just a scene and these fields).
+@export var cast_effect: PackedScene
+@export var impact_effect: PackedScene
 @export_range(0, 12) var ap_cost := 3
 ## Manhattan distance from the caster. 0 allows targeting the caster's own cell.
 @export_range(0, 20) var min_range := 1

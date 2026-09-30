@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="DamageType" format=3 uid="uid://cd6kstb7xerof"]
 
 [ext_resource type="Script" uid="uid://iege8qur066y" path="res://scripts/data/damage_type.gd" id="1_bfksa"]
+[ext_resource type="PackedScene" uid="uid://0cdbhoqsxges" path="res://scenes/fx/impact_fire.tscn" id="9_fx"]
 
 [resource]
 script = ExtResource("1_bfksa")
 display_name = "Fire"
 color = Color(1, 0.45, 0.15, 1)
 sort_order = 1
+impact_effect = ExtResource("9_fx")

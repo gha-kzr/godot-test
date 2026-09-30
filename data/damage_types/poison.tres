@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="DamageType" format=3 uid="uid://bpx5i7f4hovmg"]
 
 [ext_resource type="Script" uid="uid://iege8qur066y" path="res://scripts/data/damage_type.gd" id="1_13nrw"]
+[ext_resource type="PackedScene" uid="uid://ennh02lxsyqo" path="res://scenes/fx/impact_poison.tscn" id="9_fx"]
 
 [resource]
 script = ExtResource("1_13nrw")
 display_name = "Poison"
 color = Color(0.55, 0.85, 0.2, 1)
 sort_order = 2
+impact_effect = ExtResource("9_fx")

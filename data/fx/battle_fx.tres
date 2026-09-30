@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BattleFx" format=3 uid="uid://dhx86movjb5qe"]
+
+[ext_resource type="Script" uid="uid://cwvnr3dnvosar" path="res://scripts/view/battle_fx.gd" id="1_fx"]
+[ext_resource type="PackedScene" uid="uid://bxu06rvt0uncu" path="res://scenes/fx/impact_generic.tscn" id="2_generic"]
+[ext_resource type="PackedScene" uid="uid://bf4v7mdjopbwx" path="res://scenes/fx/heal.tscn" id="3_heal"]
+[ext_resource type="PackedScene" uid="uid://voayj1j5p3va" path="res://scenes/fx/status.tscn" id="4_status"]
+
+[resource]
+script = ExtResource("1_fx")
+default_impact = ExtResource("2_generic")
+heal = ExtResource("3_heal")
+status_applied = ExtResource("4_status")

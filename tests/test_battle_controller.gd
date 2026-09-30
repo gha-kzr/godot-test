@@ -500,7 +500,7 @@ func test_a_turn_order_chip_hovers_its_unit_and_a_click_focuses_the_camera() -> 
 		if controller.camera_rig.position.is_equal_approx(goal):
 			break
 		await _tree().process_frame
-	assert_eq(controller.camera_rig.position, goal, "the camera slid to the unit")
+	assert_true(controller.camera_rig.position.is_equal_approx(goal), "the camera slid to the unit")
 
 
 func test_esc_closes_the_order_overlay_first() -> void:
@@ -763,3 +763,22 @@ func test_recenter_goes_to_the_unit_on_screen_not_the_states_final_actor() -> vo
 	controller.camera_rig.focus(Vector3(0, 0, 0))
 	controller.recenter()
 	assert_true(await _camera_settles_on(controller, controller.camera_rig.clamp_point(controller.units_view.view(1).position)))
+
+
+func test_the_inspect_card_goes_to_the_side_away_from_the_unit_it_shows() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.camera_rig.focus(controller.board_view.center())
+	controller.camera_rig.rotate_steps(0, false)
+	controller.pin(1)  # The enemy: the hero is the active unit, whose card is elsewhere.
+	await _tree().process_frame
+	var on_screen := func() -> bool:  # An independent reading of which half the enemy is drawn in.
+		var x := controller.camera_rig.camera.unproject_position(controller.units_view.to_global(controller.units_view.view(1).position)).x
+		return x > controller.get_viewport().get_visible_rect().size.x / 2.0
+	var enemy_on_right: bool = on_screen.call()
+	assert_eq(controller.hud.is_inspect_on_left(), enemy_on_right, "the card is on the side away from the enemy")
+	controller.camera_rig.rotate_steps(2, false)  # Half a turn: the enemy is now on the other side.
+	await _tree().process_frame
+	controller._update_inspected()
+	assert_eq(on_screen.call(), not enemy_on_right, "the turn moved the enemy to the other half")
+	assert_eq(controller.hud.is_inspect_on_left(), not enemy_on_right, "and the card followed")

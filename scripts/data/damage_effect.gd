@@ -15,7 +15,7 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 	var target := state.units[target_id]
 	var amount := mini(roundi(scaled(state, caster_id, target_id, state.roll(min_amount, max_amount))), target.hp)
 	target.hp -= amount
-	return [BattleEvents.DamageDealt.new(target_id, amount, target.hp)]
+	return [BattleEvents.DamageDealt.new(target_id, amount, target.hp, damage_type)]
 
 
 ## A roll after the caster's power and the target's damage taken and resistance:
