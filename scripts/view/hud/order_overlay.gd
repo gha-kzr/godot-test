@@ -11,9 +11,11 @@ var _units: Array[UnitInfo] = []
 
 @onready var _rows: VBoxContainer = %Rows
 @onready var _dim: ColorRect = %Dim
+@onready var _hint: Label = %Hint
 
 
 func _ready() -> void:
+	_hint.text = "%s or Esc to close" % SettingsApplier.key_text(&"show_order")
 	hide()
 	_dim.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed \

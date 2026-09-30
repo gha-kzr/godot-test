@@ -6,6 +6,11 @@ extends RefCounted
 
 enum CellType { FLOOR, OBSTACLE, HOLE }
 
+## An obstacle is a full cube: one cell wide and deep, this many height levels tall (a level
+## is half a cell, so two levels make one world unit). Rules and drawing both read it
+## through obstacle_levels(), so what is drawn is what blocks.
+const OBSTACLE_LEVELS := 2
+
 const DIRECTIONS: Array[Vector2i] = [Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT, Vector2i.UP]
 
 var size: Vector2i:
@@ -38,6 +43,12 @@ func height_at(cell: Vector2i) -> int:
 	if not _check_bounds(cell):
 		return 0
 	return _heights[_index(cell)]
+
+
+## How many levels the obstacle on `cell` rises above the cell's height (0: not an obstacle).
+## A per-cell value later (taller objects) only changes this function.
+func obstacle_levels(cell: Vector2i) -> int:
+	return OBSTACLE_LEVELS if type_at(cell) == CellType.OBSTACLE else 0
 
 
 ## Out-of-bounds cells read as OBSTACLE, so rules treat them as impassable and opaque.

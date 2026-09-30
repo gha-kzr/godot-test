@@ -34,5 +34,14 @@ func _chip(info: UnitInfo) -> PanelContainer:
 	hp.theme_type_variation = &"SmallLabel"
 	hp.text = "%d / %d HP" % [info.hp, info.max_hp]
 	rows.add_child(hp)
+	if info.xp_max > 0:
+		var xp := ProgressBar.new()
+		xp.name = "XpBar"
+		xp.theme_type_variation = &"XpBar"
+		xp.show_percentage = false
+		xp.custom_minimum_size = Vector2(0, 8)
+		xp.max_value = info.xp_max
+		xp.value = info.xp_value
+		rows.add_child(xp)
 	chip.add_child(rows)
 	return chip

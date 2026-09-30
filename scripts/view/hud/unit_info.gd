@@ -21,6 +21,9 @@ var base_mp := 0
 var statuses: Array[StatusInfo] = []
 var spells: Array[SpellData] = []
 var power := 0
+## A hero's XP towards its next level, for menus (xp_max 0: not shown, as in battle).
+var xp_value := 0
+var xp_max := 0
 ## Damage type name → resistance %, every damage type of the game, in display order.
 var resistances: Dictionary[String, int] = {}
 

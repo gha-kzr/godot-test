@@ -97,3 +97,31 @@ func test_buttons_take_focus_and_esc_does_not_leave() -> void:
 	screen._unhandled_input(escape)
 	assert_eq(backs.count, 0, "leaving the run is an explicit choice")
 	screen.free()
+
+
+func test_the_party_button_asks_for_the_hub_between_floors_only() -> void:
+	var screen := _screen(_profile_on_floor(3))
+	var requests := {"count": 0}
+	screen.party_pressed.connect(func() -> void: requests.count += 1)
+	(screen.find_child("PartyButton", true, false) as Button).pressed.emit()
+	assert_eq(requests.count, 1)
+	screen.free()
+	var profile := _profile_on_floor(11)
+	profile.run.choice_pending = true
+	screen = _screen(profile)
+	assert_true(screen.find_child("PartyButton", true, false) != null, "also at a boss choice")
+	screen.free()
+	profile.run = null
+	screen = _screen(profile)
+	assert_true(screen.find_child("PartyButton", true, false) == null, "no run, no party button: Back is there")
+	screen.free()
+
+
+func test_the_party_chips_carry_a_thin_xp_bar() -> void:
+	var profile := _profile_on_floor(2)
+	profile.heroes[0].xp = 10
+	var screen := _screen(profile)
+	var chip := screen.get_node("%PartyHpRow").get_child(0)
+	var bar := chip.find_child("XpBar", true, false) as ProgressBar
+	assert_eq([bar.value, bar.max_value], [10.0, 20.0])
+	screen.free()

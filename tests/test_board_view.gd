@@ -53,7 +53,7 @@ func test_colliders_cover_the_column_and_the_obstacle_block() -> void:
 		var top := shape.position.y + (shape.shape as BoxShape3D).size.y / 2.0
 		var expected := board.cell_to_world(cell).y
 		if cell == Vector2i(2, 0):
-			expected += BoardView.OBSTACLE_SIZE.y
+			expected += board.grid.obstacle_levels(cell) * board.active_theme().level_height
 		assert_true(is_equal_approx(top, expected), "%s collider top %f, expected %f" % [cell, top, expected])
 	board.free()
 
@@ -186,3 +186,15 @@ func test_preview_cells_are_never_saved_into_the_scene() -> void:
 	assert_eq((copy.get_child(0) as BoardView).board_theme, null, "no default theme written into the scene")
 	copy.free()
 	root.free()
+
+
+func test_the_drawn_obstacle_is_the_rules_cube() -> void:
+	var board := _board()
+	var cell := Vector2i(2, 0)
+	var block := board.find_child("Obstacle", true, false) as MeshInstance3D
+	var size := (block.mesh as BoxMesh).size
+	var theme := board.active_theme()
+	assert_true(is_equal_approx(size.y, board.grid.obstacle_levels(cell) * theme.level_height), "as tall as the rules say")
+	assert_true(is_equal_approx(size.x, BoardView.CELL_SIZE * theme.block_fill), "a full cell wide, like the terrain blocks")
+	assert_true(is_equal_approx(size.y, 1.0), "two half-cell levels: a cube of one cell")
+	board.free()

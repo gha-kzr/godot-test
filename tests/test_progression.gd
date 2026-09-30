@@ -163,3 +163,15 @@ func test_validation() -> void:
 	errors = Array(config.get_validation_errors())
 	assert_true(errors.any(func(e: String) -> bool: return "must increase" in e))
 	assert_true(errors.any(func(e: String) -> bool: return "3 XP thresholds" in e))
+
+
+func test_xp_progress_counts_from_the_current_level_and_fills_at_the_cap() -> void:
+	var profile := Profile.create(load("res://data/progression/roster.tres") as Roster)
+	profile.heroes[0].xp = 30
+	profile.heroes[0].level = 2  # Thresholds 0, 20, 50: 10 of the 30 needed.
+	assert_eq(profile.xp_progress(0), Vector2i(10, 30))
+	assert_eq(profile.xp_text(0), "XP 30 / 50")
+	profile.heroes[0].level = profile.roster.config.level_cap
+	profile.heroes[0].xp = 999
+	assert_eq(profile.xp_progress(0), Vector2i(1, 1), "a full bar at the cap")
+	assert_eq(profile.xp_text(0), "XP 999 (max level)")

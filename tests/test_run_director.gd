@@ -198,3 +198,47 @@ func test_a_saved_run_is_dropped_when_its_party_cant_be_restored() -> void:
 	assert_eq(Profile.from_dict(data, roster).run, null, "the HP would land on the wrong heroes")
 	data["party"] = [data["party"][1], knight]  # An older 2-hero party: the Ranger joins.
 	assert_eq(Profile.from_dict(data, roster).run, null)
+
+
+func test_clamp_hp_caps_saved_hp_to_the_current_maximum_and_never_heals() -> void:
+	var profile := Profile.create(load("res://data/progression/roster.tres") as Roster)
+	RunDirector.start_tower(profile, load("res://data/tower/tower.tres") as TowerConfig, 1)
+	var maximum := RunDirector.max_hp(profile, 0)
+	profile.run.hero_hp[0] = maximum + 50
+	profile.run.hero_hp[1] = 5
+	profile.run.hero_hp[2] = -1
+	RunDirector.clamp_hp(profile)
+	assert_eq(profile.run.hero_hp[0], maximum, "capped")
+	assert_eq(profile.run.hero_hp[1], 5, "a lower HP stays: no heal")
+	assert_eq(profile.run.hero_hp[2], -1, "full stays full")
+	profile.run = null
+	RunDirector.clamp_hp(profile)  # No run: nothing to do, no error.
+
+
+func test_materialize_hp_turns_full_into_the_current_maximum() -> void:
+	var profile := Profile.create(load("res://data/progression/roster.tres") as Roster)
+	RunDirector.start_tower(profile, load("res://data/tower/tower.tres") as TowerConfig, 1)
+	profile.run.hero_hp[0] = -1
+	profile.run.hero_hp[1] = 7
+	RunDirector.materialize_hp(profile)
+	assert_eq(profile.run.hero_hp[0], RunDirector.max_hp(profile, 0))
+	assert_eq(profile.run.hero_hp[1], 7, "an absolute HP is untouched")
+	profile.run = null
+	RunDirector.materialize_hp(profile)
+
+
+func test_hero_hp_for_the_menus() -> void:
+	var profile := Profile.create(load("res://data/progression/roster.tres") as Roster)
+	var maximum := RunDirector.max_hp(profile, 0)
+	assert_eq(RunDirector.hero_hp(profile, 0), Vector2i(maximum, maximum), "no run: full")
+	RunDirector.start_tower(profile, load("res://data/tower/tower.tres") as TowerConfig, 1)
+	profile.run.hero_hp[0] = 12
+	profile.run.hero_hp[1] = -1
+	assert_eq(RunDirector.hero_hp(profile, 0), Vector2i(12, maximum), "a run: the saved HP")
+	assert_eq(RunDirector.hero_hp(profile, 1).x, RunDirector.hero_hp(profile, 1).y, "-1 is full")
+	profile.run.hero_hp[0] = maximum + 30
+	assert_eq(RunDirector.hero_hp(profile, 0).x, maximum, "never above the maximum")
+	profile.party = [1, 2] as Array[int]  # Hero 0 benched: full HP by its own stats, run or not.
+	var benched := RunDirector.hero_hp(profile, 0)
+	assert_eq(benched.x, benched.y)
+	assert_true(benched.y > 0)

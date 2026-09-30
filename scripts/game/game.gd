@@ -155,6 +155,7 @@ func start_battle() -> void:
 	if hints.should_show("first_battle"):
 		battle.hint_text = hints.text("first_battle")
 		battle.hint_dismissed.connect(_dismiss_hint.bind("first_battle"))
+	battle.left_battle.connect(_on_battle_left)
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
 	_battle_title = setup.title
@@ -189,6 +190,13 @@ func _on_battle_finished(state: BattleState) -> void:
 	_show_run_screen(_report, title)
 
 
+## The player left a fight from its menu: nothing from it counts (no rewards, HP as before),
+## and the run, saved between floors, waits at the same floor.
+func _on_battle_left() -> void:
+	_summary = "You left the fight. It starts over when you continue the run."
+	show_party()
+
+
 ## As soon as a battle ends, its result goes to the director (rewards, HP, next floor or
 ## run end) and the profile is saved.
 func _apply_battle_result(state: BattleState) -> void:
@@ -203,6 +211,7 @@ func _show_run_screen(report: RunDirector.Report, title: String) -> void:
 	var run_screen := RUN_SCENE.instantiate() as RunScreen
 	_replace_screen(run_screen)
 	run_screen.next_pressed.connect(next_step)
+	run_screen.party_pressed.connect(show_party)
 	run_screen.boss_choice_made.connect(_on_boss_choice_made)
 	run_screen.back_pressed.connect(_on_back_pressed.bind(report))
 	run_screen.show_report(report, profile, title)
@@ -230,17 +239,27 @@ func _on_abandon_pressed() -> void:
 	show_party()
 
 
+## Runes change on the hub only, so never during a fight (a battle has no equipment UI, and a
+## stray request while one is on screen is ignored). In a run, saved HP follows the new maxima.
 func _on_equip_requested(hero_index: int, stash_index: int) -> void:
-	var error := profile.equip(hero_index, stash_index)
-	if error.is_empty() and not _save():
-		error = SAVE_FAILED
-	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
+	if not screen is PartyScreen:
+		return
+	RunDirector.materialize_hp(profile)
+	_finish_rune_change(profile.equip(hero_index, stash_index))
 
 
 func _on_unequip_requested(hero_index: int, slot: int) -> void:
-	var error := profile.unequip(hero_index, slot)
-	if error.is_empty() and not _save():
-		error = SAVE_FAILED
+	if not screen is PartyScreen:
+		return
+	RunDirector.materialize_hp(profile)
+	_finish_rune_change(profile.unequip(hero_index, slot))
+
+
+func _finish_rune_change(error: String) -> void:
+	if error.is_empty():
+		RunDirector.clamp_hp(profile)
+		if not _save():
+			error = SAVE_FAILED
 	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 

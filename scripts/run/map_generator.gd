@@ -119,6 +119,8 @@ static func _attempt(rng: RandomNumberGenerator, settings: MapGenSettings, enemy
 		for x in width:
 			var cell := Vector2i(x, y)
 			var token := marks[y][x]
+			if token == "#" and heights[y][x] > 0:
+				token = "%d#" % heights[y][x]  # A block stands on its plateau, not sunk to level 0.
 			if token.is_empty() or cell in zone or cell in enemies:
 				token = str(heights[y][x])
 				if cell in zone:

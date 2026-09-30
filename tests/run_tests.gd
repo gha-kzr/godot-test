@@ -8,8 +8,8 @@ extends SceneTree
 ## that aborted it midway included), or if it ran no assertions.
 ## Tests may `await` (e.g. a tween finishing). A test still running after TEST_TIMEOUT_MSEC
 ## aborts the run with exit code 1, after printing the results so far.
-## After each test the runner resets Engine.time_scale and frees nodes the test left
-## under `root`, so a test that failed midway can't leak into the next one.
+## After each test the runner resets Engine.time_scale, frees nodes the test left
+## under `root`, calls the file's `after_each_clean()` if it has one, so a test that failed midway can't leak into the next one.
 
 const TESTS_DIR := "res://tests"
 const TEST_TIMEOUT_MSEC := 10_000
@@ -86,6 +86,8 @@ func _run_all() -> void:
 			await test_case.call(test_name)
 			_test_deadline = 0
 			_clean_up_after_test(nodes_before)
+			if test_case.has_method("after_each_clean"):
+				test_case.call("after_each_clean")  # A test file's own cleanup (files, bindings).
 			test_case.check_logged_errors(catcher.take())
 			if test_case.assertion_count == 0 and test_case.failures.is_empty():
 				test_case.failures.append("%s: no assertions ran" % test_case.current_test)

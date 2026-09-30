@@ -507,3 +507,67 @@ func test_enter_dismisses_a_shown_hint_and_space_does_not() -> void:
 	assert_false((hud.get_node("%HintCard") as Control).visible)
 	assert_eq((hud.get_node("%HintCard/Rows/DismissButton") as Button).focus_mode, Control.FOCUS_NONE)
 	hud.free()
+
+
+func after_each_clean() -> void:
+	SettingsApplier.reset_bindings(Settings.new())
+
+
+func test_button_labels_show_the_keys_the_player_bound() -> void:
+	var settings := Settings.new()
+	SettingsApplier.set_binding(settings, &"end_turn", KEY_G)
+	SettingsApplier.set_binding(settings, &"camera_toggle_view", KEY_J)
+	SettingsApplier.set_binding(settings, &"show_order", KEY_K)
+	var hud := _hud()
+	assert_eq((hud.get_node("%EndTurnButton") as Button).text, "End turn (G)")
+	assert_eq((hud.get_node("%ViewButton") as Button).text, "Top view (J)")
+	assert_eq((hud.get_node("%TurnTimeline/OrderButton") as Button).text, "All (K)")
+	assert_eq((hud.get_node("%OrderOverlay/%Hint") as Label).text, "K or Esc to close")
+	hud.set_placing(true)
+	assert_eq((hud.get_node("%EndTurnButton") as Button).text, "Ready (G)")
+	hud.set_overhead_view(true)
+	assert_eq((hud.get_node("%ViewButton") as Button).text, "Side view (J)")
+	hud.free()
+
+
+func test_default_labels_are_unchanged() -> void:
+	var hud := _hud()
+	assert_eq((hud.get_node("%EndTurnButton") as Button).text, "End turn (Space)")
+	assert_eq((hud.get_node("%ViewButton") as Button).text, "Top view (T)")
+	assert_eq((hud.get_node("%TurnTimeline/OrderButton") as Button).text, "All (Tab)")
+	hud.free()
+
+
+func test_the_menu_button_asks_before_leaving_the_fight() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10)
+	var leaves := {"count": 0}
+	hud.leave_confirmed.connect(func() -> void: leaves.count += 1)
+	var panel := hud.get_node("%LeavePanel") as Control
+	assert_false(panel.visible, "closed at first")
+	(hud.get_node("%MenuButton") as Button).pressed.emit()
+	assert_true(panel.visible)
+	assert_eq(leaves.count, 0, "asking isn't leaving")
+	assert_true(_spell_button(hud, 0).disabled and (hud.get_node("%EndTurnButton") as Button).disabled, "the shortcuts are locked meanwhile")
+	(hud.get_node("%StayButton") as Button).pressed.emit()
+	assert_false(panel.visible)
+	assert_false((hud.get_node("%EndTurnButton") as Button).disabled, "unlocked again")
+	assert_eq(leaves.count, 0)
+	(hud.get_node("%MenuButton") as Button).pressed.emit()
+	(hud.get_node("%LeaveButton") as Button).pressed.emit()
+	assert_eq(leaves.count, 1)
+	assert_false(panel.visible)
+	assert_false(hud.close_leave_panel(), "nothing left to close")
+	hud.free()
+
+
+func test_the_menu_button_can_be_hidden_and_goes_away_with_the_result() -> void:
+	var hud := _hud()
+	var menu := hud.get_node("%MenuButton") as Button
+	assert_true(menu.visible)
+	hud.set_leave_available(false)
+	assert_false(menu.visible)
+	hud.set_leave_available(true)
+	hud.show_result(true)
+	assert_false(menu.visible, "the result screen has its own button")
+	hud.free()

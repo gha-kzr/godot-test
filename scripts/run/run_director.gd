@@ -182,6 +182,45 @@ static func _party_modifiers(profile: Profile) -> Array:
 	return modifiers
 
 
+## Turns every "full" (-1) saved HP into the hero's current maximum. Called before a rune
+## change in a run, so that a bigger maximum can't count as a free heal.
+static func materialize_hp(profile: Profile) -> void:
+	var run := profile.run
+	if run == null:
+		return
+	for slot in run.hero_hp.size():
+		if run.hero_hp[slot] < 0 and slot < profile.party.size():
+			run.hero_hp[slot] = max_hp(profile, slot)
+
+
+## Caps every hero's saved HP to its current maximum. Called after a rune change in a run:
+## HP never rises with a bigger maximum (no heal), and a smaller one takes the excess for good
+## (so unequipping then re-equipping a rune can't bring it back). -1 ("full") stays.
+static func clamp_hp(profile: Profile) -> void:
+	var run := profile.run
+	if run == null:
+		return
+	for slot in run.hero_hp.size():
+		if run.hero_hp[slot] >= 0 and slot < profile.party.size():
+			run.hero_hp[slot] = mini(run.hero_hp[slot], max_hp(profile, slot))
+
+
+## What the menus show for a hero's HP: Vector2i(current, maximum). In a run, a party hero
+## shows its saved HP (run boons count in the maximum); otherwise the hero is at full HP.
+static func hero_hp(profile: Profile, hero_index: int) -> Vector2i:
+	var slot := profile.party.find(hero_index)
+	if slot >= 0:
+		var maximum := max_hp(profile, slot)
+		var run := profile.run
+		if run != null and slot < run.hero_hp.size() and run.hero_hp[slot] >= 0:
+			return Vector2i(mini(run.hero_hp[slot], maximum), maximum)
+		return Vector2i(maximum, maximum)
+	var record := profile.heroes[hero_index]
+	var unit := UnitState.new(0, record.battle_unit_data(), UnitState.Team.PLAYER, Vector2i.ZERO)
+	unit.permanent_modifiers.assign(record.modifiers())
+	return Vector2i(unit.max_hp(), unit.max_hp())
+
+
 ## A party hero's max HP with its levels, runes and the run's boons.
 static func max_hp(profile: Profile, slot: int) -> int:
 	var record := profile.party_records()[slot]

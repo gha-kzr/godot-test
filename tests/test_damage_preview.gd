@@ -120,3 +120,13 @@ func test_a_fully_resisted_hit_lists_nobody() -> void:
 	var battle := _battle("0p 0 0e", [_damage(3, 5)] as Array[EffectData])
 	battle.state.units[1].permanent_modifiers.append(BattleFixtures.modifier(StatModifier.Stat.DAMAGE_TAKEN_PERCENT, -100))
 	assert_eq(_preview(battle, Vector2i(2, 0)).size(), 0)
+
+
+func test_the_preview_follows_line_of_sight_over_a_block() -> void:
+	var spell := BattleFixtures.damage_spell(2, 1, 4, 4, AreaShape.Kind.SINGLE, 0, true)
+	for case: Array in [["0p # 0e", 0], ["2p # 0e", 1]]:
+		var caster := BattleFixtures.unit("P0", 200)
+		caster.spells = [spell] as Array[SpellData]
+		var battle := Battle.new(BattleFixtures.state_with(case[0], [caster], [BattleFixtures.unit("E0", 100)]))
+		battle.start()
+		assert_eq(_preview(battle, Vector2i(2, 0)).size(), case[1], "layout %s" % case[0])

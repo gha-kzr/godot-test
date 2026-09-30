@@ -387,3 +387,101 @@ func test_resetting_the_save_forgets_the_selected_hero() -> void:
 	game.show_party()
 	assert_eq((game.screen as PartyScreen).selected_hero, 0)
 	game.free()
+
+
+func test_runes_can_be_changed_between_floors_through_the_party_button() -> void:
+	var game := _game()
+	game.start_tower(1)
+	_finish(game, true)
+	assert_true(game.screen is RunScreen)
+	_press(game.screen, "PartyButton")
+	assert_true(game.screen is PartyScreen, "the hub between floors")
+	assert_true(game.screen.find_child("ContinueButton", true, false) != null, "with the run waiting")
+	game.profile.stash.append(load("res://data/runes/vitality.tres") as RuneData)
+	var floor_before := game.profile.run.floor_number
+	game._on_equip_requested(0, game.profile.stash.size() - 1)
+	assert_true(game.profile.heroes[0].runes.has(load("res://data/runes/vitality.tres")), "equipped")
+	_press(game.screen, "ContinueButton")
+	assert_eq(_battle(game).battle_title, "Floor %d" % floor_before, "the run goes on where it was")
+	game.free()
+
+
+func test_hp_stays_when_a_rune_raises_the_maximum_and_a_lower_maximum_takes_the_excess_for_good() -> void:
+	var game := _game()
+	game.start_tower(1)
+	_finish(game, true)
+	var vitality := load("res://data/runes/vitality.tres") as RuneData
+	game.profile.stash.append(vitality)
+	game.show_party()
+	game.profile.run.hero_hp[0] = 30
+	game._on_equip_requested(0, game.profile.stash.size() - 1)
+	assert_eq(game.profile.run.hero_hp[0], 30, "no heal from the bigger maximum")
+	game.profile.run.hero_hp[0] = RunDirector.max_hp(game.profile, 0)
+	var slot := game.profile.heroes[0].runes.find(vitality)
+	game._on_unequip_requested(0, slot)
+	var lowered := game.profile.run.hero_hp[0]
+	assert_eq(lowered, RunDirector.max_hp(game.profile, 0), "capped to the smaller maximum")
+	game._on_equip_requested(0, game.profile.stash.size() - 1)
+	assert_eq(game.profile.run.hero_hp[0], lowered, "re-equipping doesn't bring the excess back")
+	game.free()
+
+
+func test_rune_requests_are_ignored_during_a_fight() -> void:
+	var game := _game()
+	game.profile.stash.append(load("res://data/runes/vitality.tres") as RuneData)
+	game.start_tower(1)
+	assert_true(game.screen is BattleController)
+	game._on_equip_requested(0, 0)
+	assert_eq(game.profile.stash.size(), 1, "the rune stayed in the stash: no swapping mid-fight")
+	game._on_unequip_requested(0, 0)
+	assert_eq(game.profile.stash.size(), 1)
+	game.free()
+
+
+func test_a_full_hp_hero_gets_no_free_heal_from_a_bigger_maximum() -> void:
+	var game := _game()
+	game.start_tower(1)
+	game.profile.run.hero_hp[0] = -1  # "Full", as after a boss heal.
+	var before := RunDirector.max_hp(game.profile, 0)
+	game.show_party()
+	game.profile.stash.append(load("res://data/runes/vitality.tres") as RuneData)
+	game._on_equip_requested(0, game.profile.stash.size() - 1)
+	assert_eq(game.profile.run.hero_hp[0], before, "still the old maximum, not the new one")
+	game.free()
+
+
+func test_runes_can_change_while_a_boss_choice_is_pending_and_the_run_returns_to_it() -> void:
+	var game := _game()
+	game.profile.cleared_stages.append(game.tower.stages[0])
+	game.start_tower(1)
+	game.profile.run.floor_number = 10
+	game.next_step()
+	_finish(game, true)
+	assert_true(game.profile.run.awaiting_choice())
+	_press(game.screen, "PartyButton")
+	game.profile.stash.append(load("res://data/runes/vitality.tres") as RuneData)
+	game._on_equip_requested(0, game.profile.stash.size() - 1)
+	_press(game.screen, "ContinueButton")
+	assert_true(game.screen is RunScreen, "back to the boss choice")
+	assert_true(game.profile.run.awaiting_choice(), "still pending")
+	game.free()
+
+
+func test_leaving_a_fight_returns_to_the_hub_with_the_run_and_no_rewards() -> void:
+	var game := _game()
+	game.start_tower(1)
+	var battle := _battle(game)
+	assert_true((battle.hud.get_node("%MenuButton") as Control).visible, "offered in a run")
+	var xp_before := game.profile.heroes[0].xp
+	var hp_before := game.profile.run.hero_hp.duplicate()
+	(battle.hud.get_node("%MenuButton") as Button).pressed.emit()
+	(battle.hud.get_node("%LeaveButton") as Button).pressed.emit()
+	assert_true(game.screen is PartyScreen, "back on the hub")
+	assert_true(game.profile.run != null and game.profile.run.floor_number == 1, "the run waits at the same floor")
+	assert_eq(game.profile.heroes[0].xp, xp_before, "no rewards")
+	assert_eq(game.profile.run.hero_hp, hp_before, "HP as before the fight")
+	assert_true((game.screen.get_node("%Summary") as Label).text.contains("left the fight"))
+	assert_true(game.screen.find_child("ContinueButton", true, false) != null)
+	_press(game.screen, "ContinueButton")
+	assert_true(game.screen is BattleController, "continuing starts the floor over")
+	game.free()

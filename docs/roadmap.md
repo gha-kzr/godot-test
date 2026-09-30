@@ -64,6 +64,11 @@ Decisions: `decisions/2026-09-30-ui-revamp.md` and `decisions/2026-09-30-screens
 
 *Why here:* the screens are placeholders over stable mechanics; independent of the art, so 5 and 6 can swap order.
 
+### 5.5. Gameplay rules pass — done
+Decisions: `decisions/2026-09-30-gameplay-rules.md`; plan: `plans/2026-09-30-gameplay-rules.md`.
+- Obstacles are full two-level cubes and block line of sight only up to their top (high ground sees over low blocks); maps can write `<height>#` so blocks stand on plateaus.
+- Runes can be changed between floors (a Party button on the run screen), never during a fight; saved HP never rises with a bigger maximum.
+
 ### 6. Art and audio
 - Replace the placeholder capsules and boxes: unit models and animations (idle, walk, cast, hit, death) through `UnitData.model_scene`, board tiles and props through `BoardTheme` — slice plan item 4 (display polish and asset integration).
 - Spell VFX and particles, hit and heal feedback; sound effects and music.
@@ -86,10 +91,13 @@ Ideas to schedule into a milestone (grill them first):
 - **Clearer climbing cost** — a climb costs 1 extra MP per level, so a 3-cell move can spend 4 MP, and players can't tell why (playtest feedback). Either drop the extra cost (climbing costs a normal step; the climb and drop limits stay), or make it readable: the MP cost shown next to the hovered path (e.g. "4 MP"), climbing steps marked on the path, and the reachable area shaded by cost. Deciding means weighing height as a tactical lever against readability; the AI and balance follow the rule either way.
 
 - **Choosing active spells** — heroes will know more spells than they can bring: the player picks up to **5 active spells** per hero (a loadout, e.g. on the hub), the rest stay inactive. Touches `HeroRecord` (saved loadout), level rewards (a new spell goes to the loadout if there's room), the party screen and the HUD's spell bar (5 slots).
-- **Obstacles block line of sight only up to their top** — today an obstacle always blocks, even when the caster stands higher and visibly sees over it (playtest: the Ranger on a raised cell couldn't shoot past a block below it, floor 6). An obstacle should block like terrain rising to its drawn top (its cell height + its block height), so high ground sees over low blocks. Reopens the slice's line-of-sight rule (`decisions/2026-09-27-tactical-rpg-slice.md`); the AI and targeting previews follow the rule.
 - **Undo a move** — a hero can take back its move(s) as long as it hasn't cast anything this turn (Disgaea-style). The slice already kept actions as commands and views re-syncing from state so undo stays cheap (`decisions/2026-09-27-tactical-rpg-slice.md`, "Undo"); needs a snapshot of the unit before its first move, an Undo button / key, and the AI never using it.
 - **Localization** — translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
-- **Runes during a run** — today runes can't be changed between floors, but the player can leave to the hub, re-equip, and continue the run: a workaround that makes the rule meaningless. Pick one, consistently: (a) **allow** equipping between floors (a Party button on the run screen) — found loot is usable right away; or (b) **lock** rune changes while a run is saved (the hub shows them read-only until the run ends or is abandoned). Recommended: (a), since players already can and fresh loot is part of the fun.
+
+- **Managing accumulating runes** — the stash grows without limit (every win can drop runes, and duplicates of common ones pile up), so the player needs a way to get rid of the ones they don't want. Options to grill: (a) **drop / discard** a rune (a button on a stash rune, with a confirm) — trivial, no economy; (b) **sell** it for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions for the grill: is a currency wanted in the game at all, what would it buy, and is the rune stash meant to stay a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` on the hub and the drop rules (`LootTable`).
+
+- **Focus a unit from the full turn order** — clicking a chip in the top bar moves the camera to its unit, but the bar shows only the next 5 turns, so a later unit can't be found that way. Let a row of the full-order overlay (Tab) do the same (close the overlay, move the camera there), and probably a click on a unit card too.
+- **Camera: free movement and reset** — once the camera is moved to a unit (chip click) it stays there: the rig only rotates, zooms and toggles the overhead view, it cannot pan or return. To discuss: (a) **recenter automatically** on the acting unit at the start of each ally turn (and on demand with a key / button), (b) **free panning** (drag, arrow keys or screen edge) plus a recenter key, or both: auto-recenter on turns and free panning in between. Questions: does the camera follow enemy turns, and should the bounds keep the board on screen? Touches `CameraRig`, the input map (and the rebindable keys in the settings), the HUD hints.
 
 ## Open questions
 

@@ -8,6 +8,8 @@ extends Screen
 ## spells it unlocks. No Esc: leaving is an explicit button.
 
 signal next_pressed
+## The player wants the hub (to change runes) between two floors.
+signal party_pressed
 ## `choice`: an index into the boss offer, or RunDirector.HEAL.
 signal boss_choice_made(choice: int, keep_going: bool)
 
@@ -44,8 +46,10 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 		_buttons.add_child(_button("BackButton", "Back to the party", back_pressed.emit))
 	elif profile.run.awaiting_choice():
 		_show_boss_choice(profile.run.boss_offer)
+		_buttons.add_child(_button("PartyButton", "Party", party_pressed.emit))
 	else:
 		_buttons.add_child(_button("NextButton", "Floor %d" % profile.run.floor_number, next_pressed.emit))
+		_buttons.add_child(_button("PartyButton", "Party", party_pressed.emit))
 
 
 func _ready() -> void:
@@ -105,6 +109,9 @@ func _party_infos(profile: Profile) -> Array[UnitInfo]:
 		var info := UnitInfo.new()
 		info.display_name = records[slot].hero.display_name()
 		info.level = records[slot].level
+		var progress := profile.xp_progress(profile.party[slot])
+		info.xp_value = progress.x
+		info.xp_max = progress.y
 		info.max_hp = RunDirector.max_hp(profile, slot)
 		var hp: int = profile.run.hero_hp[slot] if slot < profile.run.hero_hp.size() else -1
 		info.hp = info.max_hp if hp < 0 else mini(hp, info.max_hp)

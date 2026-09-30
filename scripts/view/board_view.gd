@@ -19,7 +19,6 @@ const CELL_SIZE := 1.0
 const BOARD_LAYER := 1
 const UNITS_LAYER := 2
 const CELL_META := &"cell"
-const OBSTACLE_SIZE := Vector3(0.8, 0.9, 0.8)
 ## Highlights float just above the cell top; later kinds draw above earlier ones.
 const HIGHLIGHT_LIFT := 0.02
 const HIGHLIGHT_LAYER_GAP := 0.01
@@ -235,15 +234,18 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 
 	var collider_top := top
 	if is_obstacle:
+		# The rules' own height (Grid.obstacle_levels): what is drawn is what blocks sight.
+		var block_height := grid.obstacle_levels(cell) * active_theme().level_height
+		var fill_width := CELL_SIZE * active_theme().block_fill
 		if active_theme().obstacle_scene != null:
 			var model := active_theme().obstacle_scene.instantiate() as Node3D
 			model.position.y = top
 			body.add_child(model)
 		else:
-			var block := _box(OBSTACLE_SIZE, top + OBSTACLE_SIZE.y / 2.0, active_theme().obstacle_color)
+			var block := _box(Vector3(fill_width, block_height, fill_width), top + block_height / 2.0, active_theme().obstacle_color)
 			block.name = "Obstacle"
 			body.add_child(block)
-		collider_top = top + OBSTACLE_SIZE.y
+		collider_top = top + block_height
 
 	# The collider fills the whole cell (no gaps), so every pixel of the board picks a cell.
 	var shape := BoxShape3D.new()

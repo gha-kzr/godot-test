@@ -189,3 +189,37 @@ func test_focus_returns_to_the_rebuilt_button_after_a_change() -> void:
 	var focused := screen.get_viewport().gui_get_focus_owner()
 	assert_true(focused != null and focused.name == &"Stash0", "focus is back on the list")
 	screen.free()
+
+
+func test_xp_shows_on_the_tabs_and_inside_a_gold_bar_in_the_panel() -> void:
+	var profile := _profile()
+	profile.heroes[0].xp = 30
+	profile.heroes[0].level = 2
+	var screen := _screen(profile)
+	var tab_bar := screen.find_child("Hero0", true, false).get_node("XpBar") as ProgressBar
+	assert_eq([tab_bar.value, tab_bar.max_value], [10.0, 30.0])
+	assert_eq(tab_bar.theme_type_variation, &"XpBar")
+	var bar := screen.get_node("%HeroPanel").find_child("XpBar", true, false) as ProgressBar
+	assert_eq([bar.value, bar.max_value], [10.0, 30.0], "the panel's bar")
+	assert_true(bar.find_child("XpLabel", true, false) != null, "with its text drawn inside")
+	assert_true(bar.custom_minimum_size.y >= 20.0, "tall enough to read")
+	screen.free()
+
+
+func test_hp_shows_above_the_xp_bar_on_the_tabs_and_in_the_panel() -> void:
+	var profile := _profile()
+	RunDirector.start_tower(profile, _tower(), 1)
+	profile.run.hero_hp[0] = 12
+	var screen := PARTY_SCENE.instantiate() as PartyScreen
+	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
+	screen.show_profile(profile, "", "", _tower())
+	var tab := screen.find_child("Hero0", true, false)
+	var tab_hp := tab.get_node("HpBar") as ProgressBar
+	assert_eq([tab_hp.value, tab_hp.max_value], [12.0, float(RunDirector.max_hp(profile, 0))])
+	assert_true(tab_hp.offset_top < tab.get_node("XpBar").offset_top, "HP sits above XP on the tab")
+	var panel := screen.get_node("%HeroPanel")
+	var hp := panel.find_child("HpBar", true, false) as ProgressBar
+	assert_eq(hp.value, 12.0)
+	assert_eq((hp.find_child("HpLabel", true, false) as Label).text, "HP 12 / %d" % RunDirector.max_hp(profile, 0))
+	assert_true(hp.get_index() < panel.find_child("XpBar", true, false).get_index(), "HP above XP in the panel")
+	screen.free()

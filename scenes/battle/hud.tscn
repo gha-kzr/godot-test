@@ -124,7 +124,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -182.0
-offset_top = -112.0
+offset_top = -158.0
 offset_right = -12.0
 offset_bottom = -12.0
 grow_horizontal = 0
@@ -132,11 +132,17 @@ grow_vertical = 0
 mouse_filter = 2
 alignment = 2
 
+[node name="MenuButton" type="Button" parent="Root/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Menu"
+
 [node name="ViewButton" type="Button" parent="Root/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
-text = "Top view (T)"
+text = "Top view"
 
 [node name="EndTurnButton" type="Button" parent="Root/Actions"]
 unique_name_in_owner = true
@@ -144,7 +150,7 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 18
-text = "End turn (Space)"
+text = "End turn"
 
 [node name="OrderOverlay" parent="Root" instance=ExtResource("5_overlay")]
 unique_name_in_owner = true
@@ -198,3 +204,62 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 focus_mode = 0
 text = "Play again"
+
+[node name="LeavePanel" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="Root/LeavePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Box" type="PanelContainer" parent="Root/LeavePanel/Center"]
+layout_mode = 2
+
+[node name="Rows" type="VBoxContainer" parent="Root/LeavePanel/Center/Box"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root/LeavePanel/Center/Box/Rows"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Leave the fight?"
+horizontal_alignment = 1
+
+[node name="Text" type="Label" parent="Root/LeavePanel/Center/Box/Rows"]
+layout_mode = 2
+text = "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Root/LeavePanel/Center/Box/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="StayButton" type="Button" parent="Root/LeavePanel/Center/Box/Rows/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Stay"
+
+[node name="LeaveButton" type="Button" parent="Root/LeavePanel/Center/Box/Rows/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Leave"

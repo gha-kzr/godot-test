@@ -17,6 +17,8 @@ extends Node3D
 signal battle_ended(state: BattleState)
 ## The hint card on the HUD was dismissed.
 signal hint_dismissed
+## The player left the fight from the HUD's menu: nothing from it is kept.
+signal left_battle
 ## A battle set up by setup() ended and the player chose to continue.
 signal battle_finished(state: BattleState)
 
@@ -107,6 +109,8 @@ func _ready() -> void:
 	hud.restart_pressed.connect(_on_result_action)
 	hud.card_closed.connect(unpin)
 	hud.hint_dismissed.connect(hint_dismissed.emit)
+	hud.leave_confirmed.connect(left_battle.emit)
+	hud.set_leave_available(not standalone)
 	hud.chip_hovered.connect(_on_chip_hovered)
 	hud.chip_unhovered.connect(_on_chip_unhovered)
 	hud.chip_pressed.connect(_on_chip_pressed)
@@ -185,10 +189,10 @@ func select_spell(index: int) -> void:
 	_set_state(State.TARGETING)
 
 
-## Esc / right click: closes the order overlay, else stops aiming, else deselects the hero
+## Esc / right click: closes the leave confirmation or the order overlay, else stops aiming, else deselects the hero
 ## being placed, else unpins the card.
 func cancel() -> void:
-	if hud.close_order_overlay():
+	if hud.close_leave_panel() or hud.close_order_overlay():
 		return
 	if input_state == State.TARGETING:
 		_enter_idle()
@@ -425,18 +429,25 @@ func _prompt_text() -> String:
 	match input_state:
 		State.PLACING:
 			if _placing_hero == -1:
-				return "Place your heroes: click one, then a teal cell. Ready (Space) to fight"
+				return "Place your heroes: click one, then a teal cell. Ready (%s) to fight" % SettingsApplier.key_text(&"end_turn")
 			return "Click a teal cell to place %s (Esc to deselect)" % battle.state.units[_placing_hero].label
 		State.IDLE:
 			if _nothing_left_to_do():
-				return "Nothing left to do: end your turn (Space)"
-			return "Move to a blue cell or pick a spell (1-%d)" % maxi(1, battle.state.current_unit().data.spells.size())
+				return "Nothing left to do: end your turn (%s)" % SettingsApplier.key_text(&"end_turn")
+			return "Move to a blue cell or pick a spell (%s)" % _spell_keys_text(battle.state.current_unit().data.spells.size())
 		State.TARGETING:
 			return "Choose a target for %s (orange cells). Esc to cancel" % \
 					battle.state.current_unit().data.spells[selected_spell].display_name
 		State.ENEMY_TURN:
 			return "%s is acting..." % battle.state.current_unit().label
 	return ""
+
+
+## The keys of the spell slots, e.g. "1-3", or "1" for one spell.
+func _spell_keys_text(spell_count: int) -> String:
+	var count := clampi(spell_count, 1, SpellBar.MAX_KEYED_SLOTS)
+	var first := SettingsApplier.key_text(&"spell_1")
+	return first if count == 1 else "%s-%s" % [first, SettingsApplier.key_text(StringName("spell_%d" % count))]
 
 
 ## The acting hero can neither move nor afford any spell.

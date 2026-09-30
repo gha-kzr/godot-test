@@ -186,3 +186,43 @@ func test_blocked_cells_are_in_range_but_out_of_sight() -> void:
 			"behind the obstacle; the obstacle itself is never a target")
 	spell.needs_line_of_sight = false
 	assert_eq(Targeting.blocked_cells(state, 0, spell), [] as Array[Vector2i], "no sight needed, nothing blocked")
+
+
+# --- Obstacles block up to their top ---
+
+func test_an_obstacle_is_a_two_level_cube_and_only_obstacles_have_height() -> void:
+	var state := BattleFixtures.state("0p # . 0e")
+	assert_eq(state.grid.obstacle_levels(Vector2i(1, 0)), Grid.OBSTACLE_LEVELS)
+	assert_eq(Grid.OBSTACLE_LEVELS, 2, "a full cube: two half-cell levels")
+	assert_eq(state.grid.obstacle_levels(Vector2i(0, 0)), 0, "a floor")
+	assert_eq(state.grid.obstacle_levels(Vector2i(2, 0)), 0, "a hole")
+
+
+func test_high_ground_sees_over_a_low_block_but_the_ground_does_not() -> void:
+	assert_false(_los("0p # 0 0e", Vector2i(0, 0), Vector2i(3, 0)), "from the ground the block stops sight")
+	assert_true(_los("2p # 0 0e", Vector2i(0, 0), Vector2i(3, 0)), "from two levels up sight clears its top")
+
+
+func test_a_block_beside_the_target_hides_a_low_target_from_the_ground_only() -> void:
+	assert_false(_los("0p 0 # 0e", Vector2i(0, 0), Vector2i(3, 0)), "ground to ground")
+	assert_true(_los("3p 0 # 0e", Vector2i(0, 0), Vector2i(3, 0)), "from three levels up")
+
+
+func test_can_target_follows_the_height_rule() -> void:
+	var ground := BattleFixtures.state("0p # 0e")
+	var high := BattleFixtures.state("2p # 0e")
+	var spell := _spell(1, 4)
+	assert_false(Targeting.can_target(ground, 0, spell, Vector2i(2, 0)), "blocked from the ground")
+	assert_true(Targeting.can_target(high, 0, spell, Vector2i(2, 0)), "open from the high ground")
+
+
+func test_a_block_on_a_plateau_rises_from_the_plateau() -> void:
+	var state := BattleFixtures.state("2p 2# 0 0e")
+	assert_eq(state.grid.height_at(Vector2i(1, 0)) + state.grid.obstacle_levels(Vector2i(1, 0)), 4, "top at 2 + 2")
+	assert_false(_los("2p 2# 0 0e", Vector2i(0, 0), Vector2i(3, 0)), "a caster level with the plateau can't see over its block")
+	assert_true(_los("5p 2# 0 0e", Vector2i(0, 0), Vector2i(3, 0)), "from well above the plateau it can")
+
+
+func test_the_edge_of_the_world_is_opaque() -> void:
+	var state := BattleFixtures.state("4p 0e")
+	assert_true(Targeting._blocks(state, Vector2i(-1, 0), 99.0), "out of bounds blocks whatever the sight height")

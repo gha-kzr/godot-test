@@ -7,6 +7,8 @@ extends VBoxContainer
 signal unequip_requested(slot: int)
 
 @onready var _title: Label = %HeroTitle
+@onready var _hp_bar: ProgressBar = %HpBar
+@onready var _hp_label: Label = %HpLabel
 @onready var _xp_bar: ProgressBar = %XpBar
 @onready var _xp_label: Label = %XpLabel
 @onready var _stats: Label = %Stats
@@ -20,11 +22,14 @@ func show_hero(profile: Profile, hero_index: int) -> void:
 	var record := profile.heroes[hero_index]
 	var stats := _battle_view(record)
 	_title.text = "%s — level %d" % [record.hero.display_name(), record.level]
-	var next := profile.roster.config.xp_for_next(record.level)
-	var from := profile.roster.config.xp_thresholds[record.level - 1]
-	_xp_bar.max_value = maxi(1, next - from) if next >= 0 else 1
-	_xp_bar.value = record.xp - from if next >= 0 else 1
-	_xp_label.text = "XP %d / %d" % [record.xp, next] if next >= 0 else "XP %d (max level)" % record.xp
+	var hp := RunDirector.hero_hp(profile, hero_index)
+	_hp_bar.max_value = hp.y
+	_hp_bar.value = hp.x
+	_hp_label.text = "HP %d / %d" % [hp.x, hp.y]
+	var progress := profile.xp_progress(hero_index)
+	_xp_bar.max_value = progress.y
+	_xp_bar.value = progress.x
+	_xp_label.text = profile.xp_text(hero_index)
 	var lines: Array[String] = [
 		"HP %d   AP %d   MP %d   Initiative %d" % [stats.max_hp(), stats.max_ap(), stats.max_mp(), stats.initiative()],
 		"Power %+d%%" % stats.power(),
@@ -39,7 +44,7 @@ func show_hero(profile: Profile, hero_index: int) -> void:
 	_stats.text = "\n".join(lines)
 	_show_spells(record)
 	var reward := record.hero.reward_for(record.level + 1)
-	_next_reward.visible = reward != null and next >= 0
+	_next_reward.visible = reward != null and profile.roster.config.xp_for_next(record.level) >= 0
 	_next_reward.text = "Next level: " + reward.describe() if _next_reward.visible else ""
 	_show_rune_slots(record)
 

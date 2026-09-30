@@ -87,3 +87,14 @@ func assert_null_grid_with_error(result: MapData.ParseResult, expected_fragment:
 	assert_true(result.grid == null, "no grid when invalid")
 	assert_true(Array(result.errors).any(func(e: String) -> bool: return expected_fragment in e),
 			"errors %s should mention '%s'" % [result.errors, expected_fragment])
+
+
+func test_an_obstacle_token_may_carry_its_height() -> void:
+	var result := _map("0p 2# #\n0# 3e .").parse()
+	assert_true(result.errors.is_empty(), str(result.errors))
+	var grid := result.grid
+	assert_eq([grid.type_at(Vector2i(1, 0)), grid.height_at(Vector2i(1, 0))], [Grid.CellType.OBSTACLE, 2])
+	assert_eq([grid.type_at(Vector2i(2, 0)), grid.height_at(Vector2i(2, 0))], [Grid.CellType.OBSTACLE, 0], "a bare # stays on level 0")
+	assert_eq(grid.height_at(Vector2i(0, 1)), 0, "0# is fine")
+	assert_false(_map("0p x# 0e").parse().errors.is_empty(), "a bad height is an error")
+	assert_false(_map("0p -1# 0e").parse().errors.is_empty(), "so is a negative one")

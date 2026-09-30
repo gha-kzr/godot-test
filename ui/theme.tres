@@ -357,14 +357,28 @@ shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 3
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="FontVariation" id="FontVariation_2d6lx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2d6lx"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.78, 0.25, 1)
+border_color = Color(0.1, 0.09, 0.13, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="FontVariation" id="FontVariation_6eqeh"]
 base_font = ExtResource("1_rqugq")
 variation_opentype = {
 2003265652: 600
 }
 
 [resource]
-default_font = SubResource("FontVariation_2d6lx")
+default_font = SubResource("FontVariation_6eqeh")
 default_font_size = 18
 Button/colors/font_color = Color(1, 0.98, 0.94, 1)
 Button/colors/font_disabled_color = Color(0.7, 0.7, 0.75, 1)
@@ -421,3 +435,5 @@ TooltipLabel/colors/font_color = Color(1, 0.98, 0.94, 1)
 TooltipLabel/colors/font_outline_color = Color(0.1, 0.09, 0.13, 1)
 TooltipLabel/constants/outline_size = 4
 TooltipPanel/styles/panel = SubResource("StyleBoxFlat_o3grh")
+XpBar/base_type = &"ProgressBar"
+XpBar/styles/fill = SubResource("StyleBoxFlat_2d6lx")

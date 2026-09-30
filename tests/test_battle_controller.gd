@@ -587,3 +587,34 @@ func test_right_click_over_the_hud_stops_aiming() -> void:
 	right.position = controller.hud.get_node("%EndTurnButton").get_global_rect().get_center()
 	controller.get_viewport().push_input(right)
 	assert_eq(controller.input_state, BattleController.State.IDLE, "the HUD didn't swallow the cancel")
+
+
+func test_prompts_show_the_keys_the_player_bound() -> void:
+	var settings := Settings.new()
+	SettingsApplier.set_binding(settings, &"end_turn", KEY_G)
+	SettingsApplier.set_binding(settings, &"spell_1", KEY_Z)
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)], false)
+	assert_true(controller._prompt_text().contains("Ready (G)"), controller._prompt_text())
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_true(controller._prompt_text().ends_with("(Z)"), "one spell: its key only: %s" % controller._prompt_text())
+	assert_eq(controller._spell_keys_text(3), "Z-3")
+	SettingsApplier.reset_bindings(Settings.new())
+
+
+func test_leaving_the_fight_is_offered_when_injected_and_esc_closes_the_question_first() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_false((controller.hud.get_node("%MenuButton") as Control).visible, "a standalone battle has nowhere to go back to")
+	controller.standalone = false
+	controller.hud.set_leave_available(true)
+	var left := {"count": 0}
+	controller.left_battle.connect(func() -> void: left.count += 1)
+	(controller.hud.get_node("%MenuButton") as Button).pressed.emit()
+	controller.select_spell(0)
+	controller.cancel()
+	assert_false((controller.hud.get_node("%LeavePanel") as Control).visible, "Esc closes the question")
+	assert_eq(left.count, 0, "and leaves nothing")
+	(controller.hud.get_node("%MenuButton") as Button).pressed.emit()
+	(controller.hud.get_node("%LeaveButton") as Button).pressed.emit()
+	assert_eq(left.count, 1)

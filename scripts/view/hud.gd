@@ -18,6 +18,8 @@ signal chip_unhovered
 signal chip_pressed(unit_id: int)
 ## The inspect card's ✕ was pressed.
 signal card_closed
+## The player confirmed leaving the fight (Menu, then Leave).
+signal leave_confirmed
 ## The hint card was dismissed (its button, or Enter).
 signal hint_dismissed
 
@@ -32,6 +34,10 @@ var _banner_tween: Tween
 var _pulse_tween: Tween
 
 @onready var _round_label: Label = %RoundLabel
+@onready var _menu_button: Button = %MenuButton
+@onready var _leave_panel: Control = %LeavePanel
+@onready var _leave_button: Button = %LeaveButton
+@onready var _stay_button: Button = %StayButton
 @onready var _hint_card: HintCard = %HintCard
 @onready var _prompt_label: Label = %PromptLabel
 @onready var _timeline: TurnTimeline = %TurnTimeline
@@ -62,6 +68,12 @@ func _ready() -> void:
 	_order_overlay.closed.connect(_refresh_buttons)
 	_inspect_card.closed.connect(card_closed.emit)
 	_hint_card.dismissed.connect(hint_dismissed.emit)
+	_menu_button.pressed.connect(_open_leave_panel)
+	_stay_button.pressed.connect(close_leave_panel)
+	_leave_button.pressed.connect(func() -> void:
+		close_leave_panel()
+		leave_confirmed.emit())
+	_leave_panel.hide()
 	(_hint_card.get_node("%DismissButton") as Button).focus_mode = Control.FOCUS_NONE  # Space ends the turn here.
 	# Spells listed on the inspect card show their details above the spell bar.
 	_inspect_card.spell_hovered.connect(_spell_bar.show_details)
@@ -71,6 +83,8 @@ func _ready() -> void:
 	end_turn_event.action = &"end_turn"
 	end_turn_shortcut.events = [end_turn_event]
 	_end_turn_button.shortcut = end_turn_shortcut
+	_end_turn_button.text = _end_turn_text()
+	set_overhead_view(false)
 	_banner.modulate.a = 0.0
 	_result_panel.hide()
 	_inspect_card.hide()
@@ -119,6 +133,26 @@ func is_inspect_control(control: Control) -> bool:
 	return _inspect_card.visible and (control == _inspect_card or _inspect_card.is_ancestor_of(control))
 
 
+## Whether the Menu button (leave the fight) is offered: not in a standalone battle, which has
+## nowhere to go back to, and not once the result is showing.
+func set_leave_available(available: bool) -> void:
+	_menu_button.visible = available
+
+
+func _open_leave_panel() -> void:
+	_leave_panel.show()
+	_refresh_buttons()
+
+
+## Closes the leave confirmation if it's open; true if it was (Esc closes it first).
+func close_leave_panel() -> bool:
+	if not _leave_panel.visible:
+		return false
+	_leave_panel.hide()
+	_refresh_buttons()
+	return true
+
+
 ## Closes the full-order overlay if it's open; true if it was (Esc closes it first).
 func close_order_overlay() -> bool:
 	if not _order_overlay.is_open():
@@ -151,7 +185,7 @@ func set_player_controls_enabled(enabled: bool) -> void:
 ## While heroes are placed before the battle: no spells, and End turn becomes Ready.
 func set_placing(placing: bool) -> void:
 	_placing = placing
-	_end_turn_button.text = "Ready (Space)" if placing else "End turn (Space)"
+	_end_turn_button.text = _end_turn_text()
 	_refresh_buttons()
 
 
@@ -185,7 +219,13 @@ func is_end_turn_pulsing() -> bool:
 
 
 func set_overhead_view(enabled: bool) -> void:
-	_view_button.text = "Side view (T)" if enabled else "Top view (T)"
+	var key := SettingsApplier.key_text(&"camera_toggle_view")
+	_view_button.text = ("Side view (%s)" if enabled else "Top view (%s)") % key
+
+
+## "End turn (Space)" / "Ready (Space)", with whatever key End turn is bound to.
+func _end_turn_text() -> String:
+	return "%s (%s)" % ["Ready" if _placing else "End turn", SettingsApplier.key_text(&"end_turn")]
 
 
 ## Fades a short message in and out. Await it to wait until it's gone.
@@ -205,6 +245,7 @@ func show_result(won: bool, battle_seed := 0) -> void:
 	_result_label.text = "Victory!" if won else "Defeat"
 	_seed_label.text = "Battle seed %d" % battle_seed
 	set_player_controls_enabled(false)
+	_menu_button.hide()  # The result's own button leaves the fight.
 	_result_panel.show()
 
 
@@ -223,6 +264,6 @@ static func spell_description(spell: SpellData) -> String:
 
 
 func _refresh_buttons() -> void:
-	var overlay_open := _order_overlay.is_open()
+	var overlay_open := _order_overlay.is_open() or _leave_panel.visible
 	_spell_bar.set_locked(not _controls_enabled or _placing or overlay_open)
 	_end_turn_button.disabled = not _controls_enabled or overlay_open

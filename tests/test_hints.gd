@@ -39,3 +39,15 @@ func test_the_card_is_hidden_until_shown_and_reports_dismissal_once() -> void:
 	card.dismiss()
 	assert_eq(dismissals.count, 1, "a hidden card doesn't dismiss again")
 	card.free()
+
+
+func after_each_clean() -> void:
+	SettingsApplier.reset_bindings(Settings.new())
+
+
+func test_hint_texts_name_the_bound_key() -> void:
+	var hints := Hints.new(Settings.new())
+	assert_true(hints.text("first_battle").contains("Ready (Space)"), hints.text("first_battle"))
+	SettingsApplier.set_binding(Settings.new(), &"end_turn", KEY_G)
+	assert_true(hints.text("first_battle").contains("Ready (G)"), hints.text("first_battle"))
+	assert_false(hints.text("first_battle").contains("{"), "no placeholder left")

@@ -133,9 +133,12 @@ static func _in_range(state: BattleState, from: Vector2i, spell: SpellData, cell
 
 
 static func _blocks(state: BattleState, cell: Vector2i, sight_height: float) -> bool:
+	if not state.grid.in_bounds(cell):
+		return true  # The edge of the world is opaque, whatever a block's height.
 	match state.grid.type_at(cell):
 		Grid.CellType.OBSTACLE:
-			return true
+			# Like terrain rising to the block's top: high ground sees over low blocks.
+			return state.grid.height_at(cell) + state.grid.obstacle_levels(cell) > sight_height
 		Grid.CellType.HOLE:
 			return false
 	return state.is_occupied(cell) or state.grid.height_at(cell) > sight_height

@@ -42,6 +42,24 @@ static func create(from_roster: Roster) -> Profile:
 	return profile
 
 
+## A hero's XP towards its next level: Vector2i(gained this level, needed this level). A hero
+## at the level cap reads (1, 1): a full bar.
+func xp_progress(hero_index: int) -> Vector2i:
+	var record := heroes[hero_index]
+	var next := roster.config.xp_for_next(record.level)
+	if next < 0:
+		return Vector2i(1, 1)
+	var from := roster.config.xp_thresholds[record.level - 1]
+	return Vector2i(record.xp - from, maxi(1, next - from))
+
+
+## "XP 30 / 50" (total XP over the next threshold), or "XP 540 (max level)".
+func xp_text(hero_index: int) -> String:
+	var record := heroes[hero_index]
+	var next := roster.config.xp_for_next(record.level)
+	return "XP %d / %d" % [record.xp, next] if next >= 0 else "XP %d (max level)" % record.xp
+
+
 func party_records() -> Array[HeroRecord]:
 	var records: Array[HeroRecord] = []
 	for index in party:

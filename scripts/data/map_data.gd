@@ -4,12 +4,14 @@ extends Resource
 ## A battle map written as text: one row per line, one whitespace-separated token per cell.
 ##   <height>    floor cell at that height, e.g. 0, 2, 11
 ##   <height>p   floor cell + player spawn     <height>e   floor cell + enemy spawn
-##   #           obstacle (impassable, blocks line of sight)
+##   #           obstacle on a level-0 cell; <height># (e.g. 2#) on a cell at that height: a block
+##               two levels tall (impassable; blocks line of sight up to its top)
 ##   .           hole (impassable, does not block line of sight)
 ## Spawns are numbered in reading order (left to right, top to bottom).
 
 const PLAYER_SPAWN := "p"
 const ENEMY_SPAWN := "e"
+const OBSTACLE := "#"
 
 @export var display_name := ""
 ## Emits `changed` when edited, so editor previews can follow.
@@ -72,13 +74,15 @@ func _parse_token(token: String, cell: Vector2i, heights: PackedInt32Array, type
 			type = Grid.CellType.HOLE
 		_:
 			var digits := token
-			if token.ends_with(PLAYER_SPAWN) or token.ends_with(ENEMY_SPAWN):
+			if token.ends_with(PLAYER_SPAWN) or token.ends_with(ENEMY_SPAWN) or token.ends_with(OBSTACLE):
 				digits = token.left(-1)
 			if not digits.is_valid_int() or int(digits) < 0:
 				result.errors.append("%s: invalid cell '%s' at %s" % [display_name, token, cell])
 			else:
 				height = int(digits)
-				if token.ends_with(PLAYER_SPAWN):
+				if token.ends_with(OBSTACLE):
+					type = Grid.CellType.OBSTACLE
+				elif token.ends_with(PLAYER_SPAWN):
 					result.player_spawns.append(cell)
 				elif token.ends_with(ENEMY_SPAWN):
 					result.enemy_spawns.append(cell)

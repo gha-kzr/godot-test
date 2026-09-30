@@ -75,6 +75,11 @@ func _base_theme() -> Theme:
 	theme.set_type_variation("HeaderLabel", "Label")
 	theme.set_font_size("font_size", "HeaderLabel", 24)
 	theme.set_constant("outline_size", "HeaderLabel", 6)
+	theme.set_type_variation("XpBar", "ProgressBar")  # Gold, to tell it from the green HP bars.
+	var xp_fill := _box(ACCENT, 7, 0)
+	xp_fill.set_content_margin_all(0)
+	xp_fill.shadow_size = 0
+	theme.set_stylebox("fill", "XpBar", xp_fill)
 	theme.set_type_variation("SmallLabel", "Label")
 	theme.set_font_size("font_size", "SmallLabel", 14)
 	theme.set_type_variation("PromptLabel", "Label")

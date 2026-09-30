@@ -131,3 +131,15 @@ func test_too_many_enemies_are_reported_not_hung() -> void:
 	expect_error("7 enemies")
 	var map := MapGenerator.generate(rng, _tower().map_settings, 7, false, MapGenerator.Layout.AMBUSH)
 	assert_eq(map.parse().enemy_spawns.size(), MapGenerator.MAX_ENEMIES, "clamped")
+
+
+func test_generated_blocks_stand_on_their_plateau() -> void:
+	var raised := 0
+	var pattern := RegEx.create_from_string("^[1-9][0-9]*#$")
+	for floor_number in range(1, 40):
+		var map := FloorGenerator.encounter(_tower(), floor_number).map
+		assert_true(map.parse().errors.is_empty(), "floor %d parses" % floor_number)
+		for token in map.layout.split(" ", false):
+			if pattern.search(token.strip_edges()) != null:
+				raised += 1
+	assert_true(raised > 0, "some generated blocks sit on raised ground, not sunk to level 0")
