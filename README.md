@@ -126,7 +126,7 @@ Instructions for AI agents working on this repo:
 - **Keep resource files in the editor's format.** After generating or hand-editing `.tres` / `.tscn` files from the CLI, run `tools/fill_uid_refs.gd` (a test fails otherwise), so opening the editor doesn't rewrite them into formatting-only diffs. Commit any editor re-save on its own.
 - **Milestones live on a branch until done.** Work on `milestone-<n>` (e.g. `milestone-5a`), committing task by task; push the branch as a backup if needed. `main` only receives a finished milestone, squashed into one commit, when the user asks.
 - **Credit every external asset.** Anything downloaded, bought or copied (icons, fonts, models, sounds, UI packs) gets a row in `CREDITS.md` (files, source URL, author, license) in the same commit, with the license file next to the asset when it has one.
-- **Design decisions are recorded in `docs/decisions/`.** Read them before designing; don't re-ask what's settled. The milestone order is in `docs/roadmap.md`.
+- **Design decisions are recorded in `docs/decisions/`.** Read them before designing; don't re-ask what's settled. The finished milestones and the proposed next milestones are in `docs/roadmap.md`, the full descriptions of each feature in `docs/backlog.md`.
 
 Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://github.com/jame581/GodotPrompter) and [awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) and trimmed to stand alone.
 
@@ -148,7 +148,8 @@ tests/            # headless tests: test_*.gd files extending TestCase
 tools/            # CLI helper scripts (fill_uid_refs.gd, build_theme.gd)
 ui/               # UI theme, fonts, icons (third-party files credited in CREDITS.md)
 assets/           # third-party 3D models (assets/quaternius: SOURCE.md has page URLs and file hashes), credited in CREDITS.md
-docs/roadmap.md   # milestones toward the full game
+docs/roadmap.md   # finished milestones, then the proposed next milestones with their features (by category)
+docs/backlog.md   # the backlog in full: what each feature is and its open questions
 docs/decisions/   # design decision records
 docs/plans/       # implementation plans
 .godot/           # editor/import cache, gitignored

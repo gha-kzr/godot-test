@@ -4,111 +4,116 @@
 
 **Done:** the tactical RPG vertical slice — see [`plans/2026-09-27-tactical-rpg-slice.md`](plans/2026-09-27-tactical-rpg-slice.md). Its "After the slice" section holds the detailed design notes referenced below.
 
-**Scope guard:** one biome, 4–6 enemy types, ~10 spells, 2–3 heroes, a short run. Ship that polished before widening.
+**Scope guard:** the first release stays small (one biome, 4–6 enemy types, ~10 spells, 2–3 heroes, a short run) and polished; everything that widens it (biomes, more heroes and enemies, branching runs) is in the backlog below.
 
-Each milestone starts by settling its open decisions (`godot-grill`), then a plan (`godot-brainstorming`), then implementation task by task, then a `godot-code-review` pass.
+Each milestone starts by settling its open decisions (`godot-grill`), then a plan (`godot-brainstorming`), then implementation task by task, then a `godot-code-review` pass. Decisions are in `decisions/`, plans in `plans/`.
 
-## Milestones
+## Done
 
-The order follows dependencies: each milestone needs the systems of the ones before it.
+| # | Milestone | What it brought | Decisions · plan |
+|---|---|---|---|
+| 0 | Vertical slice | A turn-based tactical battle on a heightmap grid: movement with climb costs, line of sight, spells with areas, an AI, the hover and click picking | [plan](plans/2026-09-27-tactical-rpg-slice.md) · [decisions](decisions/2026-09-27-tactical-rpg-slice.md) |
+| 1 | Combat depth | Status effects (damage and heal over time, buffs, debuffs), AI that values statuses, inspect any unit | [decisions](decisions/2026-09-28-status-effects.md) · [plan](plans/2026-09-28-status-effects.md) |
+| 2 | Progression model | Stats, levels and XP, spell scaling, runes (equipment) and loot | [decisions](decisions/2026-09-28-progression.md) · [plan](plans/2026-09-28-progression.md) |
+| 3 | Design tools | An editor plugin: spell and enemy previews, the Design panel, the balance lab | [decisions](decisions/2026-09-29-design-tools.md) · [plan](plans/2026-09-29-design-tools.md) |
+| 4 | Run loop | The roguelite: an infinite tower of generated floors, stages, boons, saved runs, procedural maps and encounters | [decisions](decisions/2026-09-29-run-loop.md) · [plan](plans/2026-09-29-run-loop.md) |
+| 4.5 | Allies and placement | Walking through allies, a placement phase before each battle | [decisions](decisions/2026-09-29-allies-and-placement.md) · [plan](plans/2026-09-29-allies-and-placement.md) |
+| 5a | Battle UI revamp | HUD components (timeline, cards, spell bar), event-driven HUD, status icons, exact damage preview, path costs, prompt line | [decisions](decisions/2026-09-30-ui-revamp.md) · [plan](plans/2026-09-30-battle-ui.md) |
+| 5b | Screens | Title, settings (window, UI scale, key rebinding, credits), hub, run screen, first-run hints, keyboard navigation | [decisions](decisions/2026-09-30-screens.md) · [plan](plans/2026-09-30-screens.md) |
+| 5c | Gameplay rules pass | Obstacles as cubes blocking sight up to their top, runes changeable between floors, leave a fight | [decisions](decisions/2026-09-30-gameplay-rules.md) · [plan](plans/2026-09-30-gameplay-rules.md) |
+| 5d | Playtest polish | Camera pan, recenter and follow, focus a unit from the turn order, XP gain display, drop a rune | [decisions](decisions/2026-09-30-playtest-polish.md) · [plan](plans/2026-09-30-playtest-polish.md) |
+| 6a | Art pass | Quaternius character models with a shared animation set, toon board with rock obstacles, particle effects, elite and boss scale | [decisions](decisions/2026-10-01-art.md) · [plan](plans/2026-10-01-art.md) |
+| — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
-### 1. Combat depth — done
-Implemented per `plans/2026-09-28-status-effects.md` (all tasks checked; a hand playtest remains).
+## Next milestones (proposed)
 
-- **Status effects** (DoT first, then buffs / debuffs) — decisions in `decisions/2026-09-28-status-effects.md`, plan in `plans/2026-09-28-status-effects.md`. Includes, from the reviews: AI scoring of statuses (a pure DoT spell scores 0 today and would never be cast), a single event-dispatch point, the turn-start death loop, live HUD updates during playback.
-- **Inspect any unit on hover** — show any unit's stats (enemies included) in the side panel.
+The backlog grouped into milestones, in the order I would build them: each follows the ones whose systems it needs and ends in something playable on its own. The order can change if priorities do. Full descriptions and open questions are in [`backlog.md`](backlog.md); each milestone starts with a grill and a plan, like the finished ones.
 
-*Why first:* completes the combat rules while the code is fresh; statuses change the spell data model, which the skill tool will build on.
+### 6b. Feel: audio, effects and camera
 
-### 2. Progression model — done
-Decisions: `decisions/2026-09-28-progression.md`; plan: `plans/2026-09-28-progression.md`.
-- Unit stats (e.g. power, defense), levels and XP.
-- Spell scaling formula (damage / heal growing with stats or level).
-- Items and equipment that modify stats; loot drops.
+Finishes the art-and-audio work that is already under way: sound, a better pass on animation, particles and spells (timed together with the audio), and the camera following a walking unit.
 
-*Why here:* this is the core of "keep level and loot", and both design tools need it.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Audio: sound effects, music and volume settings](backlog.md#audio-sound-effects-music-and-volume-settings) | Audio | settings screen; credits |
+| [Second pass on animation, particles and spells](backlog.md#second-pass-on-animation-particles-and-spells) | Animation / VFX | audio (timed together) |
+| [Camera follows a walking unit](backlog.md#camera-follows-a-walking-unit) | Animation / camera | camera rig |
 
-### 3. Design tools — done
-Decisions: `decisions/2026-09-29-design-tools.md`; plan: `plans/2026-09-29-design-tools.md`.
-- **Skill designer** — area of effect (visual shape preview), power, scaling; previews such as damage per AP at each level. Slice plan item 5.
-- **Enemy designer** — level, stats, loot table, XP given on death, difficulty presets (normal / elite / boss). Slice plan item 6.
+### 7. First impressions
 
-*Why here:* content volume grows from now on; tools built on a stable data model don't need rework.
+What a new player meets first, and what shows the game off: comfort in long battles, a real onboarding, a name, a visible best floor and achievements. New texts written here should already go through `tr()` (see Reach).
 
-### 4. Run loop (roguelite) — done
-Decisions: `decisions/2026-09-29-run-loop.md` (stages + infinite tower; supersedes the bullets below where they differ); plan: `plans/2026-09-29-run-loop.md`.
-- Procedural map generator (connectivity-checked, previewed in the editor — the preview part of slice plan item 3; the map painter is mostly replaced by generation).
-- Encounter generator: enemy presets and a difficulty budget that grows with depth. **The first battles must be easy** (playtest feedback: the slice battle is too hard as a first fight); the slice's 10–10 AI-vs-AI tuning is a mid-difficulty baseline, not the opening experience. Levers: encounter budget, enemy presets, a gentler AI profile early.
-- AI difficulty profiles and smarter strategies — slice plan item 2.
-- Run flow: battle → reward choice → next battle; death → hub, keeping level and loot.
-- Saving between battles.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Battle speed and quality of life](backlog.md#battle-speed-and-quality-of-life) | UI / UX | event player timings, settings |
+| [Better tutorial and tooltips for the first levels](backlog.md#better-tutorial-and-tooltips-for-the-first-levels) | UI / UX (onboarding) | hints, first floors |
+| [Rename the game](backlog.md#rename-the-game) | Branding | repo name, Pages address, save folder |
+| [Max floor reached and achievements](backlog.md#max-floor-reached-and-achievements) | Meta / UI | profile; feeds meta progression |
 
-*Why here:* everything it needs exists by then — this is when the game becomes the game.
+### 8. Hero depth
 
-### 4.5. Walking through allies and starting positions — done
-Decisions: `decisions/2026-09-29-allies-and-placement.md`; plan: `plans/2026-09-29-allies-and-placement.md`.
-- Units walk through their allies (enemies still block).
-- A placement phase before each battle: heroes pre-placed by role in a 3 × 3 start zone, rearranged by the player, then Ready. Generated maps vary the zone's layout (facing edges, corners, ambushes).
+Deepens the tactics before content scales up: the spell loadout, a higher level cap (which needs the loadout for its new spells), movement spells and undo. Enemy AI must learn to value positions for the movement spells, which later milestones rely on.
 
-*Why here:* both change the rules; polish should come after the mechanics settle.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Choosing active spells (5-spell loadout)](backlog.md#choosing-active-spells-5-spell-loadout) | Gameplay | level cap, hub, spell bar |
+| [Increase the level cap](backlog.md#increase-the-level-cap) | Gameplay / balance | loadout, rewards content, balance |
+| [Movement spells: teleport, jump and more](backlog.md#movement-spells-teleport-jump-and-more) | Gameplay | height rules, enemy AI, enemy roles |
+| [Undo a move](backlog.md#undo-a-move) | Gameplay | command actions |
 
-Milestone 5 used to be one "Polish" milestone; it is split in three. Earlier decision records and plans that defer items "to M5" mean the matching part below: UI and UX items → 5, art and audio → 6, balance, exports and release checks → 7.
+### 9. Encounters
 
-### 5. UI and UX revamp — done
-Decisions: `decisions/2026-09-30-ui-revamp.md` and `decisions/2026-09-30-screens.md`; plans: `plans/2026-09-30-battle-ui.md` (5a) and `plans/2026-09-30-screens.md` (5b). Split in **5a battle** (HUD, timeline, unit cards, status icons, damage preview, move costs, guidance) and **5b screens** (theme, title, hub, run screen, settings, first-run hints).
-- UI theme, fonts and spell / status icons; title, hub (party screen), run screen and settings menus — the first-version screens from M2 and M4 are replaced.
-- Battle HUD: an event-driven refresh (events carrying "after" values, status countdowns mid-playback), the status display and unit inspection panels redone, the preset tag color, a lasting sudden-death tag, the placement phase's hints.
-- Readability: move costs on the hovered path (see "Clearer climbing cost" below), first-run hints, a hint when a unit has nothing left to do.
-- Small UX items from the reviews: rebindable spell keys (rebindable click is not built), right click over the HUD cancels aiming, keeping the selected hero across screens, spells in the level-up summary, self-buff turns wording.
-- Platforms: built for desktop and web first, then maybe Android, later gamepad (same platforms). Nothing is hover-only, layouts are anchored, and platform differences live in `SettingsApplier` / `OS.has_feature`; a web export must include `CREDITS.md` (shown in the settings) and `user://` persists as browser storage.
+Smarter, more varied fights: enemy roles with predefined team compositions (needs new enemy content and AI that handles movement spells) and bigger maps with enough enemies to fill them.
 
-*Why here:* the screens are placeholders over stable mechanics; independent of the art, so 5 and 6 can swap order.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Enemy roles and team compositions](backlog.md#enemy-roles-and-team-compositions) | Content / gameplay | new enemies, AI profiles, biomes |
+| [Bigger maps](backlog.md#bigger-maps) | Gameplay / content | props, map types, balance, AI speed |
 
-### 5.5. Gameplay rules pass — done
-Decisions: `decisions/2026-09-30-gameplay-rules.md`; plan: `plans/2026-09-30-gameplay-rules.md`.
-- Obstacles are full two-level cubes and block line of sight only up to their top (high ground sees over low blocks); maps can write `<height>#` so blocks stand on plateaus.
-- Runes can be changed between floors (a Party button on the run screen), never during a fight; saved HP never rises with a bigger maximum.
+### 10. World
 
-### 5.6. Playtest polish — done
-Decisions: `decisions/2026-09-30-playtest-polish.md`; plan: `plans/2026-09-30-playtest-polish.md`.
-- Camera: arrow keys and left / middle drag pan it (a short press is still a click), it stays within the board, follows the acting unit every turn, and `C` / a button recenters; a row of the full turn order looks at that unit.
-- The floor-cleared screen shows XP text and a two-tone bar (lighter gold for the XP just gained); a rune can be dropped from the stash (inline confirm).
+Makes levels look and play differently: props and floor types, map typologies from noise, and biomes that change every few floors (a biome picks a look, map types and enemy pools from the previous milestones).
 
-### 6. Art and audio
-Split in **6a art** (done) and **6b audio**. Decisions: `decisions/2026-10-01-art.md`; plan: `plans/2026-10-01-art.md`.
-- **6a — done:** Quaternius CC0 character models with one shared animation set (idle, walk, attack / cast, hit, death) for the three heroes and two enemies, carried to elite and boss scale (labels, click targets, status icons); a toon-shaded, speckled board with rock obstacles fitted to the cube; particle effects per damage type and for heals, with data fields for heavier per-spell effects later. More heroes and enemies are a model file plus data (the pack has 50+ characters).
-- **6b — next:** sound effects (UI, hits, heals, spells, footsteps, deaths, turn start), music (hub, battle, victory / defeat), volume settings (master / music / effects, mute) in the settings screen, CC0 sources credited. Grill first.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [More props and floor types](backlog.md#more-props-and-floor-types) | Art / content | biomes, bigger maps |
+| [Map typologies from noise](backlog.md#map-typologies-from-noise) | Content / procedural | bigger maps, biomes |
+| [Biomes that change every X floors](backlog.md#biomes-that-change-every-x-floors) | Content | props, map types, enemy roles |
 
-*Why here:* the display already reads everything from data (`model_scene`, `BoardTheme`), so assets slot in without rule changes; independent of the UI revamp.
+### 11. Loot depth
 
-### 7. Balance and release
-- Balance pass with playtests and the balance lab (tower bands, boons, presets, the slice baseline).
-- Exported builds (`export_presets.cfg`), an export filter for `addons/`, UID save references checked in a real export, a golden test pinning generated floors across engine upgrades.
+Makes runes interesting and manageable: sets and power tiers, and the answer to the stash piling up (sell, fuse or cap), which settles whether the game has a currency.
 
-*Why last:* balance and builds are only final once the content and UI stop moving. The "small but polished" goal lives in 5–7.
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Rune sets and rune power tiers](backlog.md#rune-sets-and-rune-power-tiers) | Gameplay / content | save format, loot, hub |
+| [Rune economy: sell, fuse, stash cap](backlog.md#rune-economy-sell-fuse-stash-cap) | Core loop | a currency decision; meta progression |
 
-Some early placeholder art (one model, one spell effect) can slot in anywhere; it's independent of the rest.
+### 12. Run structure and meta
 
-## Future features
+Gives runs a shape and lasting value: meta progression (needs the currency decided in Loot depth) and the branching run map (needs events and items to put on its nodes). Both need a full grill first.
 
-Ideas to schedule into a milestone (grill them first):
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Meta progression](backlog.md#meta-progression) | Core loop / meta | currency, achievements, new heroes |
+| [Branching run map (to elaborate)](backlog.md#branching-run-map-to-elaborate) | Core loop | rune economy, meta progression; needs a full grill |
 
-- **Clearer climbing cost** — a climb costs 1 extra MP per level, so a 3-cell move can spend 4 MP, and players can't tell why (playtest feedback). Either drop the extra cost (climbing costs a normal step; the climb and drop limits stay), or make it readable: the MP cost shown next to the hovered path (e.g. "4 MP"), climbing steps marked on the path, and the reachable area shaded by cost. Deciding means weighing height as a tactical lever against readability; the AI and balance follow the rule either way.
+### 13. Reach
 
-- **Choosing active spells** — heroes will know more spells than they can bring: the player picks up to **5 active spells** per hero (a loadout, e.g. on the hub), the rest stay inactive. Touches `HeroRecord` (saved loadout), level rewards (a new spell goes to the loadout if there's room), the party screen and the HUD's spell bar (5 slots).
-- **Undo a move** — a hero can take back its move(s) as long as it hasn't cast anything this turn (Disgaea-style). The slice already kept actions as commands and views re-syncing from state so undo stays cheap (`decisions/2026-09-27-tactical-rpg-slice.md`, "Undo"); needs a snapshot of the unit before its first move, an Undo button / key, and the AI never using it.
-- **Localization** — translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
+Widens who can play, once screens and strings have settled: save slots, localization, gamepad support and Android / touch.
 
-- **Managing accumulating runes, beyond dropping** — dropping a rune is done (5d), but the stash can still grow large, and a dropped rune is just gone. Options to grill: (b) **sell** runes for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions: is a currency wanted in the game at all, what would it buy, and is the stash a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` and the drop rules (`LootTable`).
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Multiple games (save slots)](backlog.md#multiple-games-save-slots) | Core / profile | save format |
+| [Localization](backlog.md#localization) | UI / tech | every player-facing string; cheaper earlier |
+| [Gamepad support](backlog.md#gamepad-support) | Platform | focus navigation already on screens |
+| [Android and touch](backlog.md#android-and-touch) | Platform | camera drag already shaped for it |
 
-- **Settings credits show contributor rules** — the Credits section of the settings screen prints `CREDITS.md` line by line, including its intro and the "add a row whenever an external file is added" rule, which are for contributors, not players. Show only the credit rows (asset, author, license, source), e.g. by keeping the contributor rules out of the file the screen reads (a separate `docs/` note) or by reading only the table. To do with the credits work of milestone 6 (it grows with every asset).
+### 14. Balance and release
 
-- **Camera follows a walking unit** — the camera now slides to the acting unit at the start of each turn, but stays put while that unit walks, so a long move can leave the screen. Follow the unit along its path (the view position is already animated cell by cell in `UnitView.play_move`), probably by easing the focus point toward the unit during a move and stopping when the player pans; decide whether it applies to enemy moves too (likely yes) and whether to skip it for short moves that stay on screen. Touches `CameraRig` (a follow target) and `BattleController` / `EventPlayer` (start and stop around `UnitMoved`).
+The final pass when content stops moving: a balance pass with the balance lab, an export filter, UID checks in a real export and a golden test on generated floors.
 
-## Open questions
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Balance pass and release checks](backlog.md#balance-pass-and-release-checks) | Balance / release | content stable |
 
-To settle with `godot-grill` before the milestone that needs them:
-
-- **Milestone 2 / 4 — what persists on death:** character level only, equipped items, the whole inventory? What resets?
-- **Milestone 2 — party:** a fixed party of heroes (Knight, Mage) or a recruitable roster?
-- **Undo:** the design keeps it cheap (command actions, views re-sync from state); decide whether the game wants it.
