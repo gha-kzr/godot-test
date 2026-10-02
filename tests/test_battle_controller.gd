@@ -186,8 +186,8 @@ func test_a_real_mouse_click_moves_the_unit() -> void:
 	assert_eq(controller.battle.state.units[0].cell, Vector2i(2, 0))
 
 
-## Waits until the caster has lunged and come back while the spell area is still lit,
-## i.e. the EventPlayer is inside its area flash (polled per frame, no timing guesses).
+## Waits until a cast is playing with its spell area lit (from the cast's start through its flash),
+## polled per frame (no timing guesses).
 func _wait_for_area_flash(controller: BattleController, _caster_id: int) -> bool:
 	var deadline := Time.get_ticks_msec() + FLASH_WAIT_MSEC
 	while Time.get_ticks_msec() < deadline:
