@@ -106,7 +106,8 @@ func test_move_spends_mp_and_reports_the_path() -> void:
 	assert_eq(moved.mp_spent, 2)
 	assert_eq(battle.state.units[0].cell, Vector2i(2, 0))
 	assert_eq(battle.state.units[0].mp, 1)
-	assert_false(battle.perform(Move.new(0, Vector2i(0, 0))).ok(), "only 1 MP left for 2 cells")
+	assert_true(battle.perform(Move.new(0, Vector2i(0, 0))).ok(), "repositioning: back to the start, refunded")
+	assert_eq(battle.state.units[0].mp, 3)
 
 
 # --- Spells ---

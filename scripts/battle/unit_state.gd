@@ -27,6 +27,12 @@ var permanent_modifiers: Array[StatModifier] = []
 var reward: UnitReward
 ## Overrides the encounter's AI profile (e.g. a boss preset); null: the encounter's.
 var ai_profile: AIProfile
+## Repositioning: since its last cast (or its turn start) the unit has moved from
+## `moved_from`, spending `moved_cost` MP. Until it casts, it may move anywhere that cell
+## could reach with that MP back (moving back refunds it); a cast commits the position.
+var moved := false
+var moved_from: Vector2i
+var moved_cost := 0
 ## Name shown in the HUD, e.g. "Brute Lv 5 · Elite".
 var label := ""
 var visual_scale := 1.0
@@ -51,6 +57,23 @@ func is_alive() -> bool:
 func start_turn() -> void:
 	ap = max_ap()
 	mp = max_mp()
+	commit_position()
+
+
+## Where the current move segment started: the cell the unit's reach floods from.
+func move_start() -> Vector2i:
+	return moved_from if moved else cell
+
+
+## The MP of the current move segment: what is left plus what repositioning would refund.
+func move_budget() -> int:
+	return mp + (moved_cost if moved else 0)
+
+
+## Ends the move segment (a cast, a turn start): the next move counts from here.
+func commit_position() -> void:
+	moved = false
+	moved_cost = 0
 
 
 ## Sum of the permanent and status modifiers for one stat (and damage type, for
@@ -146,6 +169,9 @@ func clone() -> UnitState:
 	copy.hp = hp
 	copy.ap = ap
 	copy.mp = mp
+	copy.moved = moved
+	copy.moved_from = moved_from
+	copy.moved_cost = moved_cost
 	for status in statuses:
 		copy.statuses.append(status.clone())
 	copy.permanent_modifiers = permanent_modifiers.duplicate()
