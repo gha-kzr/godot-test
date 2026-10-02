@@ -427,3 +427,24 @@ func test_a_buff_or_a_heal_is_cast_not_swung() -> void:
 	assert_eq(view._cast_animation(mend), &"Cast", "a heal of range 1 isn't a sword swing")
 	assert_eq(view._cast_animation(BattleFixtures.damage_spell(3, 1, 1)), &"Attack", "a melee damage spell still is")
 	_done(stage)
+
+
+func test_every_displacement_ends_on_its_cell_at_full_size() -> void:
+	var stage := _stage("0p 0 0 0 0 0\n0 0 0 0 0 0e")
+	var view := stage.units.view(0)
+	for kind: MoveEffect.Kind in MoveEffect.Kind.values():
+		var cell := Vector2i(1 + kind % 4, kind / 4)
+		await view.play_displaced([cell] as Array[Vector2i], kind)
+		assert_true(view.position.is_equal_approx(stage.board.cell_to_world(cell)), "%s: on its cell" % MoveEffect.Kind.keys()[kind])
+		assert_eq(view.picked_cell(), cell, "%s: picked there" % MoveEffect.Kind.keys()[kind])
+	assert_true(view.get_node("Body").scale.is_equal_approx(Vector3.ONE), "a blink grows back")
+	_done(stage)
+
+
+func test_the_event_player_plays_a_displacement() -> void:
+	var stage := _stage("0p 0 0 0e")
+	var displaced := BattleEvents.UnitDisplaced.new(0, Vector2i(0, 0), [Vector2i(1, 0), Vector2i(2, 0)] as Array[Vector2i], MoveEffect.Kind.PUSH)
+	stage.battle.state.units[0].cell = Vector2i(2, 0)
+	await stage.player.play([displaced] as Array[BattleEvents.Event])
+	_assert_in_sync(stage)
+	_done(stage)

@@ -58,6 +58,23 @@ class UnitPlaced extends UnitEvent:
 		cell = placed_on
 
 
+## A unit moved by a spell (MoveEffect), not by walking: no MP spent. `path` excludes `from`
+## and ends on the new cell (one cell for a teleport or a jump; every cell for a slide).
+class UnitDisplaced extends UnitEvent:
+	var from: Vector2i
+	var path: Array[Vector2i]
+	var kind: MoveEffect.Kind
+
+	func _init(unit: int, from_cell: Vector2i, cells: Array[Vector2i], move_kind: MoveEffect.Kind) -> void:
+		unit_id = unit
+		from = from_cell
+		path = cells.duplicate()
+		kind = move_kind
+
+	func to() -> Vector2i:
+		return path.back()
+
+
 class SpellCast extends Event:
 	var caster_id: int
 	var spell: SpellData

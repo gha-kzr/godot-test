@@ -22,6 +22,8 @@ const GROUND_FX_HEIGHT := 0.3
 ## A hit of at least this share of the target's max HP shakes the camera.
 const BIG_HIT_SHARE := 0.25
 ## How high above its cell a falling projectile starts.
+## A teleport's flash where the unit reappears.
+const BLINK_TINT := Color(0.6, 0.8, 1.0)
 const SKY_HEIGHT := 7.0
 const SHAKE_MIN := 0.08
 const SHAKE_MAX := 0.22
@@ -211,6 +213,11 @@ func _play_event(event: BattleEvents.Event) -> void:
 		return
 	if event is BattleEvents.UnitMoved:
 		await _play_move(view, (event as BattleEvents.UnitMoved).path)
+	elif event is BattleEvents.UnitDisplaced:
+		var displaced := event as BattleEvents.UnitDisplaced
+		await view.play_displaced(displaced.path, displaced.kind)
+		if fx != null and displaced.kind == MoveEffect.Kind.TELEPORT:
+			view.spawn_fx(fx.status_applied, BLINK_TINT)  # A flash where it reappears.
 	elif event is BattleEvents.UnitPlaced:
 		await view.play_place((event as BattleEvents.UnitPlaced).cell)
 	elif event is BattleEvents.SpellCast:

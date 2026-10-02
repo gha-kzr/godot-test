@@ -14,6 +14,10 @@ const ENEMY_RING_COLOR := Color(1.0, 0.3, 0.25)
 const DAMAGE_COLOR := Color(1.0, 0.35, 0.3)
 const HEAL_COLOR := Color(0.4, 1.0, 0.45)
 const STEP_DURATION := 0.18
+## Moved by a spell: each half of a blink, a whole leap, and how high a leap rises.
+const BLINK_DURATION := 0.14
+const LEAP_DURATION := 0.4
+const LEAP_HEIGHT := 1.2
 const CAST_DURATION := 0.3
 const HIT_DURATION := 0.3
 const DEATH_DURATION := 0.45
@@ -169,6 +173,47 @@ func play_move(path: Array[Vector2i]) -> void:
 		_pick_body.set_meta(BoardView.CELL_META, cell)
 		stepped.emit()
 	_play_model(&"Idle")
+
+
+## Moved by a spell: a blink (teleport), a leap in an arc (jump, retreat), a quick dash
+## (charge) or a slide without walking (push, pull).
+func play_displaced(path: Array[Vector2i], kind: MoveEffect.Kind) -> void:
+	if path.is_empty():
+		return
+	var end := _board.cell_to_world(path.back())
+	match kind:
+		MoveEffect.Kind.TELEPORT:
+			var tween := create_tween().set_trans(Tween.TRANS_QUAD)
+			tween.tween_property(_body, "scale", Vector3(0.05, 1.6, 0.05) * _visual_scale, BLINK_DURATION)
+			tween.tween_callback(func() -> void: position = end)
+			tween.tween_property(_body, "scale", Vector3.ONE * _visual_scale, BLINK_DURATION)
+			await tween.finished
+		MoveEffect.Kind.JUMP, MoveEffect.Kind.RETREAT:
+			if kind == MoveEffect.Kind.JUMP:
+				_face(end)
+			var start := position
+			var top := maxf(start.y, end.y) + LEAP_HEIGHT
+			var tween := create_tween()
+			tween.tween_method(func(t: float) -> void:
+				var flat := start.lerp(end, t)
+				position = Vector3(flat.x, lerpf(lerpf(start.y, top, t), lerpf(top, end.y, t), t), flat.z),
+				0.0, 1.0, LEAP_DURATION)
+			await tween.finished
+		_:
+			var charge := kind == MoveEffect.Kind.CHARGE
+			if charge:
+				_play_model(&"Walk")
+			for cell in path:
+				var target := _board.cell_to_world(cell)
+				if charge:
+					_face(target)
+				var tween := create_tween()
+				tween.tween_property(self, "position", target, STEP_DURATION * (0.4 if charge else 0.5))
+				await tween.finished
+			if charge:
+				_play_model(&"Idle")
+	position = end
+	_pick_body.set_meta(BoardView.CELL_META, path.back())
 
 
 ## Before the battle: a quick hop to another start cell.

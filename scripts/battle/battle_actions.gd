@@ -107,7 +107,7 @@ class CastSpell extends Action:
 		for effect in spell.effects:
 			for target_id in _targets_of(effect, state, in_area):
 				if state.units[target_id].is_alive():  # Killed by an earlier effect: skipped.
-					events.append_array(effect.apply(state, actor_id, target_id))
+					events.append_array(effect.apply_cast(state, actor_id, target_id, target))
 		caster.commit_position()  # A cast ends free repositioning: the next move counts from here.
 		return events
 

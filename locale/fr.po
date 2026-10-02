@@ -260,6 +260,9 @@ msgstr "Amenez un héros au niveau 30."
 msgid "Brute"
 msgstr "Brute"
 
+msgid "Charges in a straight line next to the target"
+msgstr "Charge en ligne droite jusqu'à la cible"
+
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr "Choisissez une cible pour %s (cases orange). Échap pour annuler"
 
@@ -476,6 +479,9 @@ msgstr "Garde de fer"
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr "C'est votre tour. Les cases bleues sont celles où vous pouvez marcher : chaque pas coûte des PM. Cliquez sur l'une d'elles."
 
+msgid "Jumps to the target cell (climbs up to %d levels)"
+msgstr "Saute sur la case ciblée (monte jusqu'à %d niveaux)"
+
 msgid "Keys reset."
 msgstr "Touches réinitialisées."
 
@@ -484,6 +490,11 @@ msgstr "Chevalier"
 
 msgid "Language"
 msgstr "Langue"
+
+msgid "Leaps back %d cell"
+msgid_plural "Leaps back up to %d cells"
+msgstr[0] "Bondit de %d case en arrière"
+msgstr[1] "Bondit jusqu'à %d cases en arrière"
 
 msgid "learns %s"
 msgstr "apprend %s"
@@ -631,6 +642,16 @@ msgstr "Appuyez sur une touche..."
 
 msgid "Progress couldn't be saved."
 msgstr "La progression n'a pas pu être sauvegardée."
+
+msgid "Pulls %d cell closer"
+msgid_plural "Pulls up to %d cells closer"
+msgstr[0] "Attire de %d case"
+msgstr[1] "Attire de %d cases au plus"
+
+msgid "Pushes back %d cell"
+msgid_plural "Pushes back %d cells"
+msgstr[0] "Repousse de %d case"
+msgstr[1] "Repousse de %d cases"
 
 msgid "Quit"
 msgstr "Quitter"
@@ -829,6 +850,9 @@ msgstr "Poussée"
 
 msgid "Swift Stride"
 msgstr "Foulée rapide"
+
+msgid "Teleports to the target cell"
+msgstr "Se téléporte sur la case ciblée"
 
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."

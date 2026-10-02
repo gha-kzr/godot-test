@@ -337,6 +337,10 @@ msgstr ""
 msgid "Brute"
 msgstr ""
 
+#: scripts/data/move_effect.gd
+msgid "Charges in a straight line next to the target"
+msgstr ""
+
 #: scripts/view/battle_controller.gd
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr ""
@@ -625,6 +629,10 @@ msgstr ""
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr ""
 
+#: scripts/data/move_effect.gd
+msgid "Jumps to the target cell (climbs up to %d levels)"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Keys reset."
 msgstr ""
@@ -636,6 +644,12 @@ msgstr ""
 #: scenes/game/settings_screen.tscn
 msgid "Language"
 msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Leaps back %d cell"
+msgid_plural "Leaps back up to %d cells"
+msgstr[0] ""
+msgstr[1] ""
 
 #: scripts/data/level_reward.gd
 msgid "learns %s"
@@ -832,6 +846,18 @@ msgstr ""
 #: scripts/game/game.gd
 msgid "Progress couldn't be saved."
 msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Pulls %d cell closer"
+msgid_plural "Pulls up to %d cells closer"
+msgstr[0] ""
+msgstr[1] ""
+
+#: scripts/data/move_effect.gd
+msgid "Pushes back %d cell"
+msgid_plural "Pushes back %d cells"
+msgstr[0] ""
+msgstr[1] ""
 
 #: scenes/game/title_screen.tscn
 msgid "Quit"
@@ -1095,6 +1121,10 @@ msgstr ""
 
 #: data/boons/swift_stride.tres
 msgid "Swift Stride"
+msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Teleports to the target cell"
 msgstr ""
 
 #: scripts/progression/profile.gd
