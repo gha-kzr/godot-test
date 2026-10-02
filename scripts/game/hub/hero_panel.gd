@@ -42,6 +42,8 @@ func show_hero(profile: Profile, hero_index: int) -> void:
 	if not resistances.is_empty():
 		lines.append(tr("Resistance: %s") % ", ".join(resistances))
 	_stats.text = "\n".join(lines)
+	_stats.tooltip_text = Glossary.tips([&"hp", &"ap", &"mp", &"initiative", &"power", &"resistance"] as Array[StringName])
+	_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 	_show_spells(record)
 	var reward := record.hero.reward_for(record.level + 1)
 	_next_reward.visible = reward != null and profile.roster.config.xp_for_next(record.level) >= 0

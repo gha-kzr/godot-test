@@ -13,6 +13,8 @@ extends SceneTree
 
 const TESTS_DIR := "res://tests"
 const TEST_TIMEOUT_MSEC := 10_000
+## A test slower than this is named in the output, so a test that quietly became slow shows.
+const SLOW_TEST_MSEC := 3000
 
 
 ## Collects every error logged while a test runs.
@@ -84,8 +86,11 @@ func _run_all() -> void:
 			_current_test = test_case.current_test
 			var nodes_before := root.get_children()
 			_test_deadline = Time.get_ticks_msec() + TEST_TIMEOUT_MSEC
+			var started := Time.get_ticks_msec()
 			await test_case.call(test_name)
 			_test_deadline = 0
+			if Time.get_ticks_msec() - started > SLOW_TEST_MSEC:
+				print("  slow: %s took %.1f s" % [test_case.current_test, (Time.get_ticks_msec() - started) / 1000.0])
 			_clean_up_after_test(nodes_before)
 			if test_case.has_method("after_each_clean"):
 				test_case.call("after_each_clean")  # A test file's own cleanup (files, bindings).

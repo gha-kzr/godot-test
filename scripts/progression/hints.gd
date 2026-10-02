@@ -6,8 +6,12 @@ extends RefCounted
 ## `show_hint` calls.
 
 const TEXTS: Dictionary[String, String] = {
-	"hub_intro": "Click a rune in the stash to equip it on the selected hero, then climb the tower or try a stage.",
-	"first_battle": "Place your heroes on the teal cells, then press Ready ({end_turn}). Hover anything for details; click a unit to pin its card.",
+	"hub_intro": "Climb the tower to fight floor after floor, or try a stage: one hard battle that unlocks higher floors.",
+	"first_status": "A status is on a unit: its icon shows the turns left. Hover the unit to read what it does.",
+	"first_elite": "An elite floor: its enemies are stronger and drop better runes. Take your time.",
+	"first_stage": "A stage: one hard boss fight. Win it to raise the tower's top floor and start your climbs higher.",
+	"first_boss": "A boss floor! The boss is much stronger. Winning offers a boon (a bonus for the whole run) or a full heal.",
+	"first_level_up": "A hero gained a level: its stats grow, and some levels teach a new spell.",
 }
 
 var _settings: Settings

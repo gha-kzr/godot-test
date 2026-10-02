@@ -6,6 +6,7 @@ extends Screen
 ## their choices up as signals; the Game root applies them (then calls show_profile).
 ## Esc (back) returns to the title.
 
+signal achievements_pressed
 signal tower_pressed(start_floor: int)
 signal stage_pressed(stage_index: int)
 signal continue_pressed
@@ -18,9 +19,15 @@ signal drop_requested(stash_index: int)
 signal hero_selected(hero_index: int)
 ## The hint card was dismissed.
 signal hint_dismissed
+## A tutorial step was finished or skipped (the Game root saves the settings).
+signal tutorial_changed
 
 ## The hero whose details are shown (a roster index).
 var selected_hero := 0
+## The guided first steps (null: none); the Game root hands it in before show_profile().
+var tutorial: Tutorial
+var _step: Dictionary = {}
+var _tutorial_overlay: TutorialOverlay
 var _profile: Profile
 var _tower: TowerConfig
 
@@ -31,14 +38,22 @@ var _tower: TowerConfig
 @onready var _destinations: DestinationBar = %DestinationBar
 @onready var _hint_card: HintCard = %HintCard
 @onready var _menu_button: Button = %MenuButton
+@onready var _achievements_button: Button = %AchievementsButton
 
 
 func _ready() -> void:
 	_menu_button.pressed.connect(back_pressed.emit)
+	_achievements_button.pressed.connect(achievements_pressed.emit)
 	_hint_card.dismissed.connect(hint_dismissed.emit)
+	_tutorial_overlay = TutorialOverlay.new()
+	_tutorial_overlay.block_cancel = true  # Esc would leave for the title, mid-step.
+	_tutorial_overlay.skipped.connect(_skip_tutorial)
+	add_child(_tutorial_overlay)
 	_tabs.hero_selected.connect(select_hero)
 	_panel.unequip_requested.connect(func(slot: int) -> void: unequip_requested.emit(selected_hero, slot))
-	_stash.equip_requested.connect(func(index: int) -> void: equip_requested.emit(selected_hero, index))
+	_stash.equip_requested.connect(func(index: int) -> void:
+		_on_equip_for_tutorial()
+		equip_requested.emit(selected_hero, index))
 	_stash.drop_requested.connect(drop_requested.emit)
 	_destinations.tower_pressed.connect(tower_pressed.emit)
 	_destinations.stage_pressed.connect(stage_pressed.emit)
@@ -62,6 +77,41 @@ func show_profile(profile: Profile, summary := "", message := "", tower: TowerCo
 	_stash.show_stash(profile)
 	_destinations.show_destinations(profile, _tower)
 	_restore_focus.call_deferred(focused)
+	_refresh_tutorial()
+
+
+## The rune step: when the stash holds a rune, light it and wait for the equip.
+func _refresh_tutorial() -> void:
+	_step = {}
+	_tutorial_overlay.clear()
+	if tutorial == null or _profile == null or _profile.stash.is_empty():
+		return
+	var step := tutorial.next_step(Tutorial.HUB_STEPS)
+	if step.is_empty():
+		return
+	_step = step
+	_tutorial_overlay.show_step(Tutorial.text_of(step), _stash.get_global_rect())
+
+
+func _process(_delta: float) -> void:
+	if not _step.is_empty():
+		_tutorial_overlay.set_hole(_stash.get_global_rect())  # The layout settles after the first frame.
+
+
+func _on_equip_for_tutorial() -> void:
+	if not _step.is_empty() and _step["awaits"] == Tutorial.Action.EQUIP_RUNE:
+		tutorial.complete(_step["id"])
+		_step = {}
+		_tutorial_overlay.clear()
+		tutorial_changed.emit()
+
+
+func _skip_tutorial() -> void:
+	if tutorial != null:
+		tutorial.skip_all()
+		_step = {}
+		_tutorial_overlay.clear()
+		tutorial_changed.emit()
 
 
 ## The name of the control holding keyboard focus inside this screen ("" for none).

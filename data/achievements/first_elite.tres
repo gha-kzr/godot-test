@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3 uid="uid://d2l1a8tpxpx0d"]
+
+[ext_resource type="Script" uid="uid://cqs0xyw32ke7v" path="res://scripts/data/achievement_data.gd" id="1_a"]
+
+[resource]
+script = ExtResource("1_a")
+display_name = "First elite"
+description = "Win a fight on an elite floor (a floor ending in 5)."
+kind = 1

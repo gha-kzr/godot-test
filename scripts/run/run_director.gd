@@ -95,6 +95,10 @@ static func apply_result(profile: Profile, config: TowerConfig, state: BattleSta
 		profile.run = null
 		return report
 	report.rewards = BattleRewards.compute(state)
+	var starter := profile.roster.config.first_rune if profile.roster.config != null else null
+	if starter != null and not profile.starter_rune_given:
+		report.rewards.runes.append(starter)  # The first victory always brings a rune to learn equipping with.
+		profile.starter_rune_given = true
 	report.level_ups = profile.apply_rewards(report.rewards)
 	# HP carries over; after the rewards (levels may raise max HP), nobody stays below 25 %.
 	for slot in profile.party.size():

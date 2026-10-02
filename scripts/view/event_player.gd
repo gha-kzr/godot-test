@@ -28,6 +28,9 @@ const SHAKE_MAX := 0.22
 ## How long a spell's area stays highlighted before its effects play.
 const AREA_FLASH := 0.25
 
+## Skips every animation: events only reach the listeners (the views are synced from the state
+## by the controller afterwards). The "instant" battle speed.
+var instant := false
 var is_playing := false
 ## The spell whose effects are being played (set by its SpellCast, cleared by the next turn
 ## event or status tick), so its impact effect can replace the damage type's.
@@ -55,9 +58,12 @@ func play(events: Array[BattleEvents.Event]) -> void:
 	_spell = null
 	var generation := _generation
 	for event in events:
-		await _play_event(event)
-		if generation != _generation:
-			return  # stop() was called; it already reset the player.
+		if not instant:
+			await _play_event(event)
+			if generation != _generation:
+				return  # stop() was called; it already reset the player.
+		else:
+			_track_spell(event)
 		event_played.emit(event)
 	is_playing = false
 
@@ -188,14 +194,18 @@ func _play_move(view: UnitView, path: Array[Vector2i]) -> void:
 		_camera.focus_on(view.position)  # Ends the follow with a last glide onto the unit.
 
 
-## One dispatch point: the event's subject_id() names the view, the type picks the
-## animation. Events with no board animation (turns, battle end) just pass through; the
-## HUD and controller react to them through event_played.
-func _play_event(event: BattleEvents.Event) -> void:
+func _track_spell(event: BattleEvents.Event) -> void:
 	if event is BattleEvents.SpellCast:
 		_spell = (event as BattleEvents.SpellCast).spell
 	elif event is BattleEvents.TurnStarted or event is BattleEvents.TurnEnded or event is BattleEvents.StatusTicked:
 		_spell = null
+
+
+## One dispatch point: the event's subject_id() names the view, the type picks the
+## animation. Events with no board animation (turns, battle end) just pass through; the
+## HUD and controller react to them through event_played.
+func _play_event(event: BattleEvents.Event) -> void:
+	_track_spell(event)
 	var view := _units.find_view(event.subject_id())
 	if view == null or not is_instance_valid(view):
 		return

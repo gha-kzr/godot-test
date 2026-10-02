@@ -10,9 +10,12 @@ config_version=5
 
 [application]
 
-config/name="godot-test"
+config/name="Rune Ascent"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Godot/app_userdata/godot-test"
 run/main_scene="res://scenes/game/game.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+config/icon="res://ui/branding/icon.png"
 
 [audio]
 

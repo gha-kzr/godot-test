@@ -28,6 +28,10 @@ var party: Array[int] = []  ## Hero indices, in spawn order.
 var stash: Array[RuneData] = []
 ## The deepest tower floor cleared.
 var best_depth := 0
+## Ids of the unlocked achievements (Achievements, data/achievements).
+var achievements: Array[String] = []
+## The first victory's starter rune was handed out (ProgressionConfig.first_rune).
+var starter_rune_given := false
 var cleared_stages: Array[StageData] = []
 ## The run in progress, or null.
 var run: RunState
@@ -185,6 +189,7 @@ func to_dict() -> Dictionary:
 		stash_refs.append(_ref(rune))
 	return {"version": SAVE_VERSION, "heroes": hero_entries, "unlocked": _hero_refs(unlocked),
 			"party": _hero_refs(party), "stash": stash_refs, "best_depth": best_depth,
+			"starter_rune_given": starter_rune_given, "achievements": achievements,
 			"cleared_stages": cleared_stages.map(func(s: StageData) -> Dictionary: return _ref(s)),
 			"run": run.to_dict() if run != null else null}
 
@@ -235,6 +240,10 @@ static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 			profile.stash.append(rune)
 	var depth: Variant = data.get("best_depth", 0)
 	profile.best_depth = maxi(0, int(depth)) if depth is int or depth is float else 0
+	profile.starter_rune_given = data.get("starter_rune_given", false) == true
+	for id: Variant in _array(data, "achievements"):
+		if id is String and id not in profile.achievements:
+			profile.achievements.append(id)
 	for ref: Variant in _array(data, "cleared_stages"):
 		var path := _resolve_path(ref)
 		var stage := load(path) as StageData if not path.is_empty() and ResourceLoader.exists(path) else null

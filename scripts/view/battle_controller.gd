@@ -17,9 +17,13 @@ extends Node3D
 ## A sound to hear (an AudioSet.SFX_EVENTS name), from the playback or the turn flow.
 signal sound(event: StringName)
 
+## The battle speed was changed with the HUD button (the Game root saves the settings).
+signal speed_changed
+
+## A tutorial step was finished or skipped (the Game root saves the settings).
+signal tutorial_changed
+
 signal battle_ended(state: BattleState)
-## The hint card on the HUD was dismissed.
-signal hint_dismissed
 ## The player left the fight from the HUD's menu: nothing from it is kept.
 signal left_battle
 ## A battle set up by setup() ended and the player chose to continue.
@@ -34,6 +38,10 @@ const WEB_LIGHT_SCALE := 0.6
 
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
+## Time scale of the "fast" battle speed.
+const FAST_TIME_SCALE := 2.0
+## Pause before the turn ends by itself (auto end turn), so the player sees what happened.
+const AUTO_END_DELAY := 0.5
 ## How long the camera takes to reach an enemy that starts its turn off screen.
 const ENEMY_FOCUS_DURATION := 0.45
 
@@ -57,8 +65,10 @@ var sudden_death_percent := 10
 var battle_title := ""
 ## The heroes' levels, parallel to `players` (shown in the HUD cards); empty: not shown.
 var player_levels: Array = []
-## A first-run hint shown when the battle opens ("" for none); `hint_dismissed` says it went.
-var hint_text := ""
+## The first-run hints (null: none) and the id of the one to show when the battle opens ("" for none).
+var hints: Hints
+var opening_tip := ""
+var _tip_id := ""
 var _sudden_death_announced := false
 
 var battle: Battle
@@ -108,6 +118,41 @@ func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers
 	standalone = false
 
 
+## The player's settings (battle speed, auto end turn); the Game root hands in its own, edited in
+## place. A standalone battle uses the defaults.
+var settings := Settings.new()
+## The guided first steps (null: none, as in a standalone battle); the Game root hands it in.
+var tutorial: Tutorial
+var _step: Dictionary = {}
+## Whether this controller set Engine.time_scale (so it gives it back).
+var _set_time_scale := false
+
+
+func _exit_tree() -> void:
+	if _set_time_scale:
+		Engine.time_scale = 1.0
+
+
+## Puts the settings' battle speed into effect: fast speeds the whole scene up (the rules never
+## look at the clock), instant makes the event player skip its animations.
+func apply_battle_speed() -> void:
+	hud.set_battle_speed(settings.battle_speed)
+	event_player.instant = settings.battle_speed == Settings.BattleSpeed.INSTANT
+	if settings.battle_speed == Settings.BattleSpeed.FAST:
+		Engine.time_scale = FAST_TIME_SCALE
+		_set_time_scale = true
+	elif _set_time_scale:
+		Engine.time_scale = 1.0
+		_set_time_scale = false
+
+
+## The HUD button: normal, fast, instant, normal...
+func cycle_battle_speed() -> void:
+	settings.battle_speed = ((settings.battle_speed + 1) % Settings.BattleSpeed.size()) as Settings.BattleSpeed
+	apply_battle_speed()
+	speed_changed.emit()
+
+
 func _ready() -> void:
 	if OS.has_feature("web"):
 		$DirectionalLight3D.light_energy *= WEB_LIGHT_SCALE
@@ -120,9 +165,12 @@ func _ready() -> void:
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
 	hud.restart_pressed.connect(_on_result_action)
 	hud.card_closed.connect(unpin)
-	hud.hint_dismissed.connect(hint_dismissed.emit)
+	hud.hint_dismissed.connect(_on_tip_dismissed)
 	hud.leave_confirmed.connect(left_battle.emit)
 	hud.recenter_pressed.connect(recenter)
+	hud.speed_pressed.connect(cycle_battle_speed)
+	hud.tutorial_skipped.connect(_skip_tutorial)
+	apply_battle_speed()
 	hud.set_leave_available(not standalone)
 	hud.chip_hovered.connect(_on_chip_hovered)
 	hud.chip_unhovered.connect(_on_chip_unhovered)
@@ -173,8 +221,8 @@ func start_battle() -> bool:
 	_chip_unit = -1
 	_refresh_hud()
 	_set_state(State.PLACING)
-	if not hint_text.is_empty():
-		hud.show_hint(hint_text)
+	if not opening_tip.is_empty():
+		_show_tip(opening_tip)
 	return true
 
 
@@ -200,7 +248,10 @@ func select_spell(index: int) -> void:
 	if index == selected_spell or not BattleActions.CastSpell.can_afford(unit, index):
 		_enter_idle()
 		return
+	if not Tutorial.allows(_step, Tutorial.Action.SELECT_SPELL):
+		return
 	selected_spell = index
+	_tutorial_done(Tutorial.Action.SELECT_SPELL)
 	_set_state(State.TARGETING)
 
 
@@ -235,9 +286,14 @@ func unpin() -> void:
 ## Ends the turn, or ends placement and starts the fight.
 func end_turn() -> void:
 	if input_state == State.PLACING:
+		if not Tutorial.allows(_step, Tutorial.Action.READY):
+			return
 		_placing_hero = -1
+		_tutorial_done(Tutorial.Action.READY)
 		_play(battle.start())
 	elif input_state == State.IDLE or input_state == State.TARGETING:
+		if not Tutorial.allows(_step, Tutorial.Action.END_TURN):
+			return
 		_perform(BattleActions.EndTurn.new(battle.state.current_unit().id))
 
 
@@ -247,8 +303,11 @@ func click_cell(cell: Vector2i) -> void:
 	var clicked := battle.state.unit_at(cell) if battle != null else null
 	# A click that casts, moves or places is that action only; one that does nothing else pins the
 	# unit under it (to look at it).
-	if clicked != null and clicked.id != _active_card_unit_id() and not _click_acts(cell, clicked):
+	var action := _click_action(cell, clicked)
+	if clicked != null and clicked.id != _active_card_unit_id() and action == -1:
 		pin(clicked.id)
+	if action != -1 and not Tutorial.allows(_step, action as Tutorial.Action):
+		return  # The tutorial lets only the step's own action through.
 	match input_state:
 		State.PLACING:
 			# Select a hero, then a zone cell (a hero there swaps); the selected hero again deselects.
@@ -272,19 +331,19 @@ func click_cell(cell: Vector2i) -> void:
 				_perform(BattleActions.CastSpell.new(unit_id, selected_spell, cell))
 
 
-## Whether a click on `cell` (with `clicked` on it) does something in the current state: picks or
-## places a hero, moves, or casts.
-func _click_acts(cell: Vector2i, clicked: UnitState) -> bool:
+## What a click on `cell` (with `clicked` on it) does in the current state, as a Tutorial.Action:
+## picks or places a hero, moves, or casts; -1 when it does nothing.
+func _click_action(cell: Vector2i, clicked: UnitState) -> int:
 	match input_state:
 		State.PLACING:
 			if _placing_hero == -1:
-				return clicked != null and clicked.team == UnitState.Team.PLAYER
-			return cell in battle.state.zone or (clicked != null and clicked.id == _placing_hero)
+				return Tutorial.Action.PLACE if clicked != null and clicked.team == UnitState.Team.PLAYER else -1
+			return Tutorial.Action.PLACE if cell in battle.state.zone or (clicked != null and clicked.id == _placing_hero) else -1
 		State.IDLE:
-			return _reach != null and _reach.can_reach(cell)
+			return Tutorial.Action.MOVE if _reach != null and _reach.can_reach(cell) else -1
 		State.TARGETING:
-			return _targetable.has(cell)
-	return false
+			return Tutorial.Action.CAST if _targetable.has(cell) else -1
+	return -1
 
 
 # --- Input ---
@@ -320,6 +379,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				if cell != BoardView.NO_CELL and cell == _press_cell:
 					click_cell(cell)
 					get_viewport().set_input_as_handled()
+
+
+func _process(_delta: float) -> void:
+	if not _step.is_empty():
+		hud.update_tutorial_area(_tutorial_rect(_step["spot"]))  # The camera may be moving; the HUD settles after its first frame.
 
 
 ## Hover is re-picked every physics frame from the mouse position, so it also follows
@@ -397,6 +461,12 @@ func _perform(action: BattleActions.Action) -> void:
 	if not result.ok():
 		push_warning("Battle: %s" % result.error)  # A UI bug; the state is unchanged.
 		return
+	if action is BattleActions.Move:
+		_tutorial_done(Tutorial.Action.MOVE)
+	elif action is BattleActions.CastSpell:
+		_tutorial_done(Tutorial.Action.CAST)
+	elif action is BattleActions.EndTurn and battle.state.units[action.actor_id].team == UnitState.Team.PLAYER:
+		_tutorial_done(Tutorial.Action.END_TURN)
 	_play(result.events)
 
 
@@ -423,6 +493,7 @@ func _begin_next() -> void:
 		# A mutual wipe (DRAW) is shown as a defeat (decision record).
 		var won := battle_state.outcome() == BattleState.Outcome.PLAYER_WON
 		sound.emit(&"victory" if won else &"defeat")
+		_cheer(UnitState.Team.PLAYER if won else UnitState.Team.ENEMY, battle_state)
 		hud.show_result(won, battle_seed)
 		battle_ended.emit(battle_state)
 		return
@@ -435,7 +506,10 @@ func _begin_next() -> void:
 
 func _run_enemy_action() -> void:
 	var generation := _battle_generation
-	await create_tween().tween_interval(ENEMY_ACTION_DELAY).finished
+	if event_player.instant:
+		await get_tree().process_frame
+	else:
+		await create_tween().tween_interval(ENEMY_ACTION_DELAY).finished
 	if generation != _battle_generation:
 		return
 	var unit_id := battle.state.current_unit().id
@@ -453,7 +527,34 @@ func _ai_profile_for(unit: UnitState) -> AIProfile:
 	return encounter.ai_profile if encounter.ai_profile != null else ai_profile
 
 
+## The survivors of the winning team play their victory animation (heroes after a win, the
+## enemies after a loss), over the fanfare.
+func _cheer(winners: UnitState.Team, state: BattleState) -> void:
+	for unit in state.units:
+		if unit.team == winners and unit.is_alive():
+			var view := units_view.find_view(unit.id)
+			if view != null:
+				view.play_victory()
+
+
+## Shows a one-time tip card (not while a tutorial step is up, and never twice).
+func _show_tip(id: String) -> void:
+	if hints == null or not hints.should_show(id) or hud.is_tutorial_active():
+		return
+	_tip_id = id
+	hud.show_hint(hints.text(id))
+
+
+func _on_tip_dismissed() -> void:
+	if hints != null and not _tip_id.is_empty():
+		hints.dismiss(_tip_id)
+		_tip_id = ""
+		tutorial_changed.emit()  # The Game root saves the settings.
+
+
 func _on_event_played(event: BattleEvents.Event) -> void:
+	if event is BattleEvents.StatusApplied:
+		_show_tip("first_status")
 	_hud_model.apply(event)
 	_show_turn()
 	if event is BattleEvents.TurnStarted:
@@ -505,7 +606,115 @@ func _set_state(new_state: State) -> void:
 					Targeting.blocked_cells(battle.state, unit_id, spell))
 	hud.set_prompt(_prompt_text())
 	hud.set_end_turn_pulse(new_state == State.IDLE and _nothing_left_to_do())
+	if new_state == State.IDLE and settings.auto_end_turn and _nothing_left_to_do():
+		_end_turn_soon()
+	_refresh_tutorial()
 	_update_hover()
+
+
+## Marks the current tutorial step done when the player did what it waits for.
+func _tutorial_done(action: Tutorial.Action) -> void:
+	if tutorial != null and not _step.is_empty() and _step["awaits"] == action:
+		tutorial.complete(_step["id"])
+		_step = {}
+		hud.hide_tutorial()
+		tutorial_changed.emit()
+
+
+## Shows the first step not done, when the state is the one it is about; steps that can't apply
+## (a hero who can't move) are skipped as done.
+func _refresh_tutorial() -> void:
+	_step = {}
+	if tutorial == null or battle == null or battle.state.is_over():
+		hud.hide_tutorial()
+		return
+	for guard in Tutorial.BATTLE_STEPS.size():
+		var step := tutorial.next_step(Tutorial.BATTLE_STEPS)
+		if step.is_empty() or not _tutorial_can_show(step):
+			if not step.is_empty() and _tutorial_obsolete(step):
+				tutorial.complete(step["id"])
+				tutorial_changed.emit()
+				continue
+			hud.hide_tutorial()
+			return
+		_step = step
+		hud.show_tutorial_step(Tutorial.text_of(step), _tutorial_rect(step["spot"]))
+		return
+	hud.hide_tutorial()
+
+
+## The step's moment has come: the state it talks about.
+func _tutorial_can_show(step: Dictionary) -> bool:
+	match step["awaits"]:
+		Tutorial.Action.READY: return input_state == State.PLACING
+		Tutorial.Action.MOVE: return input_state == State.IDLE and _reach != null and not _reach.cells().is_empty()
+		Tutorial.Action.SELECT_SPELL: return input_state == State.IDLE and _can_cast_any()
+		Tutorial.Action.CAST: return input_state == State.TARGETING and not _targetable.is_empty()
+		Tutorial.Action.END_TURN: return input_state == State.IDLE
+	return false
+
+
+## The step can never apply this turn (the hero can't move or cast): it counts as done.
+func _tutorial_obsolete(step: Dictionary) -> bool:
+	if input_state != State.IDLE:
+		return false
+	match step["awaits"]:
+		Tutorial.Action.MOVE: return _reach != null and _reach.cells().is_empty()
+		Tutorial.Action.SELECT_SPELL: return not _can_cast_any()
+	return false
+
+
+func _can_cast_any() -> bool:
+	var unit := battle.state.current_unit()
+	for slot in unit.data.spells.size():
+		if BattleActions.CastSpell.can_afford(unit, slot):
+			return true
+	return false
+
+
+func _skip_tutorial() -> void:
+	if tutorial != null:
+		tutorial.skip_all()
+		_step = {}
+		hud.hide_tutorial()
+		tutorial_changed.emit()
+
+
+## Screen rectangle of what a step lights.
+func _tutorial_rect(spot: Tutorial.Spot) -> Rect2:
+	match spot:
+		Tutorial.Spot.READY_BUTTON, Tutorial.Spot.END_TURN_BUTTON: return hud.end_turn_rect()
+		Tutorial.Spot.SPELL_BAR: return hud.spell_slots_rect()
+		Tutorial.Spot.REACH: return _screen_rect_of(_reach.cells() if _reach != null else [] as Array[Vector2i])
+		Tutorial.Spot.TARGETS: return _screen_rect_of(_targetable.keys() as Array[Vector2i] if not _targetable.is_empty() else [] as Array[Vector2i])
+	return Rect2()
+
+
+## The screen rectangle around the top faces of board cells.
+func _screen_rect_of(cells: Array[Vector2i]) -> Rect2:
+	var box := Rect2()
+	var first := true
+	for cell in cells:
+		var center := board_view.cell_to_world(cell)
+		for corner in [Vector2(-0.5, -0.5), Vector2(0.5, -0.5), Vector2(-0.5, 0.5), Vector2(0.5, 0.5)]:
+			var point := camera_rig.camera.unproject_position(center + Vector3(corner.x, 0.0, corner.y) * BoardView.CELL_SIZE)
+			box = Rect2(point, Vector2.ZERO) if first else box.expand(point)
+			first = false
+	return box
+
+
+## Auto end turn: ends the turn after a short pause, if the hero still has nothing to do then.
+func _end_turn_soon() -> void:
+	var generation := _battle_generation
+	var turn := battle.state.current_unit().id
+	if event_player.instant:
+		await get_tree().process_frame
+	else:
+		await create_tween().tween_interval(AUTO_END_DELAY).finished
+	# While a tutorial step is up the player follows it: the step's own card must be readable.
+	if generation == _battle_generation and input_state == State.IDLE and battle.state.current_unit().id == turn \
+			and not battle.state.is_over() and _nothing_left_to_do() and _step.is_empty():
+		end_turn()
 
 
 ## The guidance line for the current step.

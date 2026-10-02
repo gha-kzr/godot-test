@@ -11,6 +11,10 @@ extends CanvasLayer
 signal spell_selected(index: int)
 signal end_turn_pressed
 signal view_toggle_pressed
+## The speed button was pressed: the controller cycles the battle speed.
+signal speed_pressed
+## The tutorial's Skip link was pressed.
+signal tutorial_skipped
 signal restart_pressed
 ## A turn-order chip is hovered (unit id) or left, or clicked.
 signal chip_hovered(unit_id: int)
@@ -50,6 +54,8 @@ var _pulse_tween: Tween
 @onready var _spell_bar: SpellBar = %SpellBar
 @onready var _end_turn_button: Button = %EndTurnButton
 @onready var _view_button: Button = %ViewButton
+@onready var _speed_button: Button = %SpeedButton
+var _tutorial: TutorialOverlay
 @onready var _banner: Label = %Banner
 @onready var _result_panel: Control = %ResultPanel
 @onready var _result_label: Label = %ResultLabel
@@ -60,6 +66,10 @@ var _pulse_tween: Tween
 func _ready() -> void:
 	_end_turn_button.pressed.connect(end_turn_pressed.emit)
 	_view_button.pressed.connect(view_toggle_pressed.emit)
+	_speed_button.pressed.connect(speed_pressed.emit)
+	_tutorial = TutorialOverlay.new()
+	_tutorial.skipped.connect(tutorial_skipped.emit)
+	$Root.add_child(_tutorial)  # Last: above the rest of the HUD.
 	_restart_button.pressed.connect(restart_pressed.emit)
 	_spell_bar.spell_pressed.connect(spell_selected.emit)
 	_timeline.chip_hovered.connect(chip_hovered.emit)
@@ -223,6 +233,42 @@ func show_hint(text: String) -> void:
 func set_prompt(text: String) -> void:
 	_prompt_label.text = text
 	_prompt_label.visible = not text.is_empty()
+
+
+## Lights `area` (screen coordinates) with `text`: the tutorial's spotlight.
+func show_tutorial_step(text: String, area: Rect2) -> void:
+	_hint_card.hide()  # A tip card would sit behind the dimming; it comes back at its next trigger.
+	_tutorial.show_step(text, area)
+
+
+func update_tutorial_area(area: Rect2) -> void:
+	if _tutorial.is_active():
+		_tutorial.set_hole(area)
+
+
+func hide_tutorial() -> void:
+	_tutorial.clear()
+
+
+func is_tutorial_active() -> bool:
+	return _tutorial.is_active()
+
+
+## Screen rectangles of the HUD parts a tutorial step can light.
+func end_turn_rect() -> Rect2:
+	return _end_turn_button.get_global_rect()
+
+
+func spell_slots_rect() -> Rect2:
+	return _spell_bar.get_node("Slots").get_global_rect()
+
+
+## Shows the current battle speed on its button.
+func set_battle_speed(speed: Settings.BattleSpeed) -> void:
+	match speed:
+		Settings.BattleSpeed.NORMAL: _speed_button.text = tr("Speed x1")
+		Settings.BattleSpeed.FAST: _speed_button.text = tr("Speed x2")
+		Settings.BattleSpeed.INSTANT: _speed_button.text = tr("Speed: skip")
 
 
 ## Makes End turn pulse while the active hero has nothing left to do.

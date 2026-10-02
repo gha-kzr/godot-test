@@ -1,11 +1,13 @@
 @tool
 class_name Settings
 extends RefCounted
-## Player preferences: language, volumes, window mode, UI scale, rebound keys and the hints already seen.
+## Player preferences: language, volumes, battle speed, window mode, UI scale, rebound keys and the hints already seen.
 ## Plain data; SettingsStore saves it (user://settings.cfg, apart from the profile so
 ## resetting the save keeps it) and SettingsApplier puts it into effect.
 
 enum WindowMode { WINDOWED, FULLSCREEN }
+## How fast battles play: animations at normal speed, twice as fast, or skipped.
+enum BattleSpeed { NORMAL, FAST, INSTANT }
 
 const UI_SCALES: Array[float] = [0.75, 1.0, 1.25, 1.5]
 ## The actions the player can rebind, in display order. Right click and Esc (`cancel`)
@@ -31,6 +33,9 @@ var master_volume := 0.8
 var music_volume := 0.5
 var effects_volume := 0.8
 var muted := false
+var battle_speed := BattleSpeed.NORMAL
+## Ends the turn by itself once the acting hero can neither move nor afford a spell.
+var auto_end_turn := false
 var window_mode := WindowMode.WINDOWED
 var ui_scale := 1.0
 ## Action → physical keycode, only for actions the player changed.

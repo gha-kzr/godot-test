@@ -365,17 +365,19 @@ func test_show_hints_again_brings_the_hub_hint_back() -> void:
 	game.free()
 
 
-func test_the_first_battle_hint_shows_on_the_hud_and_is_saved_when_dismissed() -> void:
+func test_the_first_battle_opens_with_the_tutorial_and_skipping_is_saved() -> void:
 	var game := _game()
 	game.start_tower(1)
 	var battle := _battle(game)
-	var card := battle.hud.get_node("%HintCard") as Control
-	assert_true(card.visible, "the first battle opens with its hint")
-	(card.get_node("%DismissButton") as Button).pressed.emit()
-	assert_true(SettingsStore.new(SETTINGS).load_or_default().dismissed_hints.has("first_battle"))
+	assert_true(battle.hud.is_tutorial_active(), "the first battle opens with the first step")
+	battle.hud.get_node("Root").find_child("SkipButton", true, false).pressed.emit()
+	assert_false(battle.hud.is_tutorial_active())
+	assert_true(game.tutorial.is_done("end_turn"), "every step is done")
+	assert_true(SettingsStore.new(SETTINGS).load_or_default().dismissed_hints.has("tutorial_ready"), "and saved")
 	game.start_tower(1)
-	assert_false((_battle(game).hud.get_node("%HintCard") as Control).visible, "not in the next battle")
+	assert_false(_battle(game).hud.is_tutorial_active(), "not in the next battle")
 	game.free()
+
 
 
 func test_resetting_the_save_forgets_the_selected_hero() -> void:
@@ -501,3 +503,91 @@ func test_dropping_a_rune_is_saved_and_ignored_during_a_fight() -> void:
 	game._on_drop_requested(0)
 	assert_eq(game.profile.stash.size(), 1, "never during a fight")
 	game.free()
+
+
+func test_a_web_build_asks_for_a_click_before_the_title_and_the_music_waits_for_it() -> void:
+	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
+	SaveStore.new(SAVE).delete()
+	SettingsStore.new(SETTINGS).delete()
+	var game := GAME_SCENE.instantiate() as Game
+	game.save_path = SAVE
+	game.settings_path = SETTINGS
+	game.require_click_to_start = true
+	_tree().root.add_child(game)
+	assert_true(game.screen is StartScreen, "the start screen first")
+	assert_eq(game.audio.current_music, &"", "no music before the click")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	game.screen._unhandled_input(click)
+	assert_true(game.screen is TitleScreen, "the click goes on to the title")
+	assert_eq(game.audio.current_music, &"hub", "and the title's music starts from the beginning")
+	game.free()
+
+
+func test_a_desktop_build_goes_straight_to_the_title() -> void:
+	var game := _game()
+	assert_true(game.screen is TitleScreen or game.screen is PartyScreen)
+	game.free()
+
+
+func test_the_start_screen_goes_on_with_a_key_or_a_tap_but_not_with_a_release_or_a_held_key() -> void:
+	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
+	_tree().root.add_child(screen)
+	var starts := [0]
+	screen.started.connect(func() -> void: starts[0] += 1)
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	screen._unhandled_input(release)
+	var held := InputEventKey.new()
+	held.keycode = KEY_A
+	held.pressed = true
+	held.echo = true
+	screen._unhandled_input(held)
+	assert_eq(starts[0], 0, "a release and an auto-repeat don't start")
+	var key := InputEventKey.new()
+	key.keycode = KEY_A
+	key.pressed = true
+	screen._unhandled_input(key)
+	var tap := InputEventScreenTouch.new()
+	tap.pressed = true
+	screen._unhandled_input(tap)
+	assert_eq(starts[0], 2, "a key press and a tap do")
+	screen.free()
+
+
+func test_the_title_uses_the_owners_artwork_when_there_is_some_else_the_text() -> void:
+	var title := (load("res://scenes/game/title_screen.tscn") as PackedScene).instantiate() as TitleScreen
+	_tree().root.add_child(title)
+	title.show_title(Game.TITLE)
+	title.apply_branding(null, null)
+	assert_true(title.get_node("%TitleLabel").visible and not title.get_node("%Logo").visible, "no files: the text title")
+	assert_false(title.get_node("%Picture").visible)
+	var texture := PlaceholderTexture2D.new()
+	texture.size = Vector2(64, 32)
+	title.apply_branding(texture, null)
+	assert_true(title.get_node("%Logo").visible and not title.get_node("%TitleLabel").visible, "a logo alone replaces the text")
+	title.apply_branding(texture, texture)
+	assert_false(title.get_node("%Logo").visible or title.get_node("%TitleLabel").visible, "a title picture carries the name itself")
+	assert_true(title.get_node("%Picture").visible, "and fills the screen")
+	assert_true(absf(title.get_node("%Center").anchor_top - TitleScreen.PICTURE_MENU_TOP) < 0.001, "the menu sits under the picture's name")
+	title.apply_branding(null, null)
+	assert_eq(title.get_node("%Center").anchor_top, 0.0, "back to the centred menu")
+	title.free()
+	assert_eq(Game.TITLE, "Rune Ascent")
+	assert_eq(ProjectSettings.get_setting("application/config/name"), "Rune Ascent")
+	assert_true(ProjectSettings.globalize_path("user://").contains("godot-test"), "saves stay in the old folder: " + ProjectSettings.globalize_path("user://"))
+
+
+func test_the_shipped_branding_is_found_and_the_start_screen_shows_it() -> void:
+	assert_true(Branding.title_image() != null, "ui/branding/title_image.jpg is there")
+	assert_eq(ProjectSettings.get_setting("application/config/icon"), "res://ui/branding/icon.png")
+	assert_true(load("res://ui/branding/icon.png") is Texture2D)
+	var start := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
+	_tree().root.add_child(start)
+	start.apply_branding(Branding.title_image())
+	assert_true(start.get_node("%Picture").visible and not start.get_node("%TitleLabel").visible)
+	start.apply_branding(null)
+	assert_true(start.get_node("%TitleLabel").visible and not start.get_node("%Picture").visible)
+	start.free()

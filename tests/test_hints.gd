@@ -8,7 +8,7 @@ func test_a_known_hint_shows_until_dismissed() -> void:
 	assert_true(hints.should_show("hub_intro"))
 	hints.dismiss("hub_intro")
 	assert_false(hints.should_show("hub_intro"))
-	assert_true(hints.should_show("first_battle"), "others are unaffected")
+	assert_true(hints.should_show("first_status"), "others are unaffected")
 	assert_eq(settings.dismissed_hints, ["hub_intro"] as Array[String], "kept in the settings")
 	hints.dismiss("hub_intro")
 	assert_eq(settings.dismissed_hints.size(), 1, "no duplicates")
@@ -17,9 +17,9 @@ func test_a_known_hint_shows_until_dismissed() -> void:
 func test_reset_shows_everything_again_and_unknown_ids_never_show() -> void:
 	var hints := Hints.new(Settings.new())
 	hints.dismiss("hub_intro")
-	hints.dismiss("first_battle")
+	hints.dismiss("first_status")
 	hints.reset()
-	assert_true(hints.should_show("hub_intro") and hints.should_show("first_battle"))
+	assert_true(hints.should_show("hub_intro") and hints.should_show("first_status"))
 	assert_false(hints.should_show("no_such_hint"))
 	assert_eq(hints.text("no_such_hint"), "")
 	assert_true(hints.text("hub_intro").length() > 10)
@@ -46,8 +46,8 @@ func after_each_clean() -> void:
 
 
 func test_hint_texts_name_the_bound_key() -> void:
-	var hints := Hints.new(Settings.new())
-	assert_true(hints.text("first_battle").contains("Ready (Space)"), hints.text("first_battle"))
+	var step := Tutorial.BATTLE_STEPS[0]
+	assert_true(Tutorial.text_of(step).contains("Ready (Space)"), Tutorial.text_of(step))
 	SettingsApplier.set_binding(Settings.new(), &"end_turn", KEY_G)
-	assert_true(hints.text("first_battle").contains("Ready (G)"), hints.text("first_battle"))
-	assert_false(hints.text("first_battle").contains("{"), "no placeholder left")
+	assert_true(Tutorial.text_of(step).contains("Ready (G)"), Tutorial.text_of(step))
+	assert_false(Tutorial.text_of(step).contains("{"), "no placeholder left")

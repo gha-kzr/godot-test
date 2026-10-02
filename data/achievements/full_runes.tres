@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3 uid="uid://8s4osrrues5m"]
+
+[ext_resource type="Script" uid="uid://cqs0xyw32ke7v" path="res://scripts/data/achievement_data.gd" id="1_a"]
+
+[resource]
+script = ExtResource("1_a")
+display_name = "Fully runed"
+description = "Fill all six rune slots of one hero."
+kind = 4
+sort_order = 21

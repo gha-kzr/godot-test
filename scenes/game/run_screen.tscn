@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://brsq6keutpaet" path="res://scripts/game/run_screen.gd" id="1_run"]
 [ext_resource type="PackedScene" uid="uid://cwewpt1cb3tpc" path="res://scenes/game/run/floor_strip.tscn" id="2_strip"]
 [ext_resource type="PackedScene" uid="uid://bffb8c0cwjfcs" path="res://scenes/game/run/party_hp_row.tscn" id="3_row"]
+[ext_resource type="PackedScene" uid="uid://d05xe2ggt3vys" path="res://scenes/game/hint_card.tscn" id="4_hint"]
 
 [node name="RunScreen" type="Control"]
 layout_mode = 3
@@ -77,3 +78,16 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
+
+[node name="HintCard" parent="." instance=ExtResource("4_hint")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -364.0
+offset_top = -24.0
+offset_right = -24.0
+offset_bottom = -24.0

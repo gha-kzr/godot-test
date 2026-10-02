@@ -2,5 +2,8 @@
 
 [ext_resource type="Script" uid="uid://6v2wgl3cklfa" path="res://scripts/data/progression_config.gd" id="1_2oik6"]
 
+[ext_resource type="Resource" uid="uid://c1crad81kemnf" path="res://data/runes/might.tres" id="2_rune"]
+
 [resource]
 script = ExtResource("1_2oik6")
+first_rune = ExtResource("2_rune")

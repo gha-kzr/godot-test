@@ -1,7 +1,7 @@
 @tool
 class_name SettingsStore
 extends RefCounted
-## Reads and writes Settings as a ConfigFile ([display] (language, window mode, UI scale), [audio] (volumes, mute), [keys], [hints]). A missing or
+## Reads and writes Settings as a ConfigFile ([display] (language, window mode, UI scale), [audio] (volumes, mute), [gameplay] (battle speed, auto end turn), [keys], [hints]). A missing or
 ## unreadable file gives defaults (with a warning), and unknown or invalid values fall back
 ## one by one, so a hand-edited file never crashes the game.
 
@@ -30,6 +30,12 @@ func load_or_default() -> Settings:
 		var volume: Variant = config.get_value("audio", field, settings.get(field))
 		if _is_number(volume) and is_finite(float(volume)):
 			settings.set(field, clampf(float(volume), 0.0, 1.0))
+	var speed: Variant = config.get_value("gameplay", "battle_speed", Settings.BattleSpeed.NORMAL)
+	if _is_number(speed) and int(speed) in Settings.BattleSpeed.values():
+		settings.battle_speed = int(speed) as Settings.BattleSpeed
+	var auto_end: Variant = config.get_value("gameplay", "auto_end_turn", false)
+	if auto_end is bool:
+		settings.auto_end_turn = auto_end
 	var muted: Variant = config.get_value("audio", "muted", false)
 	if muted is bool:
 		settings.muted = muted
@@ -60,6 +66,8 @@ static func _is_number(value: Variant) -> bool:
 ## Writes to a temporary file first, then swaps it in. False (with an error) on failure.
 func save(settings: Settings) -> bool:
 	var config := ConfigFile.new()
+	config.set_value("gameplay", "battle_speed", settings.battle_speed)
+	config.set_value("gameplay", "auto_end_turn", settings.auto_end_turn)
 	config.set_value("audio", "master_volume", settings.master_volume)
 	config.set_value("audio", "music_volume", settings.music_volume)
 	config.set_value("audio", "effects_volume", settings.effects_volume)

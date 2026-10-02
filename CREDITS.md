@@ -29,3 +29,4 @@ whenever an external file is added (downloaded, bought or copied), in the same c
 | Sound effect: generic cast | `assets/audio/sfx/cast.ogg` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | JaggedStone | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Victory fanfare | `assets/audio/sfx/victory.wav` | [Victory Fanfare Short](https://opengameart.org/content/victory-fanfare-short) | cynicmusic | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Sound effect: heal | `assets/audio/sfx/heal.wav` | [Cure Magic](https://opengameart.org/content/cure-magic) | Someoneman | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| Rune Ascent title picture and emblem (icon) | `ui/branding/title_image.jpg`, `ui/branding/icon.png` | Provided by the project owner | The project owner | The project's own artwork |

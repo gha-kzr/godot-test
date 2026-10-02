@@ -4,39 +4,9 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 ## Sound and animation leftovers
 
-*Milestone: 7 First impressions · Category: Audio / animation · Pairs with: audio set, unit model*
+*Milestone: 8 Hero depth (or any, it is small) · Category: Audio / animation · Pairs with: audio set, unit model*
 
-What milestone 6b left out on purpose. Sounds: **turn start** stays silent (no candidate liked); cast, death and victory sounds arrived in 6c, with `cast_sound` on `SpellData` and `DamageType` (more per-spell sounds are data). The death sound is quite heavy: its gain (`sfx_gain_db`) may need adjusting by ear. Animation: victory and defeat poses on the result screen, and a better blend between clips (walk to attack). A music loop for the hub that differs from the title's would be a small addition.
-
-## Selecting an enemy to attack also pins its card
-
-*Milestone: 7 First impressions · Category: UI / UX · Pairs with: battle controller click handling, unit card pinning*
-
-Noted by the owner while playing: clicking an enemy to cast a spell on it also pins that enemy's card on the right (the "click a unit to pin its card" rule from milestone 5d), and it is not clear this is wanted. Decide whether a click that casts a spell should pin at all (probably not: pinning only when the click does nothing else), and whether the card should still show on hover. Touches the click path in `BattleController` and its tests.
-
-## Battle speed and quality of life
-
-*Milestone: 7 First impressions · Category: UI / UX · Pairs with: event player timings, settings*
-
-an animation speed setting (normal, fast, skip animations) in the settings and a quick toggle in battle, a faster enemy turn, and possibly an auto end-turn when a hero has nothing left to do (today End turn only pulses). Touches `EventPlayer` / `UnitView` timings (the queue's waits scale with the setting, animations keep playing on their own) and the settings screen. Small and pays off in long runs.
-
-## Better tutorial and tooltips for the first levels
-
-*Milestone: 7 First impressions · Category: UI / UX (onboarding) · Pairs with: hints, first floors*
-
-today the only guidance is the prompt line and two one-time tips (hub, first battle). Improve the first floors: a short guided sequence (place, move, cast, end turn; reading the timeline, the unit cards, the damage preview and the path cost), contextual tips when a situation comes up for the first time (the first rune drop, the first status, the first elite and boss floor, the first level-up and new spell), and clearer tooltips on spells, statuses, stats and runes (what Power, resistance, AP and MP mean). Builds on `Hints` / `HintCard` (dismissals stored in the settings, "Show hints again"); questions for the grill: how intrusive (a scripted first battle vs tips only), keyboard and touch parity, and whether the first floors are also rebalanced to teach one idea at a time.
-
-## Rename the game
-
-*Milestone: 7 First impressions · Category: Branding · Pairs with: repo name, Pages address, save folder*
-
-"Tower Tactics" is a placeholder; ideas: **Rune Ascent** or **Rune Ascend** (runes and the tower climb). To do when a name is chosen: `Game.TITLE` (the title screen), `application/config/name` and the window / web page title (the exported `index.html` takes it), the README and docs headings, the web build's page, and the icon if one is added. Two traps: changing `config/name` **moves the save folder** (`user://` is named after it), so keep saves by setting `application/config/use_custom_user_dir` with `custom_user_dir_name = "godot-test"` first (or migrate the files); and renaming the GitHub repo changes the Pages address (`gha-kzr.github.io/<repo>/`), so decide the repo name at the same time.
-
-## Max floor reached and achievements
-
-*Milestone: 7 First impressions · Category: Meta / UI · Pairs with: profile; feeds meta progression*
-
-show the best floor reached (already recorded as `best_depth`: put it on the title and hub, per hero if useful) and a small achievements list (first boss, first elite, clear a floor without losing a hero, reach floor 10 / 20 / 30, equip a full rune set…), unlocked as the game goes, shown on a simple screen, saved in the profile (and optionally feeding the meta progression). Not a full run history.
+What milestones 6b to 7 left out on purpose: **turn start** stays silent (no candidate liked); a smoother blend between clips (walk to attack); the death sound is heavy, so its gain (`sfx_gain_db`) may need adjusting by ear. Hub and title share one track on purpose.
 
 ## Choosing active spells (5-spell loadout)
 

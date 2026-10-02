@@ -7,16 +7,20 @@ extends Node
 ## the report. No global state: everything a screen needs is passed to it (calls down,
 ## signals up).
 
-## The game's name (a placeholder), shown on the title screen.
-const TITLE := "Tower Tactics"
+## The game's name, shown on the title screen.
+const TITLE := "Rune Ascent"
 const TITLE_SCENE := preload("res://scenes/game/title_screen.tscn")
 const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
+const START_SCENE := preload("res://scenes/game/start_screen.tscn")
+const ACHIEVEMENTS_SCENE := preload("res://scenes/game/achievements_screen.tscn")
 const CREDITS_SCENE := preload("res://scenes/game/credits_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
 ## Distance of the mute button from the corner of the window.
 const OVERLAY_MARGIN := 8.0
+## How long an achievement toast stays.
+const TOAST_SECONDS := 3.5
 const AUDIO_SET := preload("res://data/audio/audio_set.tres")
 
 @export var roster: Roster
@@ -24,6 +28,8 @@ const AUDIO_SET := preload("res://data/audio/audio_set.tres")
 @export var tower: TowerConfig
 @export var save_path := SaveStore.DEFAULT_PATH
 @export var settings_path := SettingsStore.DEFAULT_PATH
+## Ask for a click before the title (browsers keep sound off until one): on in a web build.
+@export var require_click_to_start := OS.has_feature("web")
 ## 0 picks a random seed per battle (floors are deterministic anyway; this is the dice).
 @export var rng_seed := 0
 
@@ -31,7 +37,12 @@ var profile: Profile
 var settings: Settings
 ## Sounds and music; screens and views only ask it by event name.
 var audio: AudioService
+## The guided first steps (their progress lives in the settings).
+var tutorial: Tutorial
 var _mute_button: MuteButton
+var _toast: PanelContainer
+var _toast_label: Label
+var _toast_tween: Tween
 var hints: Hints
 var screen: Node
 var _store: SaveStore
@@ -59,9 +70,22 @@ func _ready() -> void:
 	_settings_store = SettingsStore.new(settings_path)
 	settings = _settings_store.load_or_default()
 	hints = Hints.new(settings)
+	tutorial = Tutorial.new(settings)
 	SettingsApplier.apply(settings, get_window(), false)
 	_mute_button.show_muted(settings.muted)
-	show_title()
+	if require_click_to_start:
+		show_start()
+	else:
+		show_title()
+
+
+## Web only: the click that lets the browser play sound comes before the title.
+func show_start() -> void:
+	var start := START_SCENE.instantiate() as StartScreen
+	_replace_screen(start)
+	start.show_title(TITLE)
+	start.apply_branding(Branding.title_image())
+	start.started.connect(show_title)
 
 
 ## The first screen. Play opens the hub, where a saved run waits as Continue / Abandon.
@@ -69,6 +93,8 @@ func show_title() -> void:
 	var title := TITLE_SCENE.instantiate() as TitleScreen
 	_replace_screen(title)
 	title.show_title(TITLE)
+	title.apply_branding(Branding.logo(), Branding.title_image())
+	title.show_best_floor(profile.best_depth)
 	title.play_pressed.connect(show_party)
 	title.settings_pressed.connect(show_settings)
 	title.quit_pressed.connect(get_tree().quit)
@@ -98,6 +124,18 @@ func _build_overlay() -> void:
 	_mute_button.offset_bottom = OVERLAY_MARGIN + 44.0
 	_mute_button.toggled.connect(_on_mute_toggled)
 	overlay.add_child(_mute_button)
+	_toast = PanelContainer.new()
+	_toast.theme_type_variation = &"Chip"
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_toast.offset_top = 12.0
+	_toast_label = Label.new()
+	_toast_label.theme_type_variation = &"PromptLabel"
+	_toast_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.add_child(_toast_label)
+	_toast.hide()
+	overlay.add_child(_toast)
 
 
 func _on_mute_toggled(muted: bool) -> void:
@@ -105,6 +143,38 @@ func _on_mute_toggled(muted: bool) -> void:
 	_on_settings_changed()
 	if screen is SettingsScreen:
 		(screen as SettingsScreen).sync_audio(settings)  # Its own checkbox follows.
+
+
+## The achievements, a screen under the hub: back returns to it.
+func show_achievements() -> void:
+	var achievements_screen := ACHIEVEMENTS_SCENE.instantiate() as AchievementsScreen
+	_replace_screen(achievements_screen)
+	achievements_screen.show_achievements(profile)
+	achievements_screen.back_pressed.connect(show_party)
+
+
+## Records the achievements just met, saves, and shows a toast with their names.
+func _unlock(unlocked: Array[AchievementData]) -> void:
+	if unlocked.is_empty():
+		return
+	_save()
+	var names: Array[String] = []
+	for achievement in unlocked:
+		names.append(tr(achievement.display_name))
+	_show_toast(tr("Achievement unlocked: %s") % ", ".join(names))
+
+
+## A message at the top of the screen for a few seconds, over every screen.
+func _show_toast(text: String) -> void:
+	_toast_label.text = text
+	_toast.show()
+	_toast.modulate.a = 1.0
+	if _toast_tween != null:
+		_toast_tween.kill()
+	_toast_tween = create_tween()
+	_toast_tween.tween_interval(TOAST_SECONDS)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.6)
+	_toast_tween.tween_callback(_toast.hide)
 
 
 ## The credits, a screen under the settings: back returns to them.
@@ -152,6 +222,9 @@ func show_party(message := "") -> void:
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
 	party.drop_requested.connect(_on_drop_requested)
+	party.achievements_pressed.connect(show_achievements)
+	party.tutorial = tutorial
+	party.tutorial_changed.connect(_on_settings_changed)
 	party.show_profile(profile, _summary, message, tower)
 	if hints.should_show("hub_intro"):
 		party.show_hint(hints.text("hub_intro"))
@@ -199,10 +272,13 @@ func start_battle() -> void:
 	var battle := BATTLE_SCENE.instantiate() as BattleController
 	battle.setup(setup.encounter, setup.units, setup.modifiers, rng_seed, setup.hero_hp,
 			setup.sudden_death_round, setup.sudden_death_percent, setup.title, setup.levels)
-	if hints.should_show("first_battle"):
-		battle.hint_text = hints.text("first_battle")
-		battle.hint_dismissed.connect(_dismiss_hint.bind("first_battle"))
+	battle.tutorial = tutorial
+	battle.hints = hints
+	battle.opening_tip = _opening_tip()
+	battle.tutorial_changed.connect(_on_settings_changed)
 	battle.sound.connect(audio.play_sfx)
+	battle.settings = settings
+	battle.speed_changed.connect(_on_settings_changed)
 	battle.left_battle.connect(_on_battle_left)
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
@@ -212,6 +288,15 @@ func start_battle() -> void:
 	_replace_screen(battle)
 	if battle.battle == null:
 		show_party(tr("The battle couldn't start (see the log)."))
+
+
+## The one-time tip a battle opens with: the first elite floor, boss floor or stage.
+func _opening_tip() -> String:
+	if profile.run.mode == RunState.Mode.STAGE:
+		return "first_stage"
+	if TowerConfig.is_boss_floor(profile.run.floor_number):
+		return "first_boss"
+	return "first_elite" if TowerConfig.is_elite_floor(profile.run.floor_number) else ""
 
 
 ## Shows the hub with the tower's errors, if any (a battle can't be generated from them).
@@ -253,8 +338,11 @@ func _apply_battle_result(state: BattleState) -> void:
 	if state == _applied_state:
 		return
 	_applied_state = state
+	var floor_number := profile.run.floor_number if profile.run != null else 0
+	var is_stage := profile.run != null and profile.run.mode == RunState.Mode.STAGE
 	_report = RunDirector.apply_result(profile, tower, state)
 	_save()
+	_unlock(Achievements.check(profile, Achievements.Context.from_battle(state, floor_number, is_stage) if _report.won else null))
 
 
 func _show_run_screen(report: RunDirector.Report, title: String) -> void:
@@ -265,6 +353,9 @@ func _show_run_screen(report: RunDirector.Report, title: String) -> void:
 	run_screen.boss_choice_made.connect(_on_boss_choice_made)
 	run_screen.back_pressed.connect(_on_back_pressed.bind(report))
 	run_screen.show_report(report, profile, title)
+	if not report.level_ups.is_empty() and hints.should_show("first_level_up"):
+		run_screen.show_hint(hints.text("first_level_up"))
+		run_screen.hint_dismissed.connect(_dismiss_hint.bind("first_level_up"))
 
 
 func _on_boss_choice_made(choice: int, keep_going: bool) -> void:
@@ -319,6 +410,7 @@ func _on_drop_requested(stash_index: int) -> void:
 func _finish_rune_change(error: String) -> void:
 	if error.is_empty():
 		RunDirector.clamp_hp(profile)
+		_unlock(Achievements.check(profile))
 		if not _save():
 			error = tr("Progress couldn't be saved.")
 	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
@@ -341,6 +433,7 @@ func _replace_screen(next: Node) -> void:
 		screen.queue_free()
 	screen = next
 	add_child(next)
-	audio.play_music(_battle_music if next is BattleController else &"hub")
+	if next is not StartScreen:  # Before the first click the browser plays nothing anyway.
+		audio.play_music(_battle_music if next is BattleController else &"hub")
 	if next is Screen:
 		(next as Screen).focus_first.call_deferred()

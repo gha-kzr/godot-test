@@ -12,6 +12,9 @@ extends Resource
 @export_range(1, 1000) var level_cap := 100
 @export_range(0.1, 1000.0) var curve_coefficient := 8.0
 @export_range(1.0, 4.0) var curve_exponent := 2.45
+## The rune the first victory always grants, so a new player has one to learn equipping with
+## (the tutorial's hub step). Empty: none.
+@export var first_rune: RuneData
 ## Total XP for the first levels, by hand (quick first levels); index 0 is level 1 (always 0). The
 ## curve takes over past its end; empty: the curve from level 2.
 @export var xp_thresholds: Array[int] = [0, 20, 50, 90]

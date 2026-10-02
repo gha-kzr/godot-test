@@ -42,11 +42,22 @@ func show_unit(info: UnitInfo) -> void:
 	_ap_label.modulate = _modifier_tint(info.max_ap, info.base_ap)
 	_mp_label.modulate = _modifier_tint(info.max_mp, info.base_mp)
 	_combat_stats.text = info.combat_stats_text()
+	_set_tooltips()
 	_fill_statuses(info.statuses)
 	var listed: Array[SpellData] = []
 	if show_spells:
 		listed = info.spells
 	_fill_spells(listed)
+
+
+## Hovering the numbers explains the terms.
+func _set_tooltips() -> void:
+	for pair: Array in [[_hp_label, &"hp"], [_ap_label, &"ap"], [_mp_label, &"mp"]]:
+		var label := pair[0] as Label
+		label.tooltip_text = Glossary.tip(pair[1])
+		label.mouse_filter = Control.MOUSE_FILTER_PASS
+	_combat_stats.tooltip_text = Glossary.tips([&"power", &"resistance"] as Array[StringName])
+	_combat_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 
 
 ## Shows the ✕ that unpins the card.

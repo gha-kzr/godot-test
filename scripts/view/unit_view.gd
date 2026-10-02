@@ -206,6 +206,11 @@ func play_hit(amount: int, hp_after: int) -> void:
 	await _play_hp_change("-%d" % amount, DAMAGE_COLOR, hp_after)
 
 
+## The cheer of the winning side on the result screen (nothing for a model without the clip).
+func play_victory() -> void:
+	_play_model(&"Victory")
+
+
 func play_heal(amount: int, hp_after: int) -> void:
 	await _play_hp_change("+%d" % amount, HEAL_COLOR, hp_after)
 

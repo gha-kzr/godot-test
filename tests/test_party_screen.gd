@@ -133,6 +133,8 @@ func test_every_hub_button_takes_keyboard_focus() -> void:
 	var buttons := 0
 	while not nodes.is_empty():
 		var node: Node = nodes.pop_back()
+		if node is TutorialOverlay:
+			continue  # Its Skip link must not take the keyboard focus the spotlight blocks.
 		nodes.append_array(node.get_children())
 		if node is BaseButton or node is OptionButton:
 			buttons += 1

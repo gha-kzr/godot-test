@@ -54,16 +54,27 @@ func test_elites_are_stronger_than_a_normal_enemy_of_their_level_and_bosses_than
 	assert_true(hp.call(elite) > hp.call(normal) and hp.call(boss) > hp.call(elite))
 
 
+## Total XP of a first climb that clears every floor, before each floor: [0, xp before floor 1,
+## before floor 2, ...]. Generating floors is slow, so the whole climb is computed once.
+static var _xp_before: Array[int] = []
+
+
+func _climb_xp(floor_number: int) -> int:
+	if _xp_before.is_empty():
+		var tower := _tower()
+		var xp := 0
+		_xp_before.append(0)
+		for floor_index in range(1, 131):
+			_xp_before.append(xp)
+			for spawn in FloorGenerator.encounter(tower, floor_index).spawns:
+				xp += spawn.enemy.build(spawn.level, spawn.preset).reward.xp
+	return _xp_before[floor_number]
+
+
 ## The hero level reached at the start of floor `floor_number` of a first climb that clears
 ## every floor.
 func _hero_level_at(floor_number: int) -> int:
-	var tower := _tower()
-	var config := _roster().config
-	var xp := 0
-	for floor_index in range(1, floor_number):
-		for spawn in FloorGenerator.encounter(tower, floor_index).spawns:
-			xp += spawn.enemy.build(spawn.level, spawn.preset).reward.xp
-	return config.level_for_xp(xp)
+	return _roster().config.level_for_xp(_climb_xp(floor_number))
 
 
 func test_levelling_follows_the_pace_targets() -> void:

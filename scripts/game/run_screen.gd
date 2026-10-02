@@ -10,6 +10,8 @@ extends Screen
 signal next_pressed
 ## The player wants the hub (to change runes) between two floors.
 signal party_pressed
+## The tip card was dismissed.
+signal hint_dismissed
 ## `choice`: an index into the boss offer, or RunDirector.HEAL.
 signal boss_choice_made(choice: int, keep_going: bool)
 
@@ -25,6 +27,12 @@ var choice := NONE
 @onready var _boons: Label = %Boons
 @onready var _choices: VBoxContainer = %Choices
 @onready var _buttons: HBoxContainer = %Buttons
+@onready var _hint_card: HintCard = %HintCard
+
+
+## Shows a dismissable tip card.
+func show_hint(text: String) -> void:
+	_hint_card.show_hint(text)
 
 
 ## `title`: e.g. "Floor 3 cleared". The next step comes from profile.run (null once the run ended).
@@ -54,6 +62,7 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 
 func _ready() -> void:
 	back_enabled = false  # Leaving the run is an explicit button.
+	_hint_card.dismissed.connect(hint_dismissed.emit)
 
 
 func select_choice(value: int) -> void:

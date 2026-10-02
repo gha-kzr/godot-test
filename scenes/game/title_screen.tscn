@@ -21,7 +21,31 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.1, 0.11, 0.14, 1)
 
+[node name="Picture" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="Picture"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.35)
+
 [node name="Center" type="CenterContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,6 +57,14 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_constants/separation = 14
 
+[node name="Logo" type="TextureRect" parent="Center/Rows"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="TitleLabel" type="Label" parent="Center/Rows"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -42,6 +74,7 @@ text = "Title"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="Center/Rows"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 
@@ -63,3 +96,10 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
 text = "Quit"
+
+[node name="BestLabel" type="Label" parent="Center/Rows"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"PromptLabel"
+horizontal_alignment = 1

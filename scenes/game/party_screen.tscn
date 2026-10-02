@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cgugftdm3dh0a" path="res://scenes/game/hub/destination_bar.tscn" id="5_bar"]
 [ext_resource type="PackedScene" uid="uid://d05xe2ggt3vys" path="res://scenes/game/hint_card.tscn" id="6_hint"]
 [ext_resource type="Texture2D" uid="uid://drved486jxqgs" path="res://ui/icons/arrow_back.svg" id="7_back"]
+[ext_resource type="Texture2D" uid="uid://dkr6ovhdkbpq" path="res://ui/icons/trophy.svg" id="8_trophy"]
 
 [node name="PartyScreen" type="Control"]
 layout_mode = 3
@@ -59,8 +60,17 @@ theme_type_variation = &"HeaderLabel"
 text = "Party"
 horizontal_alignment = 1
 
+[node name="AchievementsButton" type="Button" parent="Rows/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+tooltip_text = "Achievements"
+icon = ExtResource("8_trophy")
+icon_alignment = 1
+expand_icon = true
+
 [node name="Spacer" type="Control" parent="Rows/TopBar"]
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 
 [node name="Summary" type="Label" parent="Rows"]

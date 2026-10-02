@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3 uid="uid://bk2kb8ffgdgxx"]
+
+[ext_resource type="Script" uid="uid://cqs0xyw32ke7v" path="res://scripts/data/achievement_data.gd" id="1_a"]
+
+[resource]
+script = ExtResource("1_a")
+display_name = "Level 30"
+description = "Bring a hero to level 30."
+kind = 5
+threshold = 30
+sort_order = 31

@@ -23,6 +23,8 @@ var _key_buttons: Dictionary[StringName, Button] = {}
 @onready var _music: HSlider = %MusicVolume
 @onready var _effects: HSlider = %EffectsVolume
 @onready var _muted: CheckButton = %Muted
+@onready var _battle_speed: OptionButton = %BattleSpeed
+@onready var _auto_end_turn: CheckButton = %AutoEndTurn
 @onready var _window_row: HBoxContainer = %WindowRow
 @onready var _window_mode: OptionButton = %WindowMode
 @onready var _ui_scale: OptionButton = %UiScale
@@ -60,6 +62,15 @@ func _ready() -> void:
 			_dragging = false
 			changed.emit())  # Saved once, when the knob is let go.
 	_muted.toggled.connect(_on_muted_toggled)
+	_battle_speed.add_item("Normal", Settings.BattleSpeed.NORMAL)
+	_battle_speed.add_item("Fast (x2)", Settings.BattleSpeed.FAST)
+	_battle_speed.add_item("Instant (skip animations)", Settings.BattleSpeed.INSTANT)
+	_battle_speed.item_selected.connect(func(index: int) -> void:
+		_settings.battle_speed = _battle_speed.get_item_id(index) as Settings.BattleSpeed
+		changed.emit())
+	_auto_end_turn.toggled.connect(func(pressed: bool) -> void:
+		_settings.auto_end_turn = pressed
+		changed.emit())
 	_window_mode.item_selected.connect(_on_window_mode_selected)
 	_ui_scale.item_selected.connect(_on_ui_scale_selected)
 	_reset_keys.pressed.connect(_on_reset_keys)
@@ -90,6 +101,8 @@ func show_settings(settings: Settings) -> void:
 	_music.set_value_no_signal(settings.music_volume)
 	_effects.set_value_no_signal(settings.effects_volume)
 	_muted.set_pressed_no_signal(settings.muted)
+	_battle_speed.select(_battle_speed.get_item_index(settings.battle_speed))
+	_auto_end_turn.set_pressed_no_signal(settings.auto_end_turn)
 	_window_mode.select(_window_mode.get_item_index(settings.window_mode))
 	_ui_scale.select(Settings.UI_SCALES.find(settings.ui_scale))
 	_build_bindings()
@@ -150,7 +163,7 @@ func _link_focus() -> void:
 	if _window_row.visible:
 		chain.append(_window_mode)
 	chain.append(_ui_scale)
-	chain.append_array([_master, _music, _effects, _muted])
+	chain.append_array([_master, _music, _effects, _muted, _battle_speed, _auto_end_turn])
 	for action in Settings.REBINDABLE:
 		chain.append(_key_buttons[action])
 	chain.append_array([_reset_keys, _show_hints, _reset_save, _credits_button])

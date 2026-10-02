@@ -7,6 +7,10 @@ msgstr ""
 msgid "%d / %d HP"
 msgstr ""
 
+#: scripts/game/achievements_screen.gd
+msgid "%d / %d unlocked"
+msgstr ""
+
 #: scripts/view/hud/spell_bar.gd
 msgid "%d AP"
 msgstr ""
@@ -209,8 +213,32 @@ msgstr ""
 msgid "0 AP"
 msgstr ""
 
+#: scripts/progression/hints.gd
+msgid "A boss floor! The boss is much stronger. Winning offers a boon (a bonus for the whole run) or a full heal."
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "A stage: one hard boss fight. Win it to raise the tower's top floor and start your climbs higher."
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "A status is on a unit: its icon shows the turns left. Hover the unit to read what it does."
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd
 msgid "Abandon run"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Achievement unlocked: %s"
+msgstr ""
+
+#: scenes/game/achievements_screen.tscn scenes/game/party_screen.tscn
+msgid "Achievements"
 msgstr ""
 
 #: scenes/battle/hud/turn_timeline.tscn
@@ -221,12 +249,20 @@ msgstr ""
 msgid "All (%s)"
 msgstr ""
 
+#: scripts/progression/hints.gd
+msgid "An elite floor: its enemies are stronger and drop better runes. Take your time."
+msgstr ""
+
 #: scripts/view/hud/unit_card.gd
 msgid "AP %d / %d"
 msgstr ""
 
 #: scenes/battle/hud/unit_card.tscn
 msgid "AP 0 / 0"
+msgstr ""
+
+#: scripts/data/glossary.gd
+msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr ""
 
 #: data/units/archer.tres
@@ -241,11 +277,15 @@ msgstr ""
 msgid "Audio"
 msgstr ""
 
+#: scenes/game/settings_screen.tscn
+msgid "Auto end turn"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Automatic"
 msgstr ""
 
-#: scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
+#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
 msgid "Back"
 msgstr ""
 
@@ -257,8 +297,20 @@ msgstr ""
 msgid "Back to the title"
 msgstr ""
 
+#: scenes/game/settings_screen.tscn
+msgid "Battle"
+msgstr ""
+
 #: scripts/view/hud.gd
 msgid "Battle seed %d"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Battle speed"
+msgstr ""
+
+#: scripts/game/title_screen.gd
+msgid "Best floor: %d"
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -273,6 +325,14 @@ msgstr ""
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr ""
 
+#: data/achievements/level_10.tres
+msgid "Bring a hero to level 10."
+msgstr ""
+
+#: data/achievements/level_30.tres
+msgid "Bring a hero to level 30."
+msgstr ""
+
 #: data/units/brute.tres
 msgid "Brute"
 msgstr ""
@@ -285,12 +345,16 @@ msgstr ""
 msgid "Circle"
 msgstr ""
 
-#: scripts/game/hub/destination_bar.gd
-msgid "Clear the previous stage first."
+#: data/achievements/first_stage.tres
+msgid "Clear a stage."
 msgstr ""
 
-#: scripts/progression/hints.gd
-msgid "Click a rune in the stash to equip it on the selected hero, then climb the tower or try a stage."
+#: data/achievements/all_stages.tres
+msgid "Clear every stage."
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Clear the previous stage first."
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -301,8 +365,16 @@ msgstr ""
 msgid "Click to look at this unit"
 msgstr ""
 
+#: scenes/game/start_screen.tscn
+msgid "Click to start"
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd
 msgid "Climb the tower"
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "Climb the tower to fight floor after floor, or try a stage: one hard battle that unlocks higher floors."
 msgstr ""
 
 #: scenes/battle/hud/order_overlay.tscn
@@ -377,8 +449,20 @@ msgstr ""
 msgid "End turn (%s)"
 msgstr ""
 
+#: scenes/game/settings_screen.tscn
+msgid "Ends your turn by itself when a hero can neither move nor cast."
+msgstr ""
+
 #: scripts/data/rune_data.gd
 msgid "Epic"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Fast (x2)"
+msgstr ""
+
+#: data/achievements/full_runes.tres
+msgid "Fill all six rune slots of one hero."
 msgstr ""
 
 #: data/damage_types/fire.tres
@@ -395,6 +479,18 @@ msgstr ""
 
 #: data/spells/firebolt.tres
 msgid "Firebolt"
+msgstr ""
+
+#: data/achievements/first_boss.tres
+msgid "First boss"
+msgstr ""
+
+#: data/achievements/first_elite.tres
+msgid "First elite"
+msgstr ""
+
+#: data/achievements/flawless.tres
+msgid "Flawless"
 msgstr ""
 
 #: scripts/game/run_screen.gd scripts/run/run_director.gd
@@ -417,6 +513,22 @@ msgstr ""
 msgid "Floor %d isn't unlocked as a starting floor."
 msgstr ""
 
+#: data/achievements/floor_10.tres
+msgid "Floor 10"
+msgstr ""
+
+#: data/achievements/floor_20.tres
+msgid "Floor 20"
+msgstr ""
+
+#: data/achievements/floor_30.tres
+msgid "Floor 30"
+msgstr ""
+
+#: data/achievements/floor_40.tres
+msgid "Floor 40"
+msgstr ""
+
 #: data/boons/focus_crown.tres
 msgid "Focus Crown"
 msgstr ""
@@ -435,6 +547,10 @@ msgstr ""
 
 #: scripts/game/settings_screen.gd
 msgid "Fullscreen"
+msgstr ""
+
+#: data/achievements/full_runes.tres
+msgid "Fully runed"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -485,8 +601,24 @@ msgstr ""
 msgid "HP %d / %d"
 msgstr ""
 
+#: scripts/data/glossary.gd
+msgid "HP: health. At 0 the unit falls."
+msgstr ""
+
+#: scripts/data/glossary.gd
+msgid "Initiative: the higher it is, the earlier the unit plays."
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Instant (skip animations)"
+msgstr ""
+
 #: data/boons/iron_ward.tres
 msgid "Iron Ward"
+msgstr ""
+
+#: scripts/progression/tutorial.gd
+msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -519,6 +651,14 @@ msgstr ""
 
 #: scripts/data/rune_data.gd
 msgid "Legendary"
+msgstr ""
+
+#: data/achievements/level_10.tres
+msgid "Level 10"
+msgstr ""
+
+#: data/achievements/level_30.tres
+msgid "Level 30"
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -555,6 +695,10 @@ msgstr ""
 
 #: scenes/battle/hud/unit_card.tscn
 msgid "MP 0 / 0"
+msgstr ""
+
+#: scripts/data/glossary.gd
+msgid "MP: movement points. Walking costs 1 per cell (and 1 more per step up); they refill every turn."
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -601,6 +745,10 @@ msgstr ""
 msgid "none"
 msgstr ""
 
+#: scripts/game/settings_screen.gd
+msgid "Normal"
+msgstr ""
+
 #: scenes/battle/hud.tscn
 msgid "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
 msgstr ""
@@ -611,6 +759,10 @@ msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
+msgstr ""
+
+#: scripts/progression/tutorial.gd
+msgid "Orange cells can be targeted. Click an enemy to cast the spell on it."
 msgstr ""
 
 #: scripts/game/run_screen.gd scenes/game/party_screen.tscn
@@ -627,10 +779,6 @@ msgstr ""
 
 #: data/spells/piercing_thrust.tres
 msgid "Piercing Thrust"
-msgstr ""
-
-#: scripts/progression/hints.gd
-msgid "Place your heroes on the teal cells, then press Ready ({end_turn}). Hover anything for details; click a unit to pin its card."
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -659,6 +807,10 @@ msgstr ""
 
 #: scripts/view/hud/unit_info.gd
 msgid "Power: All %+d%%\nResist: %s"
+msgstr ""
+
+#: scripts/data/glossary.gd
+msgid "Power: percent added to the damage and heals of the unit's spells."
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -701,6 +853,22 @@ msgstr ""
 msgid "Rare"
 msgstr ""
 
+#: data/achievements/floor_10.tres
+msgid "Reach floor 10 of the tower."
+msgstr ""
+
+#: data/achievements/floor_20.tres
+msgid "Reach floor 20 of the tower."
+msgstr ""
+
+#: data/achievements/floor_30.tres
+msgid "Reach floor 30 of the tower."
+msgstr ""
+
+#: data/achievements/floor_40.tres
+msgid "Reach floor 40 of the tower."
+msgstr ""
+
 #: scripts/view/hud.gd
 msgid "Ready (%s)"
 msgstr ""
@@ -735,6 +903,10 @@ msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
 msgid "Resistance: %s"
+msgstr ""
+
+#: scripts/data/glossary.gd
+msgid "Resistance: percent less damage of one type (never more than half)."
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -817,6 +989,10 @@ msgstr ""
 msgid "Single"
 msgstr ""
 
+#: scripts/game/tutorial_overlay.gd
+msgid "Skip tutorial"
+msgstr ""
+
 #: data/stages/sky_bastion.tres
 msgid "Sky Bastion"
 msgstr ""
@@ -827,6 +1003,18 @@ msgstr ""
 
 #: data/spells/smash.tres
 msgid "Smash"
+msgstr ""
+
+#: scripts/view/hud.gd scenes/battle/hud.tscn
+msgid "Speed x1"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Speed x2"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Speed: skip"
 msgstr ""
 
 #: scenes/battle/hud/spell_bar.tscn
@@ -859,6 +1047,18 @@ msgstr ""
 
 #: scenes/game/hub/hero_panel.tscn
 msgid "Spells"
+msgstr ""
+
+#: scripts/progression/tutorial.gd
+msgid "Spells cost AP. Pick one (or press its number) to see where it can reach."
+msgstr ""
+
+#: data/achievements/first_stage.tres
+msgid "Stage cleared"
+msgstr ""
+
+#: data/achievements/all_stages.tres
+msgid "Stage master"
 msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
@@ -937,7 +1137,7 @@ msgstr ""
 msgid "Titan's Heart"
 msgstr ""
 
-#: scenes/game/title_screen.tscn
+#: scenes/game/start_screen.tscn scenes/game/title_screen.tscn
 msgid "Title"
 msgstr ""
 
@@ -1013,8 +1213,24 @@ msgstr ""
 msgid "Volley"
 msgstr ""
 
+#: scripts/progression/tutorial.gd
+msgid "When you are done, end your turn ({end_turn}). The enemies play next."
+msgstr ""
+
 #: data/spells/whirlwind.tres
 msgid "Whirlwind"
+msgstr ""
+
+#: data/achievements/first_boss.tres
+msgid "Win a boss fight: a boss floor (a multiple of 10) or a stage."
+msgstr ""
+
+#: data/achievements/first_elite.tres
+msgid "Win a fight on an elite floor (a floor ending in 5)."
+msgstr ""
+
+#: data/achievements/flawless.tres
+msgid "Win a floor without a single hero falling."
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -1041,12 +1257,20 @@ msgstr ""
 msgid "Yes, reset"
 msgstr ""
 
+#: scripts/progression/tutorial.gd
+msgid "You found a rune! Click it in the stash to equip it on the selected hero."
+msgstr ""
+
 #: scripts/run/run_director.gd
 msgid "You leave the tower after floor %d."
 msgstr ""
 
 #: scripts/game/game.gd
 msgid "You left the fight. It starts over when you continue the run."
+msgstr ""
+
+#: scripts/progression/tutorial.gd
+msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr ""
 
 #: scripts/data/apply_status_effect.gd

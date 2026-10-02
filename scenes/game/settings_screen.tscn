@@ -183,6 +183,31 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Mute"
 
+[node name="GameplayTitle" type="Label" parent="Rows/Scroll/Margin/Sections"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Battle"
+
+[node name="SpeedRow" type="HBoxContainer" parent="Rows/Scroll/Margin/Sections"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Rows/Scroll/Margin/Sections/SpeedRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Battle speed"
+
+[node name="BattleSpeed" type="OptionButton" parent="Rows/Scroll/Margin/Sections/SpeedRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+
+[node name="AutoEndTurn" type="CheckButton" parent="Rows/Scroll/Margin/Sections"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Auto end turn"
+tooltip_text = "Ends your turn by itself when a hero can neither move nor cast."
+
 [node name="ControlsTitle" type="Label" parent="Rows/Scroll/Margin/Sections"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"

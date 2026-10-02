@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3 uid="uid://b34ie72bnmf5s"]
+
+[ext_resource type="Script" uid="uid://cqs0xyw32ke7v" path="res://scripts/data/achievement_data.gd" id="1_a"]
+
+[resource]
+script = ExtResource("1_a")
+display_name = "First boss"
+description = "Win a boss fight: a boss floor (a multiple of 10) or a stage."
+kind = 2

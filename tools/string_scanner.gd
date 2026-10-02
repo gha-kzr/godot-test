@@ -13,7 +13,7 @@ const EXCLUDED_SCRIPT_DIRS: Array[String] = ["res://scripts/tools"]
 const SCENE_DIR := "res://scenes"
 const DATA_DIR := "res://data"
 const SCENE_PROPERTIES: Array[String] = ["text", "tooltip_text", "title", "placeholder_text"]
-const DATA_PROPERTIES: Array[String] = ["display_name", "tag"]
+const DATA_PROPERTIES: Array[String] = ["display_name", "tag", "description"]
 
 ## Functions that put a text argument on a Control: name → the index of that argument.
 const TEXT_HELPERS: Dictionary[String, int] = {
@@ -44,6 +44,10 @@ func scan_all() -> void:
 		_scan_lines(path, _data_pattern)
 	for text in Hints.TEXTS.values():
 		_add(text, "", "", "scripts/progression/hints.gd")
+	for text in Glossary.TEXTS.values():
+		_add(text, "", "", "scripts/data/glossary.gd")
+	for step in Tutorial.BATTLE_STEPS + Tutorial.HUB_STEPS:
+		_add(step["text"], "", "", "scripts/progression/tutorial.gd")
 	for text in Settings.ACTION_LABELS.values():
 		_add(text, "", "", "scripts/progression/settings.gd")
 	for kind_name in AreaShape.Kind.keys():  # Shown by SpellBar.detail_lines as the capitalized name.
