@@ -4,7 +4,7 @@ extends TestCase
 
 const SLICE_MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
-const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
+const ENEMIES := ["res://data/units/brute.tres", "res://data/units/skeleton_archer.tres"]
 
 
 class Stage:

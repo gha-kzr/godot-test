@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dlbpiywp7yi2b"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_rns42"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_biklg"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_rfce6"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_1svhb"]
+[ext_resource type="Texture2D" uid="uid://0bakvd2858y4" path="res://ui/icons/bone_arrow.svg" id="5_vtxce"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="6_x2pva"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_7ysoe"]
+
+[sub_resource type="Resource" id="Resource_7sis8"]
+script = ExtResource("1_rns42")
+
+[sub_resource type="Resource" id="Resource_2hvtv"]
+script = ExtResource("4_1svhb")
+min_amount = 5
+max_amount = 7
+damage_type = ExtResource("3_rfce6")
+
+[resource]
+script = ExtResource("7_7ysoe")
+display_name = "Bone Arrow"
+icon = ExtResource("5_vtxce")
+projectile = ExtResource("6_x2pva")
+projectile_speed = 20.0
+min_range = 2
+max_range = 6
+height_extends_range = true
+area = SubResource("Resource_7sis8")
+effects = Array[ExtResource("2_biklg")]([SubResource("Resource_2hvtv")])

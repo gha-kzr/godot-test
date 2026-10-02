@@ -3,7 +3,8 @@ class_name FloorGenerator
 extends RefCounted
 ## Builds a tower floor's (or a stage's) encounter from its number: the same map and
 ## enemies for everyone, since the RNG is seeded from the tower's salt and the floor.
-## Floors ending in 5 have an elite, multiples of 10 a boss with escorts.
+## Floors ending in 5 have an elite, multiples of 10 a boss with escorts. An enemy with a
+## `max_per_floor` is never drawn past it.
 
 
 static func encounter(config: TowerConfig, floor_number: int) -> Encounter:
@@ -36,7 +37,11 @@ static func _build(config: TowerConfig, floor_number: int, rng: RandomNumberGene
 			spawn.enemy = band.boss_pool[rng.randi_range(0, band.boss_pool.size() - 1)]
 			spawn.preset = config.boss_preset
 		else:
-			spawn.enemy = band.enemy_pool[rng.randi_range(0, band.enemy_pool.size() - 1)]
+			var pool := band.enemy_pool.filter(func(enemy: EnemyData) -> bool:
+				return enemy.max_per_floor <= 0 or result.spawns.filter(func(s: EncounterSpawn) -> bool: return s.enemy == enemy).size() < enemy.max_per_floor)
+			if pool.is_empty():
+				pool = band.enemy_pool  # Every enemy capped: the band is too small for its count.
+			spawn.enemy = pool[rng.randi_range(0, pool.size() - 1)]
 			spawn.preset = config.elite_preset if i == 0 and TowerConfig.is_elite_floor(floor_number) else config.normal_preset
 		result.spawns.append(spawn)
 	result.map = MapGenerator.generate(rng, config.map_settings, count, boss,

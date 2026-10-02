@@ -4,7 +4,9 @@
 [ext_resource type="Resource" uid="uid://cw0qadwpbynea" path="res://data/ai/default.tres" id="1_hfmpi"]
 [ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="2_hfmpi"]
 [ext_resource type="Resource" uid="uid://cljtsr3vu6yxp" path="res://data/enemies/brute.tres" id="3_6mk45"]
-[ext_resource type="Resource" uid="uid://5et4vmvo2won" path="res://data/enemies/archer.tres" id="4_7d522"]
+[ext_resource type="Resource" uid="uid://jw1uo3o7t48e" path="res://data/enemies/skeleton_archer.tres" id="4_7d522"]
+[ext_resource type="Resource" uid="uid://b5vymr4wg3xdd" path="res://data/enemies/ghoul.tres" id="m8_ghoul"]
+[ext_resource type="Resource" uid="uid://cv01vnhjwp5cl" path="res://data/enemies/ghost.tres" id="m8_ghost"]
 [ext_resource type="Script" uid="uid://7x1a0mgytc88" path="res://scripts/data/boon_data.gd" id="5_1pmip"]
 [ext_resource type="Resource" uid="uid://cp682n27hhug1" path="res://data/boons/tower_might.tres" id="6_da6r2"]
 [ext_resource type="Resource" uid="uid://2hdoidu40ayc" path="res://data/boons/tough_skin.tres" id="7_mqrmq"]
@@ -45,8 +47,8 @@ enemy_level = 2
 levels_per_floor = 0.4
 min_enemies = 3
 max_enemies = 3
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul")])
 
 [sub_resource type="Resource" id="Resource_1pmip"]
 script = ExtResource("1_2021b")
@@ -55,8 +57,8 @@ enemy_level = 8
 levels_per_floor = 0.31
 min_enemies = 3
 max_enemies = 3
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
 
 [sub_resource type="Resource" id="Resource_da6r2"]
 script = ExtResource("1_2021b")
@@ -65,8 +67,8 @@ enemy_level = 12
 levels_per_floor = 0.3
 min_enemies = 4
 max_enemies = 4
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
 
 [sub_resource type="Resource" id="Resource_mqrmq"]
 script = ExtResource("1_2021b")
@@ -75,8 +77,8 @@ enemy_level = 18
 levels_per_floor = 0.28
 min_enemies = 4
 max_enemies = 4
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
 
 [sub_resource type="Resource" id="Resource_m824n"]
 script = ExtResource("1_2021b")
@@ -85,8 +87,8 @@ enemy_level = 23
 levels_per_floor = 0.28
 min_enemies = 5
 max_enemies = 5
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
 
 [sub_resource type="Resource" id="Resource_elsql"]
 script = ExtResource("1_2021b")
@@ -95,8 +97,8 @@ enemy_level = 29
 levels_per_floor = 0.25
 min_enemies = 5
 max_enemies = 5
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
 
 [sub_resource type="Resource" id="Resource_mdxgi"]
 script = ExtResource("17_dasot")

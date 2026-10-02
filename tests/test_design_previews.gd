@@ -49,8 +49,8 @@ func test_enemy_rows_cover_levels_and_presets() -> void:
 
 
 func test_enemy_summary_lists_loot_odds() -> void:
-	var text := "\n".join(EnemyPreview.summary(load("res://data/enemies/archer.tres") as EnemyData))
-	assert_true(text.contains("Archer — +3 HP and +4 Power per level"), text)
+	var text := "\n".join(EnemyPreview.summary(load("res://data/enemies/skeleton_archer.tres") as EnemyData))
+	assert_true(text.contains("Skeleton Archer — +3 HP and +4 Power per level"), text)
 	assert_true(text.contains("Rune of Focus"), text)
 	assert_true(text.contains("per roll"), text)
 

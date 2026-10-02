@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bwm8usljesqst"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_6xsbv"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="2_ly4mj"]
+[ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="3_vm64c"]
+[ext_resource type="PackedScene" uid="uid://dy87ccp800m0w" path="res://assets/quaternius/monsters/Ghost.glb" id="4_2irem"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_kmiac"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_3w4te"]
+[ext_resource type="Resource" uid="uid://bicmvcrbk87sw" path="res://data/spells/chill_touch.tres" id="7_o0h2d"]
+[ext_resource type="Resource" uid="uid://b75kumhcl5guq" path="res://data/spells/wail.tres" id="8_55vt5"]
+
+[sub_resource type="Resource" id="Resource_joei4"]
+script = ExtResource("1_6xsbv")
+stat = 4
+amount = 100
+damage_type = ExtResource("2_ly4mj")
+
+[sub_resource type="Resource" id="Resource_j2iax"]
+script = ExtResource("1_6xsbv")
+stat = 4
+amount = -50
+damage_type = ExtResource("3_vm64c")
+
+[resource]
+script = ExtResource("5_kmiac")
+display_name = "Ghost"
+max_hp = 20
+mp = 4
+initiative = 120
+spells = Array[ExtResource("6_3w4te")]([ExtResource("7_o0h2d"), ExtResource("8_55vt5")])
+innate_modifiers = Array[ExtResource("1_6xsbv")]([SubResource("Resource_joei4"), SubResource("Resource_j2iax")])
+color = Color(0.55, 0.4, 0.8, 1)
+model_scene = ExtResource("4_2irem")
+model_scale = 0.42
+model_height = 1.3

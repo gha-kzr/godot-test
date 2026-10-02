@@ -107,7 +107,7 @@ func test_encounter_builds_and_validation() -> void:
 	var encounter := load("res://data/encounters/slice.tres") as Encounter
 	assert_eq(encounter.get_validation_errors(), PackedStringArray())
 	var builds := encounter.builds()
-	assert_eq(builds.map(func(b: EnemyData.Build) -> String: return b.label), ["Brute Lv 1", "Archer Lv 1"])
+	assert_eq(builds.map(func(b: EnemyData.Build) -> String: return b.label), ["Brute Lv 1", "Skeleton Archer Lv 1"])
 	var bad := Encounter.new()
 	bad.display_name = "Bad"
 	var errors := Array(bad.get_validation_errors())

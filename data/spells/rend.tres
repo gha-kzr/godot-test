@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ljmd26clkr6d"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_7y122"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_lknyq"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_3is25"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_gyqk3"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="5_etfv0"]
+[ext_resource type="Resource" uid="uid://dwd0srqca2oww" path="res://data/statuses/crippled.tres" id="6_55fv7"]
+[ext_resource type="Texture2D" uid="uid://dva4dgm8sb7n8" path="res://ui/icons/rend.svg" id="7_2kam8"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_52u1x"]
+
+[sub_resource type="Resource" id="Resource_ularl"]
+script = ExtResource("1_7y122")
+
+[sub_resource type="Resource" id="Resource_kryuv"]
+script = ExtResource("4_gyqk3")
+min_amount = 5
+max_amount = 7
+damage_type = ExtResource("3_3is25")
+
+[sub_resource type="Resource" id="Resource_7sbav"]
+script = ExtResource("5_etfv0")
+status = ExtResource("6_55fv7")
+
+[resource]
+script = ExtResource("8_52u1x")
+display_name = "Rend"
+icon = ExtResource("7_2kam8")
+cooldown = 2
+needs_line_of_sight = false
+area = SubResource("Resource_ularl")
+effects = Array[ExtResource("2_lknyq")]([SubResource("Resource_kryuv"), SubResource("Resource_7sbav")])

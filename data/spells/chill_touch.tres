@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bicmvcrbk87sw"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_wssje"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_rltpu"]
+[ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="3_jofat"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_cdv0y"]
+[ext_resource type="Texture2D" uid="uid://depqno5d0k8pe" path="res://ui/icons/chill_touch.svg" id="5_hwlvo"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_ghinj"]
+
+[sub_resource type="Resource" id="Resource_gum2j"]
+script = ExtResource("1_wssje")
+
+[sub_resource type="Resource" id="Resource_ch0h6"]
+script = ExtResource("4_cdv0y")
+min_amount = 5
+max_amount = 7
+damage_type = ExtResource("3_jofat")
+
+[resource]
+script = ExtResource("6_ghinj")
+display_name = "Chill Touch"
+icon = ExtResource("5_hwlvo")
+max_range = 2
+needs_line_of_sight = false
+area = SubResource("Resource_gum2j")
+effects = Array[ExtResource("2_rltpu")]([SubResource("Resource_ch0h6")])

@@ -209,9 +209,6 @@ msgstr "PA 0 / 0"
 msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr "PA : points d'action. Chaque sort en coûte ; ils se rechargent à chaque tour."
 
-msgid "Archer"
-msgstr "Archer"
-
 msgid "Arrow"
 msgstr "Flèche"
 
@@ -251,6 +248,12 @@ msgstr "Meilleur étage : %d"
 msgid "Blink"
 msgstr "Clignement"
 
+msgid "Bone Arrow"
+msgstr "Flèche d'os"
+
+msgid "Bone Rain"
+msgstr "Pluie d'os"
+
 msgid "Boons: %s"
 msgstr "Bienfaits : %s"
 
@@ -274,6 +277,9 @@ msgstr "Charge"
 
 msgid "Charges in a straight line next to the target"
 msgstr "Charge en ligne droite jusqu'à la cible"
+
+msgid "Chill Touch"
+msgstr "Toucher glacial"
 
 msgid "Chilled"
 msgstr "Gelé"
@@ -340,6 +346,9 @@ msgstr "Croix"
 
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr "Défaite. L'ascension s'arrête ; les héros gardent leurs niveaux et leurs runes."
+
+msgid "Devour"
+msgstr "Dévorer"
 
 msgid "Display"
 msgstr "Affichage"
@@ -457,6 +466,12 @@ msgstr "Pleinement runé"
 
 msgid "Game"
 msgstr "Jeu"
+
+msgid "Ghost"
+msgstr "Spectre"
+
+msgid "Ghoul"
+msgstr "Goule"
 
 msgid "Got it"
 msgstr "Compris"
@@ -655,6 +670,9 @@ msgstr "Choisissez d'abord un emplacement, puis ce sort pour l'y mettre."
 msgid "Piercing Thrust"
 msgstr "Estocade perçante"
 
+msgid "Pinning Shot"
+msgstr "Tir clouant"
+
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr "Placez vos héros : cliquez sur l'un, puis sur une case turquoise. Prêt (%s) pour combattre"
 
@@ -749,6 +767,9 @@ msgstr "Recentrer la caméra"
 msgid "Regeneration"
 msgstr "Régénération"
 
+msgid "Rend"
+msgstr "Lacérer"
+
 msgid "Repulse"
 msgstr "Répulsion"
 
@@ -826,6 +847,9 @@ msgstr "Vue de côté (%s)"
 
 msgid "Single"
 msgstr "Simple"
+
+msgid "Skeleton Archer"
+msgstr "Archer squelette"
 
 msgid "Skip tutorial"
 msgstr "Passer le tutoriel"
@@ -1003,6 +1027,9 @@ msgstr "Vigueur"
 
 msgid "Volley"
 msgstr "Volée"
+
+msgid "Wail"
+msgstr "Lamentation"
 
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
 msgstr "Quand vous avez fini, terminez votre tour ({end_turn}). Les ennemis jouent ensuite."

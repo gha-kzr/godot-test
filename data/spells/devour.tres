@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://c38v8hqfe2ved"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_2d2p8"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_dw1ei"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_5x27n"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_lemio"]
+[ext_resource type="Script" uid="uid://dqic6ten54j2t" path="res://scripts/data/heal_effect.gd" id="5_v734n"]
+[ext_resource type="Texture2D" uid="uid://44ftigjjyjsc" path="res://ui/icons/devour.svg" id="6_hn8mc"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_xud68"]
+
+[sub_resource type="Resource" id="Resource_xqcws"]
+script = ExtResource("1_2d2p8")
+
+[sub_resource type="Resource" id="Resource_0r2l4"]
+script = ExtResource("4_lemio")
+min_amount = 8
+max_amount = 11
+damage_type = ExtResource("3_5x27n")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_0kx8s"]
+script = ExtResource("5_v734n")
+min_amount = 4
+max_amount = 6
+target_filter = 3
+
+[resource]
+script = ExtResource("7_xud68")
+display_name = "Devour"
+icon = ExtResource("6_hn8mc")
+needs_line_of_sight = false
+area = SubResource("Resource_xqcws")
+effects = Array[ExtResource("2_dw1ei")]([SubResource("Resource_0r2l4"), SubResource("Resource_0kx8s")])

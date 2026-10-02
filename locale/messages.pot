@@ -269,10 +269,6 @@ msgstr ""
 msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr ""
 
-#: data/units/archer.tres
-msgid "Archer"
-msgstr ""
-
 #: data/spells/arrow.tres
 msgid "Arrow"
 msgstr ""
@@ -325,6 +321,14 @@ msgstr ""
 msgid "Blink"
 msgstr ""
 
+#: data/spells/bone_arrow.tres
+msgid "Bone Arrow"
+msgstr ""
+
+#: data/spells/bone_rain.tres
+msgid "Bone Rain"
+msgstr ""
+
 #: scripts/game/run_screen.gd
 msgid "Boons: %s"
 msgstr ""
@@ -355,6 +359,10 @@ msgstr ""
 
 #: scripts/data/move_effect.gd
 msgid "Charges in a straight line next to the target"
+msgstr ""
+
+#: data/spells/chill_touch.tres
+msgid "Chill Touch"
 msgstr ""
 
 #: data/statuses/chilled.tres
@@ -443,6 +451,10 @@ msgstr ""
 
 #: scripts/run/run_director.gd
 msgid "Defeat. The run ends; heroes keep their levels and runes."
+msgstr ""
+
+#: data/spells/devour.tres
+msgid "Devour"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -599,6 +611,14 @@ msgstr ""
 
 #: scenes/game/settings_screen.tscn
 msgid "Game"
+msgstr ""
+
+#: data/units/ghost.tres
+msgid "Ghost"
+msgstr ""
+
+#: data/units/ghoul.tres
+msgid "Ghoul"
 msgstr ""
 
 #: scenes/game/hint_card.tscn
@@ -863,6 +883,10 @@ msgstr ""
 msgid "Piercing Thrust"
 msgstr ""
 
+#: data/spells/pinning_shot.tres
+msgid "Pinning Shot"
+msgstr ""
+
 #: scripts/view/battle_controller.gd
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr ""
@@ -987,6 +1011,10 @@ msgstr ""
 msgid "Regeneration"
 msgstr ""
 
+#: data/spells/rend.tres
+msgid "Rend"
+msgstr ""
+
 #: data/spells/repulse.tres
 msgid "Repulse"
 msgstr ""
@@ -1089,6 +1117,10 @@ msgstr ""
 
 #: scripts/data/area_shape.gd
 msgid "Single"
+msgstr ""
+
+#: data/units/skeleton_archer.tres
+msgid "Skeleton Archer"
 msgstr ""
 
 #: scripts/game/tutorial_overlay.gd
@@ -1325,6 +1357,10 @@ msgstr ""
 
 #: data/spells/volley.tres
 msgid "Volley"
+msgstr ""
+
+#: data/spells/wail.tres
+msgid "Wail"
 msgstr ""
 
 #: scripts/progression/tutorial.gd

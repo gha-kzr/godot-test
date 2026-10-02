@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://qrqa601eopcl"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_f5qci"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_4bv3w"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_fppvx"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_d4cln"]
+[ext_resource type="Texture2D" uid="uid://bw3ovretcsgtb" path="res://ui/icons/bone_rain.svg" id="5_3oxt6"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="6_2yvgc"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_qwnqs"]
+
+[sub_resource type="Resource" id="Resource_0j104"]
+script = ExtResource("1_f5qci")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_jfkvq"]
+script = ExtResource("4_d4cln")
+min_amount = 3
+max_amount = 4
+damage_type = ExtResource("3_fppvx")
+
+[resource]
+script = ExtResource("7_qwnqs")
+display_name = "Bone Rain"
+icon = ExtResource("5_3oxt6")
+projectile = ExtResource("6_2yvgc")
+projectile_speed = 16.0
+projectile_falls = true
+projectile_count = 5
+cooldown = 2
+min_range = 3
+max_range = 6
+area = SubResource("Resource_0j104")
+effects = Array[ExtResource("2_4bv3w")]([SubResource("Resource_jfkvq")])

@@ -15,7 +15,7 @@ func _tree() -> SceneTree:
 	return Engine.get_main_loop() as SceneTree
 
 
-## The slice battle (enemy Archer acts first), or a small custom one; placement is skipped
+## The slice battle (the enemy Skeleton Archer acts first), or a small custom one; placement is skipped
 ## (Ready) unless `ready` is false.
 func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = [], ready := true) -> BattleController:
 	Engine.time_scale = TIME_SCALE
@@ -139,12 +139,12 @@ func test_ending_the_turn_lets_the_enemy_act_and_can_lose() -> void:
 
 func test_input_is_ignored_outside_the_players_turn() -> void:
 	var controller := _controller()
-	assert_eq(controller.battle.state.current_unit().data.display_name, "Archer", "an enemy acts first")
+	assert_eq(controller.battle.state.current_unit().data.display_name, "Skeleton Archer", "an enemy acts first")
 	controller.end_turn()
 	controller.select_spell(0)
 	controller.click_cell(Vector2i(1, 8))
 	assert_true(controller.input_state in [BattleController.State.ANIMATING, BattleController.State.ENEMY_TURN])
-	assert_eq(controller.battle.state.current_unit().data.display_name, "Archer", "still the Archer's turn")
+	assert_eq(controller.battle.state.current_unit().data.display_name, "Skeleton Archer", "still its turn")
 
 
 func test_restart_mid_animation_starts_a_clean_battle() -> void:

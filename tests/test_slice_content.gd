@@ -5,7 +5,7 @@ extends TestCase
 const CONTENT_DIRS := ["res://data/spells", "res://data/units", "res://data/maps", "res://data/ai", "res://data/statuses", "res://data/damage_types", "res://data/runes", "res://data/heroes", "res://data/progression", "res://data/enemies", "res://data/loot", "res://data/presets", "res://data/encounters", "res://data/boons", "res://data/stages", "res://data/tower"]
 const MAP := "res://data/maps/slice.tres"
 const PLAYERS := ["res://data/units/knight.tres", "res://data/units/mage.tres"]
-const ENEMIES := ["res://data/units/brute.tres", "res://data/units/archer.tres"]
+const ENEMIES := ["res://data/units/brute.tres", "res://data/units/skeleton_archer.tres"]
 ## AI-vs-AI battles for the balance checks (deterministic seeds; ~5 s).
 const BALANCE_SEEDS := 20
 
@@ -117,8 +117,8 @@ func test_ai_vs_ai_battles_on_the_slice_finish() -> void:
 	print("  spells cast: %s" % casts)
 	for spell_name in ["Crippling Blow", "Guard", "Slash", "Smash", "Firebolt"]:
 		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
-	# Which Archer attack wins depends on where the heroes stand (Volley when they're close).
-	assert_true(["Arrow", "Poison Arrow", "Volley"].any(func(s: String) -> bool: return casts.get(s, 0) > 0), "the Archer shoots")
+	# Which Skeleton Archer attack wins depends on where the heroes stand (Bone Rain when they're close).
+	assert_true(["Bone Arrow", "Pinning Shot", "Bone Rain"].any(func(s: String) -> bool: return casts.get(s, 0) > 0), "the Skeleton Archer shoots")
 	# A loose balance guard (AI plays both sides): neither team should always win.
 	assert_true(outcomes.get("PLAYER_WON", 0) >= BALANCE_SEEDS / 10, "players win sometimes: %s" % outcomes)
 	assert_true(outcomes.get("ENEMY_WON", 0) >= BALANCE_SEEDS / 10, "enemies win sometimes: %s" % outcomes)
@@ -146,7 +146,7 @@ func test_heroes_grow_with_levels() -> void:
 
 
 func test_enemies_give_xp_and_loot() -> void:
-	for path in ["res://data/enemies/brute.tres", "res://data/enemies/archer.tres"]:
+	for path in ["res://data/enemies/brute.tres", "res://data/enemies/skeleton_archer.tres", "res://data/enemies/ghoul.tres", "res://data/enemies/ghost.tres"]:
 		var enemy := load(path) as EnemyData
 		assert_true(enemy.xp_base > 0, "%s gives XP" % enemy.display_name())
 		assert_true(enemy.loot_table != null and not enemy.loot_table.runes.is_empty(), "%s drops runes" % enemy.display_name())
@@ -164,7 +164,34 @@ func test_heroes_grow_differently() -> void:
 
 func test_each_enemy_resists_a_hero_damage_type() -> void:
 	var brute := load("res://data/units/brute.tres") as UnitData
-	var archer := load("res://data/units/archer.tres") as UnitData
-	var state := BattleFixtures.state_with("0p 0e 0e", [BattleFixtures.unit("P0", 200)] as Array[UnitData], [brute, archer] as Array[UnitData])
+	var skeleton := load("res://data/units/skeleton_archer.tres") as UnitData
+	var ghost := load("res://data/units/ghost.tres") as UnitData
+	var state := BattleFixtures.state_with("0p 0e 0e 0e", [BattleFixtures.unit("P0", 200)] as Array[UnitData], [brute, skeleton, ghost] as Array[UnitData])
+	var holy := load("res://data/damage_types/holy.tres") as DamageType
 	assert_eq(state.units[1].resistance_percent(load("res://data/damage_types/physical.tres")), 20, "the Brute resists the Knight")
-	assert_eq(state.units[2].resistance_percent(load("res://data/damage_types/fire.tres")), 20, "the Archer resists the Mage")
+	assert_eq(state.units[2].resistance_percent(load("res://data/damage_types/poison.tres")), 50, "the Skeleton Archer shrugs off the Ranger's poison")
+	assert_eq(state.units[3].resistance_percent(load("res://data/damage_types/physical.tres")), 100, "the Ghost is immune to physical damage")
+	for unit in [state.units[2], state.units[3]]:
+		assert_true(unit.resistance_percent(holy) < 0, "%s: Holy hurts the undead more" % unit.label)
+
+
+func test_the_ghoul_and_the_ghost_use_their_kits() -> void:
+	var casts := {}
+	for rng_seed in range(1, 6):
+		var map := load(MAP) as MapData
+		var battle := Battle.new(BattleState.create(map.parse(), _team(["res://data/units/knight.tres", "res://data/units/ranger.tres"]),
+				_team(["res://data/units/ghoul.tres", "res://data/units/ghost.tres"]), rng_seed))
+		battle.start()
+		var actions := 0
+		while not battle.state.is_over() and actions < 1000:
+			var result := battle.perform(EnemyAI.choose_next(battle.state, battle.state.turn_order.current_unit_id()))
+			assert_true(result.ok(), result.error)
+			for event in result.events:
+				if event is BattleEvents.SpellCast:
+					var spell_name := (event as BattleEvents.SpellCast).spell.display_name
+					casts[spell_name] = casts.get(spell_name, 0) + 1
+			actions += 1
+		assert_true(battle.state.is_over(), "seed %d ends" % rng_seed)
+	print("  ghoul and ghost casts: %s" % casts)
+	for spell_name in ["Rend", "Devour", "Chill Touch", "Wail"]:
+		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)

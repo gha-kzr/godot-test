@@ -134,3 +134,18 @@ func test_an_action_animation_restarts_when_asked_again_and_returns_to_idle_by_i
 		await (Engine.get_main_loop() as SceneTree).process_frame
 	assert_true(player.assigned_animation.ends_with("|Death"), "but a death stays: %s" % player.assigned_animation)
 	model.free()
+
+
+func test_a_mangled_export_resolves_through_any_part_between_bars() -> void:
+	var model := _model(_scene_with_animations(["Arm|Arm|Arm|Idle|Arm|Idle", "Arm|Arm|Arm|Death|Arm|Dea", "Arm|Arm|Arm|Jump_Idle|Arm"] as Array[String]))
+	assert_true(model.has_animation(&"Idle"), "Idle in the middle")
+	assert_true(model.has_animation(&"Death"), "a truncated tail")
+	model.free()
+
+
+func test_the_monsters_have_the_animations_the_game_needs() -> void:
+	for path in ["res://assets/quaternius/monsters/Skeleton.glb", "res://assets/quaternius/monsters/Zombie.glb", "res://assets/quaternius/monsters/Ghost.glb"]:
+		var model := _model(load(path) as PackedScene)
+		for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death"]:
+			assert_true(model.has_animation(logical), "%s: %s" % [path.get_file(), logical])
+		model.free()

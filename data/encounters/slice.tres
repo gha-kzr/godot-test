@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://cpgc1dvqnbd3p" path="res://scripts/data/encounter_spawn.gd" id="4_43o03"]
 [ext_resource type="Resource" uid="uid://cljtsr3vu6yxp" path="res://data/enemies/brute.tres" id="5_6jck5"]
 [ext_resource type="Resource" uid="uid://b6yxvpm43xmv3" path="res://data/presets/normal.tres" id="6_gc54w"]
-[ext_resource type="Resource" uid="uid://5et4vmvo2won" path="res://data/enemies/archer.tres" id="7_m8ows"]
+[ext_resource type="Resource" uid="uid://jw1uo3o7t48e" path="res://data/enemies/skeleton_archer.tres" id="7_m8ows"]
 
 [sub_resource type="Resource" id="Resource_ampax"]
 script = ExtResource("4_43o03")

@@ -3,18 +3,19 @@ extends Node3D
 ## A character model from an asset pack, behind one animation contract. The model's own
 ## AnimationPlayer is found by type; the animations the game needs are asked for by a logical
 ## name (Idle, Walk, Attack, Cast, Hit, Death, Victory, Defeat) and resolved to whatever the
-## model calls them: the part of a name after a "|" (Blender's "Armature|Idle") is compared
-## against candidates, so models from different packs work, and a missing animation just
+## model calls them: each part of a name between "|" (Blender's "Armature|Idle", or a mangled
+## export's "Armature|Armature|Idle|Armature|Id") is compared against candidates, so models
+## from different packs work, and a missing animation just
 ## does nothing (the caller falls back to a tween). Also re-colors the skin material and
 ## flashes the model (hit feedback). Adding a hero or enemy is a model file plus data.
 
 ## Logical name → candidate animation names, in order of preference.
 const ANIMATIONS := {
-	&"Idle": ["Idle"],
-	&"Walk": ["Walk", "Run"],
-	&"Attack": ["SwordSlash", "Punch"],
-	&"Cast": ["Shoot_OneHanded", "SwordSlash"],
-	&"Hit": ["RecieveHit", "HitRecieve", "Hit"],
+	&"Idle": ["Idle", "Flying_Idle"],
+	&"Walk": ["Walk", "Run", "Fast_Flying"],
+	&"Attack": ["SwordSlash", "Sword", "Punch", "Attack"],
+	&"Cast": ["Shoot_OneHanded", "SwordSlash", "Sword", "Punch", "Attack"],
+	&"Hit": ["RecieveHit", "HitRecieve", "HitReact", "Hit"],
 	&"Death": ["Death"],
 	&"Victory": ["Victory"],
 	&"Defeat": ["Defeat"],
@@ -195,7 +196,7 @@ func _on_animation_finished(animation: StringName) -> void:
 func _resolve(logical: StringName) -> String:
 	for candidate: String in ANIMATIONS[logical]:
 		for animation in _player.get_animation_list():
-			if animation == candidate or animation.ends_with("|" + candidate):
+			if candidate in animation.split("|"):
 				return animation
 	return ""
 

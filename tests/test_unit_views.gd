@@ -379,7 +379,7 @@ func test_units_start_facing_the_nearest_enemy() -> void:
 
 
 func test_the_shipped_roster_has_models() -> void:
-	for unit_name in ["knight", "mage", "ranger", "archer", "brute"]:
+	for unit_name in ["knight", "mage", "ranger", "brute", "skeleton_archer", "ghoul", "ghost"]:
 		var data := load("res://data/units/%s.tres" % unit_name) as UnitData
 		assert_true(data.model_scene != null, "%s has a model" % unit_name)
 		assert_true(data.model_scale > 0.0 and data.model_height > 0.0, "%s has a scale and a height" % unit_name)
