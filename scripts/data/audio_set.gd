@@ -12,6 +12,8 @@ const MUSIC_TRACKS: Array[StringName] = [&"hub", &"battle", &"boss"]
 
 @export var sfx: Dictionary[StringName, AudioStream] = {}
 @export var music: Dictionary[StringName, AudioStream] = {}
+## How loud the music plays, in dB: below 0 so spell and hit sounds stand out over it.
+@export_range(-30.0, 0.0) var music_gain_db := -6.0
 ## Per event gain in dB, to balance the files against each other (0 when absent).
 @export var sfx_gain_db: Dictionary[StringName, float] = {}
 ## Per event random pitch change, 0.1 = up to 10 % either way (so a repeated sound, footsteps

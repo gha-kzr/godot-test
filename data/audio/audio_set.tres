@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bor7i5e7t132s" path="res://scripts/data/audio_set.gd" id="1_set"]
 [ext_resource type="AudioStream" uid="uid://ty536fy2d3qg" path="res://assets/audio/sfx/ui_click.ogg" id="sfx_ui_click"]
 [ext_resource type="AudioStream" uid="uid://do5bl366na08a" path="res://assets/audio/sfx/hit.ogg" id="sfx_hit"]
-[ext_resource type="AudioStream" uid="uid://by0xccsjl1ed2" path="res://assets/audio/sfx/heal.ogg" id="sfx_heal"]
 [ext_resource type="AudioStream" uid="uid://xfiuasirk24h" path="res://assets/audio/sfx/step.ogg" id="sfx_step"]
 [ext_resource type="AudioStream" uid="uid://c7icxd0idicof" path="res://assets/audio/sfx/defeat.ogg" id="sfx_defeat"]
 [ext_resource type="AudioStream" uid="uid://cgtylwoldl6gk" path="res://assets/audio/sfx/cast.ogg" id="sfx_cast"]
@@ -22,7 +21,6 @@ script = ExtResource("1_set")
 sfx = Dictionary[StringName, AudioStream]({
 &"ui_click": ExtResource("sfx_ui_click"),
 &"hit": ExtResource("sfx_hit"),
-&"heal": ExtResource("sfx_heal"),
 &"step": ExtResource("sfx_step"),
 &"defeat": ExtResource("sfx_defeat"),
 &"cast": ExtResource("sfx_cast"),
@@ -41,14 +39,13 @@ music = Dictionary[StringName, AudioStream]({
 sfx_gain_db = Dictionary[StringName, float]({
 &"ui_click": -6.0,
 &"hit": -4.0,
-&"heal": -6.0,
 &"step": -18.0,
 &"defeat": -4.0,
-&"cast": -8.0,
-&"cast_fire": -8.0,
-&"cast_fireball": -6.0,
-&"cast_physical": -8.0,
-&"cast_poison": -8.0,
+&"cast": -3.0,
+&"cast_fire": -3.0,
+&"cast_fireball": -2.0,
+&"cast_physical": -4.0,
+&"cast_poison": -4.0,
 &"death": -12.0,
 &"victory": -6.0
 })
@@ -62,3 +59,4 @@ sfx_cooldown = Dictionary[StringName, float]({
 &"hit": 0.05,
 &"cast_poison": 0.08
 })
+music_gain_db = -6.0

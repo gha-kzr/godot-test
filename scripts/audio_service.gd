@@ -115,7 +115,7 @@ func play_music(track: StringName) -> void:
 		make_loop(stream)
 		incoming.stream = stream
 		incoming.play()
-		_fade.tween_property(incoming, "volume_db", 0.0, CROSSFADE)  # Both fade at once: a cross-fade.
+		_fade.tween_property(incoming, "volume_db", audio_set.music_gain_db, CROSSFADE)  # Both fade at once: a cross-fade.
 	_fade.chain().tween_callback(outgoing.stop)
 
 

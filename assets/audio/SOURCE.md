@@ -7,7 +7,7 @@ Chosen by the project owner by ear from samplers of candidates. Each was downloa
 
 | Pack | Page | Archive SHA-256 | Files used |
 |---|---|---|---|
-| Interface Sounds | https://kenney.nl/assets/interface-sounds | `f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232` | `click_001` → `sfx/ui_click.ogg`, `maximize_003` → `sfx/heal.ogg` |
+| Interface Sounds | https://kenney.nl/assets/interface-sounds | `f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232` | `click_001` → `sfx/ui_click.ogg` |
 | Impact Sounds | https://kenney.nl/assets/impact-sounds | `029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8` | `impactPlate_medium_001` → `sfx/hit.ogg`, `footstep_grass_000` → `sfx/step.ogg` |
 | Music Jingles | https://kenney.nl/assets/music-jingles | `b729ba57959bd58793d2c5cafa348aaf2655d354f3da35ec4729e03ec77197b8` | `jingles_STEEL13` → `sfx/defeat.ogg` |
 
@@ -44,7 +44,6 @@ The packs' `License.txt` files are next to the sounds (`sfx/License-Kenney-*.txt
 b34a816a401c5d80c77a61dabbedef7d1918a01320bbb67286c70f22db4acd43  sfx/death.ogg
 cf7aca1193530c804f41a22cfd9a2813c25d3c244fa96ad88c88c6206daa033d  sfx/victory.wav
 1eddde22f0894c2267d558198d7fbfb289423929d0a060a3c4f5e1b6ab83be49  sfx/defeat.ogg
-df16f25d45189f5d44d6a482ab20d5067350ca8525a9affa1f8ce599e31a20a5  sfx/heal.ogg
 68ba7701b71ef620f498f3038e832157d71ac8db7ad59424545890b250ceb24e  sfx/hit.ogg
 9d49497777405d78d7cf7f2888e28277f3a23192300cfd1d79d54876b20f479f  sfx/step.ogg
 ccfb7fa0cccdd9faec0eb16033c732b1e308d139d80f799161495d58f7adcdb9  sfx/ui_click.ogg
