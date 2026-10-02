@@ -22,6 +22,9 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("roster: empty hero slot")
 			continue
 		errors.append_array(hero.get_validation_errors())
+		if config != null and config.level_cap > hero.level_rewards.size() + 1 and hero.growth_reward == null:
+			errors.append("%s: level cap %d is past its %d rewards and it has no growth_reward" % [
+					hero.display_name(), config.level_cap, hero.level_rewards.size()])
 	for index in starting_party:
 		if index < 0 or index >= heroes.size():
 			errors.append("roster: starting party index %d out of range" % index)

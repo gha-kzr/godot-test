@@ -245,9 +245,10 @@ func end_turn() -> void:
 func click_cell(cell: Vector2i) -> void:
 	var unit_id := battle.state.current_unit().id if battle != null else -1
 	var clicked := battle.state.unit_at(cell) if battle != null else null
-	var selecting_hero := input_state == State.PLACING and clicked != null and clicked.team == UnitState.Team.PLAYER
-	if clicked != null and clicked.id != _active_card_unit_id() and not selecting_hero:
-		pin(clicked.id)  # The click still acts below (a cast on a target cell, a placement).
+	# A click that casts, moves or places is that action only; one that does nothing else pins the
+	# unit under it (to look at it).
+	if clicked != null and clicked.id != _active_card_unit_id() and not _click_acts(cell, clicked):
+		pin(clicked.id)
 	match input_state:
 		State.PLACING:
 			# Select a hero, then a zone cell (a hero there swaps); the selected hero again deselects.
@@ -269,6 +270,21 @@ func click_cell(cell: Vector2i) -> void:
 		State.TARGETING:
 			if _targetable.has(cell):
 				_perform(BattleActions.CastSpell.new(unit_id, selected_spell, cell))
+
+
+## Whether a click on `cell` (with `clicked` on it) does something in the current state: picks or
+## places a hero, moves, or casts.
+func _click_acts(cell: Vector2i, clicked: UnitState) -> bool:
+	match input_state:
+		State.PLACING:
+			if _placing_hero == -1:
+				return clicked != null and clicked.team == UnitState.Team.PLAYER
+			return cell in battle.state.zone or (clicked != null and clicked.id == _placing_hero)
+		State.IDLE:
+			return _reach != null and _reach.can_reach(cell)
+		State.TARGETING:
+			return _targetable.has(cell)
+	return false
 
 
 # --- Input ---

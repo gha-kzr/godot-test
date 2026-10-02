@@ -13,6 +13,9 @@ extends Resource
 ## are just a scene and these fields).
 @export var cast_effect: PackedScene
 @export var impact_effect: PackedScene
+## The sound event played at the cast (an AudioSet.SFX_EVENTS name). Empty: its damage type's,
+## else the generic `cast`.
+@export var cast_sound: StringName = &""
 @export_group("Cast timing")
 ## A model file (an imported .fbx / .glb) whose animation the caster borrows for this spell. Its
 ## skeleton must carry the same bones as the caster's (the Quaternius characters share one
@@ -76,6 +79,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("%s: impact_delay must be -1 (default) or 0 and more" % display_name)
 	if projectile != null and projectile_speed <= 0.0:
 		errors.append("%s: projectile_speed must be above 0" % display_name)
+	if not cast_sound.is_empty() and cast_sound not in AudioSet.SFX_EVENTS:
+		errors.append("%s: unknown cast_sound %s" % [display_name, cast_sound])
 	if projectile_count > 1 and projectile == null:
 		errors.append("%s: projectile_count above 1 needs a projectile" % display_name)
 	if effects.is_empty():
@@ -87,6 +92,18 @@ func get_validation_errors() -> PackedStringArray:
 		for error in effect.get_validation_errors():
 			errors.append("%s: %s" % [display_name, error])
 	return errors
+
+
+## The sound event of casting this spell: its own, else the first damage effect's type, else `cast`.
+func cast_sound_event() -> StringName:
+	if not cast_sound.is_empty():
+		return cast_sound
+	for effect in effects:
+		if effect is DamageEffect and (effect as DamageEffect).damage_type != null:
+			var type_sound := (effect as DamageEffect).damage_type.cast_sound
+			if not type_sound.is_empty():
+				return type_sound
+	return &"cast"
 
 
 ## The icon to show: its own, else the default spell icon.

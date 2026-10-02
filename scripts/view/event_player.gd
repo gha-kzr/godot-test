@@ -206,7 +206,7 @@ func _play_event(event: BattleEvents.Event) -> void:
 	elif event is BattleEvents.SpellCast:
 		var cast := event as BattleEvents.SpellCast
 		var generation_before := _generation
-		sound.emit(&"cast")
+		sound.emit(cast.spell.cast_sound_event())
 		view.spawn_fx(cast.spell.cast_effect)
 		_board.show_highlight(BoardView.Highlight.AREA, cast.area)
 		await _play_cast(view, cast)

@@ -25,48 +25,76 @@
 [ext_resource type="Resource" uid="uid://o34jlgmg6x4o" path="res://data/stages/sunken_crypt.tres" id="22_4pmag"]
 [ext_resource type="Resource" uid="uid://baxm0tw8w7yfk" path="res://data/stages/sky_bastion.tres" id="23_dnkor"]
 
-[sub_resource type="Resource" id="Resource_ykx3g"]
+[sub_resource type="Resource" id="Resource_hfmpi"]
 script = ExtResource("1_2021b")
 enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
 
-[sub_resource type="Resource" id="Resource_r5yn0"]
+[sub_resource type="Resource" id="Resource_6mk45"]
 script = ExtResource("1_2021b")
 from_floor = 5
-enemy_level = 1
-levels_per_floor = 0.25
+levels_per_floor = 0.3
 min_enemies = 2
-max_enemies = 2
 enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
 
-[sub_resource type="Resource" id="Resource_e8d23"]
+[sub_resource type="Resource" id="Resource_7d522"]
 script = ExtResource("1_2021b")
 from_floor = 10
 enemy_level = 2
-levels_per_floor = 0.3
-min_enemies = 2
-max_enemies = 2
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
-
-[sub_resource type="Resource" id="Resource_0gqvx"]
-script = ExtResource("1_2021b")
-from_floor = 20
-enemy_level = 4
-levels_per_floor = 0.3
+levels_per_floor = 0.4
 min_enemies = 3
 max_enemies = 3
 enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 
-[sub_resource type="Resource" id="Resource_d4bcx"]
+[sub_resource type="Resource" id="Resource_1pmip"]
 script = ExtResource("1_2021b")
-from_floor = 30
-enemy_level = 9
-levels_per_floor = 0.5
+from_floor = 25
+enemy_level = 8
+levels_per_floor = 0.31
 min_enemies = 3
 max_enemies = 3
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_da6r2"]
+script = ExtResource("1_2021b")
+from_floor = 40
+enemy_level = 12
+levels_per_floor = 0.3
+min_enemies = 4
+max_enemies = 4
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_mqrmq"]
+script = ExtResource("1_2021b")
+from_floor = 60
+enemy_level = 18
+levels_per_floor = 0.28
+min_enemies = 4
+max_enemies = 4
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_m824n"]
+script = ExtResource("1_2021b")
+from_floor = 80
+enemy_level = 23
+levels_per_floor = 0.28
+min_enemies = 5
+max_enemies = 5
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+
+[sub_resource type="Resource" id="Resource_elsql"]
+script = ExtResource("1_2021b")
+from_floor = 100
+enemy_level = 29
+levels_per_floor = 0.25
+min_enemies = 5
+max_enemies = 5
 enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
 
@@ -75,7 +103,7 @@ script = ExtResource("17_dasot")
 
 [resource]
 script = ExtResource("19_a8lb2")
-bands = Array[ExtResource("1_2021b")]([SubResource("Resource_ykx3g"), SubResource("Resource_r5yn0"), SubResource("Resource_e8d23"), SubResource("Resource_0gqvx"), SubResource("Resource_d4bcx")])
+bands = Array[ExtResource("1_2021b")]([SubResource("Resource_hfmpi"), SubResource("Resource_6mk45"), SubResource("Resource_7d522"), SubResource("Resource_1pmip"), SubResource("Resource_da6r2"), SubResource("Resource_mqrmq"), SubResource("Resource_m824n"), SubResource("Resource_elsql")])
 normal_preset = ExtResource("18_ee8oe")
 elite_preset = ExtResource("16_gjhya")
 boss_preset = ExtResource("15_w7drk")

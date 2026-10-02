@@ -6,7 +6,7 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 *Milestone: 7 First impressions · Category: Audio / animation · Pairs with: audio set, unit model*
 
-What milestone 6b left out on purpose. Sounds: the owner found none of the candidates right for **cast** (it plays for every spell, so per-spell sounds through a `cast_sound` field on `SpellData` would suit better), **death**, **turn start** and **victory**; the events exist in `AudioSet` and are silent until a sound is chosen (sampler pages and the safe-intake routine are in `assets/audio/SOURCE.md`'s notes). Animation: victory and defeat poses on the result screen, and a better blend between clips (walk to attack). A music loop for the hub that differs from the title's would be a small addition.
+What milestone 6b left out on purpose. Sounds: **turn start** stays silent (no candidate liked); cast, death and victory sounds arrived in 6c, with `cast_sound` on `SpellData` and `DamageType` (more per-spell sounds are data). The death sound is quite heavy: its gain (`sfx_gain_db`) may need adjusting by ear. Animation: victory and defeat poses on the result screen, and a better blend between clips (walk to attack). A music loop for the hub that differs from the title's would be a small addition.
 
 ## Selecting an enemy to attack also pins its card
 

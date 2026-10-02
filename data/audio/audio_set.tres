@@ -1,13 +1,20 @@
 [gd_resource type="Resource" script_class="AudioSet" format=3 uid="uid://bt5u4tcd8l4kd"]
 
 [ext_resource type="Script" uid="uid://bor7i5e7t132s" path="res://scripts/data/audio_set.gd" id="1_set"]
-[ext_resource type="AudioStream" uid="uid://ckrs3hepmfyyd" path="res://assets/audio/music/battle.mp3" id="music_battle"]
 [ext_resource type="AudioStream" uid="uid://ty536fy2d3qg" path="res://assets/audio/sfx/ui_click.ogg" id="sfx_ui_click"]
 [ext_resource type="AudioStream" uid="uid://do5bl366na08a" path="res://assets/audio/sfx/hit.ogg" id="sfx_hit"]
 [ext_resource type="AudioStream" uid="uid://by0xccsjl1ed2" path="res://assets/audio/sfx/heal.ogg" id="sfx_heal"]
 [ext_resource type="AudioStream" uid="uid://xfiuasirk24h" path="res://assets/audio/sfx/step.ogg" id="sfx_step"]
 [ext_resource type="AudioStream" uid="uid://c7icxd0idicof" path="res://assets/audio/sfx/defeat.ogg" id="sfx_defeat"]
+[ext_resource type="AudioStream" uid="uid://cgtylwoldl6gk" path="res://assets/audio/sfx/cast.ogg" id="sfx_cast"]
+[ext_resource type="AudioStream" uid="uid://cwh0mixu8vktt" path="res://assets/audio/sfx/cast_fire.ogg" id="sfx_cast_fire"]
+[ext_resource type="AudioStream" uid="uid://btflotfltlxwi" path="res://assets/audio/sfx/cast_fireball.wav" id="sfx_cast_fireball"]
+[ext_resource type="AudioStream" uid="uid://pgrdjpckware" path="res://assets/audio/sfx/cast_physical.wav" id="sfx_cast_physical"]
+[ext_resource type="AudioStream" uid="uid://dhohe0py4dpcn" path="res://assets/audio/sfx/cast_poison.ogg" id="sfx_cast_poison"]
+[ext_resource type="AudioStream" uid="uid://dgy184mk0vla2" path="res://assets/audio/sfx/death.ogg" id="sfx_death"]
+[ext_resource type="AudioStream" uid="uid://ce6b162op25pb" path="res://assets/audio/sfx/victory.wav" id="sfx_victory"]
 [ext_resource type="AudioStream" uid="uid://dj25x5dwa7ofl" path="res://assets/audio/music/hub.mp3" id="music_hub"]
+[ext_resource type="AudioStream" uid="uid://ckrs3hepmfyyd" path="res://assets/audio/music/battle.mp3" id="music_battle"]
 [ext_resource type="AudioStream" uid="uid://c6vdl3x73qnvf" path="res://assets/audio/music/boss.mp3" id="music_boss"]
 
 [resource]
@@ -17,11 +24,18 @@ sfx = Dictionary[StringName, AudioStream]({
 &"hit": ExtResource("sfx_hit"),
 &"heal": ExtResource("sfx_heal"),
 &"step": ExtResource("sfx_step"),
-&"defeat": ExtResource("sfx_defeat")
+&"defeat": ExtResource("sfx_defeat"),
+&"cast": ExtResource("sfx_cast"),
+&"cast_fire": ExtResource("sfx_cast_fire"),
+&"cast_fireball": ExtResource("sfx_cast_fireball"),
+&"cast_physical": ExtResource("sfx_cast_physical"),
+&"cast_poison": ExtResource("sfx_cast_poison"),
+&"death": ExtResource("sfx_death"),
+&"victory": ExtResource("sfx_victory")
 })
 music = Dictionary[StringName, AudioStream]({
-&"battle": ExtResource("music_battle"),
 &"hub": ExtResource("music_hub"),
+&"battle": ExtResource("music_battle"),
 &"boss": ExtResource("music_boss")
 })
 sfx_gain_db = Dictionary[StringName, float]({
@@ -29,13 +43,22 @@ sfx_gain_db = Dictionary[StringName, float]({
 &"hit": -4.0,
 &"heal": -6.0,
 &"step": -18.0,
-&"defeat": -4.0
+&"defeat": -4.0,
+&"cast": -8.0,
+&"cast_fire": -8.0,
+&"cast_fireball": -6.0,
+&"cast_physical": -8.0,
+&"cast_poison": -8.0,
+&"death": -12.0,
+&"victory": -6.0
 })
 sfx_pitch_variation = Dictionary[StringName, float]({
 &"step": 0.08,
-&"hit": 0.05
+&"hit": 0.05,
+&"cast_physical": 0.06
 })
 sfx_cooldown = Dictionary[StringName, float]({
 &"step": 0.12,
-&"hit": 0.05
+&"hit": 0.05,
+&"cast_poison": 0.08
 })

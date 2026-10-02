@@ -17,7 +17,9 @@ class LevelUp:
 
 
 ## Save format version; bump on incompatible changes (from_dict must read older ones).
-const SAVE_VERSION := 4
+## Version 5: the XP curve changed (milestone 6c); saves of older versions load, with levels recomputed
+## from their XP.
+const SAVE_VERSION := 5
 
 var roster: Roster
 var heroes: Array[HeroRecord] = []  ## One per roster hero, same order.
@@ -49,7 +51,7 @@ func xp_progress(hero_index: int) -> Vector2i:
 	var next := roster.config.xp_for_next(record.level)
 	if next < 0:
 		return Vector2i(1, 1)
-	var from := roster.config.xp_thresholds[record.level - 1]
+	var from := roster.config.xp_for_level(record.level)
 	return Vector2i(record.xp - from, maxi(1, next - from))
 
 

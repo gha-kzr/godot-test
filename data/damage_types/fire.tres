@@ -9,3 +9,4 @@ display_name = "Fire"
 color = Color(1, 0.45, 0.15, 1)
 sort_order = 1
 impact_effect = ExtResource("9_fx")
+cast_sound = &"cast_fire"

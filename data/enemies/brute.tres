@@ -7,6 +7,8 @@
 [resource]
 script = ExtResource("2_7xw1r")
 unit = ExtResource("3_fv3vh")
+hp_per_level = 4
+power_per_level = 2
 xp_base = 15
 xp_per_level = 5
 loot_table = ExtResource("1_cb57j")

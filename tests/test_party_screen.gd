@@ -35,7 +35,7 @@ func test_details_show_level_xp_stats_spells_and_runes() -> void:
 	var screen := _screen(profile)
 	assert_eq((screen.find_child("XpLabel", true, false) as Label).text, "XP 30 / 50")
 	var stats := (screen.find_child("Stats", true, false) as Label).text
-	assert_true(stats.contains("HP 44"), "40 + 4 from level 2: %s" % stats)
+	assert_true(stats.contains("HP 49"), "44 + 5 from level 2: %s" % stats)
 	assert_true(stats.contains("Power +2%"), stats)
 	assert_true(stats.contains("Fire +25%"), stats)
 	var slot := screen.find_child("Slot1", true, false) as Button

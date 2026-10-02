@@ -14,6 +14,10 @@ config/name="godot-test"
 run/main_scene="res://scenes/game/game.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
+[audio]
+
+general/default_playback_type.web=0
+
 [autoload]
 
 WindowSetup="*res://scripts/window_setup.gd"

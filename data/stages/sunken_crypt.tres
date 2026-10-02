@@ -6,6 +6,6 @@
 script = ExtResource("1_vo5km")
 display_name = "Sunken Crypt"
 seed = 202
-difficulty_floor = 20
+difficulty_floor = 25
 unlocks_cap = 30
 unlocks_start_floor = 21

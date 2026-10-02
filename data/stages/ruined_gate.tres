@@ -6,3 +6,4 @@
 script = ExtResource("1_pdsmq")
 display_name = "Ruined Gate"
 seed = 101
+difficulty_floor = 15

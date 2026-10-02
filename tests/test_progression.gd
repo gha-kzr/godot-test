@@ -59,9 +59,10 @@ func test_xp_curve_and_cap() -> void:
 	assert_eq(config.level_for_xp(19), 1)
 	assert_eq(config.level_for_xp(20), 2)
 	assert_eq(config.level_for_xp(95), 4)
-	assert_eq(config.level_for_xp(99999), 10, "capped")
+	assert_eq(config.level_for_xp(99999999), config.level_cap, "capped")
 	assert_eq(config.xp_for_next(1), 20)
-	assert_eq(config.xp_for_next(10), -1)
+	assert_eq(config.xp_for_next(4), roundi(config.curve_coefficient * pow(4, config.curve_exponent)), "past the hand-set levels the curve takes over")
+	assert_eq(config.xp_for_next(config.level_cap), -1)
 	assert_eq(config.get_validation_errors(), PackedStringArray())
 
 
@@ -76,8 +77,13 @@ func test_rewards_give_full_xp_to_every_party_hero_and_report_level_ups() -> voi
 
 func test_levels_stop_at_the_cap() -> void:
 	var profile := _profile()
+	profile.roster.config.level_cap = 10
 	profile.apply_rewards(_rewards(100000))
 	assert_eq(profile.heroes[0].level, 10)
+	profile.roster.config.level_cap = 100
+	profile.heroes[0].xp = 100000000
+	profile.apply_rewards(_rewards(1))
+	assert_eq(profile.heroes[0].level, 100, "the real cap")
 
 
 func test_level_rewards_become_permanent_modifiers_and_spells() -> void:
@@ -162,7 +168,9 @@ func test_validation() -> void:
 	config.xp_thresholds = [0, 10, 5] as Array[int]
 	errors = Array(config.get_validation_errors())
 	assert_true(errors.any(func(e: String) -> bool: return "must increase" in e))
-	assert_true(errors.any(func(e: String) -> bool: return "3 XP thresholds" in e))
+	config.xp_thresholds = [0] as Array[int]
+	config.xp_thresholds = [5] as Array[int]
+	assert_true(Array(config.get_validation_errors()).any(func(e: String) -> bool: return "level 1 must need 0" in e))
 
 
 func test_xp_progress_counts_from_the_current_level_and_fills_at_the_cap() -> void:
@@ -185,3 +193,110 @@ func test_dropping_a_rune_removes_it_for_good() -> void:
 	assert_ne(profile.drop_rune(5), "", "no such rune")
 	assert_ne(profile.drop_rune(-1), "")
 	assert_eq(profile.stash.size(), 1, "a bad index changes nothing")
+
+
+func test_the_xp_curve_is_one_smooth_rising_curve_with_a_cap_of_100() -> void:
+	var config := load("res://data/progression/config.tres") as ProgressionConfig
+	assert_eq(config.level_cap, 100)
+	assert_eq([config.xp_for_level(2), config.xp_for_level(3), config.xp_for_level(4)], [20, 50, 90], "the first levels are hand-set")
+	var last := -1
+	for level in range(1, config.level_cap + 1):
+		assert_true(config.xp_for_level(level) > last, "rises at level %d" % level)
+		last = config.xp_for_level(level)
+	assert_eq(config.level_for_xp(config.xp_for_level(57)), 57, "level_for_xp inverts it")
+	assert_eq(config.level_for_xp(config.xp_for_level(57) - 1), 56)
+	var steeper := config.duplicate() as ProgressionConfig
+	steeper.curve_coefficient *= 2.0
+	assert_true(steeper.xp_for_level(20) > config.xp_for_level(20) * 1.9, "the coefficient shifts the curve")
+	assert_eq(steeper.xp_for_level(3), 50, "the hand-set levels don't move")
+	var bare := ProgressionConfig.new()
+	bare.xp_thresholds = [] as Array[int]
+	assert_true(bare.xp_for_level(5) > bare.xp_for_level(4) and bare.xp_for_level(2) > 0, "empty table: the curve from level 2")
+
+
+
+func _growth_hero() -> HeroData:
+	var hero := _hero("Grower")
+	hero.growth_reward = LevelReward.new()
+	hero.growth_reward.modifiers = [BattleFixtures.modifier(StatModifier.Stat.MAX_HP, 4), BattleFixtures.modifier(StatModifier.Stat.POWER, 2)] as Array[StatModifier]
+	var mp := LevelReward.new()
+	mp.modifiers = [BattleFixtures.modifier(StatModifier.Stat.MP, 1)] as Array[StatModifier]
+	hero.milestone_rewards = {15: mp}
+	return hero
+
+
+func test_levels_past_the_table_follow_the_growth_rule_and_milestones() -> void:
+	var hero := _growth_hero()
+	var table := hero.level_rewards.size()  # Levels 2 to table + 1.
+	assert_eq(hero.reward_for(table + 1), hero.level_rewards[table - 1], "inside the table: the authored reward")
+	assert_eq(hero.reward_for(1), null)
+	var growth := hero.reward_for(table + 2)
+	assert_eq(growth.modifiers.map(func(m: StatModifier) -> int: return m.amount), [4, 2])
+	assert_eq(hero.reward_for(15).modifiers.map(func(m: StatModifier) -> int: return m.stat), [StatModifier.Stat.MAX_HP, StatModifier.Stat.POWER, StatModifier.Stat.MP], "growth plus the milestone")
+	assert_eq(hero.reward_for(16).modifiers.size(), 2, "no milestone: growth only")
+	var plain := _hero("Plain")
+	assert_eq(plain.reward_for(table + 2), null, "no growth rule: nothing past the table")
+
+
+func test_a_hero_at_a_high_level_has_the_growth_in_its_stats() -> void:
+	var record := HeroRecord.new(_growth_hero())
+	record.level = 20
+	var hp := 0
+	var mp := 0
+	for modifier in record.modifiers():
+		if modifier.stat == StatModifier.Stat.MAX_HP:
+			hp += modifier.amount
+		elif modifier.stat == StatModifier.Stat.MP:
+			mp += modifier.amount
+	var table := record.hero.level_rewards.size()
+	var authored_hp := 0
+	for reward in record.hero.level_rewards:
+		for modifier in reward.modifiers:
+			if modifier.stat == StatModifier.Stat.MAX_HP:
+				authored_hp += modifier.amount
+	assert_eq(hp, authored_hp + 4 * (20 - table - 1), "the table's HP, then 4 per level")
+	assert_eq(mp, 1, "the milestone at 15, once")
+
+
+func test_growth_rule_validation() -> void:
+	var hero := _growth_hero()
+	assert_eq(hero.get_validation_errors(), PackedStringArray())
+	hero.growth_reward.spells = [BattleFixtures.damage_spell()] as Array[SpellData]
+	assert_true(Array(hero.get_validation_errors()).any(func(e: String) -> bool: return "growth reward can't unlock" in e))
+	hero.growth_reward.spells = [] as Array[SpellData]
+	hero.milestone_rewards[3] = LevelReward.new()
+	assert_true(Array(hero.get_validation_errors()).any(func(e: String) -> bool: return "inside the reward table" in e))
+
+
+func test_the_shipped_heroes_keep_growing_to_the_cap() -> void:
+	var roster := load("res://data/progression/roster.tres") as Roster
+	for hero in roster.heroes:
+		assert_true(hero.growth_reward != null, "%s has a growth rule" % hero.display_name())
+		assert_eq(hero.get_validation_errors(), PackedStringArray())
+		var at_10 := hero.reward_for(10).modifiers.map(func(m: StatModifier) -> int: return m.amount)
+		var at_11 := hero.reward_for(11).modifiers.map(func(m: StatModifier) -> int: return m.amount)
+		assert_eq(at_11, at_10, "%s: level 11 continues the rate of the table" % hero.display_name())
+		var stats_10 := hero.reward_for(10).modifiers.map(func(m: StatModifier) -> int: return m.stat)
+		var stats_11 := hero.reward_for(11).modifiers.map(func(m: StatModifier) -> int: return m.stat)
+		assert_eq(stats_11, stats_10, "%s: the same stats, not just the same amounts" % hero.display_name())
+		assert_true(hero.reward_for(15).modifiers.any(func(m: StatModifier) -> bool: return m.stat == StatModifier.Stat.MP), "+1 MP at 15")
+		assert_true(hero.reward_for(20).modifiers.any(func(m: StatModifier) -> bool: return m.stat == StatModifier.Stat.AP), "+1 AP at 20")
+
+
+func test_the_monotonic_guard_keeps_a_flat_curve_rising() -> void:
+	var config := ProgressionConfig.new()
+	config.xp_thresholds = [0, 20, 50, 90, 140, 200] as Array[int]
+	config.curve_coefficient = 0.1  # The curve alone would sit far below the table.
+	var last := config.xp_for_level(6)
+	for level in range(7, 60):
+		assert_true(config.xp_for_level(level) > last, "rises at level %d" % level)
+		last = config.xp_for_level(level)
+	assert_eq(config.level_for_xp(last), 59, "and level_for_xp still inverts it")
+
+
+func test_the_roster_needs_a_growth_rule_when_the_cap_is_past_the_hero_table() -> void:
+	var roster := load("res://data/progression/roster.tres") as Roster
+	assert_eq(roster.get_validation_errors(), PackedStringArray())
+	var copy := roster.duplicate_deep(Resource.DEEP_DUPLICATE_ALL) as Roster
+	copy.heroes[0].growth_reward = null
+	assert_true(Array(copy.get_validation_errors()).any(func(e: String) -> bool: return "no growth_reward" in e))

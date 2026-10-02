@@ -6,6 +6,6 @@
 script = ExtResource("1_bmlcx")
 display_name = "Sky Bastion"
 seed = 303
-difficulty_floor = 30
+difficulty_floor = 35
 unlocks_cap = 40
 unlocks_start_floor = 31

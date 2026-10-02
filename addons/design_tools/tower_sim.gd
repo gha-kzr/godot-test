@@ -94,10 +94,10 @@ static func snapshot(roster: Roster, config: TowerConfig) -> Array:
 ## A profile at `level` whose cleared stages let a run start at `start_floor`.
 static func _profile(roster: Roster, config: TowerConfig, start_floor: int, level: int) -> Profile:
 	var profile := Profile.create(roster)
-	var capped := clampi(level, 1, roster.config.xp_thresholds.size())
+	var capped := clampi(level, 1, roster.config.level_cap)
 	for record in profile.heroes:
 		record.level = capped
-		record.xp = roster.config.xp_thresholds[capped - 1]
+		record.xp = roster.config.xp_for_level(capped)
 	for stage in config.stages:
 		if stage.unlocks_start_floor <= start_floor:
 			profile.cleared_stages.append(stage)

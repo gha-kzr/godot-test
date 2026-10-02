@@ -457,7 +457,7 @@ func test_esc_stops_aiming_before_it_unpins() -> void:
 	assert_false(_inspect_card(controller).visible)
 
 
-func test_clicking_another_unit_moves_the_pin_and_a_click_still_casts() -> void:
+func test_a_click_that_casts_does_not_pin_but_one_that_does_nothing_else_does() -> void:
 	var controller := _controller("0p 0e 0e 0", [_fighter("P0", 200)], [_fighter("E0", 100), _fighter("E1", 90)])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 	var name_path := "Rows/Header/NameLabel"
@@ -466,9 +466,11 @@ func test_clicking_another_unit_moves_the_pin_and_a_click_still_casts() -> void:
 	controller.select_spell(0)
 	var hp_before := controller.battle.state.units[1].hp
 	controller.click_cell(Vector2i(1, 0))
-	assert_eq((_inspect_card(controller).get_node(name_path) as Label).text, "E0 Lv 1", "the pin moved")
+	assert_eq((_inspect_card(controller).get_node(name_path) as Label).text, "E1 Lv 1", "casting on E0 left the pin on E1")
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
-	assert_true(controller.battle.state.units[1].hp < hp_before, "the same click cast the spell")
+	assert_true(controller.battle.state.units[1].hp < hp_before, "the click cast the spell")
+	controller.click_cell(Vector2i(1, 0))
+	assert_eq((_inspect_card(controller).get_node(name_path) as Label).text, "E0 Lv 1", "with no spell aimed the click only looks: it pins")
 
 
 func test_a_pinned_unit_that_dies_unpins() -> void:

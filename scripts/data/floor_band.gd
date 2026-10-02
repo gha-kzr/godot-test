@@ -8,8 +8,8 @@ extends Resource
 ## Enemy level on `from_floor`; grows by `levels_per_floor` for each floor into the band.
 @export_range(1, 99) var enemy_level := 1
 @export_range(0.0, 5.0) var levels_per_floor := 0.0
-@export_range(1, 3) var min_enemies := 1
-@export_range(1, 3) var max_enemies := 2
+@export_range(1, 6) var min_enemies := 1
+@export_range(1, 6) var max_enemies := 2
 @export var enemy_pool: Array[EnemyData] = []
 ## Bosses for boss floors (multiples of 10) in this band.
 @export var boss_pool: Array[EnemyData] = []

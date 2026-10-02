@@ -300,7 +300,7 @@ func test_boss_floors_and_stages_get_the_boss_music_and_other_floors_the_battle_
 
 func test_the_shipped_sounds_are_in_the_set_and_credited() -> void:
 	var set := load("res://data/audio/audio_set.tres") as AudioSet
-	for event: StringName in [&"ui_click", &"hit", &"heal", &"step", &"defeat"]:
+	for event: StringName in [&"ui_click", &"hit", &"heal", &"step", &"defeat", &"cast", &"cast_fire", &"cast_fireball", &"cast_physical", &"cast_poison", &"death", &"victory"]:
 		assert_true(set.sfx.get(event) != null, "a sound for %s" % event)
 	for track: StringName in [&"hub", &"battle", &"boss"]:
 		assert_true(set.music.get(track) != null, "a track for %s" % track)
@@ -308,7 +308,7 @@ func test_the_shipped_sounds_are_in_the_set_and_credited() -> void:
 	var credits := FileAccess.get_file_as_string("res://CREDITS.md")
 	for dir in ["sfx", "music"]:
 		for file in DirAccess.get_files_at("res://assets/audio/%s" % dir):
-			if file.get_extension() in ["ogg", "mp3"]:
+			if file.get_extension() in ["ogg", "mp3", "wav"]:
 				assert_true(source.contains("%s/%s" % [dir, file]), "%s/%s is listed in SOURCE.md" % [dir, file])
 	assert_true(credits.contains("assets/audio/sfx") and credits.contains("assets/audio/music/hub.mp3"), "credited in CREDITS.md")
 
@@ -394,3 +394,97 @@ func test_a_volume_that_is_not_a_number_is_ignored() -> void:
 	file.close()
 	var loaded := SettingsStore.new(SETTINGS).load_or_default()
 	assert_eq([loaded.master_volume, loaded.music_volume], [Settings.new().master_volume, Settings.new().music_volume])
+
+
+func test_a_spells_cast_sound_is_its_own_then_its_damage_types_then_the_generic_one() -> void:
+	var spell := BattleFixtures.damage_spell()
+	assert_eq(spell.cast_sound_event(), &"cast", "an untyped spell: the generic cast")
+	var fire := DamageType.new()
+	fire.display_name = "Fire"
+	fire.cast_sound = &"cast_fire"
+	(spell.effects[0] as DamageEffect).damage_type = fire
+	assert_eq(spell.cast_sound_event(), &"cast_fire", "the damage type's")
+	spell.cast_sound = &"cast_poison"
+	assert_eq(spell.cast_sound_event(), &"cast_poison", "the spell's own wins")
+	var heal := BattleFixtures.damage_spell()
+	heal.effects = [HealEffect.new()] as Array[EffectData]
+	assert_eq(heal.cast_sound_event(), &"cast", "a heal has no damage type")
+
+
+func test_unknown_cast_sound_names_are_validation_errors() -> void:
+	var spell := BattleFixtures.damage_spell()
+	spell.cast_sound = &"boom"
+	assert_true(Array(spell.get_validation_errors()).any(func(e: String) -> bool: return "unknown cast_sound" in e))
+	var type := DamageType.new()
+	type.display_name = "X"
+	type.cast_sound = &"boom"
+	assert_true(Array(type.get_validation_errors()).any(func(e: String) -> bool: return "unknown cast_sound" in e))
+	type.cast_sound = &"cast_fire"
+	assert_eq(type.get_validation_errors().size(), 0)
+
+
+func test_the_event_player_announces_the_spells_own_cast_sound() -> void:
+	Engine.time_scale = 10.0
+	var spell := BattleFixtures.damage_spell(2, 1, 5, 3)
+	spell.cast_sound = &"cast_fire"
+	var hero := BattleFixtures.unit("P0", 200, 3, 6, 20)
+	hero.spells = [spell] as Array[SpellData]
+	var battle := Battle.new(BattleFixtures.state_with("0p 0 0 0e", [hero], [BattleFixtures.unit("E0", 100, 3, 6, 40)]))
+	battle.start()
+	var root := Node3D.new()
+	var board := BoardView.new()
+	var units := UnitsView.new()
+	var player := EventPlayer.new()
+	for node: Node in [board, units, player]:
+		root.add_child(node)
+	_tree().root.add_child(root)
+	board.build(battle.state.grid)
+	units.build(battle.state, board)
+	player.setup(units, board)
+	var heard: Array[StringName] = []
+	player.sound.connect(func(event: StringName) -> void: heard.append(event))
+	await player.play(battle.perform(BattleActions.CastSpell.new(0, 0, Vector2i(3, 0))).events)
+	assert_true(heard.has(&"cast_fire") and not heard.has(&"cast"), "the specific cast sound only: %s" % [heard])
+	root.free()
+	Engine.time_scale = 1.0
+
+
+func test_a_victory_or_defeat_stinger_takes_the_music_out_and_the_next_screens_music_returns() -> void:
+	for stinger: StringName in [&"victory", &"defeat"]:
+		var service := _service()
+		service.play_music(&"battle")
+		await _tree().create_timer(0.3).timeout
+		service.play_sfx(stinger)
+		assert_eq(service.current_music, &"", "%s: the battle music is told to stop" % stinger)
+		await _tree().create_timer(1.1).timeout
+		for player: AudioStreamPlayer in service._music_players:
+			assert_false(player.playing, "%s: no music under the fanfare" % stinger)
+		service.play_music(&"hub")
+		assert_eq(service.current_music, &"hub", "the next screen's music starts again")
+		assert_true(service._music_players[service._music_active].playing)
+		service.free()
+	var plain := _service()
+	plain.play_music(&"battle")
+	plain.play_sfx(&"hit")
+	assert_eq(plain.current_music, &"battle", "an ordinary sound leaves the music alone")
+	plain.free()
+
+
+func test_the_next_screens_music_cuts_off_a_fanfare_still_playing() -> void:
+	var service := _service()
+	service.audio_set.sfx[&"victory"] = _long_stream()  # A fanfare that outlasts the click on Continue.
+	service.play_music(&"boss")
+	service.play_sfx(&"victory")
+	var fanfare := service._stinger
+	assert_true(fanfare != null and fanfare.playing, "the fanfare plays")
+	service.play_music(&"hub")  # Continue: the run screen's music.
+	await _tree().create_timer(0.7).timeout
+	assert_false(fanfare.playing, "the fanfare was cut off when the next music started")
+	assert_true(service._music_players[service._music_active].volume_db > -15.0, "and the new music fades in: %f" % service._music_players[service._music_active].volume_db)
+	var other := _service()
+	other.audio_set.sfx[&"hit"] = _long_stream()
+	other.play_sfx(&"hit")
+	other.play_music(&"hub")
+	assert_true(other._stinger == null, "an ordinary sound is no stinger and is never cut")
+	service.free()
+	other.free()

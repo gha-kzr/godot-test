@@ -1,7 +1,7 @@
 # Audio — source
 
 All files are **CC0 1.0** (public domain, no attribution required; credited anyway): https://creativecommons.org/publicdomain/zero/1.0/
-Chosen by the project owner by ear from a sampler of candidates. Each was downloaded from the official page over HTTPS into a scratch folder outside the repo, the archive listed and type-checked (only `.ogg` and `.mp3` files; valid file headers), and the chosen file copied here unmodified (renamed).
+Chosen by the project owner by ear from samplers of candidates. Each was downloaded from the official page over HTTPS into a scratch folder outside the repo, the archive listed and type-checked (only `.ogg` and `.mp3` files; valid file headers), and the chosen file copied here unmodified (renamed).
 
 ## Sound effects and stingers — Kenney (https://kenney.nl)
 
@@ -12,6 +12,18 @@ Chosen by the project owner by ear from a sampler of candidates. Each was downlo
 | Music Jingles | https://kenney.nl/assets/music-jingles | `b729ba57959bd58793d2c5cafa348aaf2655d354f3da35ec4729e03ec77197b8` | `jingles_STEEL13` → `sfx/defeat.ogg` |
 
 The packs' `License.txt` files are next to the sounds (`sfx/License-Kenney-*.txt`).
+
+## Spell, death and victory sounds — OpenGameArt (license field "CC0" on each page)
+
+| Sound | Author | Page | File used | Archive SHA-256 |
+|---|---|---|---|---|
+| `sfx/cast_fire.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `spell_fire_01.ogg` | `1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd` |
+| `sfx/cast_poison.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `creature_slime_01.ogg` | (same archive) |
+| `sfx/death.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `creature_die_01.ogg` | (same archive) |
+| `sfx/cast_physical.wav` | artisticdude | https://opengameart.org/content/swishes-sound-pack | `swish-1.wav` | `7980215241b739a787dcf26f660ce510bb237900968789395a86911619795693` |
+| `sfx/cast_fireball.wav` | Julien Matthey | https://opengameart.org/content/fireball-1 | `105016__julien-matthey__jm-fx-fireball-01.wav` | (single file) |
+| `sfx/cast.ogg` | JaggedStone | https://opengameart.org/content/magic-spell-sfx | `magical_1_0.ogg` | (single file) |
+| `sfx/victory.wav` | cynicmusic | https://opengameart.org/content/victory-fanfare-short | `Heavy_ConceptB.wav` | (single file) |
 
 ## Music — OpenGameArt (https://opengameart.org), license field "CC0" on each page
 
@@ -24,6 +36,13 @@ The packs' `License.txt` files are next to the sounds (`sfx/License-Kenney-*.txt
 ## File hashes (SHA-256)
 
 ```
+02fa3a2c6e79e868e546802f45127c5cdda69aba6d5a24ac997ea66f81a816cb  sfx/cast_fire.ogg
+3992598c814de25c318780e506aeda673a7e410b7b3c4f0793883483ff9766b8  sfx/cast_fireball.wav
+9a15c881345c1ce1c39cc31f52f081c8c4dc81fa41111e0079400f39d3ba0e45  sfx/cast_physical.wav
+746d6ef073abfadd43fe184c50c6a2528350d4f566f2c0f54cd51ff0eb665118  sfx/cast_poison.ogg
+119f9061a566c72c1c58444b03f8685b833079ef268dda02fe742eb34d3bc68f  sfx/cast.ogg
+b34a816a401c5d80c77a61dabbedef7d1918a01320bbb67286c70f22db4acd43  sfx/death.ogg
+cf7aca1193530c804f41a22cfd9a2813c25d3c244fa96ad88c88c6206daa033d  sfx/victory.wav
 1eddde22f0894c2267d558198d7fbfb289423929d0a060a3c4f5e1b6ab83be49  sfx/defeat.ogg
 df16f25d45189f5d44d6a482ab20d5067350ca8525a9affa1f8ce599e31a20a5  sfx/heal.ogg
 68ba7701b71ef620f498f3038e832157d71ac8db7ad59424545890b250ceb24e  sfx/hit.ogg

@@ -246,7 +246,7 @@ func test_hud_lets_clicks_through_to_the_board_and_never_takes_focus() -> void:
 
 func test_spell_description_covers_range_area_and_effects() -> void:
 	var fireball := load("res://data/spells/fireball.tres") as SpellData
-	assert_eq(Hud.spell_description(fireball), "Range 3-5, line of sight. Circle area 1. 6-8 fire damage.")
+	assert_eq(Hud.spell_description(fireball), "Range 3-5, line of sight. Circle area 1. 5-7 fire damage.")
 	var mend := load("res://data/spells/mend.tres") as SpellData
 	assert_eq(Hud.spell_description(mend), "Range 0-3. Heals 6-10.")
 	var firebolt := load("res://data/spells/firebolt.tres") as SpellData

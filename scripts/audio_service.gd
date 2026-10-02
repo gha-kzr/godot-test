@@ -10,6 +10,11 @@ extends Node
 const MASTER_BUS := &"Master"
 const MUSIC_BUS := &"Music"
 const EFFECTS_BUS := &"Effects"
+## Sound events that take the stage alone: the music fades out when one plays (the next screen
+## brings its own music back).
+const STINGERS: Array[StringName] = [&"victory", &"defeat"]
+## How long a still-playing stinger takes to fade out when the next music starts.
+const STINGER_CUT := 0.4
 const POOL_SIZE := 8
 const CROSSFADE := 0.8
 const SILENT_DB := -60.0
@@ -22,6 +27,8 @@ var current_music: StringName = &""
 
 ## Event → the time (msec) it last played, for the cooldowns.
 var _last_played: Dictionary[StringName, int] = {}
+## The player of the stinger now playing, if any: new music cuts it off.
+var _stinger: AudioStreamPlayer
 var _pool: Array[AudioStreamPlayer] = []
 var _next_player := 0
 var _music_players: Array[AudioStreamPlayer] = []
@@ -68,6 +75,8 @@ func play_sfx(event: StringName) -> void:
 		requested.pop_front()
 	if audio_set == null or not audio_set.sfx.has(event) or _pool.is_empty():
 		return
+	if event in STINGERS:
+		stop_music()  # The fanfare is heard on its own, not over the battle music.
 	var now := Time.get_ticks_msec()
 	if now - _last_played.get(event, -1_000_000) < audio_set.sfx_cooldown.get(event, 0.0) * 1000.0:
 		return
@@ -79,6 +88,8 @@ func play_sfx(event: StringName) -> void:
 	var variation: float = audio_set.sfx_pitch_variation.get(event, 0.0)
 	player.pitch_scale = 1.0 + randf_range(-variation, variation)
 	player.play()
+	if event in STINGERS:
+		_stinger = player
 
 
 ## Plays a music track on a loop, fading out the previous one. The same track again does
@@ -86,6 +97,8 @@ func play_sfx(event: StringName) -> void:
 func play_music(track: StringName) -> void:
 	if track == current_music:
 		return
+	if track != &"":
+		_cut_stinger()  # A new screen's music doesn't play over the fanfare of the last one.
 	current_music = track
 	var stream: AudioStream = audio_set.music.get(track) if audio_set != null else null
 	var outgoing := _music_players[_music_active]
@@ -104,6 +117,15 @@ func play_music(track: StringName) -> void:
 		incoming.play()
 		_fade.tween_property(incoming, "volume_db", 0.0, CROSSFADE)  # Both fade at once: a cross-fade.
 	_fade.chain().tween_callback(outgoing.stop)
+
+
+## Fades the stinger out quickly (it is a long fanfare; the player has moved on).
+func _cut_stinger() -> void:
+	var player := _stinger
+	_stinger = null
+	if player == null or not player.playing:
+		return
+	create_tween().tween_property(player, "volume_db", SILENT_DB, STINGER_CUT).finished.connect(player.stop)
 
 
 ## Sets a music stream to loop (each stream type has its own switch).

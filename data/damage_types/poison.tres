@@ -9,3 +9,4 @@ display_name = "Poison"
 color = Color(0.55, 0.85, 0.2, 1)
 sort_order = 2
 impact_effect = ExtResource("9_fx")
+cast_sound = &"cast_poison"

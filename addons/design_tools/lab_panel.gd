@@ -54,7 +54,7 @@ func _init() -> void:
 		_hero_pickers.append(picker)
 		var level := SpinBox.new()
 		level.min_value = 1
-		level.max_value = _roster.config.level_cap if _roster != null and _roster.config != null else 10
+		level.max_value = _roster.config.level_cap if _roster != null and _roster.config != null else 100
 		level.value = 1
 		level.prefix = "Lv"
 		row.add_child(level)
@@ -81,7 +81,7 @@ func _init() -> void:
 	tower_row.add_child(_label("Tower runs from"))
 	_tower_start = _spin(1, 999, 1, "Floor")
 	tower_row.add_child(_tower_start)
-	_tower_level = _spin(1, _roster.config.level_cap if _roster != null and _roster.config != null else 10, 1, "Heroes Lv")
+	_tower_level = _spin(1, _roster.config.level_cap if _roster != null and _roster.config != null else 100, 1, "Heroes Lv")
 	tower_row.add_child(_tower_level)
 	_tower_runs = _spin(1, 200, 10, "")
 	_tower_runs.suffix = "runs"

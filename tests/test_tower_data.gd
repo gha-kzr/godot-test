@@ -29,7 +29,7 @@ func test_bands_and_levels_follow_the_floor() -> void:
 	assert_eq(tower.band_for(1).from_floor, 1)
 	assert_eq(tower.band_for(4).from_floor, 1)
 	assert_eq(tower.band_for(5).from_floor, 5)
-	assert_eq(tower.band_for(99).from_floor, 30)
+	assert_eq(tower.band_for(99).from_floor, 80)
 	assert_eq(tower.band_for(1).level_on(1), 1, "floor 1 starts easy")
 	assert_true(tower.band_for(35).level_on(35) > tower.band_for(12).level_on(12), "levels rise")
 

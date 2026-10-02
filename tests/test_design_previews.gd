@@ -44,7 +44,7 @@ func test_enemy_rows_cover_levels_and_presets() -> void:
 	assert_eq([first.preset_name, first.level, first.hp, first.power, first.xp], ["Normal", 1, 42, 0, 15])
 	assert_eq(first.resistances, "Physical +20%")
 	var elite_5: EnemyPreview.Row = rows.filter(func(r: EnemyPreview.Row) -> bool: return r.preset_name == "Elite" and r.level == 5)[0]
-	assert_eq([elite_5.hp, elite_5.power, elite_5.xp], [93, 32, 70], "(42 + 20) x 1.5; 12 + 20; (15 + 20) x 2")
+	assert_eq([elite_5.hp, elite_5.power, elite_5.xp], [87, 28, 70], "(42 + 16) x 1.5; 8 + 20; (15 + 20) x 2")
 
 
 func test_enemy_summary_lists_loot_odds() -> void:

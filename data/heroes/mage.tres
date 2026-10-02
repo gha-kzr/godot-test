@@ -7,6 +7,20 @@
 [ext_resource type="Script" uid="uid://k0qhv5lhw2yq" path="res://scripts/data/hero_data.gd" id="5_ij7mj"]
 [ext_resource type="Resource" uid="uid://chk68t5vjn12d" path="res://data/units/mage.tres" id="6_duldw"]
 
+[sub_resource type="Resource" id="Resource_pgojp"]
+script = ExtResource("2_t2s1d")
+stat = 5
+amount = 2
+
+[sub_resource type="Resource" id="Resource_t2s1d"]
+script = ExtResource("2_t2s1d")
+stat = 3
+amount = 5
+
+[sub_resource type="Resource" id="Resource_65wfw"]
+script = ExtResource("1_pgojp")
+modifiers = Array[ExtResource("2_t2s1d")]([SubResource("Resource_pgojp"), SubResource("Resource_t2s1d")])
+
 [sub_resource type="Resource" id="Resource_byjel"]
 script = ExtResource("2_t2s1d")
 stat = 5
@@ -138,7 +152,29 @@ amount = 5
 script = ExtResource("1_pgojp")
 modifiers = Array[ExtResource("2_t2s1d")]([SubResource("Resource_7iemh"), SubResource("Resource_u6e7x")])
 
+[sub_resource type="Resource" id="Resource_oi40l"]
+script = ExtResource("2_t2s1d")
+amount = 1
+
+[sub_resource type="Resource" id="Resource_ij7mj"]
+script = ExtResource("1_pgojp")
+modifiers = Array[ExtResource("2_t2s1d")]([SubResource("Resource_oi40l")])
+
+[sub_resource type="Resource" id="Resource_duldw"]
+script = ExtResource("2_t2s1d")
+stat = 0
+amount = 1
+
+[sub_resource type="Resource" id="Resource_q8sh5"]
+script = ExtResource("1_pgojp")
+modifiers = Array[ExtResource("2_t2s1d")]([SubResource("Resource_duldw")])
+
 [resource]
 script = ExtResource("5_ij7mj")
 unit = ExtResource("6_duldw")
 level_rewards = Array[ExtResource("1_pgojp")]([SubResource("Resource_d18nk"), SubResource("Resource_h2stu"), SubResource("Resource_hfpi5"), SubResource("Resource_efepg"), SubResource("Resource_rhme6"), SubResource("Resource_f4sgv"), SubResource("Resource_70pfi"), SubResource("Resource_704w3"), SubResource("Resource_5u7m2")])
+growth_reward = SubResource("Resource_65wfw")
+milestone_rewards = Dictionary[int, ExtResource("1_pgojp")]({
+15: SubResource("Resource_ij7mj"),
+20: SubResource("Resource_q8sh5")
+})
