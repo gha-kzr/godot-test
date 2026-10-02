@@ -23,3 +23,4 @@ icon = ExtResource("5_17wf5")
 needs_line_of_sight = false
 area = SubResource("Resource_6ljn6")
 effects = Array[ExtResource("2_rgwqt")]([SubResource("Resource_2j2jj")])
+impact_delay = 0.3

@@ -24,7 +24,7 @@ func should_show(id: String) -> bool:
 
 ## The hint's text, with {action} placeholders replaced by the key bound to that action.
 func text(id: String) -> String:
-	var result: String = TEXTS.get(id, "")
+	var result := tr(TEXTS.get(id, ""))  # The texts stay English: they are the message ids.
 	for action in Settings.REBINDABLE:
 		result = result.replace("{%s}" % action, SettingsApplier.key_text(action))
 	return result

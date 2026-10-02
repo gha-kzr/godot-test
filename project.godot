@@ -147,6 +147,11 @@ camera_recenter={
 ]
 }
 
+[internationalization]
+
+locale/fallback="en"
+locale/translations=PackedStringArray("res://locale/fr.po")
+
 [layer_names]
 
 3d_physics/layer_1="board"

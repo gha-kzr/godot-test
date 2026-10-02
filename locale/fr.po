@@ -1,0 +1,801 @@
+# Translation. The message id is the English text shown in the game.
+# Rebuilt and merged by tools/extract_strings.gd; translations are kept, new texts arrive empty.
+msgid ""
+msgstr ""
+"Project-Id-Version: godot-test\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "%d / %d HP"
+msgstr "%d / %d PV"
+
+msgid "%d AP"
+msgstr "%d PA"
+
+msgid "%d MP"
+msgstr "%d PM"
+
+msgid "%d turn"
+msgid_plural "%d turns"
+msgstr[0] "%d tour"
+msgstr[1] "%d tours"
+
+msgid "%s  Lv %d"
+msgstr "%s  Niv. %d"
+
+msgid "%s %s damage"
+msgstr "%s dégâts (%s)"
+
+msgid "%s %s damage (%d%% Power)"
+msgstr "%s dégâts (%s, %d%% Puissance)"
+
+msgid "%s %s: %s. Click to unequip."
+msgstr "%s · %s : %s. Cliquez pour retirer."
+
+msgid "%s (%d AP)"
+msgstr "%s (%d PA)"
+
+msgid "%s (%d AP): %s"
+msgstr "%s (%d PA) : %s"
+
+msgid "%s (allies only)"
+msgstr "%s (alliés uniquement)"
+
+msgid "%s (boss reward to pick)"
+msgstr "%s (récompense de boss à choisir)"
+
+msgid "%s (caster only)"
+msgstr "%s (lanceur uniquement)"
+
+msgid "%s (cleared)"
+msgstr "%s (terminé)"
+
+msgid "%s (enemies only)"
+msgstr "%s (ennemis uniquement)"
+
+msgid "%s (locked)"
+msgstr "%s (verrouillé)"
+
+msgid "%s AP"
+msgstr "%s PA"
+
+msgid "%s area %d"
+msgstr "Zone %s %d"
+
+msgid "%s cleared"
+msgstr "%s terminé"
+
+msgid "%s cleared! The tower now goes up to floor %d, and you can start at floor %d."
+msgstr "%s terminé ! La tour monte maintenant jusqu'à l'étage %d, et vous pouvez commencer à l'étage %d."
+
+msgid "%s damage"
+msgstr "%s dégâts"
+
+msgid "%s damage (%d%% Power)"
+msgstr "%s dégâts (%d%% Puissance)"
+
+msgid "%s for %s (%s)"
+msgstr "%s pendant %s (%s)"
+
+msgid "%s has no free rune slot."
+msgstr "%s n'a plus d'emplacement de rune libre."
+
+msgid "%s HP"
+msgstr "%s PV"
+
+msgid "%s initiative"
+msgstr "%s initiative"
+
+msgid "%s is %s: one per hero."
+msgstr "%s est %s : une seule par héros."
+
+msgid "%s is acting..."
+msgstr "%s joue..."
+
+msgid "%s is already used by %s."
+msgstr "%s est déjà utilisée par %s."
+
+msgid "%s is reserved for the menus."
+msgstr "%s est réservée aux menus."
+
+msgid "%s lost"
+msgstr "%s : défaite"
+
+msgid "%s Lv %d"
+msgstr "%s Niv. %d"
+
+msgid "%s MP"
+msgstr "%s PM"
+
+msgid "%s or Esc to close"
+msgstr "%s ou Échap pour fermer"
+
+msgid "%s per turn"
+msgstr "%s par tour"
+
+msgid "%s Power"
+msgstr "%s Puissance"
+
+msgid "%s reached level %d and learned %s."
+msgstr "%s atteint le niveau %d et apprend %s."
+
+msgid "%s reached level %d."
+msgstr "%s atteint le niveau %d."
+
+msgid "%s · Lv %d"
+msgstr "%s · Niv. %d"
+
+msgid "%s · Round %d"
+msgstr "%s · Round %d"
+
+msgid "%s — level %d"
+msgstr "%s — niveau %d"
+
+msgid "%s%% %s resistance"
+msgstr "%s%% résistance (%s)"
+
+msgid "%s%% damage taken"
+msgstr "%s%% de dégâts subis"
+
+msgid "%s's turn"
+msgstr "Tour de %s"
+
+msgid "%s: %s for the rest of the run."
+msgstr "%s : %s jusqu'à la fin de l'ascension."
+
+msgid "%s: %s.\n%s rune (one per hero). Click to equip on the selected hero."
+msgstr "%s : %s.\nRareté : %s (une par héros). Cliquez pour équiper sur le héros sélectionné."
+
+msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
+msgstr "%s : %s.\nRareté : %s. Cliquez pour équiper sur le héros sélectionné."
+
+msgid "(empty)"
+msgstr "(vide)"
+
+msgid "+%d XP for each hero."
+msgstr "+%d XP pour chaque héros."
+
+msgid "0 / 0 HP"
+msgstr "0 / 0 PV"
+
+msgid "0 AP"
+msgstr "0 PA"
+
+msgid "Abandon run"
+msgstr "Abandonner l'ascension"
+
+msgid "All"
+msgstr "Tous"
+
+msgid "All (%s)"
+msgstr "Tous (%s)"
+
+msgid "AP %d / %d"
+msgstr "PA %d / %d"
+
+msgid "AP 0 / 0"
+msgstr "PA 0 / 0"
+
+msgid "Archer"
+msgstr "Archer"
+
+msgid "Arrow"
+msgstr "Flèche"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Automatic"
+msgstr "Automatique"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Back to the party"
+msgstr "Retour à l'équipe"
+
+msgid "Back to the title"
+msgstr "Retour au titre"
+
+msgid "Battle seed %d"
+msgstr "Graine du combat %d"
+
+msgid "Boons: %s"
+msgstr "Bienfaits : %s"
+
+msgid "Boss"
+msgstr "Boss"
+
+msgid "Boss defeated! Pick a boon, or heal the party instead."
+msgstr "Boss vaincu ! Choisissez un bienfait, ou soignez l'équipe à la place."
+
+msgid "Brute"
+msgstr "Brute"
+
+msgid "Choose a target for %s (orange cells). Esc to cancel"
+msgstr "Choisissez une cible pour %s (cases orange). Échap pour annuler"
+
+msgid "Circle"
+msgstr "Cercle"
+
+msgid "Clear the previous stage first."
+msgstr "Terminez d'abord l'épreuve précédente."
+
+msgid "Click a rune in the stash to equip it on the selected hero, then climb the tower or try a stage."
+msgstr "Cliquez sur une rune de la réserve pour l'équiper sur le héros sélectionné, puis gravissez la tour ou tentez une épreuve."
+
+msgid "Click a teal cell to place %s (Esc to deselect)"
+msgstr "Cliquez sur une case turquoise pour placer %s (Échap pour désélectionner)"
+
+msgid "Click to look at this unit"
+msgstr "Cliquez pour regarder cette unité"
+
+msgid "Climb the tower"
+msgstr "Gravir la tour"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Common"
+msgstr "Commun"
+
+msgid "Continue run"
+msgstr "Continuer l'ascension"
+
+msgid "Continue the climb"
+msgstr "Poursuivre l'ascension"
+
+msgid "Controls"
+msgstr "Commandes"
+
+msgid "Credits"
+msgstr "Crédits"
+
+msgid "Crippled"
+msgstr "Entravé"
+
+msgid "Crippling Blow"
+msgstr "Coup handicapant"
+
+msgid "Cross"
+msgstr "Croix"
+
+msgid "Defeat. The run ends; heroes keep their levels and runes."
+msgstr "Défaite. L'ascension s'arrête ; les héros gardent leurs niveaux et leurs runes."
+
+msgid "Display"
+msgstr "Affichage"
+
+msgid "Drop"
+msgstr "Jeter"
+
+msgid "Drop %s?"
+msgstr "Jeter %s ?"
+
+msgid "Effects"
+msgstr "Effets"
+
+msgid "Elemental Aegis"
+msgstr "Égide élémentaire"
+
+msgid "Elite"
+msgstr "Élite"
+
+msgid "End turn"
+msgstr "Fin du tour"
+
+msgid "End turn (%s)"
+msgstr "Fin du tour (%s)"
+
+msgid "Epic"
+msgstr "Épique"
+
+msgid "Fire"
+msgstr "Feu"
+
+msgid "Fire Ward Rune"
+msgstr "Rune de protection du feu"
+
+msgid "Fireball"
+msgstr "Boule de feu"
+
+msgid "Firebolt"
+msgstr "Trait de feu"
+
+msgid "Floor %d"
+msgstr "Étage %d"
+
+msgid "Floor %d boss defeated"
+msgstr "Boss de l'étage %d vaincu"
+
+msgid "Floor %d cleared."
+msgstr "Étage %d terminé."
+
+msgid "Floor %d cleared: the top of the tower for now. Clear the next stage to go higher."
+msgstr "Étage %d terminé : le sommet de la tour pour le moment. Terminez l'épreuve suivante pour monter plus haut."
+
+msgid "Floor %d isn't unlocked as a starting floor."
+msgstr "L'étage %d n'est pas débloqué comme étage de départ."
+
+msgid "Focus Crown"
+msgstr "Couronne de concentration"
+
+msgid "Found: %s."
+msgstr "Trouvé : %s."
+
+msgid "From floor %d"
+msgstr "À partir de l'étage %d"
+
+msgid "Full heal — every hero back to full HP"
+msgstr "Soin complet — chaque héros retrouve tous ses PV"
+
+msgid "Fullscreen"
+msgstr "Plein écran"
+
+msgid "Game"
+msgstr "Jeu"
+
+msgid "Got it"
+msgstr "Compris"
+
+msgid "Ground Slam"
+msgstr "Fracas du sol"
+
+msgid "Guard"
+msgstr "Garde"
+
+msgid "Guarded"
+msgstr "Protégé"
+
+msgid "Hamstring"
+msgstr "Coup de jarret"
+
+msgid "heals %s"
+msgstr "soigne %s"
+
+msgid "heals %s (%d%% Power)"
+msgstr "soigne %s (%d%% Puissance)"
+
+msgid "Hero"
+msgstr "Héros"
+
+msgid "Hints will show again."
+msgstr "Les astuces s'afficheront à nouveau."
+
+msgid "HP %d   AP %d   MP %d   Initiative %d"
+msgstr "PV %d   PA %d   PM %d   Initiative %d"
+
+msgid "HP %d / %d"
+msgstr "PV %d / %d"
+
+msgid "Iron Ward"
+msgstr "Garde de fer"
+
+msgid "Keys reset."
+msgstr "Touches réinitialisées."
+
+msgid "Knight"
+msgstr "Chevalier"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "learns %s"
+msgstr "apprend %s"
+
+msgid "Leave"
+msgstr "Quitter"
+
+msgid "Leave the fight?"
+msgstr "Quitter le combat ?"
+
+msgid "Leave the tower"
+msgstr "Quitter la tour"
+
+msgid "Legendary"
+msgstr "Légendaire"
+
+msgid "Level up! (+%d XP)"
+msgstr "Niveau supérieur ! (+%d XP)"
+
+msgid "Line"
+msgstr "Ligne"
+
+msgid "Mage"
+msgstr "Mage"
+
+msgid "Master volume"
+msgstr "Volume général"
+
+msgid "Mend"
+msgstr "Soin"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Move to a blue cell or pick a spell (%s)"
+msgstr "Déplacez-vous sur une case bleue ou choisissez un sort (%s)"
+
+msgid "MP %d / %d"
+msgstr "PM %d / %d"
+
+msgid "MP 0 / 0"
+msgstr "PM 0 / 0"
+
+msgid "Music"
+msgstr "Musique"
+
+msgid "Mute"
+msgstr "Couper le son"
+
+msgid "Mute or unmute all sound"
+msgstr "Couper ou rétablir tout le son"
+
+msgid "Next level: %s"
+msgstr "Niveau suivant : %s"
+
+msgid "No"
+msgstr "Non"
+
+msgid "No rune found."
+msgstr "Aucune rune trouvée."
+
+msgid "No runes yet: win battles to find some."
+msgstr "Pas encore de runes : gagnez des combats pour en trouver."
+
+msgid "no status"
+msgstr "aucun statut"
+
+msgid "No such hero."
+msgstr "Ce héros n'existe pas."
+
+msgid "No such rune in the stash."
+msgstr "Cette rune n'est pas dans la réserve."
+
+msgid "none"
+msgstr "aucune"
+
+msgid "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
+msgstr "Rien de ce combat n'est conservé : il recommencera depuis le début quand vous le rejouerez. Échap pour rester."
+
+msgid "Nothing left to do: end your turn (%s)"
+msgstr "Plus rien à faire : terminez votre tour (%s)"
+
+msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
+msgstr "Un seul combat. Le réussir permet à la tour de monter jusqu'à l'étage %d et de commencer à l'étage %d."
+
+msgid "Party"
+msgstr "Équipe"
+
+msgid "Physical"
+msgstr "Physique"
+
+msgid "Pick a boon, or heal the party instead."
+msgstr "Choisissez un bienfait, ou soignez l'équipe à la place."
+
+msgid "Piercing Thrust"
+msgstr "Estocade perçante"
+
+msgid "Place your heroes on the teal cells, then press Ready ({end_turn}). Hover anything for details; click a unit to pin its card."
+msgstr "Placez vos héros sur les cases turquoise, puis appuyez sur Prêt ({end_turn}). Survolez n'importe quoi pour les détails ; cliquez sur une unité pour épingler sa fiche."
+
+msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
+msgstr "Placez vos héros : cliquez sur l'un, puis sur une case turquoise. Prêt (%s) pour combattre"
+
+msgid "Play"
+msgstr "Jouer"
+
+msgid "Play again"
+msgstr "Rejouer"
+
+msgid "Poison"
+msgstr "Poison"
+
+msgid "Poison Arrow"
+msgstr "Flèche empoisonnée"
+
+msgid "Power %+d%%"
+msgstr "Puissance %+d%%"
+
+msgid "Power: All %+d%%\nResist: %s"
+msgstr "Puissance : tous %+d%%\nRésist. : %s"
+
+msgid "Press a key for %s (Esc to cancel)."
+msgstr "Appuyez sur une touche pour %s (Échap pour annuler)."
+
+msgid "Press a key..."
+msgstr "Appuyez sur une touche..."
+
+msgid "Progress couldn't be saved."
+msgstr "La progression n'a pas pu être sauvegardée."
+
+msgid "Quit"
+msgstr "Quitter"
+
+msgid "Range %s"
+msgstr "Portée %s"
+
+msgid "Range %s, +range from high ground"
+msgstr "Portée %s, +portée en hauteur"
+
+msgid "Range %s, line of sight"
+msgstr "Portée %s, ligne de vue"
+
+msgid "Range %s, line of sight, +range from high ground"
+msgstr "Portée %s, ligne de vue, +portée en hauteur"
+
+msgid "Ranger"
+msgstr "Rôdeur"
+
+msgid "Rare"
+msgstr "Rare"
+
+msgid "Ready (%s)"
+msgstr "Prêt (%s)"
+
+msgid "Really reset? Levels, runes and runs are lost."
+msgstr "Vraiment réinitialiser ? Niveaux, runes et parties sont perdus."
+
+msgid "Recenter"
+msgstr "Recentrer"
+
+msgid "Recenter (%s)"
+msgstr "Recentrer (%s)"
+
+msgid "Recenter camera"
+msgstr "Recentrer la caméra"
+
+msgid "Regeneration"
+msgstr "Régénération"
+
+msgid "Reset keys"
+msgstr "Réinitialiser les touches"
+
+msgid "Reset save"
+msgstr "Effacer la sauvegarde"
+
+msgid "Resistance: %s"
+msgstr "Résistance : %s"
+
+msgid "Round %d"
+msgstr "Round %d"
+
+msgid "Round 1"
+msgstr "Round 1"
+
+msgid "Ruined Courtyard"
+msgstr "Cour en ruine"
+
+msgid "Ruined Gate"
+msgstr "Porte en ruine"
+
+msgid "Run abandoned."
+msgstr "Ascension abandonnée."
+
+msgid "Run complete"
+msgstr "Ascension terminée"
+
+msgid "Run in progress: %s"
+msgstr "Ascension en cours : %s"
+
+msgid "Rune of Focus"
+msgstr "Rune de concentration"
+
+msgid "Rune of Might"
+msgstr "Rune de puissance"
+
+msgid "Rune of Quickness"
+msgstr "Rune de célérité"
+
+msgid "Rune of Swiftness"
+msgstr "Rune de vélocité"
+
+msgid "Rune of Vitality"
+msgstr "Rune de vitalité"
+
+msgid "Rune stash"
+msgstr "Réserve de runes"
+
+msgid "Runes"
+msgstr "Runes"
+
+msgid "Save reset."
+msgstr "Sauvegarde effacée."
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Settings couldn't be saved."
+msgstr "Les paramètres n'ont pas pu être sauvegardés."
+
+msgid "Show hints again"
+msgstr "Réafficher les astuces"
+
+msgid "Side view (%s)"
+msgstr "Vue de côté (%s)"
+
+msgid "Single"
+msgstr "Simple"
+
+msgid "Sky Bastion"
+msgstr "Bastion céleste"
+
+msgid "Slash"
+msgstr "Entaille"
+
+msgid "Smash"
+msgstr "Écrasement"
+
+msgid "Spell"
+msgstr "Sort"
+
+msgid "Spell %s"
+msgstr "Sort %s"
+
+msgid "Spell 1"
+msgstr "Sort 1"
+
+msgid "Spell 2"
+msgstr "Sort 2"
+
+msgid "Spell 3"
+msgstr "Sort 3"
+
+msgid "Spell 4"
+msgstr "Sort 4"
+
+msgid "Spell 5"
+msgstr "Sort 5"
+
+msgid "Spells"
+msgstr "Sorts"
+
+msgid "Stages"
+msgstr "Épreuves"
+
+msgid "Stay"
+msgstr "Rester"
+
+msgid "Stone Skin Rune"
+msgstr "Rune de peau de pierre"
+
+msgid "Sudden death: the party loses %d%% HP every turn"
+msgstr "Mort subite : l'équipe perd %d%% de ses PV à chaque tour"
+
+msgid "Sunken Crypt"
+msgstr "Crypte engloutie"
+
+msgid "Surge"
+msgstr "Poussée"
+
+msgid "Swift Stride"
+msgstr "Foulée rapide"
+
+msgid "That hero isn't available."
+msgstr "Ce héros n'est pas disponible."
+
+msgid "That key can't be used."
+msgstr "Cette touche ne peut pas être utilisée."
+
+msgid "That rune slot is empty."
+msgstr "Cet emplacement de rune est vide."
+
+msgid "That rune slot isn't free."
+msgstr "Cet emplacement de rune n'est pas libre."
+
+msgid "The battle couldn't start (see the log)."
+msgstr "Le combat n'a pas pu démarrer (voir le journal)."
+
+msgid "The floor's encounter is invalid: %s"
+msgstr "La rencontre de l'étage est invalide : %s"
+
+msgid "The party is fully healed."
+msgstr "L'équipe est entièrement soignée."
+
+msgid "The party needs 1 to %d heroes to fight on this map."
+msgstr "L'équipe a besoin de 1 à %d héros pour combattre sur cette carte."
+
+msgid "The tower is invalid: %s"
+msgstr "La tour est invalide : %s"
+
+msgid "Throw this rune away for good"
+msgstr "Jeter cette rune pour de bon"
+
+msgid "Tip"
+msgstr "Astuce"
+
+msgid "Titan's Heart"
+msgstr "Cœur de titan"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Toggle top view"
+msgstr "Basculer la vue de dessus"
+
+msgid "Top view"
+msgstr "Vue de dessus"
+
+msgid "Top view (%s)"
+msgstr "Vue de dessus (%s)"
+
+msgid "Tough Skin"
+msgstr "Peau dure"
+
+msgid "Tower — up to floor %d, best floor %d"
+msgstr "Tour — jusqu'à l'étage %d, meilleur étage %d"
+
+msgid "Tower — up to floor %d, not climbed yet"
+msgstr "Tour — jusqu'à l'étage %d, pas encore gravie"
+
+msgid "Tower's Might"
+msgstr "Puissance de la tour"
+
+msgid "Tower, floor %d"
+msgstr "Tour, étage %d"
+
+msgid "Turn camera left"
+msgstr "Tourner la caméra à gauche"
+
+msgid "Turn camera right"
+msgstr "Tourner la caméra à droite"
+
+msgid "Turn order"
+msgstr "Ordre de jeu"
+
+msgid "UI scale"
+msgstr "Échelle de l'interface"
+
+msgid "Unit"
+msgstr "Unité"
+
+msgid "Unknown stage."
+msgstr "Épreuve inconnue."
+
+msgid "Venom Ward Rune"
+msgstr "Rune de protection du venin"
+
+msgid "Victory!"
+msgstr "Victoire !"
+
+msgid "Vigor"
+msgstr "Vigueur"
+
+msgid "Volley"
+msgstr "Volée"
+
+msgid "Whirlwind"
+msgstr "Tourbillon"
+
+msgid "Window"
+msgstr "Fenêtre"
+
+msgid "Windowed"
+msgstr "Fenêtré"
+
+msgid "XP %d (max level)"
+msgstr "XP %d (niveau max)"
+
+msgid "XP %d / %d"
+msgstr "XP %d / %d"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "Yes, reset"
+msgstr "Oui, réinitialiser"
+
+msgid "You leave the tower after floor %d."
+msgstr "Vous quittez la tour après l'étage %d."
+
+msgid "You left the fight. It starts over when you continue the run."
+msgstr "Vous avez quitté le combat. Il recommence quand vous poursuivez l'ascension."
+
+msgid "your next %d turns"
+msgstr "vos %d prochains tours"
+
+msgid "your next turn"
+msgstr "votre prochain tour"

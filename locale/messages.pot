@@ -1,0 +1,1058 @@
+# Translation. The message id is the English text shown in the game.
+# Rebuilt and merged by tools/extract_strings.gd; translations are kept, new texts arrive empty.
+msgid ""
+msgstr ""
+
+#: scripts/game/run/party_hp_row.gd scripts/view/hud/order_overlay.gd scripts/view/hud/unit_card.gd
+msgid "%d / %d HP"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "%d AP"
+msgstr ""
+
+#: scripts/view/board_view.gd
+msgid "%d MP"
+msgstr ""
+
+#: scripts/data/apply_status_effect.gd scripts/view/hud/status_info.gd
+msgid "%d turn"
+msgid_plural "%d turns"
+msgstr[0] ""
+msgstr[1] ""
+
+#: scripts/game/hub/hero_tabs.gd
+msgid "%s  Lv %d"
+msgstr ""
+
+#: scripts/data/damage_effect.gd
+msgid "%s %s damage"
+msgstr ""
+
+#: scripts/data/damage_effect.gd
+msgid "%s %s damage (%d%% Power)"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "%s %s: %s. Click to unequip."
+msgstr ""
+
+#: scripts/view/hud/unit_card.gd
+msgid "%s (%d AP)"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "%s (%d AP): %s"
+msgstr ""
+
+#: scripts/data/effect_data.gd
+msgid "%s (allies only)"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "%s (boss reward to pick)"
+msgstr ""
+
+#: scripts/data/effect_data.gd
+msgid "%s (caster only)"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "%s (cleared)"
+msgstr ""
+
+#: scripts/data/effect_data.gd
+msgid "%s (enemies only)"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd scripts/game/hub/hero_tabs.gd
+msgid "%s (locked)"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s AP"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "%s area %d"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "%s cleared"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "%s cleared! The tower now goes up to floor %d, and you can start at floor %d."
+msgstr ""
+
+#: scripts/data/damage_effect.gd
+msgid "%s damage"
+msgstr ""
+
+#: scripts/data/damage_effect.gd
+msgid "%s damage (%d%% Power)"
+msgstr ""
+
+#: scripts/data/apply_status_effect.gd
+msgid "%s for %s (%s)"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "%s has no free rune slot."
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s HP"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s initiative"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "%s is %s: one per hero."
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "%s is acting..."
+msgstr ""
+
+#: scripts/progression/settings_applier.gd
+msgid "%s is already used by %s."
+msgstr ""
+
+#: scripts/progression/settings_applier.gd
+msgid "%s is reserved for the menus."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "%s lost"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "%s Lv %d"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s MP"
+msgstr ""
+
+#: scripts/view/hud/order_overlay.gd
+msgid "%s or Esc to close"
+msgstr ""
+
+#: scripts/data/status_data.gd
+msgid "%s per turn"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s Power"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "%s reached level %d and learned %s."
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "%s reached level %d."
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "%s · Lv %d"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "%s · Round %d"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "%s — level %d"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s%% %s resistance"
+msgstr ""
+
+#: scripts/data/stat_modifier.gd
+msgid "%s%% damage taken"
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "%s's turn"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "%s: %s for the rest of the run."
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "%s: %s.\n%s rune (one per hero). Click to equip on the selected hero."
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "(empty)"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "+%d XP for each hero."
+msgstr ""
+
+#: scenes/battle/hud/unit_card.tscn
+msgid "0 / 0 HP"
+msgstr ""
+
+#: scenes/battle/hud/spell_bar.tscn
+msgid "0 AP"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Abandon run"
+msgstr ""
+
+#: scenes/battle/hud/turn_timeline.tscn
+msgid "All"
+msgstr ""
+
+#: scripts/view/hud/turn_timeline.gd
+msgid "All (%s)"
+msgstr ""
+
+#: scripts/view/hud/unit_card.gd
+msgid "AP %d / %d"
+msgstr ""
+
+#: scenes/battle/hud/unit_card.tscn
+msgid "AP 0 / 0"
+msgstr ""
+
+#: data/units/archer.tres
+msgid "Archer"
+msgstr ""
+
+#: data/spells/arrow.tres
+msgid "Arrow"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Audio"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Automatic"
+msgstr ""
+
+#: scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
+msgid "Back"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Back to the party"
+msgstr ""
+
+#: scenes/game/party_screen.tscn
+msgid "Back to the title"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Battle seed %d"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Boons: %s"
+msgstr ""
+
+#: data/presets/boss.tres
+msgid "Boss"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Boss defeated! Pick a boon, or heal the party instead."
+msgstr ""
+
+#: data/units/brute.tres
+msgid "Brute"
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Choose a target for %s (orange cells). Esc to cancel"
+msgstr ""
+
+#: scripts/data/area_shape.gd
+msgid "Circle"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Clear the previous stage first."
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "Click a rune in the stash to equip it on the selected hero, then climb the tower or try a stage."
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Click a teal cell to place %s (Esc to deselect)"
+msgstr ""
+
+#: scripts/view/hud/order_overlay.gd
+msgid "Click to look at this unit"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Climb the tower"
+msgstr ""
+
+#: scenes/battle/hud/order_overlay.tscn
+msgid "Close"
+msgstr ""
+
+#: scripts/data/rune_data.gd
+msgid "Common"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Continue run"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Continue the climb"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Controls"
+msgstr ""
+
+#: scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
+msgid "Credits"
+msgstr ""
+
+#: data/statuses/crippled.tres
+msgid "Crippled"
+msgstr ""
+
+#: data/spells/crippling_blow.tres
+msgid "Crippling Blow"
+msgstr ""
+
+#: scripts/data/area_shape.gd
+msgid "Cross"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Defeat. The run ends; heroes keep their levels and runes."
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Display"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Drop"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Drop %s?"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Effects"
+msgstr ""
+
+#: data/boons/elemental_aegis.tres
+msgid "Elemental Aegis"
+msgstr ""
+
+#: data/presets/elite.tres
+msgid "Elite"
+msgstr ""
+
+#: scenes/battle/hud.tscn scripts/progression/settings.gd
+msgid "End turn"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "End turn (%s)"
+msgstr ""
+
+#: scripts/data/rune_data.gd
+msgid "Epic"
+msgstr ""
+
+#: data/damage_types/fire.tres
+msgid "Fire"
+msgstr ""
+
+#: data/runes/fire_ward.tres
+msgid "Fire Ward Rune"
+msgstr ""
+
+#: data/spells/fireball.tres
+msgid "Fireball"
+msgstr ""
+
+#: data/spells/firebolt.tres
+msgid "Firebolt"
+msgstr ""
+
+#: scripts/game/run_screen.gd scripts/run/run_director.gd
+msgid "Floor %d"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Floor %d boss defeated"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Floor %d cleared."
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Floor %d cleared: the top of the tower for now. Clear the next stage to go higher."
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Floor %d isn't unlocked as a starting floor."
+msgstr ""
+
+#: data/boons/focus_crown.tres
+msgid "Focus Crown"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Found: %s."
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "From floor %d"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Full heal — every hero back to full HP"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Fullscreen"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Game"
+msgstr ""
+
+#: scenes/game/hint_card.tscn
+msgid "Got it"
+msgstr ""
+
+#: data/spells/ground_slam.tres
+msgid "Ground Slam"
+msgstr ""
+
+#: data/spells/guard.tres
+msgid "Guard"
+msgstr ""
+
+#: data/statuses/guarded.tres
+msgid "Guarded"
+msgstr ""
+
+#: data/spells/hamstring.tres
+msgid "Hamstring"
+msgstr ""
+
+#: scripts/data/heal_effect.gd
+msgid "heals %s"
+msgstr ""
+
+#: scripts/data/heal_effect.gd
+msgid "heals %s (%d%% Power)"
+msgstr ""
+
+#: scenes/game/hub/hero_panel.tscn
+msgid "Hero"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Hints will show again."
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "HP %d   AP %d   MP %d   Initiative %d"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd scripts/game/hub/hero_tabs.gd
+msgid "HP %d / %d"
+msgstr ""
+
+#: data/boons/iron_ward.tres
+msgid "Iron Ward"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Keys reset."
+msgstr ""
+
+#: data/units/knight.tres
+msgid "Knight"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Language"
+msgstr ""
+
+#: scripts/data/level_reward.gd
+msgid "learns %s"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Leave"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Leave the fight?"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Leave the tower"
+msgstr ""
+
+#: scripts/data/rune_data.gd
+msgid "Legendary"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "Level up! (+%d XP)"
+msgstr ""
+
+#: scripts/data/area_shape.gd
+msgid "Line"
+msgstr ""
+
+#: data/units/mage.tres
+msgid "Mage"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Master volume"
+msgstr ""
+
+#: data/spells/mend.tres
+msgid "Mend"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Menu"
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Move to a blue cell or pick a spell (%s)"
+msgstr ""
+
+#: scripts/view/hud/unit_card.gd
+msgid "MP %d / %d"
+msgstr ""
+
+#: scenes/battle/hud/unit_card.tscn
+msgid "MP 0 / 0"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Music"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Mute"
+msgstr ""
+
+#: scripts/game/mute_button.gd
+msgid "Mute or unmute all sound"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Next level: %s"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd scenes/game/settings_screen.tscn
+msgid "No"
+msgstr ""
+
+#: scripts/game/run_screen.gd
+msgid "No rune found."
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "No runes yet: win battles to find some."
+msgstr ""
+
+#: scripts/data/apply_status_effect.gd
+msgid "no status"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "No such hero."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "No such rune in the stash."
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "none"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Nothing left to do: end your turn (%s)"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
+msgstr ""
+
+#: scripts/game/run_screen.gd scenes/game/party_screen.tscn
+msgid "Party"
+msgstr ""
+
+#: data/damage_types/physical.tres
+msgid "Physical"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Pick a boon, or heal the party instead."
+msgstr ""
+
+#: data/spells/piercing_thrust.tres
+msgid "Piercing Thrust"
+msgstr ""
+
+#: scripts/progression/hints.gd
+msgid "Place your heroes on the teal cells, then press Ready ({end_turn}). Hover anything for details; click a unit to pin its card."
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
+msgstr ""
+
+#: scenes/game/title_screen.tscn
+msgid "Play"
+msgstr ""
+
+#: scripts/view/battle_controller.gd scenes/battle/hud.tscn
+msgid "Play again"
+msgstr ""
+
+#: data/damage_types/poison.tres data/statuses/poison.tres
+msgid "Poison"
+msgstr ""
+
+#: data/spells/poison_arrow.tres
+msgid "Poison Arrow"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Power %+d%%"
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "Power: All %+d%%\nResist: %s"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Press a key for %s (Esc to cancel)."
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Press a key..."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Progress couldn't be saved."
+msgstr ""
+
+#: scenes/game/title_screen.tscn
+msgid "Quit"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Range %s"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Range %s, +range from high ground"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Range %s, line of sight"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Range %s, line of sight, +range from high ground"
+msgstr ""
+
+#: data/units/ranger.tres
+msgid "Ranger"
+msgstr ""
+
+#: scripts/data/rune_data.gd
+msgid "Rare"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Ready (%s)"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Really reset? Levels, runes and runs are lost."
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Recenter"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Recenter (%s)"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Recenter camera"
+msgstr ""
+
+#: data/spells/regeneration.tres data/statuses/regeneration.tres
+msgid "Regeneration"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Reset keys"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Reset save"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Resistance: %s"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Round %d"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Round 1"
+msgstr ""
+
+#: data/encounters/slice.tres data/maps/slice.tres
+msgid "Ruined Courtyard"
+msgstr ""
+
+#: data/stages/ruined_gate.tres
+msgid "Ruined Gate"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Run abandoned."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Run complete"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Run in progress: %s"
+msgstr ""
+
+#: data/runes/focus.tres
+msgid "Rune of Focus"
+msgstr ""
+
+#: data/runes/might.tres
+msgid "Rune of Might"
+msgstr ""
+
+#: data/runes/quickness.tres
+msgid "Rune of Quickness"
+msgstr ""
+
+#: data/runes/swiftness.tres
+msgid "Rune of Swiftness"
+msgstr ""
+
+#: data/runes/vitality.tres
+msgid "Rune of Vitality"
+msgstr ""
+
+#: scenes/game/hub/rune_stash.tscn
+msgid "Rune stash"
+msgstr ""
+
+#: scenes/game/hub/hero_panel.tscn
+msgid "Runes"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Save reset."
+msgstr ""
+
+#: scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
+msgid "Settings"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Settings couldn't be saved."
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Show hints again"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Side view (%s)"
+msgstr ""
+
+#: scripts/data/area_shape.gd
+msgid "Single"
+msgstr ""
+
+#: data/stages/sky_bastion.tres
+msgid "Sky Bastion"
+msgstr ""
+
+#: data/spells/slash.tres
+msgid "Slash"
+msgstr ""
+
+#: data/spells/smash.tres
+msgid "Smash"
+msgstr ""
+
+#: scenes/battle/hud/spell_bar.tscn
+msgid "Spell"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell %s"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell 1"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell 2"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell 3"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell 4"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Spell 5"
+msgstr ""
+
+#: scenes/game/hub/hero_panel.tscn
+msgid "Spells"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Stages"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Stay"
+msgstr ""
+
+#: data/runes/stone_skin.tres
+msgid "Stone Skin Rune"
+msgstr ""
+
+#: scripts/view/battle_controller.gd
+msgid "Sudden death: the party loses %d%% HP every turn"
+msgstr ""
+
+#: data/stages/sunken_crypt.tres
+msgid "Sunken Crypt"
+msgstr ""
+
+#: data/boons/surge.tres
+msgid "Surge"
+msgstr ""
+
+#: data/boons/swift_stride.tres
+msgid "Swift Stride"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That hero isn't available."
+msgstr ""
+
+#: scripts/progression/settings_applier.gd
+msgid "That key can't be used."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That rune slot is empty."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That rune slot isn't free."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "The battle couldn't start (see the log)."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "The floor's encounter is invalid: %s"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "The party is fully healed."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "The party needs 1 to %d heroes to fight on this map."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "The tower is invalid: %s"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Throw this rune away for good"
+msgstr ""
+
+#: scenes/game/hint_card.tscn
+msgid "Tip"
+msgstr ""
+
+#: data/boons/titan.tres
+msgid "Titan's Heart"
+msgstr ""
+
+#: scenes/game/title_screen.tscn
+msgid "Title"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Toggle top view"
+msgstr ""
+
+#: scenes/battle/hud.tscn
+msgid "Top view"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Top view (%s)"
+msgstr ""
+
+#: data/boons/tough_skin.tres
+msgid "Tough Skin"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Tower — up to floor %d, best floor %d"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Tower — up to floor %d, not climbed yet"
+msgstr ""
+
+#: data/boons/tower_might.tres
+msgid "Tower's Might"
+msgstr ""
+
+#: scripts/game/hub/destination_bar.gd
+msgid "Tower, floor %d"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Turn camera left"
+msgstr ""
+
+#: scripts/progression/settings.gd
+msgid "Turn camera right"
+msgstr ""
+
+#: scenes/battle/hud/order_overlay.tscn scripts/progression/settings.gd
+msgid "Turn order"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "UI scale"
+msgstr ""
+
+#: scenes/battle/hud/unit_card.tscn
+msgid "Unit"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "Unknown stage."
+msgstr ""
+
+#: data/runes/venom_ward.tres
+msgid "Venom Ward Rune"
+msgstr ""
+
+#: scripts/view/hud.gd scenes/battle/hud.tscn
+msgid "Victory!"
+msgstr ""
+
+#: data/boons/vigor.tres
+msgid "Vigor"
+msgstr ""
+
+#: data/spells/volley.tres
+msgid "Volley"
+msgstr ""
+
+#: data/spells/whirlwind.tres
+msgid "Whirlwind"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Window"
+msgstr ""
+
+#: scripts/game/settings_screen.gd
+msgid "Windowed"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "XP %d (max level)"
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "XP %d / %d"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Yes"
+msgstr ""
+
+#: scenes/game/settings_screen.tscn
+msgid "Yes, reset"
+msgstr ""
+
+#: scripts/run/run_director.gd
+msgid "You leave the tower after floor %d."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "You left the fight. It starts over when you continue the run."
+msgstr ""
+
+#: scripts/data/apply_status_effect.gd
+msgid "your next %d turns"
+msgstr ""
+
+#: scripts/data/apply_status_effect.gd
+msgid "your next turn"
+msgstr ""

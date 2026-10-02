@@ -170,7 +170,7 @@ func clear_highlight(kind: Highlight) -> void:
 ## step (`climbs`: cell → extra MP). Replaces the previous labels.
 func show_path_cost(destination: Vector2i, total_mp: int, climbs: Dictionary[Vector2i, int]) -> void:
 	clear_path_cost()
-	_path_labels.add_child(_cost_label("Total", "%d MP" % total_mp, destination, PATH_TOTAL_COLOR, PATH_LABEL_HEIGHT))
+	_path_labels.add_child(_cost_label("Total", tr("%d MP") % total_mp, destination, PATH_TOTAL_COLOR, PATH_LABEL_HEIGHT))
 	for cell in climbs:
 		_path_labels.add_child(_cost_label("Climb", "+%d" % climbs[cell], cell, PATH_CLIMB_COLOR, PATH_LABEL_HEIGHT * 0.6))
 
@@ -236,27 +236,62 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 		body.add_child(column)
 
 	var collider_top := top
+	var hull: ConvexPolygonShape3D
 	if is_obstacle:
 		# The rules' own height (Grid.obstacle_levels): what is drawn is what blocks sight.
 		var block_height := grid.obstacle_levels(cell) * active_theme().level_height
 		var fill_width := CELL_SIZE * active_theme().block_fill
 		if not active_theme().obstacle_scenes.is_empty():
 			var scenes := active_theme().obstacle_scenes
-			body.add_child(_fitted_model(scenes[posmod(hash(cell), scenes.size())], top, fill_width, block_height))
+			var model := _fitted_model(scenes[posmod(hash(cell), scenes.size())], top, fill_width, block_height)
+			body.add_child(model)
+			hull = _hull_of(model)
 		else:
 			var block := _box(Vector3(fill_width, block_height, fill_width), top + block_height / 2.0, active_theme().obstacle_color)
 			block.name = "Obstacle"
 			body.add_child(block)
 		collider_top = top + block_height
 
-	# The collider fills the whole cell (no gaps), so every pixel of the board picks a cell.
+	# The collider fills the whole cell (no gaps), so every pixel of the board picks a cell. An
+	# obstacle drawn as a model (a tapering rock) only picks where the model is: its box would
+	# hide the tiles around the rock, which can be seen and are walkable.
+	var floor_top := top if hull != null else collider_top
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(CELL_SIZE, collider_top - bottom, CELL_SIZE)
+	shape.size = Vector3(CELL_SIZE, floor_top - bottom, CELL_SIZE)
 	var collision := CollisionShape3D.new()
 	collision.name = "Collision"
 	collision.shape = shape
-	collision.position.y = (collider_top + bottom) / 2.0
+	collision.position.y = (floor_top + bottom) / 2.0
 	body.add_child(collision)
+	if hull != null:
+		var hull_collision := CollisionShape3D.new()
+		hull_collision.name = "ObstacleCollision"
+		hull_collision.shape = hull
+		body.add_child(hull_collision)
+
+
+## The convex hull of a model's meshes, in the model's parent space (the cell body's), as a
+## collision shape. Null when it has no geometry.
+func _hull_of(model: Node3D) -> ConvexPolygonShape3D:
+	var points := PackedVector3Array()
+	var stack: Array = [[model, model.transform]]
+	while not stack.is_empty():
+		var entry: Array = stack.pop_back()
+		var node := entry[0] as Node3D
+		var xform := entry[1] as Transform3D
+		if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
+			var convex := (node as MeshInstance3D).mesh.create_convex_shape(true, true)
+			if convex != null:
+				for point in convex.points:
+					points.append(xform * point)
+		for child in node.get_children():
+			if child is Node3D:
+				stack.append([child, xform * (child as Node3D).transform])
+	if points.size() < 4:
+		return null
+	var hull := ConvexPolygonShape3D.new()
+	hull.points = points
+	return hull
 
 
 ## `scene` stretched to exactly `width` × `height` × `width`, standing with its base centered at

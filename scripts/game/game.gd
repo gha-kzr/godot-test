@@ -11,10 +11,13 @@ extends Node
 const TITLE := "Tower Tactics"
 const TITLE_SCENE := preload("res://scenes/game/title_screen.tscn")
 const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
+const CREDITS_SCENE := preload("res://scenes/game/credits_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
-const SAVE_FAILED := "Progress couldn't be saved."
+## Distance of the mute button from the corner of the window.
+const OVERLAY_MARGIN := 8.0
+const AUDIO_SET := preload("res://data/audio/audio_set.tres")
 
 @export var roster: Roster
 ## The tower's floors, boons and stages.
@@ -26,6 +29,9 @@ const SAVE_FAILED := "Progress couldn't be saved."
 
 var profile: Profile
 var settings: Settings
+## Sounds and music; screens and views only ask it by event name.
+var audio: AudioService
+var _mute_button: MuteButton
 var hints: Hints
 var screen: Node
 var _store: SaveStore
@@ -36,6 +42,8 @@ var _summary := ""
 var _applied_state: BattleState
 var _report: RunDirector.Report
 var _battle_title := ""
+## The music of the battle being started: "boss" or "battle".
+var _battle_music: StringName = &"battle"
 ## The hero whose tab the player picked last (kept when the hub is rebuilt).
 var _selected_hero := 0
 
@@ -43,10 +51,16 @@ var _selected_hero := 0
 func _ready() -> void:
 	_store = SaveStore.new(save_path)
 	profile = _store.load_or_create(roster)
+	audio = AudioService.new()
+	audio.audio_set = AUDIO_SET
+	add_child(audio)
+	audio.hook_buttons(get_tree())  # Every button clicks.
+	_build_overlay()
 	_settings_store = SettingsStore.new(settings_path)
 	settings = _settings_store.load_or_default()
 	hints = Hints.new(settings)
 	SettingsApplier.apply(settings, get_window(), false)
+	_mute_button.show_muted(settings.muted)
 	show_title()
 
 
@@ -65,8 +79,39 @@ func show_settings() -> void:
 	_replace_screen(settings_screen)
 	settings_screen.show_settings(settings)
 	settings_screen.back_pressed.connect(show_title)
+	settings_screen.credits_pressed.connect(show_credits)
+	settings_screen.audio_live.connect(func() -> void: SettingsApplier.apply_audio(settings))
 	settings_screen.changed.connect(_on_settings_changed)
 	settings_screen.reset_save_confirmed.connect(_on_reset_save_confirmed)
+
+
+## What stays on top of every screen: the mute button, in the top right corner.
+func _build_overlay() -> void:
+	var overlay := CanvasLayer.new()
+	overlay.layer = 100
+	add_child(overlay)
+	_mute_button = MuteButton.new()
+	_mute_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_mute_button.offset_left = -OVERLAY_MARGIN - 48.0
+	_mute_button.offset_right = -OVERLAY_MARGIN
+	_mute_button.offset_top = OVERLAY_MARGIN
+	_mute_button.offset_bottom = OVERLAY_MARGIN + 44.0
+	_mute_button.toggled.connect(_on_mute_toggled)
+	overlay.add_child(_mute_button)
+
+
+func _on_mute_toggled(muted: bool) -> void:
+	settings.muted = muted
+	_on_settings_changed()
+	if screen is SettingsScreen:
+		(screen as SettingsScreen).sync_audio(settings)  # Its own checkbox follows.
+
+
+## The credits, a screen under the settings: back returns to them.
+func show_credits() -> void:
+	var credits := CREDITS_SCENE.instantiate() as CreditsScreen
+	_replace_screen(credits)
+	credits.back_pressed.connect(show_settings)
 
 
 ## Records a dismissed hint so it doesn't come back.
@@ -77,6 +122,7 @@ func _dismiss_hint(id: String) -> void:
 
 func _on_settings_changed() -> void:
 	SettingsApplier.apply(settings, get_window())
+	_mute_button.show_muted(settings.muted)
 	if not _settings_store.save(settings) and screen is SettingsScreen:
 		(screen as SettingsScreen).show_message("Settings couldn't be saved.")
 
@@ -90,7 +136,7 @@ func _on_reset_save_confirmed() -> void:
 	_report = null
 	var saved := _store.save(profile)
 	if screen is SettingsScreen:
-		(screen as SettingsScreen).show_message("Save reset." if saved else SAVE_FAILED)
+		(screen as SettingsScreen).show_message("Save reset." if saved else tr("Progress couldn't be saved."))
 
 
 func show_party(message := "") -> void:
@@ -132,8 +178,8 @@ func next_step() -> void:
 	elif profile.run.awaiting_choice():
 		var report := RunDirector.Report.new()
 		report.won = true
-		report.lines.append("Pick a boon, or heal the party instead.")
-		_show_run_screen(report, "Floor %d boss defeated" % profile.run.floor_number)
+		report.lines.append(tr("Pick a boon, or heal the party instead."))
+		_show_run_screen(report, tr("Floor %d boss defeated") % profile.run.floor_number)
 	else:
 		start_battle()
 
@@ -144,11 +190,11 @@ func start_battle() -> void:
 	var setup := RunDirector.battle_setup(profile, tower)
 	var errors := setup.encounter.get_validation_errors() if setup.encounter != null else PackedStringArray(["no encounter"])
 	if not errors.is_empty():
-		show_party("The floor's encounter is invalid: %s" % "; ".join(errors))
+		show_party(tr("The floor's encounter is invalid: %s") % "; ".join(errors))
 		return
 	var spawns := setup.encounter.map.parse().player_spawns.size()
 	if profile.party.is_empty() or profile.party.size() > spawns:
-		show_party("The party needs 1 to %d heroes to fight on this map." % spawns)
+		show_party(tr("The party needs 1 to %d heroes to fight on this map.") % spawns)
 		return
 	var battle := BATTLE_SCENE.instantiate() as BattleController
 	battle.setup(setup.encounter, setup.units, setup.modifiers, rng_seed, setup.hero_hp,
@@ -156,13 +202,16 @@ func start_battle() -> void:
 	if hints.should_show("first_battle"):
 		battle.hint_text = hints.text("first_battle")
 		battle.hint_dismissed.connect(_dismiss_hint.bind("first_battle"))
+	battle.sound.connect(audio.play_sfx)
 	battle.left_battle.connect(_on_battle_left)
 	battle.battle_ended.connect(_apply_battle_result)
 	battle.battle_finished.connect(_on_battle_finished)
 	_battle_title = setup.title
+	# A boss floor or a stage gets the driving track, the rest the calmer one.
+	_battle_music = &"boss" if profile.run.mode == RunState.Mode.STAGE or TowerConfig.is_boss_floor(profile.run.floor_number) else &"battle"
 	_replace_screen(battle)
 	if battle.battle == null:
-		show_party("The battle couldn't start (see the log).")
+		show_party(tr("The battle couldn't start (see the log)."))
 
 
 ## Shows the hub with the tower's errors, if any (a battle can't be generated from them).
@@ -170,7 +219,7 @@ func _tower_invalid() -> bool:
 	var errors := tower.get_validation_errors() if tower != null else PackedStringArray(["no tower set"])
 	if errors.is_empty():
 		return false
-	show_party("The tower is invalid: %s" % "; ".join(errors))
+	show_party(tr("The tower is invalid: %s") % "; ".join(errors))
 	return true
 
 
@@ -187,14 +236,14 @@ func _start_run(error: String) -> void:
 ## is applied here if that was skipped).
 func _on_battle_finished(state: BattleState) -> void:
 	_apply_battle_result(state)
-	var title := ("%s cleared" if _report.won else "%s lost") % _battle_title
+	var title := (tr("%s cleared") if _report.won else tr("%s lost")) % _battle_title
 	_show_run_screen(_report, title)
 
 
 ## The player left a fight from its menu: nothing from it counts (no rewards, HP as before),
 ## and the run, saved between floors, waits at the same floor.
 func _on_battle_left() -> void:
-	_summary = "You left the fight. It starts over when you continue the run."
+	_summary = tr("You left the fight. It starts over when you continue the run.")
 	show_party()
 
 
@@ -222,7 +271,7 @@ func _on_boss_choice_made(choice: int, keep_going: bool) -> void:
 	var report := RunDirector.apply_boss_choice(profile, choice, keep_going)
 	_save()
 	if report.run_over:
-		_show_run_screen(report, "Run complete")
+		_show_run_screen(report, tr("Run complete"))
 	else:
 		next_step()
 
@@ -235,7 +284,7 @@ func _on_back_pressed(report: RunDirector.Report) -> void:
 
 func _on_abandon_pressed() -> void:
 	profile.run = null
-	_summary = "Run abandoned."
+	_summary = tr("Run abandoned.")
 	_save()
 	show_party()
 
@@ -263,7 +312,7 @@ func _on_drop_requested(stash_index: int) -> void:
 		return
 	var error := profile.drop_rune(stash_index)
 	if error.is_empty() and not _save():
-		error = SAVE_FAILED
+		error = tr("Progress couldn't be saved.")
 	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 
@@ -271,7 +320,7 @@ func _finish_rune_change(error: String) -> void:
 	if error.is_empty():
 		RunDirector.clamp_hp(profile)
 		if not _save():
-			error = SAVE_FAILED
+			error = tr("Progress couldn't be saved.")
 	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 
@@ -279,8 +328,8 @@ func _finish_rune_change(error: String) -> void:
 func _save() -> bool:
 	if _store.save(profile):
 		return true
-	if not _summary.contains(SAVE_FAILED):
-		_summary = "\n".join([_summary, SAVE_FAILED].filter(func(t: String) -> bool: return not t.is_empty()))
+	if not _summary.contains(tr("Progress couldn't be saved.")):
+		_summary = "\n".join([_summary, tr("Progress couldn't be saved.")].filter(func(t: String) -> bool: return not t.is_empty()))
 	return false
 
 
@@ -292,5 +341,6 @@ func _replace_screen(next: Node) -> void:
 		screen.queue_free()
 	screen = next
 	add_child(next)
+	audio.play_music(_battle_music if next is BattleController else &"hub")
 	if next is Screen:
 		(next as Screen).focus_first.call_deferred()

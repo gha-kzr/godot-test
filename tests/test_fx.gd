@@ -247,9 +247,25 @@ func test_a_spells_own_effects_win_and_end_with_the_turn() -> void:
 
 func test_every_shipped_effect_lives_as_long_as_its_particles() -> void:
 	for file in DirAccess.get_files_at("res://scenes/fx"):
-		if not file.ends_with(".tscn"):
-			continue
+		if not file.ends_with(".tscn") or file.begins_with("projectile_") or file.begins_with("aura_"):
+			continue  # Projectiles and auras loop; the game frees them.
 		var effect := (load("res://scenes/fx/%s" % file) as PackedScene).instantiate() as Fx
 		for particles in effect.find_children("*", "CPUParticles3D", true, false):
 			assert_true(effect.duration >= (particles as CPUParticles3D).lifetime, "%s: duration %f covers the particles' %f" % [file, effect.duration, (particles as CPUParticles3D).lifetime])
 		effect.free()
+
+
+func test_projectiles_and_auras_loop_and_free_nothing_by_themselves() -> void:
+	var seen := 0
+	for file in DirAccess.get_files_at("res://scenes/fx"):
+		if not file.ends_with(".tscn") or not (file.begins_with("projectile_") or file.begins_with("aura_")):
+			continue
+		var effect := (load("res://scenes/fx/%s" % file) as PackedScene).instantiate()
+		seen += 1
+		assert_false(effect is Fx, "%s: an Fx would free itself on a timer" % file)
+		var particles := effect.find_children("*", "CPUParticles3D", true, false)
+		assert_false(particles.is_empty(), "%s has particles" % file)
+		for node in particles:
+			assert_true((node as CPUParticles3D).emitting and not (node as CPUParticles3D).one_shot, "%s keeps emitting" % file)
+		effect.free()
+	assert_true(seen >= 7, "three projectiles and four auras: %d" % seen)

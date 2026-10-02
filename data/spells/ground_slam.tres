@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_cxook"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_hya6t"]
 [ext_resource type="Texture2D" uid="uid://dey8fw74k1bw0" path="res://ui/icons/ground_slam.svg" id="5_bpmjk"]
+[ext_resource type="PackedScene" uid="uid://kpfw6g2sdwtx" path="res://scenes/fx/impact_slam.tscn" id="fx_hit"]
 
 [sub_resource type="Resource" id="Resource_gx1gh"]
 script = ExtResource("1_h00el")
@@ -28,3 +29,5 @@ max_range = 2
 needs_line_of_sight = false
 area = SubResource("Resource_gx1gh")
 effects = Array[ExtResource("2_cxook")]([SubResource("Resource_6lqvo")])
+impact_effect = ExtResource("fx_hit")
+impact_delay = 0.35

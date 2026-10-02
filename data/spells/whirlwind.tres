@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_t0icf"]
 [ext_resource type="Texture2D" uid="uid://c2j77an3so0dn" path="res://ui/icons/whirlwind.svg" id="5_w1d03"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_xxcw0"]
+[ext_resource type="PackedScene" uid="uid://d3o27ox7cyl3j" path="res://scenes/fx/cast_whirl.tscn" id="fx_cast"]
 
 [sub_resource type="Resource" id="Resource_6vqqv"]
 script = ExtResource("1_rlfnd")
@@ -28,3 +29,5 @@ max_range = 0
 needs_line_of_sight = false
 area = SubResource("Resource_6vqqv")
 effects = Array[ExtResource("2_w1d03")]([SubResource("Resource_m8q72")])
+cast_effect = ExtResource("fx_cast")
+impact_delay = 0.3

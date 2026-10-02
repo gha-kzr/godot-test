@@ -7,8 +7,9 @@ extends Resource
 @export_range(0.1, 2.0) var level_height := 0.5
 ## Depth of the column below a height-0 cell.
 @export_range(0.1, 2.0) var base_thickness := 0.5
-## Fraction of a cell the block covers; the gaps read as grid lines.
-@export_range(0.5, 1.0) var block_fill := 0.96
+## Fraction of a cell the block covers. 1 leaves no gap: with gaps the light leaked between the
+## tiles and shadows looked broken at some camera angles. Lower values draw grid lines.
+@export_range(0.5, 1.0) var block_fill := 1.0
 @export var floor_color := Color(0.42, 0.56, 0.36)
 ## Higher cells are lightened by this much per level, so heights read at a glance.
 @export_range(0.0, 0.3) var lighten_per_level := 0.08

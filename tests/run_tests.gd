@@ -8,7 +8,7 @@ extends SceneTree
 ## that aborted it midway included), or if it ran no assertions.
 ## Tests may `await` (e.g. a tween finishing). A test still running after TEST_TIMEOUT_MSEC
 ## aborts the run with exit code 1, after printing the results so far.
-## After each test the runner resets Engine.time_scale, frees nodes the test left
+## After each test the runner resets Engine.time_scale and the language, frees nodes the test left
 ## under `root`, calls the file's `after_each_clean()` if it has one, so a test that failed midway can't leak into the next one.
 
 const TESTS_DIR := "res://tests"
@@ -70,6 +70,7 @@ func _run_all() -> void:
 
 	var catcher := ErrorCatcher.new()
 	OS.add_logger(catcher)
+	_reset_language()
 
 	for file in _test_files(filter):
 		var script := load(TESTS_DIR.path_join(file)) as GDScript
@@ -99,8 +100,15 @@ func _run_all() -> void:
 	_finish()
 
 
+## Tests read English texts whatever the machine's language is.
+func _reset_language() -> void:
+	Localization.set_system_locale("en")
+	TranslationServer.set_locale("en")
+
+
 func _clean_up_after_test(nodes_before: Array[Node]) -> void:
 	Engine.time_scale = 1.0
+	_reset_language()
 	for node in root.get_children():
 		if node not in nodes_before:
 			node.free()

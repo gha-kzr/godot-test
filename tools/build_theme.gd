@@ -54,6 +54,28 @@ func _base_theme() -> Theme:
 	bar_fill.shadow_size = 0
 	theme.set_stylebox("background", "ProgressBar", bar_bg)
 	theme.set_stylebox("fill", "ProgressBar", bar_fill)
+	# Sliders: a dark track with the filled part in the button blue and a round gold knob, so the
+	# whole range (down to the maximum) reads on the dark background.
+	var track := _box(Color(0.05, 0.05, 0.08, 0.95), 7, 2)
+	track.set_content_margin_all(0)
+	track.content_margin_top = 8
+	track.content_margin_bottom = 8
+	track.shadow_size = 0
+	var track_fill := _box(BUTTON_HOVER, 7, 2)
+	track_fill.set_content_margin_all(0)
+	track_fill.content_margin_top = 8
+	track_fill.content_margin_bottom = 8
+	track_fill.shadow_size = 0
+	theme.set_stylebox("slider", "HSlider", track)
+	theme.set_stylebox("grabber_area", "HSlider", track_fill)
+	theme.set_stylebox("grabber_area_highlight", "HSlider", track_fill)
+	theme.set_icon("grabber", "HSlider", _knob(ACCENT))
+	theme.set_icon("grabber_highlight", "HSlider", _knob(ACCENT.lightened(0.35)))
+	theme.set_icon("grabber_disabled", "HSlider", _knob(BUTTON_DISABLED))
+	var slider_focus := _box(Color.TRANSPARENT, 12, 3, ACCENT)
+	slider_focus.draw_center = false
+	slider_focus.shadow_size = 0
+	theme.set_stylebox("focus", "HSlider", slider_focus)
 	# Variations used by the HUD.
 	theme.set_type_variation("Chip", "PanelContainer")
 	var chip := _box(PANEL_LIGHT, 10, 2)
@@ -96,6 +118,21 @@ func _base_theme() -> Theme:
 	theme.set_font_size("font_size", "PromptLabel", 20)
 	theme.set_color("accent", "Hud", ACCENT)
 	return theme
+
+
+## A round knob: `fill` with an ink outline, drawn as a radial gradient (no image file).
+func _knob(fill: Color) -> GradientTexture2D:
+	var gradient := Gradient.new()
+	gradient.offsets = PackedFloat32Array([0.0, 0.6, 0.68, 0.7])
+	gradient.colors = PackedColorArray([fill, fill, INK, Color(INK, 0.0)])
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(1.0, 0.5)
+	texture.width = 32
+	texture.height = 32
+	return texture
 
 
 func _box(fill: Color, radius := 12, border := 3, border_color := INK) -> StyleBoxFlat:

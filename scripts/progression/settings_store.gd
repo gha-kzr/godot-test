@@ -1,7 +1,7 @@
 @tool
 class_name SettingsStore
 extends RefCounted
-## Reads and writes Settings as a ConfigFile ([display], [keys], [hints]). A missing or
+## Reads and writes Settings as a ConfigFile ([display] (language, window mode, UI scale), [audio] (volumes, mute), [keys], [hints]). A missing or
 ## unreadable file gives defaults (with a warning), and unknown or invalid values fall back
 ## one by one, so a hand-edited file never crashes the game.
 
@@ -23,6 +23,16 @@ func load_or_default() -> Settings:
 	if error != OK:
 		push_warning("SettingsStore: can't read %s (%s); using defaults" % [path, error_string(error)])
 		return settings
+	var language: Variant = config.get_value("display", "language", "")
+	if language is String and Localization.LANGUAGES.has(language):
+		settings.language = language
+	for field: String in ["master_volume", "music_volume", "effects_volume"]:
+		var volume: Variant = config.get_value("audio", field, settings.get(field))
+		if _is_number(volume) and is_finite(float(volume)):
+			settings.set(field, clampf(float(volume), 0.0, 1.0))
+	var muted: Variant = config.get_value("audio", "muted", false)
+	if muted is bool:
+		settings.muted = muted
 	var mode: Variant = config.get_value("display", "window_mode", Settings.WindowMode.WINDOWED)
 	if _is_number(mode) and int(mode) in Settings.WindowMode.values():
 		settings.window_mode = int(mode) as Settings.WindowMode
@@ -50,6 +60,11 @@ static func _is_number(value: Variant) -> bool:
 ## Writes to a temporary file first, then swaps it in. False (with an error) on failure.
 func save(settings: Settings) -> bool:
 	var config := ConfigFile.new()
+	config.set_value("audio", "master_volume", settings.master_volume)
+	config.set_value("audio", "music_volume", settings.music_volume)
+	config.set_value("audio", "effects_volume", settings.effects_volume)
+	config.set_value("audio", "muted", settings.muted)
+	config.set_value("display", "language", settings.language)
 	config.set_value("display", "window_mode", settings.window_mode)
 	config.set_value("display", "ui_scale", settings.ui_scale)
 	for action in settings.bindings:

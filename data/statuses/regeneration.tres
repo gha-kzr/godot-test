@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_djbyj"]
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_5p2x0"]
 [ext_resource type="Script" uid="uid://dqic6ten54j2t" path="res://scripts/data/heal_effect.gd" id="4_43wbt"]
+[ext_resource type="PackedScene" uid="uid://br8pnr1jjavth" path="res://scenes/fx/aura_regeneration.tscn" id="fx_aura"]
 
 [sub_resource type="Resource" id="Resource_evf3s"]
 script = ExtResource("4_43wbt")
@@ -20,3 +21,4 @@ color = Color(0.35, 1, 0.6, 1)
 is_positive = true
 duration = 3
 tick_effects = Array[ExtResource("3_5p2x0")]([SubResource("Resource_evf3s")])
+aura_effect = ExtResource("fx_aura")

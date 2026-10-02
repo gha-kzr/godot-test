@@ -38,7 +38,7 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 	_party_row.visible = run != null
 	_party_row.show_party(_party_infos(profile, report))
 	_boons.visible = run != null and not run.boons.is_empty()
-	_boons.text = "Boons: " + ", ".join(run.boons.map(func(b: BoonData) -> String: return b.display_name)) if _boons.visible else ""
+	_boons.text = tr("Boons: %s") % ", ".join(run.boons.map(func(b: BoonData) -> String: return tr(b.display_name))) if _boons.visible else ""
 	choice = NONE
 	_clear(_choices)
 	_clear(_buttons)
@@ -48,7 +48,7 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 		_show_boss_choice(profile.run.boss_offer)
 		_buttons.add_child(_button("PartyButton", "Party", party_pressed.emit))
 	else:
-		_buttons.add_child(_button("NextButton", "Floor %d" % profile.run.floor_number, next_pressed.emit))
+		_buttons.add_child(_button("NextButton", tr("Floor %d") % profile.run.floor_number, next_pressed.emit))
 		_buttons.add_child(_button("PartyButton", "Party", party_pressed.emit))
 
 
@@ -67,7 +67,7 @@ func select_choice(value: int) -> void:
 func _show_boss_choice(offer: Array[BoonData]) -> void:
 	for index in offer.size():
 		var boon := offer[index]
-		_choices.add_child(_choice_button("Boon%d" % index, "%s — %s" % [boon.display_name, boon.describe()], index))
+		_choices.add_child(_choice_button("Boon%d" % index, "%s — %s" % [tr(boon.display_name), boon.describe()], index))
 	_choices.add_child(_choice_button("Heal", "Full heal — every hero back to full HP", RunDirector.HEAL))
 	var go_on := _button("ContinueButton", "Continue the climb", func() -> void: boss_choice_made.emit(choice, true))
 	var leave := _button("LeaveButton", "Leave the tower", func() -> void: boss_choice_made.emit(choice, false))
@@ -80,7 +80,7 @@ func _show_boss_choice(offer: Array[BoonData]) -> void:
 func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String]:
 	var lines: Array[String] = []
 	if report.rewards != null:
-		lines.append("+%d XP for each hero." % report.rewards.xp)
+		lines.append(tr("+%d XP for each hero.") % report.rewards.xp)
 		for level_up in report.level_ups:
 			var hero := profile.heroes[level_up.hero_index].hero
 			var learned: Array[String] = []
@@ -88,13 +88,15 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 				var reward := hero.reward_for(level)
 				if reward != null:
 					for spell in reward.spells:
-						learned.append(spell.display_name)
-			var text := "%s reached level %d" % [hero.display_name(), level_up.to_level]
-			lines.append(text + (" and learned %s." % ", ".join(learned) if not learned.is_empty() else "."))
+						learned.append(tr(spell.display_name))
+			if learned.is_empty():
+				lines.append(tr("%s reached level %d.") % [tr(hero.display_name()), level_up.to_level])
+			else:
+				lines.append(tr("%s reached level %d and learned %s.") % [tr(hero.display_name()), level_up.to_level, ", ".join(learned)])
 		if report.rewards.runes.is_empty():
-			lines.append("No rune found.")
+			lines.append(tr("No rune found."))
 		else:
-			lines.append("Found: %s." % ", ".join(report.rewards.runes.map(func(r: RuneData) -> String: return r.display_name)))
+			lines.append(tr("Found: %s.") % ", ".join(report.rewards.runes.map(func(r: RuneData) -> String: return tr(r.display_name))))
 	lines.append_array(report.lines)
 	return lines
 
@@ -127,7 +129,7 @@ func _fill_xp(info: UnitInfo, profile: Profile, hero_index: int, report: RunDire
 	var leveled := report.level_ups.any(func(up: Profile.LevelUp) -> bool: return up.hero_index == hero_index)
 	if leveled:
 		info.xp_value = progress.y  # Full: the level is reached (the remainder belongs to the next one).
-		info.xp_text = "Level up! (+%d XP)" % gained
+		info.xp_text = tr("Level up! (+%d XP)") % gained
 		return
 	var capped := profile.roster.config.xp_for_next(profile.heroes[hero_index].level) < 0
 	info.xp_gain = 0 if capped else mini(gained, progress.x)  # At the cap the bar is simply full.

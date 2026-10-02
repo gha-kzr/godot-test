@@ -61,7 +61,7 @@ static func from_unit(unit: UnitState, hero_level := 0) -> UnitInfo:
 
 ## "Knight · Lv 7", or just the name.
 func title_text() -> String:
-	return "%s · Lv %d" % [display_name, level] if level > 0 else display_name
+	return tr("%s · Lv %d") % [tr(display_name), level] if level > 0 else tr(display_name)
 
 
 ## Two lines, e.g. "Power: All +8%" and "Resist: Physical +0%, Fire +20%, Poison +0%".
@@ -70,5 +70,5 @@ func title_text() -> String:
 func combat_stats_text() -> String:
 	var resist: Array[String] = []
 	for type_name in resistances:
-		resist.append("%s %+d%%" % [type_name, resistances[type_name]])
-	return "Power: All %+d%%\nResist: %s" % [power, ", ".join(resist) if not resist.is_empty() else "none"]
+		resist.append("%s %+d%%" % [tr(type_name), resistances[type_name]])
+	return tr("Power: All %+d%%\nResist: %s") % [power, ", ".join(resist) if not resist.is_empty() else tr("none")]

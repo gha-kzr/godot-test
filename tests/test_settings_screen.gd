@@ -137,13 +137,13 @@ func test_credits_show_tables_and_headings_but_not_contributor_prose() -> void:
 	var file := FileAccess.open(CREDITS, FileAccess.WRITE)
 	file.store_string("# Credits\n\nAdd a row whenever a file is added.\n\n| Asset | Files | Source | Author | License |\n|---|---|---|---|---|\n| Icons | `ui/icons/*.svg` | [site](https://x.y) | Lorc | [CC BY 3.0](https://z) |\n\n## By author\n\n| Author | Icons |\n|---|---|\n| Lorc | `arrow` |\n\n- Thanks to [a friend](https://x)\n")
 	file.close()
-	var lines := SettingsScreen.credits_text(CREDITS).split("\n")
+	var lines := CreditsScreen.credits_text(CREDITS).split("\n")
 	assert_eq(lines, PackedStringArray(["Credits", "Asset — Source — Author — License", "Icons — site — Lorc — CC BY 3.0", "", "By author", "Author — Icons", "Lorc — arrow", "Thanks to a friend"]))
-	assert_eq(SettingsScreen.credits_text("user://nope.md"), SettingsScreen.CREDITS_FALLBACK)
+	assert_eq(CreditsScreen.credits_text("user://nope.md"), CreditsScreen.CREDITS_FALLBACK)
 
 
 func test_the_real_credits_list_the_assets_without_the_rules() -> void:
-	var text := SettingsScreen.credits_text()
+	var text := CreditsScreen.credits_text()
 	assert_true(text.contains("Quaternius") and text.contains("Lorc") and text.contains("CC0 1.0") and text.contains("game-icons.net"), text)
 	assert_false(text.contains("Add a row"), "contributor rules stay out of the game")
 	assert_false(text.contains("http"), "no raw links")
@@ -184,3 +184,43 @@ func test_focus_returns_to_reset_save_when_the_confirm_row_goes_away() -> void:
 	_button(screen, "ConfirmNoButton").pressed.emit()
 	assert_eq(screen.get_viewport().gui_get_focus_owner().name, &"ResetSaveButton", "the keyboard isn't left with nothing")
 	screen.free()
+
+
+func test_the_language_row_shows_and_changes_the_language() -> void:
+	var settings := Settings.new()
+	settings.language = "fr"
+	var screen := _screen(settings)
+	var language := screen.get_node("%Language") as OptionButton
+	assert_eq(language.item_count, Localization.LANGUAGES.size() + 1, "automatic, then each language")
+	assert_eq(language.get_item_text(language.selected), "Français", "the current language, in its own name")
+	var changes := [0]
+	screen.changed.connect(func() -> void: changes[0] += 1)
+	language.select(0)
+	language.item_selected.emit(0)
+	assert_eq([settings.language, changes[0]], ["", 1], "automatic is the empty code")
+	language.select(1)
+	language.item_selected.emit(1)
+	assert_eq(settings.language, "en")
+
+
+func test_the_credits_have_a_screen_of_their_own_reached_from_the_settings_and_left_by_the_back_arrow() -> void:
+	var game := (load("res://scenes/game/game.tscn") as PackedScene).instantiate() as Game
+	game.save_path = "user://test_settings_screen/profile.json"
+	game.settings_path = "user://test_settings_screen/settings.cfg"
+	DirAccess.make_dir_recursive_absolute("user://test_settings_screen")
+	(Engine.get_main_loop() as SceneTree).root.add_child(game)
+	game.show_settings()
+	var back := game.screen.find_child("BackButton", true, false) as Button
+	assert_true(back.icon != null and back.text.is_empty(), "the settings go back with an arrow, not a word")
+	(game.screen.find_child("CreditsButton", true, false) as Button).pressed.emit()
+	assert_true(game.screen is CreditsScreen, "the credits screen")
+	var text := (game.screen.find_child("Credits", true, false) as Label).text
+	assert_true(text.contains("Quaternius") and text.contains("Kenney"), "lists the assets")
+	var credits_back := game.screen.find_child("BackButton", true, false) as Button
+	assert_true(credits_back.icon != null and credits_back.text.is_empty(), "with a back arrow too")
+	credits_back.pressed.emit()
+	assert_true(game.screen is SettingsScreen, "back to the settings")
+	game.free()
+	DirAccess.remove_absolute("user://test_settings_screen/profile.json")
+	DirAccess.remove_absolute("user://test_settings_screen/settings.cfg")
+	DirAccess.remove_absolute("user://test_settings_screen")

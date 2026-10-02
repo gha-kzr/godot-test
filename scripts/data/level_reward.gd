@@ -16,7 +16,7 @@ func describe() -> String:
 			parts.append(modifier.describe())
 	for spell in spells:
 		if spell != null:
-			parts.append("learns %s" % spell.display_name)
+			parts.append(tr("learns %s") % tr(spell.display_name))
 	return ", ".join(parts)
 
 

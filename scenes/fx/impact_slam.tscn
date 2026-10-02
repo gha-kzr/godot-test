@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://kpfw6g2sdwtx"]
+
+[ext_resource type="Script" uid="uid://cswcnbx4c84lq" path="res://scripts/view/fx.gd" id="1_fx"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.7, 0.6, 0.45, 0.6, 0.5, 0.45, 0.38, 0)
+
+[sub_resource type="StandardMaterial3D" id="Material_1"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="SphereMesh" id="Mesh_1"]
+material = SubResource("Material_1")
+radius = 0.07
+height = 0.14
+radial_segments = 6
+rings = 3
+
+[sub_resource type="Gradient" id="Gradient_2"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.55, 0.5, 0.42, 1, 0.4, 0.36, 0.3, 0)
+
+[sub_resource type="StandardMaterial3D" id="Material_2"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="SphereMesh" id="Mesh_2"]
+material = SubResource("Material_2")
+radius = 0.05
+height = 0.1
+radial_segments = 6
+rings = 3
+
+[node name="ImpactSlam" type="Node3D"]
+script = ExtResource("1_fx")
+duration = 1.1
+
+[node name="Dust" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 14
+lifetime = 0.7
+one_shot = true
+explosiveness = 1
+mesh = SubResource("Mesh_1")
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.02
+emission_ring_radius = 0.3
+emission_ring_inner_radius = 0
+direction = Vector3(0, 0.25, 0)
+spread = 75
+initial_velocity_min = 1.6
+initial_velocity_max = 3.2
+gravity = Vector3(0, -1.5, 0)
+scale_amount_min = 1
+scale_amount_max = 2
+color_ramp = SubResource("Gradient_1")
+
+[node name="Debris" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 10
+lifetime = 0.6
+one_shot = true
+explosiveness = 1
+mesh = SubResource("Mesh_2")
+direction = Vector3(0, 1, 0)
+spread = 40
+initial_velocity_min = 2
+initial_velocity_max = 3.8
+gravity = Vector3(0, -9, 0)
+scale_amount_min = 0.6
+scale_amount_max = 1
+color_ramp = SubResource("Gradient_2")

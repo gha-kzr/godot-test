@@ -2,23 +2,17 @@
 
 Features and ideas not built yet, in the order of the proposed milestones in [`roadmap.md`](roadmap.md). Each starts with a grill (`godot-grill`) and a plan before any code.
 
-## Audio: sound effects, music and volume settings
+## Sound and animation leftovers
 
-*Milestone: 6b Feel: audio, effects and camera · Category: Audio · Pairs with: settings screen; credits*
+*Milestone: 7 First impressions · Category: Audio / animation · Pairs with: audio set, unit model*
 
-Milestone 6b. Sound effects (UI clicks, hits, heals, spells, footsteps, deaths, turn start), music (hub, battle, victory / defeat stingers), and volume settings (master / music / effects, mute) in the settings screen; CC0 sources found and credited with the same safe-intake routine as the models (`docs/decisions/2026-10-01-art.md`). Grill first. Web browsers need a first click before audio plays (the title's Play press). Best timed together with the second pass on animation and effects.
+What milestone 6b left out on purpose. Sounds: the owner found none of the candidates right for **cast** (it plays for every spell, so per-spell sounds through a `cast_sound` field on `SpellData` would suit better), **death**, **turn start** and **victory**; the events exist in `AudioSet` and are silent until a sound is chosen (sampler pages and the safe-intake routine are in `assets/audio/SOURCE.md`'s notes). Animation: victory and defeat poses on the result screen, and a better blend between clips (walk to attack). A music loop for the hub that differs from the title's would be a small addition.
 
-## Second pass on animation, particles and spells
+## Selecting an enemy to attack also pins its card
 
-*Milestone: 6b Feel: audio, effects and camera · Category: Animation / VFX · Pairs with: audio (timed together)*
+*Milestone: 7 First impressions · Category: UI / UX · Pairs with: battle controller click handling, unit card pinning*
 
-a quality pass on 6a's first version: better timing and blending of the character animations (walk, attack, cast, hit, death; victory and defeat poses at the result screen), richer particles (per-spell effects and projectiles through the existing `cast_effect` / `impact_effect` fields, screen feedback for big hits, status auras), and a look at the spells themselves (feel, readability, area shapes, new spell ideas). Best done with the 6b audio, since sound and effects are timed together.
-
-## Camera follows a walking unit
-
-*Milestone: 6b Feel: audio, effects and camera · Category: Animation / camera · Pairs with: camera rig*
-
-the camera now slides to the acting unit at the start of each turn, but stays put while that unit walks, so a long move can leave the screen. Follow the unit along its path (the view position is already animated cell by cell in `UnitView.play_move`), probably by easing the focus point toward the unit during a move and stopping when the player pans; decide whether it applies to enemy moves too (likely yes) and whether to skip it for short moves that stay on screen. Touches `CameraRig` (a follow target) and `BattleController` / `EventPlayer` (start and stop around `UnitMoved`).
+Noted by the owner while playing: clicking an enemy to cast a spell on it also pins that enemy's card on the right (the "click a unit to pin its card" rule from milestone 5d), and it is not clear this is wanted. Decide whether a click that casts a spell should pin at all (probably not: pinning only when the click does nothing else), and whether the card should still show on hover. Touches the click path in `BattleController` and its tests.
 
 ## Battle speed and quality of life
 
@@ -55,6 +49,8 @@ heroes will know more spells than they can bring: the player picks up to **5 act
 *Milestone: 8 Hero depth · Category: Gameplay / balance · Pairs with: loadout, rewards content, balance*
 
 heroes cap at level 10 (the XP table has 10 thresholds and the first tower reaches floor 10 at first, then 20, 30…). Raise it (20? 30?) with the XP curve, per-level rewards (stats, spells, the 4th spell at level 3 and +1 MP at level 6 today), enemy scaling per floor and the hub / run-screen displays; needs a balance pass and more `LevelReward` content per hero (so it pairs with the active-spell loadout item, which is how new spells would be handled).
+
+**Owner's note (playtest, floor 20):** this one is wanted soon, not only at milestone 8: the cap is reached quickly and the fun stops, so raising it and re-tuning enemy levels per floor should come early (see the balance observations below).
 
 ## Movement spells: teleport, jump and more
 
@@ -128,12 +124,6 @@ the tower is a straight line of floors. The idea: between floors, choose a path 
 
 one profile today (`user://profile.json`, plus `settings.cfg` apart). Allow several saved games: a slot list on the title screen (New game, Continue, Delete, with each slot's summary: heroes' levels, best floor, a saved run), each slot its own profile file (`profile_<n>.json`, an index of slots in a small file), settings staying shared. Needs: a migration of the current save into slot 1, "Reset save" becoming per-slot, `Game` holding the active slot, the web build's storage (browser `user://`, per browser) and a limit on the number of slots; questions for the grill: how many slots, whether slots can be named or copied, and whether this is also meant as multiple players sharing one device. (If "multiple game" meant several runs in parallel inside one save, that is a different, larger design: say so.)
 
-## Localization
-
-*Milestone: 13 Reach · Category: UI / tech · Pairs with: every player-facing string; cheaper earlier*
-
-translate the UI and content text (French first?). Godot's `TranslationServer` with CSV / PO files; every player-facing string goes through `tr()` (HUD, screens, `describe()` texts built from parts, content names as translation keys). Cheaper the earlier strings are routed through `tr()`.
-
 ## Gamepad support
 
 *Milestone: 13 Reach · Category: Platform · Pairs with: focus navigation already on screens*
@@ -145,6 +135,16 @@ Screens already navigate by focus (arrows / Enter / Esc, the `ui_*` actions). St
 *Milestone: 13 Reach · Category: Platform · Pairs with: camera drag already shaped for it*
 
 The camera drag and the no-hover-only rule are already built with touch in mind (`docs/decisions/2026-09-30-screens.md`, Platforms). Still needed for a touch build: two-finger pan and pinch zoom, a touch layout for the HUD and screens (larger targets, no Esc or keyboard shortcuts), the Android export preset and a device check, and the Compatibility renderer's look on phones.
+
+## Balance observations from playtests
+
+*Milestone: 14 Balance and release (the first two points may come earlier, with the level cap) · Category: Balance · Pairs with: level cap, area spells, tower bands, balance lab*
+
+Notes from the owner's playtests, to turn into one balance pass (with the balance lab, `docs/decisions` records and `data/tower/tower.tres` bands):
+- **Enemy levels vs hero levels:** on floor 20, a level 4 Brute (57 HP) has about the stats of the owner's level 10 hero, and a level 4 elite Brute (171 HP) more than that. It is not too hard (the fight was easy by kiting with the ranged hero), but a level that doesn't match the power it stands for feels wrong: a level 4 enemy should be clearly weaker than a level 10 hero, or levels should be shown differently. Related: the Knight died very quickly, so melee heroes seem too fragile next to ranged ones (enemy damage, HP growth, how enemies pick targets). Look at `hp_per_level` / `power_per_level`, the elite and boss presets and the band's `enemy_level` curve against hero growth, and how a level is displayed.
+- **Area spells are not worth it:** a spell can be cast only once per turn, so two casts of a single-target spell out-damage one area spell unless three enemies stand in a cross, which is rare with so few enemies. Options to weigh: cheaper area spells (lower AP), higher damage per target, more enemies per floor, or bigger / better-shaped areas; the balance lab's damage-per-AP view (Inspector preview) helps compare.
+- **Stage difficulty:** a stage should be much harder than the floors below it (the ones the player starts from once it is cleared) but simpler than the floors it unlocks above it. Today a stage plays like that floor's boss fight (`difficulty_floor`), which may not sit between the two; re-tune each stage's `difficulty_floor` / seed against the floors on both sides with the balance lab (Run tower from the unlocked start floor).
+- **Level cap:** see "Increase the level cap"; the owner wants it raised early, with enemy levels re-tuned to match.
 
 ## Balance pass and release checks
 

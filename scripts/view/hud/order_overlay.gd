@@ -17,7 +17,7 @@ var _units: Array[UnitInfo] = []
 
 
 func _ready() -> void:
-	_hint.text = "%s or Esc to close" % SettingsApplier.key_text(&"show_order")
+	_hint.text = tr("%s or Esc to close") % SettingsApplier.key_text(&"show_order")
 	hide()
 	_dim.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed \
@@ -100,7 +100,7 @@ func _make_row(info: UnitInfo, is_current: bool) -> PanelContainer:
 	var hp_label := Label.new()
 	hp_label.name = "HpLabel"
 	hp_label.theme_type_variation = &"SmallLabel"
-	hp_label.text = "%d / %d HP" % [info.hp, info.max_hp]
+	hp_label.text = tr("%d / %d HP") % [info.hp, info.max_hp]
 	hp_box.add_child(hp_label)
 	line.add_child(hp_box)
 	var statuses := HBoxContainer.new()
@@ -110,7 +110,7 @@ func _make_row(info: UnitInfo, is_current: bool) -> PanelContainer:
 		var icon := TextureRect.new()
 		icon.texture = status.icon
 		icon.modulate = status.color
-		icon.tooltip_text = "%s, %s" % [status.display_name, status.turns_text()]
+		icon.tooltip_text = tr("%s, %s") % [tr(status.display_name), status.turns_text()]
 		icon.mouse_filter = Control.MOUSE_FILTER_PASS  # Keeps its tooltip, and the click goes on to the row.
 		icon.custom_minimum_size = Vector2(22, 22)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

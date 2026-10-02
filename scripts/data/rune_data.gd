@@ -26,6 +26,11 @@ func color() -> Color:
 
 
 func rarity_name() -> String:
+	match rarity:
+		Rarity.COMMON: return tr("Common")
+		Rarity.RARE: return tr("Rare")
+		Rarity.EPIC: return tr("Epic")
+		Rarity.LEGENDARY: return tr("Legendary")
 	return Rarity.keys()[rarity].capitalize()
 
 

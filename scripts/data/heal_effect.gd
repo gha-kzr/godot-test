@@ -26,8 +26,10 @@ func average_roll() -> float:
 
 
 func describe() -> String:
-	var scaling_text := " (%d%% Power)" % power_scaling if power_scaling != 100 else ""
-	return "heals %s%s" % [amount_text(min_amount, max_amount), scaling_text]
+	var amount := amount_text(min_amount, max_amount)
+	if power_scaling == 100:
+		return tr("heals %s") % amount
+	return tr("heals %s (%d%% Power)") % [amount, power_scaling]
 
 
 func get_validation_errors() -> PackedStringArray:

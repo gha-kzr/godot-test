@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://cu6cxdyh684h8" path="res://data/statuses/guarded.tres" id="4_6lefw"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_eprxx"]
 [ext_resource type="Texture2D" uid="uid://q42ohyvc1ly" path="res://ui/icons/guard.svg" id="5_rttsa"]
+[ext_resource type="PackedScene" uid="uid://d4dt4uufbdkv5" path="res://scenes/fx/cast_guard.tscn" id="fx_cast"]
 
 [sub_resource type="Resource" id="Resource_h2kpa"]
 script = ExtResource("1_iggew")
@@ -24,3 +25,4 @@ max_range = 0
 needs_line_of_sight = false
 area = SubResource("Resource_h2kpa")
 effects = Array[ExtResource("2_rttsa")]([SubResource("Resource_4dbav")])
+cast_effect = ExtResource("fx_cast")

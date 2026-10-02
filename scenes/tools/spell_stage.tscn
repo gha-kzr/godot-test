@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cmw0y4cew5cx4"]
+
+[ext_resource type="Script" uid="uid://bu1udnjiw3l6u" path="res://scripts/tools/spell_stage.gd" id="1_stage"]
+
+[node name="SpellStage" type="Node3D"]
+script = ExtResource("1_stage")

@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="3_lotta"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_sxol3"]
 [ext_resource type="Texture2D" uid="uid://dscb5nidv2xbs" path="res://ui/icons/firebolt.svg" id="5_lotta"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="fx_cast"]
+[ext_resource type="PackedScene" uid="uid://op63ci0heu70" path="res://scenes/fx/projectile_fireball.tscn" id="fx_proj"]
 
 [sub_resource type="Resource" id="Resource_ct23v"]
 script = ExtResource("1_yx4ma")
@@ -25,3 +27,7 @@ max_range = 6
 height_extends_range = true
 area = SubResource("Resource_ct23v")
 effects = Array[ExtResource("2_64poo")]([SubResource("Resource_qtak8")])
+cast_effect = ExtResource("fx_cast")
+impact_delay = 0.25
+projectile = ExtResource("fx_proj")
+projectile_speed = 16.0

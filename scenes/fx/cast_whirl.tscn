@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://d3o27ox7cyl3j"]
+
+[ext_resource type="Script" uid="uid://cswcnbx4c84lq" path="res://scripts/view/fx.gd" id="1_fx"]
+
+[sub_resource type="Gradient" id="Gradient_1"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.95, 0.95, 1, 1, 0.7, 0.75, 0.9, 0)
+
+[sub_resource type="StandardMaterial3D" id="Material_1"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="SphereMesh" id="Mesh_1"]
+material = SubResource("Material_1")
+radius = 0.06
+height = 0.12
+radial_segments = 6
+rings = 3
+
+[node name="CastWhirl" type="Node3D"]
+script = ExtResource("1_fx")
+duration = 0.9
+
+[node name="Burst" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 36
+lifetime = 0.65
+one_shot = true
+explosiveness = 1
+mesh = SubResource("Mesh_1")
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 0.2
+emission_ring_radius = 0.7
+emission_ring_inner_radius = 0.2
+direction = Vector3(0, 0.2, 0)
+spread = 20
+initial_velocity_min = 0.2
+initial_velocity_max = 0.8
+tangential_accel_min = 9
+tangential_accel_max = 9
+gravity = Vector3(0, 0.4, 0)
+scale_amount_min = 0.5
+scale_amount_max = 1
+color_ramp = SubResource("Gradient_1")

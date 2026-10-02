@@ -8,8 +8,6 @@ signal stage_pressed(stage_index: int)
 signal continue_pressed
 signal abandon_pressed
 
-const LOCKED_TEXT := "%s (locked)"
-
 
 func show_destinations(profile: Profile, tower: TowerConfig) -> void:
 	HubStyle.clear_children(self)
@@ -17,20 +15,22 @@ func show_destinations(profile: Profile, tower: TowerConfig) -> void:
 		return
 	var run := profile.run
 	if run != null:
-		var where := run.stage.display_name if run.mode == RunState.Mode.STAGE else "Tower, floor %d" % run.floor_number
+		var where := tr(run.stage.display_name) if run.mode == RunState.Mode.STAGE else tr("Tower, floor %d") % run.floor_number
 		if run.awaiting_choice():
-			where += " (boss reward to pick)"
-		add_child(_label("Run in progress: " + where))
+			where = tr("%s (boss reward to pick)") % where
+		add_child(_label(tr("Run in progress: %s") % where))
 		add_child(_row([_action("ContinueButton", "Continue run", continue_pressed.emit),
 				_action("AbandonButton", "Abandon run", abandon_pressed.emit)]))
 		return
-	var best := "best floor %d" % profile.best_depth if profile.best_depth > 0 else "not climbed yet"
-	add_child(_label("Tower — up to floor %d, %s" % [profile.tower_cap(tower), best]))
+	if profile.best_depth > 0:
+		add_child(_label(tr("Tower — up to floor %d, best floor %d") % [profile.tower_cap(tower), profile.best_depth]))
+	else:
+		add_child(_label(tr("Tower — up to floor %d, not climbed yet") % profile.tower_cap(tower)))
 	var floors := OptionButton.new()
 	floors.name = "StartFloor"
 	floors.custom_minimum_size = Vector2(180, 44)
 	for start in profile.start_floors(tower):
-		floors.add_item("From floor %d" % start, start)
+		floors.add_item(tr("From floor %d") % start, start)
 	floors.select(floors.item_count - 1)
 	var climb := _action("TowerButton", "Climb the tower", func() -> void: tower_pressed.emit(floors.get_selected_id()))
 	add_child(_row([floors, climb]))
@@ -38,14 +38,14 @@ func show_destinations(profile: Profile, tower: TowerConfig) -> void:
 	var stages: Array[Control] = []
 	for index in tower.stages.size():
 		var stage := tower.stages[index]
-		var button := _action("Stage%d" % index, stage.display_name + (" (cleared)" if stage in profile.cleared_stages else ""),
+		var button := _action("Stage%d" % index, tr("%s (cleared)") % tr(stage.display_name) if stage in profile.cleared_stages else stage.display_name,
 				stage_pressed.emit.bind(index))
 		if not profile.is_stage_available(tower, stage):
-			button.text = LOCKED_TEXT % stage.display_name
+			button.text = tr("%s (locked)") % tr(stage.display_name)
 			button.disabled = true
 			button.tooltip_text = "Clear the previous stage first."
 		else:
-			button.tooltip_text = "One battle. Clearing it lets the tower go up to floor %d and start at floor %d." % [
+			button.tooltip_text = tr("One battle. Clearing it lets the tower go up to floor %d and start at floor %d.") % [
 					stage.unlocks_cap, stage.unlocks_start_floor]
 		stages.append(button)
 	add_child(_row(stages))

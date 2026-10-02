@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://dwd0srqca2oww" path="res://data/statuses/crippled.tres" id="6_8euco"]
 [ext_resource type="Texture2D" uid="uid://cy2tc55kwth5u" path="res://ui/icons/hamstring.svg" id="7_7p5ph"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_22t7y"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="fx_proj"]
 
 [sub_resource type="Resource" id="Resource_7uvpo"]
 script = ExtResource("1_c68ey")
@@ -30,3 +31,6 @@ min_range = 2
 max_range = 5
 area = SubResource("Resource_7uvpo")
 effects = Array[ExtResource("2_7p5ph")]([SubResource("Resource_lax1v"), SubResource("Resource_scqne")])
+impact_delay = 0.3
+projectile = ExtResource("fx_proj")
+projectile_speed = 20.0

@@ -15,6 +15,9 @@ const MAX_SHORT_LABEL := 2
 @export var display_name := ""
 ## Shown above units and in cards (a white icon, tinted with `color`); a default one when empty.
 @export var icon: Texture2D
+## Looping effect on the carrier while the status lasts (a Node3D scene with looping particles;
+## not an Fx scene, which frees itself). Optional.
+@export var aura_effect: PackedScene
 ## Icon text until there's art, e.g. "P" for Poison.
 @export var short_label := ""
 @export var color := Color.WHITE
@@ -33,7 +36,7 @@ func describe() -> String:
 	var parts: Array[String] = []
 	for effect in tick_effects:
 		if effect != null:
-			parts.append("%s per turn" % effect.describe())
+			parts.append(tr("%s per turn") % effect.describe())
 	for modifier in modifiers:
 		if modifier != null:
 			parts.append(modifier.describe())

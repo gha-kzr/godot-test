@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://e4wboajbl3pi" path="res://data/statuses/poison.tres" id="5_27co1"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_glmtx"]
 [ext_resource type="Texture2D" uid="uid://bmmi05qrqjp0g" path="res://ui/icons/poison_arrow.svg" id="7_k24g2"]
+[ext_resource type="PackedScene" uid="uid://cj0ct047rhgau" path="res://scenes/fx/projectile_poison.tscn" id="fx_proj"]
 
 [sub_resource type="Resource" id="Resource_w3p2o"]
 script = ExtResource("1_xtndy")
@@ -31,3 +32,6 @@ max_range = 6
 height_extends_range = true
 area = SubResource("Resource_w3p2o")
 effects = Array[ExtResource("2_3pak8")]([SubResource("Resource_au6pt"), SubResource("Resource_ixabo")])
+impact_delay = 0.3
+projectile = ExtResource("fx_proj")
+projectile_speed = 20.0

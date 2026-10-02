@@ -28,9 +28,9 @@ enum TargetFilter {
 ## describe() plus who it applies to, e.g. "6-10 heal (allies only)".
 func full_description() -> String:
 	match target_filter:
-		TargetFilter.ALLIES: return describe() + " (allies only)"
-		TargetFilter.ENEMIES: return describe() + " (enemies only)"
-		TargetFilter.CASTER: return describe() + " (caster only)"
+		TargetFilter.ALLIES: return tr("%s (allies only)") % describe()
+		TargetFilter.ENEMIES: return tr("%s (enemies only)") % describe()
+		TargetFilter.CASTER: return tr("%s (caster only)") % describe()
 	return describe()
 
 

@@ -16,11 +16,11 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 ## caster's own turns: "Guard for your next 2 turns (...)" (a self-buff doesn't count the turn it is cast in).
 func describe() -> String:
 	if status == null:
-		return "no status"
-	var turns := "1 turn" if status.duration == 1 else "%d turns" % status.duration
+		return tr("no status")
+	var turns := tr_n("%d turn", "%d turns", status.duration) % status.duration
 	if target_filter == TargetFilter.CASTER:
-		turns = "your next turn" if status.duration == 1 else "your next %d turns" % status.duration
-	return "%s for %s (%s)" % [status.display_name, turns, status.describe()]
+		turns = tr("your next turn") if status.duration == 1 else tr("your next %d turns") % status.duration
+	return tr("%s for %s (%s)") % [tr(status.display_name), turns, status.describe()]
 
 
 func get_validation_errors() -> PackedStringArray:

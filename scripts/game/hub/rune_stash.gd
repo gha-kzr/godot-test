@@ -47,14 +47,15 @@ func _rune_row(index: int) -> HBoxContainer:
 	var rune := _profile.stash[index]
 	var row := HBoxContainer.new()
 	row.name = "Row%d" % index
-	var button := HubStyle.button("%s — %s" % [rune.display_name, rune.describe()], "Stash%d" % index)
+	var button := HubStyle.button("%s — %s" % [tr(rune.display_name), rune.describe()], "Stash%d" % index)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.clip_text = true  # The tooltip has the full text.
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.custom_minimum_size = Vector2(1, 44)
 	HubStyle.tint(button, rune.color())
-	button.tooltip_text = "%s: %s.\n%s rune%s. Click to equip on the selected hero." % [
-			rune.display_name, rune.describe(), rune.rarity_name(), " (one per hero)" if rune.is_unique() else ""]
+	var tooltip := tr("%s: %s.\n%s rune (one per hero). Click to equip on the selected hero.") if rune.is_unique() \
+			else tr("%s: %s.\n%s rune. Click to equip on the selected hero.")
+	button.tooltip_text = tooltip % [tr(rune.display_name), rune.describe(), tr(rune.rarity_name())]
 	button.pressed.connect(equip_requested.emit.bind(index))
 	row.add_child(button)
 	var drop := HubStyle.button("Drop", "Drop%d" % index)
@@ -70,7 +71,7 @@ func _confirm_row(index: int) -> HBoxContainer:
 	row.name = "Row%d" % index
 	var question := Label.new()
 	question.name = "DropQuestion%d" % index
-	question.text = "Drop %s?" % _profile.stash[index].display_name
+	question.text = tr("Drop %s?") % tr(_profile.stash[index].display_name)
 	question.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	question.clip_text = true
 	row.add_child(question)

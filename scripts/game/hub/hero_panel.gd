@@ -21,31 +21,31 @@ signal unequip_requested(slot: int)
 func show_hero(profile: Profile, hero_index: int) -> void:
 	var record := profile.heroes[hero_index]
 	var stats := _battle_view(record)
-	_title.text = "%s — level %d" % [record.hero.display_name(), record.level]
+	_title.text = tr("%s — level %d") % [tr(record.hero.display_name()), record.level]
 	var hp := RunDirector.hero_hp(profile, hero_index)
 	_hp_bar.max_value = hp.y
 	_hp_bar.value = hp.x
-	_hp_label.text = "HP %d / %d" % [hp.x, hp.y]
+	_hp_label.text = tr("HP %d / %d") % [hp.x, hp.y]
 	var progress := profile.xp_progress(hero_index)
 	_xp_bar.max_value = progress.y
 	_xp_bar.value = progress.x
 	_xp_label.text = profile.xp_text(hero_index)
 	var lines: Array[String] = [
-		"HP %d   AP %d   MP %d   Initiative %d" % [stats.max_hp(), stats.max_ap(), stats.max_mp(), stats.initiative()],
-		"Power %+d%%" % stats.power(),
+		tr("HP %d   AP %d   MP %d   Initiative %d") % [stats.max_hp(), stats.max_ap(), stats.max_mp(), stats.initiative()],
+		tr("Power %+d%%") % stats.power(),
 	]
 	var resistances: Array[String] = []
 	for type in stats.resistance_types():
 		var value := stats.resistance_percent(type)
 		if value != 0:
-			resistances.append("%s %+d%%" % [type.display_name, value])
+			resistances.append("%s %+d%%" % [tr(type.display_name), value])
 	if not resistances.is_empty():
-		lines.append("Resistance: " + ", ".join(resistances))
+		lines.append(tr("Resistance: %s") % ", ".join(resistances))
 	_stats.text = "\n".join(lines)
 	_show_spells(record)
 	var reward := record.hero.reward_for(record.level + 1)
 	_next_reward.visible = reward != null and profile.roster.config.xp_for_next(record.level) >= 0
-	_next_reward.text = "Next level: " + reward.describe() if _next_reward.visible else ""
+	_next_reward.text = tr("Next level: %s") % reward.describe() if _next_reward.visible else ""
 	_show_rune_slots(record)
 
 
@@ -59,7 +59,7 @@ func _show_spells(record: HeroRecord) -> void:
 		button.tooltip_text = Hud.spell_description(spell)
 		# Hover only shows a tooltip; clicking (or Enter) shows the same text below.
 		button.pressed.connect(func() -> void:
-			_spell_info.text = "%s (%d AP): %s" % [spell.display_name, spell.ap_cost, Hud.spell_description(spell)])
+			_spell_info.text = tr("%s (%d AP): %s") % [tr(spell.display_name), spell.ap_cost, Hud.spell_description(spell)])
 		_spells.add_child(button)
 
 
@@ -73,7 +73,7 @@ func _show_rune_slots(record: HeroRecord) -> void:
 			button.disabled = true
 		else:
 			HubStyle.tint(button, rune.color())
-			button.tooltip_text = "%s %s: %s. Click to unequip." % [rune.rarity_name(), rune.display_name, rune.describe()]
+			button.tooltip_text = tr("%s %s: %s. Click to unequip.") % [tr(rune.rarity_name()), tr(rune.display_name), rune.describe()]
 			button.pressed.connect(unequip_requested.emit.bind(slot))
 		_rune_slots.add_child(button)
 

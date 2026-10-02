@@ -32,7 +32,7 @@ func _chip(info: UnitInfo) -> PanelContainer:
 	var hp := Label.new()
 	hp.name = "HpLabel"
 	hp.theme_type_variation = &"SmallLabel"
-	hp.text = "%d / %d HP" % [info.hp, info.max_hp]
+	hp.text = tr("%d / %d HP") % [info.hp, info.max_hp]
 	rows.add_child(hp)
 	if info.xp_max > 0:
 		rows.add_child(_xp_bars(info))

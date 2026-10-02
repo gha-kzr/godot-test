@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://c0d3q3yh87q0y" path="res://scenes/game/hub/rune_stash.tscn" id="4_stash"]
 [ext_resource type="PackedScene" uid="uid://cgugftdm3dh0a" path="res://scenes/game/hub/destination_bar.tscn" id="5_bar"]
 [ext_resource type="PackedScene" uid="uid://d05xe2ggt3vys" path="res://scenes/game/hint_card.tscn" id="6_hint"]
+[ext_resource type="Texture2D" uid="uid://drved486jxqgs" path="res://ui/icons/arrow_back.svg" id="7_back"]
 
 [node name="PartyScreen" type="Control"]
 layout_mode = 3
@@ -46,7 +47,10 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
-text = "Title"
+tooltip_text = "Back to the title"
+icon = ExtResource("7_back")
+icon_alignment = 1
+expand_icon = true
 
 [node name="Title" type="Label" parent="Rows/TopBar"]
 layout_mode = 2

@@ -22,7 +22,7 @@ var _chip_hovered := false
 
 func _ready() -> void:
 	_order_button.pressed.connect(order_button_pressed.emit)
-	_order_button.text = "All (%s)" % SettingsApplier.key_text(&"show_order")
+	_order_button.text = tr("All (%s)") % SettingsApplier.key_text(&"show_order")
 
 
 ## The first MAX_CHIPS units of `units` (in acting order).

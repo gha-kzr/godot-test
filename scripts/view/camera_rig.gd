@@ -9,6 +9,10 @@ extends Node3D
 ## (a middle-button press grabs at once). A shorter press is a click, which the controller acts
 ## on at release unless `dragged` is set. The focus point stays inside the bounds (the board
 ## plus a margin), and pans follow the screen, so they stay right after rotating.
+##
+## follow() eases the focus point after a moving node (a walking unit) every frame until
+## stop_following(); the player's own pan, or any explicit focus, ends it at once. shake() jolts
+## the picture (a big hit) without moving the focus point.
 
 signal overhead_changed(enabled: bool)
 
@@ -36,6 +40,12 @@ signal overhead_changed(enabled: bool)
 @export var drag_threshold := 10.0
 ## How far past the board the focus point may go, in cells.
 @export var bounds_margin := 1.0
+## How fast follow() closes the gap (1 / seconds: the camera covers 63 % of the distance in
+## 1 / follow_smoothing s).
+@export var follow_smoothing := 5.0
+## A point counts as comfortably on screen when it is at least this share of the screen's
+## height away from every edge (the bars at the top and bottom cover the rest).
+@export_range(0.0, 0.4) var on_screen_margin := 0.2
 
 ## Quarter turns from the base yaw. Not wrapped, so a tween never spins the long way.
 var step := 0
@@ -50,6 +60,10 @@ var pan_enabled := true
 var bounds := Rect2()
 
 var _move_tween: Tween
+var _follow_target: Node3D
+var _shake_strength := 0.0
+var _shake_left := 0.0
+var _shake_duration := 0.0
 var _press_position := Vector2.ZERO
 ## A left press the rig saw is still held (a press the HUD ate never starts a drag).
 var _left_down := false
@@ -72,6 +86,13 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_apply_shake(delta)
+	if _follow_target != null:
+		if is_instance_valid(_follow_target) and _follow_target.is_inside_tree():
+			var goal := clamp_point(_follow_target.global_position)
+			position = position.lerp(goal, 1.0 - exp(-follow_smoothing * delta))
+		else:
+			_follow_target = null
 	var keys := Input.get_vector(&"camera_pan_left", &"camera_pan_right", &"camera_pan_up", &"camera_pan_down")
 	if keys != Vector2.ZERO and pan_enabled:
 		pan_by_view(Vector2(keys.x, -keys.y) * pan_speed * camera.size * delta)
@@ -118,20 +139,77 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Puts the focus point on `point` at once (clamped to the bounds).
 func focus(point: Vector3) -> void:
+	_follow_target = null
 	if _move_tween != null:
 		_move_tween.kill()
 	position = clamp_point(point)
 
 
-## Slides the focus point to `point` (clamped to the bounds).
-func focus_on(point: Vector3, animate := true) -> void:
+## Slides the focus point to `point` (clamped to the bounds), in `duration` seconds
+## (`tween_duration` when negative).
+func focus_on(point: Vector3, animate := true, duration := -1.0) -> void:
 	if not animate or not is_inside_tree():
 		focus(point)
 		return
+	_follow_target = null
 	if _move_tween != null:
 		_move_tween.kill()
 	_move_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_move_tween.tween_property(self, "position", clamp_point(point), tween_duration)
+	_move_tween.tween_property(self, "position", clamp_point(point), tween_duration if duration < 0.0 else duration)
+
+
+## Jolts the picture by up to `strength` world units for `duration` seconds, fading out. A new
+## shake replaces a weaker one in progress.
+func shake(strength: float, duration := 0.35) -> void:
+	if strength <= 0.0 or duration <= 0.0:
+		return
+	if _shake_left > 0.0 and _shake_strength * (_shake_left / _shake_duration) > strength:
+		return
+	_shake_strength = strength
+	_shake_duration = duration
+	_shake_left = duration
+
+
+func is_shaking() -> bool:
+	return _shake_left > 0.0
+
+
+func _apply_shake(delta: float) -> void:
+	if _shake_left <= 0.0:
+		return
+	_shake_left = maxf(_shake_left - delta, 0.0)
+	var fade := _shake_left / _shake_duration
+	var jolt := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * _shake_strength * fade
+	camera.h_offset = jolt.x
+	camera.v_offset = vertical_offset + jolt.y  # The resting offset keeps the board clear of the bar.
+
+
+## Starts easing the focus point after `target` (a node that moves) until stop_following().
+func follow(target: Node3D) -> void:
+	if _move_tween != null:
+		_move_tween.kill()
+	_follow_target = target
+
+
+func stop_following() -> void:
+	_follow_target = null
+
+
+func is_following() -> bool:
+	return _follow_target != null
+
+
+## Whether every world point is on screen with at least `on_screen_margin` of the screen's
+## height to spare at each edge. False without a viewport size to judge by.
+func is_on_screen(points: Array[Vector3]) -> bool:
+	var screen := get_viewport().get_visible_rect()
+	var inner := screen.grow(-screen.size.y * on_screen_margin)
+	if not inner.has_area():
+		return false
+	for point in points:
+		if camera.is_position_behind(point) or not inner.has_point(camera.unproject_position(point)):
+			return false
+	return true
 
 
 ## Sets the area (x, z world coordinates of the cell centers) the focus point may roam:
@@ -149,6 +227,7 @@ func clamp_point(point: Vector3) -> Vector3:
 ## Moves the focus point by `view` (x right, y up, in world units at the screen plane).
 ## Ground distance along the view's up axis is longer by 1 / sin(pitch).
 func pan_by_view(view: Vector2) -> void:
+	_follow_target = null  # The player takes over from a follow too.
 	if _move_tween != null:
 		_move_tween.kill()  # The player takes over from a slide.
 	var right := Vector3(camera.global_basis.x.x, 0.0, camera.global_basis.x.z).normalized()

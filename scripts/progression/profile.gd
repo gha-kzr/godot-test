@@ -57,7 +57,7 @@ func xp_progress(hero_index: int) -> Vector2i:
 func xp_text(hero_index: int) -> String:
 	var record := heroes[hero_index]
 	var next := roster.config.xp_for_next(record.level)
-	return "XP %d / %d" % [record.xp, next] if next >= 0 else "XP %d (max level)" % record.xp
+	return tr("XP %d / %d") % [record.xp, next] if next >= 0 else tr("XP %d (max level)") % record.xp
 
 
 func party_records() -> Array[HeroRecord]:
@@ -90,19 +90,19 @@ func battle_modifiers() -> Array:
 ## Returns an error message, or "" on success.
 func equip(hero_index: int, stash_index: int, slot := -1) -> String:
 	if hero_index < 0 or hero_index >= heroes.size() or not is_unlocked(hero_index):
-		return "That hero isn't available."
+		return tr("That hero isn't available.")
 	if stash_index < 0 or stash_index >= stash.size():
-		return "No such rune in the stash."
+		return tr("No such rune in the stash.")
 	var record := heroes[hero_index]
 	var rune := stash[stash_index]
 	if slot == -1:
 		slot = record.free_slot()
 		if slot == -1:
-			return "%s has no free rune slot." % record.hero.display_name()
+			return tr("%s has no free rune slot.") % tr(record.hero.display_name())
 	elif slot < 0 or slot >= HeroRecord.RUNE_SLOTS or record.runes[slot] != null:
-		return "That rune slot isn't free."
+		return tr("That rune slot isn't free.")
 	if rune.is_unique() and rune in record.runes:
-		return "%s is %s: one per hero." % [rune.display_name, rune.rarity_name().to_lower()]
+		return tr("%s is %s: one per hero.") % [tr(rune.display_name), tr(rune.rarity_name()).to_lower()]
 	record.runes[slot] = rune
 	stash.remove_at(stash_index)
 	return ""
@@ -112,7 +112,7 @@ func equip(hero_index: int, stash_index: int, slot := -1) -> String:
 ## an error message, or "".
 func drop_rune(stash_index: int) -> String:
 	if stash_index < 0 or stash_index >= stash.size():
-		return "No such rune in the stash."
+		return tr("No such rune in the stash.")
 	stash.remove_at(stash_index)
 	return ""
 
@@ -120,10 +120,10 @@ func drop_rune(stash_index: int) -> String:
 ## Moves a hero's rune back to the stash. Returns an error message, or "".
 func unequip(hero_index: int, slot: int) -> String:
 	if hero_index < 0 or hero_index >= heroes.size():
-		return "No such hero."
+		return tr("No such hero.")
 	var record := heroes[hero_index]
 	if slot < 0 or slot >= HeroRecord.RUNE_SLOTS or record.runes[slot] == null:
-		return "That rune slot is empty."
+		return tr("That rune slot is empty.")
 	stash.append(record.runes[slot])
 	record.runes[slot] = null
 	return ""

@@ -782,3 +782,26 @@ func test_the_inspect_card_goes_to_the_side_away_from_the_unit_it_shows() -> voi
 	controller._update_inspected()
 	assert_eq(on_screen.call(), not enemy_on_right, "the turn moved the enemy to the other half")
 	assert_eq(controller.hud.is_inspect_on_left(), not enemy_on_right, "and the card followed")
+
+
+func test_an_enemy_turn_moves_the_camera_only_when_the_enemy_is_off_screen() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	var rig := controller.camera_rig
+	rig.bounds = Rect2()
+	var enemy := controller.units_view.view(1).position
+	rig.camera.size = 40.0  # Zoomed far out: everything is comfortably on screen.
+	rig.focus(Vector3(2.5, 0, 0))
+	var before := rig.position
+	controller._focus_turn_start(1)
+	for i in 30:
+		await _tree().process_frame
+	assert_eq(rig.position, before, "an enemy already in view: the camera stays put")
+	rig.camera.size = 3.0  # Zoomed in: the enemy is off screen.
+	rig.focus(Vector3(-4, 0, 0))
+	controller._focus_turn_start(1)
+	assert_true(await _camera_settles_on(controller, enemy), "off screen: the camera goes to it")
+	rig.focus(Vector3(-4, 0, 0))
+	controller._focus_turn_start(0)  # An ally's turn always centers on it, in view or not.
+	rig.camera.size = 40.0
+	assert_true(await _camera_settles_on(controller, controller.units_view.view(0).position), "an ally's turn centers the camera")

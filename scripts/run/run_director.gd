@@ -42,7 +42,7 @@ class Report:
 ## Returns an error message, or "" once the run has started.
 static func start_tower(profile: Profile, config: TowerConfig, start_floor := 1) -> String:
 	if start_floor not in profile.start_floors(config):
-		return "Floor %d isn't unlocked as a starting floor." % start_floor
+		return TranslationServer.translate("Floor %d isn't unlocked as a starting floor.") % start_floor
 	var run := RunState.new()
 	run.start_floor = start_floor
 	run.floor_number = start_floor
@@ -53,7 +53,7 @@ static func start_tower(profile: Profile, config: TowerConfig, start_floor := 1)
 
 static func start_stage(profile: Profile, config: TowerConfig, stage: StageData) -> String:
 	if stage not in config.stages:
-		return "Unknown stage."
+		return TranslationServer.translate("Unknown stage.")
 	if not profile.is_stage_available(config, stage):
 		return "Clear the previous stage first."
 	var run := RunState.new()
@@ -70,10 +70,10 @@ static func battle_setup(profile: Profile, config: TowerConfig) -> Setup:
 	var setup := Setup.new()
 	if run.mode == RunState.Mode.STAGE:
 		setup.encounter = FloorGenerator.stage_encounter(config, run.stage)
-		setup.title = run.stage.display_name
+		setup.title = TranslationServer.translate(run.stage.display_name)
 	else:
 		setup.encounter = FloorGenerator.encounter(config, run.floor_number)
-		setup.title = "Floor %d" % run.floor_number
+		setup.title = TranslationServer.translate("Floor %d") % run.floor_number
 	setup.units = profile.battle_units()
 	setup.modifiers = _party_modifiers(profile)
 	setup.hero_hp.assign(run.hero_hp)
@@ -91,7 +91,7 @@ static func apply_result(profile: Profile, config: TowerConfig, state: BattleSta
 	report.won = state.outcome() == BattleState.Outcome.PLAYER_WON
 	if not report.won:
 		report.run_over = true
-		report.lines.append("Defeat. The run ends; heroes keep their levels and runes.")
+		report.lines.append(TranslationServer.translate("Defeat. The run ends; heroes keep their levels and runes."))
 		profile.run = null
 		return report
 	report.rewards = BattleRewards.compute(state)
@@ -108,24 +108,24 @@ static func apply_result(profile: Profile, config: TowerConfig, state: BattleSta
 		report.stage_cleared = run.stage
 		report.run_over = true
 		report.success = true
-		report.lines.append("%s cleared! The tower now goes up to floor %d, and you can start at floor %d." % [
-				run.stage.display_name, profile.tower_cap(config), run.stage.unlocks_start_floor])
+		report.lines.append(TranslationServer.translate("%s cleared! The tower now goes up to floor %d, and you can start at floor %d.") % [
+				TranslationServer.translate(run.stage.display_name), profile.tower_cap(config), run.stage.unlocks_start_floor])
 		profile.run = null
 		return report
 	profile.best_depth = maxi(profile.best_depth, run.floor_number)
 	if run.floor_number >= profile.tower_cap(config):
 		report.run_over = true
 		report.success = true
-		report.lines.append("Floor %d cleared: the top of the tower for now. Clear the next stage to go higher." % run.floor_number)
+		report.lines.append(TranslationServer.translate("Floor %d cleared: the top of the tower for now. Clear the next stage to go higher.") % run.floor_number)
 		profile.run = null
 	elif TowerConfig.is_boss_floor(run.floor_number):
 		run.boss_offer = offer(config, run.floor_number)
 		run.choice_pending = true
 		report.boss_offer = run.boss_offer
-		report.lines.append("Boss defeated! Pick a boon, or heal the party instead.")
+		report.lines.append(TranslationServer.translate("Boss defeated! Pick a boon, or heal the party instead."))
 	else:
 		run.floor_number += 1
-		report.lines.append("Floor %d cleared." % report.floor_cleared)
+		report.lines.append(TranslationServer.translate("Floor %d cleared.") % report.floor_cleared)
 	return report
 
 
@@ -138,11 +138,11 @@ static func apply_boss_choice(profile: Profile, choice: int, keep_going: bool) -
 	if choice == HEAL:
 		for slot in run.hero_hp.size():
 			run.hero_hp[slot] = -1
-		report.lines.append("The party is fully healed.")
+		report.lines.append(TranslationServer.translate("The party is fully healed."))
 	elif choice >= 0 and choice < run.boss_offer.size():
 		var boon := run.boss_offer[choice]
 		run.boons.append(boon)
-		report.lines.append("%s: %s for the rest of the run." % [boon.display_name, boon.describe()])
+		report.lines.append(TranslationServer.translate("%s: %s for the rest of the run.") % [TranslationServer.translate(boon.display_name), boon.describe()])
 	run.boss_offer.clear()
 	run.choice_pending = false
 	if keep_going:
@@ -150,7 +150,7 @@ static func apply_boss_choice(profile: Profile, choice: int, keep_going: bool) -
 	else:
 		report.run_over = true
 		report.success = true
-		report.lines.append("You leave the tower after floor %d." % run.floor_number)
+		report.lines.append(TranslationServer.translate("You leave the tower after floor %d.") % run.floor_number)
 		profile.run = null
 	return report
 

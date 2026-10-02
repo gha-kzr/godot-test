@@ -6,6 +6,9 @@ extends Node3D
 ## Every play_* method returns once its animation is over, so callers can await them one
 ## after another.
 
+## One step of a walk was taken (for footsteps).
+signal stepped
+
 const PLAYER_RING_COLOR := Color(0.3, 0.6, 1.0)
 const ENEMY_RING_COLOR := Color(1.0, 0.3, 0.25)
 const DAMAGE_COLOR := Color(1.0, 0.35, 0.3)
@@ -17,6 +20,8 @@ const DEATH_DURATION := 0.45
 const FLOAT_DURATION := 0.8
 ## How far toward its target a caster lunges.
 const LUNGE_DISTANCE := 0.3
+## How far above a cell's top a projectile aims (about a unit's chest).
+const PROJECTILE_HEIGHT := 0.8
 ## The active unit's ring pulses between these scales.
 const ACTIVE_PULSE_SCALE := 1.25
 const ACTIVE_PULSE_DURATION := 0.5
@@ -61,6 +66,8 @@ var _preview: Node3D
 var _model: UnitModel
 ## How tall the unit stands before the elite / boss scale (the model's or the capsule's).
 var _head_height := PLACEHOLDER_HEIGHT
+## Status → its looping effect on the unit.
+var _auras: Dictionary[StatusData, Node3D] = {}
 ## Where the damage preview floats (above the head, set by _layout_anchors).
 var _preview_y := PLACEHOLDER_HEIGHT + PREVIEW_ABOVE
 
@@ -134,7 +141,13 @@ func sync(unit: UnitState) -> void:
 		_ring.scale = Vector3.ONE * _visual_scale
 		if _model != null:
 			_model.reset()
-	_clear_status_tags()
+	# Keep the tags (and their auras) of statuses still carried: they would blink out and in.
+	var carried: Array[StatusData] = []
+	for status in unit.statuses:
+		carried.append(status.data)
+	for status: StatusData in _status_tags.keys():
+		if status not in carried:
+			_remove_status_tag(status)
 	for status in unit.statuses:
 		_set_status_tag(status.data, status.turns_left)
 
@@ -154,6 +167,7 @@ func play_move(path: Array[Vector2i]) -> void:
 		await tween.finished
 		position = target
 		_pick_body.set_meta(BoardView.CELL_META, cell)
+		stepped.emit()
 	_play_model(&"Idle")
 
 
@@ -172,7 +186,7 @@ func play_place(cell: Vector2i) -> void:
 
 ## A short lunge toward the target cell (a hop when casting on its own cell).
 func play_cast(target_cell: Vector2i, spell: SpellData = null) -> void:
-	_play_model(_cast_animation(spell))
+	_play_cast_animation(spell)
 	var target := _board.cell_to_world(target_cell)
 	var offset := Vector3(target.x - position.x, 0.0, target.z - position.z)
 	var start := position
@@ -414,6 +428,7 @@ func _set_status_tag(status: StatusData, turns_left: int) -> void:
 		tag.add_child(turns)
 		_status_row.add_child(tag)
 		_status_tags[status] = tag
+		_add_aura(status)
 	(tag.get_node("Turns") as Label3D).text = str(turns_left)
 	_layout_status_tags()
 	set_process(true)
@@ -425,6 +440,9 @@ func _remove_status_tag(status: StatusData) -> void:
 		return
 	_status_tags.erase(status)
 	tag.queue_free()
+	if _auras.has(status):
+		_auras[status].queue_free()
+		_auras.erase(status)
 	_layout_status_tags()
 	set_process(not _status_tags.is_empty() or _preview != null)
 
@@ -432,6 +450,23 @@ func _remove_status_tag(status: StatusData) -> void:
 func _clear_status_tags() -> void:
 	for status in _status_tags.keys():
 		_remove_status_tag(status)
+
+
+## The status's looping effect on the unit, while it carries the status (none when it has no aura).
+func _add_aura(status: StatusData) -> void:
+	if status.aura_effect == null or _auras.has(status):
+		return
+	var aura := status.aura_effect.instantiate() as Node3D
+	if aura == null:
+		return
+	aura.position.y = _head_height * _visual_scale * 0.5
+	aura.scale = Vector3.ONE * _visual_scale
+	add_child(aura)
+	_auras[status] = aura
+
+
+func aura_count() -> int:
+	return _auras.size()
 
 
 ## Centers the tags in a row along the row node's local X.
@@ -447,6 +482,29 @@ func _layout_status_tags() -> void:
 ## without it).
 func _play_model(logical: StringName) -> float:
 	return _model.play(logical) if _model != null else 0.0
+
+
+## The spell's animation: its own cut (and borrowed) clip when it sets one, else the caster's
+## logical animation whole. A borrowed clip that doesn't fit falls back to the logical one.
+func _play_cast_animation(spell: SpellData) -> void:
+	if _model == null:
+		return
+	var logical := _cast_animation(spell)
+	var custom := spell != null and (spell.animation_scene != null or spell.animation_start > 0.0
+			or spell.animation_end > 0.0 or not is_equal_approx(spell.animation_speed, 1.0))
+	if custom and _model.play_clip(logical, spell.animation_scene, spell.animation_name,
+			spell.animation_start, spell.animation_end, spell.animation_speed) > 0.0:
+		return
+	_model.play(logical)
+
+
+func max_hp() -> int:
+	return _max_hp
+
+
+## Where effects start on this unit: its chest, in world space.
+func chest_position() -> Vector3:
+	return global_position + Vector3(0.0, _head_height * _visual_scale * 0.6, 0.0)
 
 
 ## Attack for a melee damage spell, Cast otherwise, unless the spell names its own animation.

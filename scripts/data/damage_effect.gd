@@ -37,9 +37,15 @@ func average_roll() -> float:
 
 
 func describe() -> String:
-	var type_text := damage_type.display_name.to_lower() + " " if damage_type != null else ""
-	var scaling_text := " (%d%% Power)" % power_scaling if power_scaling != 100 else ""
-	return "%s %sdamage%s" % [amount_text(min_amount, max_amount), type_text, scaling_text]
+	var amount := amount_text(min_amount, max_amount)
+	if damage_type == null:
+		if power_scaling == 100:
+			return tr("%s damage") % amount
+		return tr("%s damage (%d%% Power)") % [amount, power_scaling]
+	var type_text := tr(damage_type.display_name).to_lower()
+	if power_scaling == 100:
+		return tr("%s %s damage") % [amount, type_text]
+	return tr("%s %s damage (%d%% Power)") % [amount, type_text, power_scaling]
 
 
 func get_validation_errors() -> PackedStringArray:

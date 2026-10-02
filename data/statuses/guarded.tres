@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cfh3vr1fh0dcp" path="res://ui/icons/status_guarded.svg" id="1_exbst"]
 [ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_exbst"]
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_evuj6"]
+[ext_resource type="PackedScene" uid="uid://c55bn52nfaekm" path="res://scenes/fx/aura_guarded.tscn" id="fx_aura"]
 
 [sub_resource type="Resource" id="Resource_ykxyc"]
 script = ExtResource("1_4n73f")
@@ -23,3 +24,4 @@ color = Color(0.45, 0.75, 1, 1)
 is_positive = true
 duration = 1
 modifiers = Array[ExtResource("1_4n73f")]([SubResource("Resource_ykxyc"), SubResource("Resource_rkwqc")])
+aura_effect = ExtResource("fx_aura")

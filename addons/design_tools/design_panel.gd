@@ -37,6 +37,12 @@ func _init() -> void:
 	duplicate.pressed.connect(_on_duplicate)
 	row.add_child(duplicate)
 	row.add_child(VSeparator.new())
+	var stage := Button.new()
+	stage.text = "Spell stage"
+	stage.tooltip_text = "Plays the spell open in the Inspector over and over, replaying when its files are saved (the Game tab or a window)."
+	stage.pressed.connect(_on_spell_stage)
+	row.add_child(stage)
+	row.add_child(VSeparator.new())
 	_floor = SpinBox.new()
 	_floor.min_value = 1
 	_floor.max_value = 999
@@ -64,6 +70,15 @@ func _on_duplicate() -> void:
 		_status.text = "Open a spell, enemy, encounter or preset in the Inspector first."
 		return
 	_report(_factory.duplicate_resource(edited, _name.text))
+
+
+func _on_spell_stage() -> void:
+	var edited := EditorInterface.get_inspector().get_edited_object() as SpellData
+	var config := ConfigFile.new()
+	config.set_value("stage", "spell", edited.resource_path if edited != null else "")
+	config.save(SpellStage.SELECTION_PATH)
+	EditorInterface.play_custom_scene("res://scenes/tools/spell_stage.tscn")
+	_status.text = "Spell stage: %s" % (edited.resource_path if edited != null else "pick a spell in its panel")
 
 
 func _on_export_floor() -> void:

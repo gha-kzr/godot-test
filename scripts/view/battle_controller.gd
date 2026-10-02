@@ -14,6 +14,9 @@ extends Node3D
 
 ## The battle just ended (the result screen shows). The state is final: the caller applies
 ## and saves rewards now, so closing the game on the result screen loses nothing.
+## A sound to hear (an AudioSet.SFX_EVENTS name), from the playback or the turn flow.
+signal sound(event: StringName)
+
 signal battle_ended(state: BattleState)
 ## The hint card on the HUD was dismissed.
 signal hint_dismissed
@@ -31,6 +34,8 @@ const WEB_LIGHT_SCALE := 0.6
 
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
+## How long the camera takes to reach an enemy that starts its turn off screen.
+const ENEMY_FOCUS_DURATION := 0.45
 
 ## The fight: map, enemies (levels, presets) and their AI profile.
 @export var encounter: Encounter
@@ -107,6 +112,9 @@ func _ready() -> void:
 	if OS.has_feature("web"):
 		$DirectionalLight3D.light_energy *= WEB_LIGHT_SCALE
 		$WorldEnvironment.environment.ambient_light_energy *= WEB_LIGHT_SCALE
+	# The light turns with the camera, so the shadows fall the same way on screen from every
+	# side (a fixed light made them look different, even broken, as the camera turned).
+	$DirectionalLight3D.reparent(camera_rig)
 	hud.spell_selected.connect(select_spell)
 	hud.end_turn_pressed.connect(end_turn)
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
@@ -122,6 +130,7 @@ func _ready() -> void:
 	hud.set_result_action_text("Play again" if standalone else "Continue")
 	camera_rig.overhead_changed.connect(hud.set_overhead_view)
 	event_player.event_played.connect(_on_event_played)
+	event_player.sound.connect(sound.emit)
 	start_battle()
 
 
@@ -154,7 +163,7 @@ func start_battle() -> bool:
 	selected_spell = -1
 	board_view.build(battle_state.grid)
 	units_view.build(battle_state, board_view)
-	event_player.setup(units_view, board_view)
+	event_player.setup(units_view, board_view, camera_rig)
 	camera_rig.set_bounds(Rect2(Vector2.ZERO, Vector2(battle_state.grid.size - Vector2i.ONE) * BoardView.CELL_SIZE))
 	camera_rig.focus(board_view.center())
 	camera_rig.face_toward(_spawn_center(parsed.player_spawns) - board_view.center())
@@ -342,6 +351,21 @@ func focus_unit(unit_id: int) -> void:
 	camera_rig.focus_on(point)
 
 
+## The camera at a turn's start: an ally's turn always centers on it; an enemy's turn moves the
+## camera only when the enemy isn't comfortably on screen already (and then slowly), so a run
+## of enemy turns in view doesn't make the view dart between them.
+func _focus_turn_start(unit_id: int) -> void:
+	if battle == null or unit_id < 0 or unit_id >= battle.state.units.size():
+		return
+	if battle.state.units[unit_id].team == UnitState.Team.PLAYER:
+		focus_unit(unit_id)
+		return
+	var view := units_view.find_view(unit_id)
+	var point := view.position if view != null else board_view.cell_to_world(battle.state.units[unit_id].cell)
+	if not camera_rig.is_on_screen([point] as Array[Vector3]):
+		camera_rig.focus_on(point, true, ENEMY_FOCUS_DURATION)
+
+
 ## Back to the acting unit (the Recenter key and button).
 func recenter() -> void:
 	if battle != null and battle.state.started and _hud_model.current_id != -1:
@@ -381,7 +405,9 @@ func _begin_next() -> void:
 	if battle_state.is_over():
 		_set_state(State.ENDED)
 		# A mutual wipe (DRAW) is shown as a defeat (decision record).
-		hud.show_result(battle_state.outcome() == BattleState.Outcome.PLAYER_WON, battle_seed)
+		var won := battle_state.outcome() == BattleState.Outcome.PLAYER_WON
+		sound.emit(&"victory" if won else &"defeat")
+		hud.show_result(won, battle_seed)
 		battle_ended.emit(battle_state)
 		return
 	if battle_state.current_unit().team == UnitState.Team.PLAYER:
@@ -415,14 +441,16 @@ func _on_event_played(event: BattleEvents.Event) -> void:
 	_hud_model.apply(event)
 	_show_turn()
 	if event is BattleEvents.TurnStarted:
-		focus_unit((event as BattleEvents.TurnStarted).unit_id)  # Every turn, ally or enemy: the camera follows the action.
+		_focus_turn_start((event as BattleEvents.TurnStarted).unit_id)  # Every turn, ally or enemy: the camera follows the action.
 	if event is BattleEvents.TurnStarted and battle.is_sudden_death() and not _sudden_death_announced:
 		_sudden_death_announced = true
-		hud.show_banner("Sudden death: the party loses %d%% HP every turn" % sudden_death_percent)
+		hud.show_banner(tr("Sudden death: the party loses %d%% HP every turn") % sudden_death_percent)
 		return
 	if event is BattleEvents.TurnStarted:
 		var unit := battle.state.units[(event as BattleEvents.TurnStarted).unit_id]
-		hud.show_banner("%s's turn" % unit.data.display_name)
+		if unit.team == UnitState.Team.PLAYER:
+			sound.emit(&"turn_start")
+		hud.show_banner(tr("%s's turn") % tr(unit.data.display_name))
 
 
 
@@ -469,17 +497,17 @@ func _prompt_text() -> String:
 	match input_state:
 		State.PLACING:
 			if _placing_hero == -1:
-				return "Place your heroes: click one, then a teal cell. Ready (%s) to fight" % SettingsApplier.key_text(&"end_turn")
-			return "Click a teal cell to place %s (Esc to deselect)" % battle.state.units[_placing_hero].label
+				return tr("Place your heroes: click one, then a teal cell. Ready (%s) to fight") % SettingsApplier.key_text(&"end_turn")
+			return tr("Click a teal cell to place %s (Esc to deselect)") % tr(battle.state.units[_placing_hero].label)
 		State.IDLE:
 			if _nothing_left_to_do():
-				return "Nothing left to do: end your turn (%s)" % SettingsApplier.key_text(&"end_turn")
-			return "Move to a blue cell or pick a spell (%s)" % _spell_keys_text(battle.state.current_unit().data.spells.size())
+				return tr("Nothing left to do: end your turn (%s)") % SettingsApplier.key_text(&"end_turn")
+			return tr("Move to a blue cell or pick a spell (%s)") % _spell_keys_text(battle.state.current_unit().data.spells.size())
 		State.TARGETING:
-			return "Choose a target for %s (orange cells). Esc to cancel" % \
-					battle.state.current_unit().data.spells[selected_spell].display_name
+			return tr("Choose a target for %s (orange cells). Esc to cancel") % \
+					tr(battle.state.current_unit().data.spells[selected_spell].display_name)
 		State.ENEMY_TURN:
-			return "%s is acting..." % battle.state.current_unit().label
+			return tr("%s is acting...") % tr(battle.state.current_unit().label)
 	return ""
 
 

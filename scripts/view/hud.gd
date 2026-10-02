@@ -74,7 +74,7 @@ func _ready() -> void:
 	_hint_card.dismissed.connect(hint_dismissed.emit)
 	_menu_button.pressed.connect(_open_leave_panel)
 	_recenter_button.pressed.connect(recenter_pressed.emit)
-	_recenter_button.text = "Recenter (%s)" % SettingsApplier.key_text(&"camera_recenter")
+	_recenter_button.text = tr("Recenter (%s)") % SettingsApplier.key_text(&"camera_recenter")
 	_stay_button.pressed.connect(close_leave_panel)
 	_leave_button.pressed.connect(func() -> void:
 		close_leave_panel()
@@ -112,7 +112,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## shows the next few, the overlay all of them); `title` (e.g. "Floor 3") goes before the
 ## round number.
 func show_turn_order(units: Array[UnitInfo], round_number: int, title := "") -> void:
-	_round_label.text = ("%s · Round %d" % [title, round_number]) if not title.is_empty() else "Round %d" % round_number
+	_round_label.text = (tr("%s · Round %d") % [title, round_number]) if not title.is_empty() else tr("Round %d") % round_number
 	_timeline.show_order(units)
 	_order_overlay.show_order(units)
 
@@ -245,12 +245,12 @@ func is_end_turn_pulsing() -> bool:
 
 func set_overhead_view(enabled: bool) -> void:
 	var key := SettingsApplier.key_text(&"camera_toggle_view")
-	_view_button.text = ("Side view (%s)" if enabled else "Top view (%s)") % key
+	_view_button.text = (tr("Side view (%s)") if enabled else tr("Top view (%s)")) % key
 
 
 ## "End turn (Space)" / "Ready (Space)", with whatever key End turn is bound to.
 func _end_turn_text() -> String:
-	return "%s (%s)" % ["Ready" if _placing else "End turn", SettingsApplier.key_text(&"end_turn")]
+	return (tr("Ready (%s)") if _placing else tr("End turn (%s)")) % SettingsApplier.key_text(&"end_turn")
 
 
 ## Fades a short message in and out. Await it to wait until it's gone.
@@ -268,7 +268,7 @@ func show_banner(text: String) -> void:
 ## `battle_seed` is shown so a battle can be replayed (BattleController.rng_seed).
 func show_result(won: bool, battle_seed := 0) -> void:
 	_result_label.text = "Victory!" if won else "Defeat"
-	_seed_label.text = "Battle seed %d" % battle_seed
+	_seed_label.text = tr("Battle seed %d") % battle_seed
 	set_player_controls_enabled(false)
 	_menu_button.hide()  # The result's own button leaves the fight.
 	_result_panel.show()

@@ -6,6 +6,9 @@
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_jw1x3"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_pdlt8"]
 [ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="5_ag3yy"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="fx_cast"]
+[ext_resource type="PackedScene" uid="uid://dibxvmjgtpu1f" path="res://scenes/fx/projectile_meteor.tscn" id="fx_proj"]
+[ext_resource type="PackedScene" uid="uid://gjrh212jw6ty" path="res://scenes/fx/impact_explosion.tscn" id="fx_boom"]
 
 [sub_resource type="Resource" id="Resource_nqnep"]
 script = ExtResource("1_ecc7m")
@@ -27,3 +30,10 @@ min_range = 3
 max_range = 5
 area = SubResource("Resource_nqnep")
 effects = Array[ExtResource("2_jw1x3")]([SubResource("Resource_08d2k")])
+cast_effect = ExtResource("fx_cast")
+impact_delay = 0.3
+projectile = ExtResource("fx_proj")
+projectile_speed = 9.0
+projectile_falls = true
+impact_shake = 0.14
+impact_effect = ExtResource("fx_boom")

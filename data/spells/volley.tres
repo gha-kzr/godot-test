@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_nyyug"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_ij030"]
 [ext_resource type="Texture2D" uid="uid://cpx2flgjfw4p8" path="res://ui/icons/volley.svg" id="5_a8xk0"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="fx_proj"]
 
 [sub_resource type="Resource" id="Resource_cvmaw"]
 script = ExtResource("1_32akc")
@@ -27,3 +28,8 @@ min_range = 3
 max_range = 6
 area = SubResource("Resource_cvmaw")
 effects = Array[ExtResource("2_nyyug")]([SubResource("Resource_saujk")])
+impact_delay = 0.35
+projectile = ExtResource("fx_proj")
+projectile_speed = 24.0
+projectile_count = 7
+projectile_interval = 0.05

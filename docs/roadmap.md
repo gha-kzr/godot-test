@@ -23,28 +23,21 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 5c | Gameplay rules pass | Obstacles as cubes blocking sight up to their top, runes changeable between floors, leave a fight | [decisions](decisions/2026-09-30-gameplay-rules.md) · [plan](plans/2026-09-30-gameplay-rules.md) |
 | 5d | Playtest polish | Camera pan, recenter and follow, focus a unit from the turn order, XP gain display, drop a rune | [decisions](decisions/2026-09-30-playtest-polish.md) · [plan](plans/2026-09-30-playtest-polish.md) |
 | 6a | Art pass | Quaternius character models with a shared animation set, toon board with rock obstacles, particle effects, elite and boss scale | [decisions](decisions/2026-10-01-art.md) · [plan](plans/2026-10-01-art.md) |
+| 6b | Feel and language | French translation (gettext, extraction tool, tests), audio (sound effects, hub / battle / boss music, volume settings), camera follows walking units, screen shake and status auras, per-spell projectiles, timing and effects, the spell stage | [decisions](decisions/2026-10-02-feel-and-language.md) · [plan](plans/2026-10-02-feel-and-language.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)
 
 The backlog grouped into milestones, in the order I would build them: each follows the ones whose systems it needs and ends in something playable on its own. The order can change if priorities do. Full descriptions and open questions are in [`backlog.md`](backlog.md); each milestone starts with a grill and a plan, like the finished ones.
 
-### 6b. Feel: audio, effects and camera
-
-Finishes the art-and-audio work that is already under way: sound, a better pass on animation, particles and spells (timed together with the audio), and the camera following a walking unit.
-
-| Feature | Category | Pairs with |
-|---|---|---|
-| [Audio: sound effects, music and volume settings](backlog.md#audio-sound-effects-music-and-volume-settings) | Audio | settings screen; credits |
-| [Second pass on animation, particles and spells](backlog.md#second-pass-on-animation-particles-and-spells) | Animation / VFX | audio (timed together) |
-| [Camera follows a walking unit](backlog.md#camera-follows-a-walking-unit) | Animation / camera | camera rig |
-
 ### 7. First impressions
 
-What a new player meets first, and what shows the game off: comfort in long battles, a real onboarding, a name, a visible best floor and achievements. New texts written here should already go through `tr()` (see Reach).
+What a new player meets first, and what shows the game off: comfort in long battles, a real onboarding, a name, a visible best floor and achievements. New texts written here go through `tr()` and get their French entry (see `README.md`, Translations).
 
 | Feature | Category | Pairs with |
 |---|---|---|
+| [Sound and animation leftovers](backlog.md#sound-and-animation-leftovers) | Audio / animation | audio set, unit model |
+| [Selecting an enemy to attack also pins its card](backlog.md#selecting-an-enemy-to-attack-also-pins-its-card) | UI / UX | unit card pinning |
 | [Battle speed and quality of life](backlog.md#battle-speed-and-quality-of-life) | UI / UX | event player timings, settings |
 | [Better tutorial and tooltips for the first levels](backlog.md#better-tutorial-and-tooltips-for-the-first-levels) | UI / UX (onboarding) | hints, first floors |
 | [Rename the game](backlog.md#rename-the-game) | Branding | repo name, Pages address, save folder |
@@ -100,12 +93,11 @@ Gives runs a shape and lasting value: meta progression (needs the currency decid
 
 ### 13. Reach
 
-Widens who can play, once screens and strings have settled: save slots, localization, gamepad support and Android / touch.
+Widens who can play, once screens and strings have settled: save slots, gamepad support and Android / touch.
 
 | Feature | Category | Pairs with |
 |---|---|---|
 | [Multiple games (save slots)](backlog.md#multiple-games-save-slots) | Core / profile | save format |
-| [Localization](backlog.md#localization) | UI / tech | every player-facing string; cheaper earlier |
 | [Gamepad support](backlog.md#gamepad-support) | Platform | focus navigation already on screens |
 | [Android and touch](backlog.md#android-and-touch) | Platform | camera drag already shaped for it |
 
@@ -115,5 +107,6 @@ The final pass when content stops moving: a balance pass with the balance lab, a
 
 | Feature | Category | Pairs with |
 |---|---|---|
+| [Balance observations from playtests](backlog.md#balance-observations-from-playtests) | Balance | level cap, area spells, tower bands |
 | [Balance pass and release checks](backlog.md#balance-pass-and-release-checks) | Balance / release | content stable |
 

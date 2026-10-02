@@ -1,7 +1,7 @@
 @tool
 class_name SettingsApplier
 extends RefCounted
-## Puts Settings into effect: UI scale, window mode (not on mobile, not in the editor's
+## Puts Settings into effect: language, UI scale, window mode (not on mobile, not in the editor's
 ## embedded game window) and the InputMap. The one place where platforms differ.
 
 ## Project defaults of the rebindable actions, captured before the first remap so keys
@@ -11,11 +11,22 @@ static var _default_events: Dictionary[StringName, Array] = {}
 
 ## `from_user`: false at startup, where browsers refuse fullscreen without a user gesture.
 static func apply(settings: Settings, window: Window, from_user := true) -> void:
+	Localization.apply(settings.language)
+	apply_audio(settings)
 	if window != null:
 		window.content_scale_factor = settings.ui_scale
 		if supports_window_mode() and (from_user or not OS.has_feature("web")):
 			window.mode = Window.MODE_FULLSCREEN if settings.window_mode == Settings.WindowMode.FULLSCREEN else Window.MODE_WINDOWED
 	apply_bindings(settings)
+
+
+## The volume sliders and the mute onto the audio buses.
+static func apply_audio(settings: Settings) -> void:
+	AudioService.ensure_buses()
+	AudioService.set_bus_volume(AudioService.MASTER_BUS, settings.master_volume)
+	AudioService.set_bus_volume(AudioService.MUSIC_BUS, settings.music_volume)
+	AudioService.set_bus_volume(AudioService.EFFECTS_BUS, settings.effects_volume)
+	AudioServer.set_bus_mute(AudioServer.get_bus_index(AudioService.MASTER_BUS), settings.muted)
 
 
 ## Fullscreen and windowed are offered everywhere but on phones and tablets, and not in the
@@ -40,11 +51,11 @@ static func apply_bindings(settings: Settings) -> void:
 ## action already uses it, else "".
 static func set_binding(settings: Settings, action: StringName, keycode: int) -> String:
 	if not Settings.is_bindable_key(keycode):
-		return "That key can't be used." if keycode <= 0 or keycode in Settings.MODIFIER_KEYS \
-				else "%s is reserved for the menus." % OS.get_keycode_string(keycode as Key)
+		return TranslationServer.translate("That key can't be used.") if keycode <= 0 or keycode in Settings.MODIFIER_KEYS \
+				else TranslationServer.translate("%s is reserved for the menus.") % OS.get_keycode_string(keycode as Key)
 	var other := action_using_key(keycode, action)
 	if other != &"":
-		return "%s is already used by %s." % [OS.get_keycode_string(keycode as Key), Settings.action_label(other)]
+		return TranslationServer.translate("%s is already used by %s.") % [OS.get_keycode_string(keycode as Key), Settings.action_label(other)]
 	settings.bindings[action] = keycode
 	apply_bindings(settings)
 	return ""

@@ -36,9 +36,9 @@ func show_unit(info: UnitInfo) -> void:
 	_name_label.text = info.title_text()
 	_hp_bar.max_value = info.max_hp
 	_hp_bar.value = info.hp
-	_hp_label.text = "%d / %d HP" % [info.hp, info.max_hp]
-	_ap_label.text = "AP %d / %d" % [info.ap, info.max_ap]
-	_mp_label.text = "MP %d / %d" % [info.mp, info.max_mp]
+	_hp_label.text = tr("%d / %d HP") % [info.hp, info.max_hp]
+	_ap_label.text = tr("AP %d / %d") % [info.ap, info.max_ap]
+	_mp_label.text = tr("MP %d / %d") % [info.mp, info.max_mp]
 	_ap_label.modulate = _modifier_tint(info.max_ap, info.base_ap)
 	_mp_label.modulate = _modifier_tint(info.max_mp, info.base_mp)
 	_combat_stats.text = info.combat_stats_text()
@@ -76,7 +76,7 @@ func _fill_statuses(statuses: Array[StatusInfo]) -> void:
 		row.add_child(icon)
 		var text := Label.new()
 		text.theme_type_variation = &"SmallLabel"
-		text.text = "%s, %s" % [status.display_name, status.turns_text()]
+		text.text = tr("%s, %s") % [tr(status.display_name), status.turns_text()]
 		text.mouse_filter = Control.MOUSE_FILTER_PASS
 		row.add_child(text)
 		_status_list.add_child(row)
@@ -97,7 +97,7 @@ func _fill_spells(spells: Array[SpellData]) -> void:
 		row.add_child(icon)
 		var label := Label.new()
 		label.theme_type_variation = &"SmallLabel"
-		label.text = "%s (%d AP)" % [spell.display_name, spell.ap_cost]
+		label.text = tr("%s (%d AP)") % [tr(spell.display_name), spell.ap_cost]
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
 		row.add_child(label)
 		row.mouse_entered.connect(spell_hovered.emit.bind(spell))

@@ -4,6 +4,12 @@ extends Node
 ## next starts (sequential playback queue). Views only animate; the BattleState has
 ## already changed by the time events are played.
 
+## A sound event to hear (an AudioSet.SFX_EVENTS name): the game connects it to the audio.
+signal sound(event: StringName)
+
+## A projectile left for `end` (world position), for tests and effects that follow it.
+signal projectile_launched(end: Vector3)
+
 ## Emitted after each event has played, for the HUD and controller to react.
 signal event_played(event: BattleEvents.Event)
 
@@ -13,6 +19,12 @@ signal event_played(event: BattleEvents.Event)
 ## How far above the cell's top a ground effect starts.
 const GROUND_FX_HEIGHT := 0.3
 
+## A hit of at least this share of the target's max HP shakes the camera.
+const BIG_HIT_SHARE := 0.25
+## How high above its cell a falling projectile starts.
+const SKY_HEIGHT := 7.0
+const SHAKE_MIN := 0.08
+const SHAKE_MAX := 0.22
 ## How long a spell's area stays highlighted before its effects play.
 const AREA_FLASH := 0.25
 
@@ -22,13 +34,16 @@ var is_playing := false
 var _spell: SpellData
 var _units: UnitsView
 var _board: BoardView
+## Eases after a unit that walks off screen (optional).
+var _camera: CameraRig
 ## Bumped by stop(); a playback that sees it change after an await gives up.
 var _generation := 0
 
 
-func setup(units: UnitsView, board: BoardView) -> void:
+func setup(units: UnitsView, board: BoardView, camera: CameraRig = null) -> void:
 	_units = units
 	_board = board
+	_camera = camera
 
 
 ## Returns when every event has played.
@@ -68,8 +83,109 @@ func _spawn_ground_fx(cast: BattleEvents.SpellCast) -> void:
 func stop() -> void:
 	_generation += 1
 	is_playing = false
+	if _camera != null:
+		_camera.stop_following()
 	if _board != null:
 		_board.clear_highlight(BoardView.Highlight.AREA)
+
+
+## A big hit jolts the camera, harder the bigger it is next to the target's HP.
+func _shake_for(view: UnitView, amount: int) -> void:
+	if _camera == null or amount <= 0:
+		return
+	var share := float(amount) / maxf(view.max_hp(), 1)
+	if share >= BIG_HIT_SHARE:
+		_camera.shake(lerpf(SHAKE_MIN, SHAKE_MAX, clampf((share - BIG_HIT_SHARE) / 0.5, 0.0, 1.0)))
+
+
+## The cast phase: the caster's animation and lunge, then the effects land. Default pacing:
+## the lunge, then a short flash of the area. A spell with an `impact_delay` or a `projectile`
+## sets the timing itself: the effects land `impact_delay` seconds after the cast starts (the
+## lunge runs on in parallel), after the projectile's flight when there is one.
+func _play_cast(view: UnitView, cast: BattleEvents.SpellCast) -> void:
+	var spell := cast.spell
+	var generation := _generation
+	if spell.impact_delay < 0.0 and spell.projectile == null:
+		await view.play_cast(cast.target, spell)
+		# A tween interval (not a SceneTreeTimer) so it pauses with the tree like the rest.
+		await create_tween().tween_interval(AREA_FLASH).finished
+	else:
+		view.play_cast(cast.target, spell)  # Not awaited: the timing is the spell's.
+		var delay := spell.impact_delay if spell.impact_delay >= 0.0 else UnitView.CAST_DURATION * 0.5
+		if delay > 0.0:
+			await create_tween().tween_interval(delay).finished
+		if generation == _generation and spell.projectile != null:
+			await _fly_projectile(view, cast)
+	if generation == _generation:  # After stop(), the AREA layer belongs to someone else.
+		_board.clear_highlight(BoardView.Highlight.AREA)
+
+
+## The spell's projectiles. Each flies from the caster's chest to the target cell, or falls from
+## the sky onto it, then is gone; a volley sends several, `projectile_interval` apart, each at
+## the next cell of the area. Returns when the last has landed, then the spell may shake the
+## camera.
+func _fly_projectile(view: UnitView, cast: BattleEvents.SpellCast) -> void:
+	var spell := cast.spell
+	var generation := _generation
+	var count := maxi(spell.projectile_count, 1)
+	var cells: Array[Vector2i] = [cast.target]
+	if count > 1 and not cast.area.is_empty():
+		cells = cast.area
+	var total := 0.0
+	for index in count:
+		var cell := cells[index % cells.size()]
+		var end := _board.cell_to_world(cell) + Vector3(0.0, UnitView.PROJECTILE_HEIGHT, 0.0)
+		if count > 1:
+			end += Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))  # Not on the exact center.
+		var start := end + Vector3(0.0, SKY_HEIGHT, 0.0) if spell.projectile_falls else view.chest_position()
+		var flight := start.distance_to(end) / spell.projectile_speed
+		var delay := index * spell.projectile_interval
+		total = maxf(total, delay + flight)
+		var launcher := create_tween()
+		launcher.tween_interval(delay)
+		launcher.tween_callback(_launch.bind(spell.projectile, start, end, flight))
+	await create_tween().tween_interval(total).finished
+	if generation == _generation and _camera != null and spell.impact_shake > 0.0:
+		_camera.shake(spell.impact_shake, 0.45)
+
+
+## One projectile in the air: it frees itself on arrival (or with the board).
+func _launch(scene: PackedScene, start: Vector3, end: Vector3, flight: float) -> void:
+	if _board == null or not is_instance_valid(_board):
+		return
+	projectile_launched.emit(end)
+	var projectile := scene.instantiate() as Node3D
+	if projectile == null:
+		return
+	_board.add_child(projectile)
+	projectile.global_position = start
+	if absf(end.x - start.x) + absf(end.z - start.z) < 0.001:  # Straight down: no "up" to look along.
+		projectile.global_basis = Basis.looking_at(end - start, Vector3.RIGHT)
+	elif not start.is_equal_approx(end):
+		projectile.look_at(end)
+	var tween := projectile.create_tween()  # Bound to the projectile: it ends with it.
+	tween.tween_property(projectile, "global_position", end, flight)
+	tween.tween_callback(projectile.queue_free)
+
+
+## A walk. When some of it would leave the screen, the camera eases after the unit (allies and
+## enemies alike) and settles on it at the end; a walk that stays in view leaves the camera
+## alone, so a run of short enemy moves doesn't make it dart about.
+func _play_move(view: UnitView, path: Array[Vector2i]) -> void:
+	var points: Array[Vector3] = [view.position]
+	for cell in path:
+		points.append(_board.cell_to_world(cell))
+	var follows := _camera != null and not _camera.is_on_screen(points)
+	var generation := _generation
+	if follows:
+		_camera.follow(view)
+	var step_sound := func() -> void: sound.emit(&"step")
+	view.stepped.connect(step_sound)
+	await view.play_move(path)
+	if is_instance_valid(view):
+		view.stepped.disconnect(step_sound)
+	if follows and generation == _generation and is_instance_valid(view) and _camera.is_following():  # Not after a pan of the player's.
+		_camera.focus_on(view.position)  # Ends the follow with a last glide onto the unit.
 
 
 ## One dispatch point: the event's subject_id() names the view, the type picks the
@@ -84,27 +200,29 @@ func _play_event(event: BattleEvents.Event) -> void:
 	if view == null or not is_instance_valid(view):
 		return
 	if event is BattleEvents.UnitMoved:
-		await view.play_move((event as BattleEvents.UnitMoved).path)
+		await _play_move(view, (event as BattleEvents.UnitMoved).path)
 	elif event is BattleEvents.UnitPlaced:
 		await view.play_place((event as BattleEvents.UnitPlaced).cell)
 	elif event is BattleEvents.SpellCast:
 		var cast := event as BattleEvents.SpellCast
+		var generation_before := _generation
+		sound.emit(&"cast")
 		view.spawn_fx(cast.spell.cast_effect)
-		_spawn_ground_fx(cast)
 		_board.show_highlight(BoardView.Highlight.AREA, cast.area)
-		await view.play_cast(cast.target, cast.spell)
-		# A tween interval (not a SceneTreeTimer) so it pauses with the tree like the rest.
-		var generation := _generation
-		await create_tween().tween_interval(AREA_FLASH).finished
-		if generation == _generation:  # After stop(), the AREA layer belongs to someone else.
-			_board.clear_highlight(BoardView.Highlight.AREA)
+		await _play_cast(view, cast)
+		if generation_before == _generation:
+			_spawn_ground_fx(cast)  # Where the effects land, when they land (after a projectile's flight).
 	elif event is BattleEvents.DamageDealt:
 		var hit := event as BattleEvents.DamageDealt
 		if fx != null:  # Even a fully resisted hit: the spell landed.
 			view.spawn_fx(fx.impact_for(hit.damage_type, _spell))
+		if hit.amount > 0:
+			sound.emit(&"hit")
+		_shake_for(view, hit.amount)
 		await view.play_hit(hit.amount, hit.hp_after)
 	elif event is BattleEvents.Healed:
 		var heal := event as BattleEvents.Healed
+		sound.emit(&"heal")
 		if fx != null:  # Even on a unit at full HP.
 			view.spawn_fx(fx.heal)
 		await view.play_heal(heal.amount, heal.hp_after)
@@ -118,4 +236,5 @@ func _play_event(event: BattleEvents.Event) -> void:
 	elif event is BattleEvents.StatusExpired:
 		await view.play_status_expired((event as BattleEvents.StatusExpired).status)
 	elif event is BattleEvents.UnitDied:
+		sound.emit(&"death")
 		await view.play_death()

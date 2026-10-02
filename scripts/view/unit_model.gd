@@ -29,6 +29,10 @@ var _resolved: Dictionary[StringName, String] = {}
 var _meshes: Array[MeshInstance3D] = []
 var _overlay: StandardMaterial3D
 var _flash_tween: Tween
+## Borrowed animations already added to the player: "scene path|name" → its name there.
+var _borrowed: Dictionary[String, String] = {}
+## Bumped by every clip; a trimmed clip's timer that finds it changed gives up.
+var _clip_serial := 0
 
 
 ## Instances `scene` under this node at `model_scale` and starts its Idle. `skin_color` with
@@ -73,12 +77,93 @@ func has_animation(logical: StringName) -> bool:
 func play(logical: StringName) -> float:
 	if _player == null or not _resolved.has(logical):
 		return 0.0
+	_clip_serial += 1  # A cut clip's end timer must not cut this one short.
 	var real := _resolved[logical]
 	var again := _player.is_playing() and _player.current_animation == real
 	_player.play(real, BLEND)
 	if again and logical not in LOOPING:
 		_player.seek(0.0, true)  # Playing the animation already playing does nothing: restart an action.
 	return _player.get_animation(real).length
+
+
+## Plays a segment of an animation and returns how long it plays (0 when nothing did).
+## `source` null: this model's own animation for the logical name `logical`. Else the animation
+## named `animation_name` (the first one when empty) of the model file `source`, borrowed when
+## its skeleton fits this one. The segment runs from `start` to `end` seconds (end <= 0: to
+## the animation's end) at `speed`; a cut one hands back to Idle at its end.
+func play_clip(logical: StringName, source: PackedScene = null, animation_name := "", start := 0.0, end := 0.0, speed := 1.0) -> float:
+	if _player == null:
+		return 0.0
+	var real := ""
+	if source == null:
+		real = _resolved.get(logical, "")
+	else:
+		real = _borrow(source, animation_name)
+	if real.is_empty():
+		return 0.0
+	var length := _player.get_animation(real).length
+	var from := clampf(start, 0.0, length)
+	var to := length if end <= 0.0 else clampf(end, from, length)
+	var rate := maxf(speed, 0.01)
+	_clip_serial += 1
+	_player.play(real, BLEND, rate)
+	_player.seek(from, true)  # Also restarts an action played twice in a row.
+	if to < length - 0.001:
+		var serial := _clip_serial
+		create_tween().tween_interval((to - from) / rate).finished.connect(func() -> void:
+			if serial == _clip_serial:
+				play(&"Idle"))
+	return (to - from) / rate
+
+
+## Adds an animation of another model file to this model's player (once) and returns its
+## name there, or "" when the file has no such animation or its skeleton doesn't fit (logged).
+func _borrow(source: PackedScene, animation_name: String) -> String:
+	var key := "%s|%s" % [source.resource_path, animation_name]
+	if _borrowed.has(key):
+		return _borrowed[key]  # "" for one that was refused: not tried (and logged) again.
+	_borrowed[key] = ""
+	var found: Animation
+	var instance := source.instantiate()
+	var players := instance.find_children("*", "AnimationPlayer", true, false)
+	if not players.is_empty():
+		var other := players[0] as AnimationPlayer
+		for candidate in other.get_animation_list():
+			if candidate == "RESET":
+				continue
+			if animation_name.is_empty() or candidate == animation_name or candidate.ends_with("|" + animation_name):
+				found = other.get_animation(candidate).duplicate() as Animation
+				break
+	instance.free()
+	if found == null:
+		push_warning("UnitModel: %s has no animation \"%s\"" % [source.resource_path, animation_name])
+		return ""
+	var missing := _missing_tracks(found)
+	if found.get_track_count() == 0 or missing > found.get_track_count() / 4:
+		push_warning("UnitModel: the animation \"%s\" of %s doesn't fit this skeleton (%d of %d tracks have no bone here)" % [
+				animation_name, source.resource_path, missing, found.get_track_count()])
+		return ""
+	found.loop_mode = Animation.LOOP_NONE
+	var library_name := "borrowed_%d" % _player.get_animation_library_list().size()
+	var library := AnimationLibrary.new()
+	library.add_animation(&"clip", found)
+	_player.add_animation_library(library_name, library)
+	_borrowed[key] = "%s/clip" % library_name
+	return _borrowed[key]
+
+
+## How many of the animation's tracks point at a node or bone this model doesn't have.
+func _missing_tracks(animation: Animation) -> int:
+	var root := _player.get_node_or_null(_player.root_node)
+	var missing := 0
+	for track in animation.get_track_count():
+		var path := animation.track_get_path(track)
+		var node := root.get_node_or_null(NodePath(path.get_concatenated_names())) if root != null else null
+		if node == null:
+			missing += 1
+		elif node is Skeleton3D and path.get_subname_count() > 0 and (node as Skeleton3D).find_bone(path.get_subname(0)) == -1:
+			missing += 1
+	return missing
 
 
 ## Tints the whole model with `color` for `duration` (a hit), fading back.

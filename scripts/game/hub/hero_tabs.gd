@@ -5,8 +5,6 @@ extends VBoxContainer
 
 signal hero_selected(hero_index: int)
 
-const LOCKED_TEXT := "%s (locked)"
-
 
 ## A thin green HP bar above the XP bar (full outside a run, the saved HP in one).
 func _hp_bar(profile: Profile, hero_index: int) -> ProgressBar:
@@ -15,7 +13,7 @@ func _hp_bar(profile: Profile, hero_index: int) -> ProgressBar:
 	bar.show_percentage = false
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var hp := RunDirector.hero_hp(profile, hero_index)
-	bar.tooltip_text = "HP %d / %d" % [hp.x, hp.y]
+	bar.tooltip_text = tr("HP %d / %d") % [hp.x, hp.y]
 	bar.max_value = hp.y
 	bar.value = hp.x
 	bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -59,13 +57,13 @@ func show_heroes(profile: Profile, selected: int) -> void:
 		var tab := HubStyle.button("", "Hero%d" % index)
 		tab.custom_minimum_size = Vector2(0, 66)
 		if profile.is_unlocked(index):
-			tab.text = "%s  Lv %d" % [record.hero.display_name(), record.level]
+			tab.text = tr("%s  Lv %d") % [tr(record.hero.display_name()), record.level]
 			tab.toggle_mode = true
 			tab.button_pressed = index == selected
 			tab.pressed.connect(hero_selected.emit.bind(index))
 			tab.add_child(_hp_bar(profile, index))
 			tab.add_child(_xp_bar(profile, index))
 		else:
-			tab.text = LOCKED_TEXT % record.hero.display_name()
+			tab.text = tr("%s (locked)") % tr(record.hero.display_name())
 			tab.disabled = true
 		add_child(tab)

@@ -73,7 +73,7 @@ func slot(index: int) -> Button:
 
 func show_details(spell: SpellData) -> void:
 	_details_name.text = spell.display_name
-	_details_cost.text = "%d AP" % spell.ap_cost
+	_details_cost.text = tr("%d AP") % spell.ap_cost
 	_details_body.text = "\n".join(detail_lines(spell))
 	_details.show()
 
@@ -86,17 +86,24 @@ func is_details_visible() -> bool:
 	return _details.visible
 
 
-## One line each for range, area and every effect, e.g. "Range 2-6, line of sight".
+## One line each for range, area and every effect, e.g. "Range 2-6, line of sight". Static, so
+## it translates through the TranslationServer (tr() is an instance method).
 static func detail_lines(spell: SpellData) -> Array[String]:
 	var lines: Array[String] = []
-	var range_text := "Range %s" % EffectData.amount_text(spell.min_range, spell.max_range)
-	if spell.needs_line_of_sight:
-		range_text += ", line of sight"
-	if spell.height_extends_range:
-		range_text += ", +range from high ground"
+	var range_amount := EffectData.amount_text(spell.min_range, spell.max_range)
+	var range_text: String
+	if spell.needs_line_of_sight and spell.height_extends_range:
+		range_text = TranslationServer.translate("Range %s, line of sight, +range from high ground")
+	elif spell.needs_line_of_sight:
+		range_text = TranslationServer.translate("Range %s, line of sight")
+	elif spell.height_extends_range:
+		range_text = TranslationServer.translate("Range %s, +range from high ground")
+	else:
+		range_text = TranslationServer.translate("Range %s")
+	range_text = range_text % range_amount
 	lines.append(range_text)
 	if spell.area != null and spell.area.kind != AreaShape.Kind.SINGLE:
-		lines.append("%s area %d" % [AreaShape.Kind.keys()[spell.area.kind].capitalize(), spell.area.size])
+		lines.append(TranslationServer.translate("%s area %d") % [TranslationServer.translate(AreaShape.Kind.keys()[spell.area.kind].capitalize()), spell.area.size])
 	for effect in spell.effects:
 		if effect != null:
 			var text := effect.full_description()
@@ -134,7 +141,7 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	var cost := Label.new()
 	cost.name = "Cost"
 	cost.theme_type_variation = &"SmallLabel"
-	cost.text = "%d AP" % spell.ap_cost
+	cost.text = tr("%d AP") % spell.ap_cost
 	cost.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(cost)

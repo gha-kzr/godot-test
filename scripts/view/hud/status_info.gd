@@ -39,4 +39,4 @@ static func from_data(status: StatusData, turns: int, is_counting := false) -> S
 
 ## "1 turn" / "3 turns".
 func turns_text() -> String:
-	return "1 turn" if turns_left == 1 else "%d turns" % turns_left
+	return tr_n("%d turn", "%d turns", turns_left) % turns_left

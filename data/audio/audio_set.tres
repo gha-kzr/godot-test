@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="AudioSet" format=3 uid="uid://bt5u4tcd8l4kd"]
+
+[ext_resource type="Script" uid="uid://bor7i5e7t132s" path="res://scripts/data/audio_set.gd" id="1_set"]
+[ext_resource type="AudioStream" uid="uid://ckrs3hepmfyyd" path="res://assets/audio/music/battle.mp3" id="music_battle"]
+[ext_resource type="AudioStream" uid="uid://ty536fy2d3qg" path="res://assets/audio/sfx/ui_click.ogg" id="sfx_ui_click"]
+[ext_resource type="AudioStream" uid="uid://do5bl366na08a" path="res://assets/audio/sfx/hit.ogg" id="sfx_hit"]
+[ext_resource type="AudioStream" uid="uid://by0xccsjl1ed2" path="res://assets/audio/sfx/heal.ogg" id="sfx_heal"]
+[ext_resource type="AudioStream" uid="uid://xfiuasirk24h" path="res://assets/audio/sfx/step.ogg" id="sfx_step"]
+[ext_resource type="AudioStream" uid="uid://c7icxd0idicof" path="res://assets/audio/sfx/defeat.ogg" id="sfx_defeat"]
+[ext_resource type="AudioStream" uid="uid://dj25x5dwa7ofl" path="res://assets/audio/music/hub.mp3" id="music_hub"]
+[ext_resource type="AudioStream" uid="uid://c6vdl3x73qnvf" path="res://assets/audio/music/boss.mp3" id="music_boss"]
+
+[resource]
+script = ExtResource("1_set")
+sfx = Dictionary[StringName, AudioStream]({
+&"ui_click": ExtResource("sfx_ui_click"),
+&"hit": ExtResource("sfx_hit"),
+&"heal": ExtResource("sfx_heal"),
+&"step": ExtResource("sfx_step"),
+&"defeat": ExtResource("sfx_defeat")
+})
+music = Dictionary[StringName, AudioStream]({
+&"battle": ExtResource("music_battle"),
+&"hub": ExtResource("music_hub"),
+&"boss": ExtResource("music_boss")
+})
+sfx_gain_db = Dictionary[StringName, float]({
+&"ui_click": -6.0,
+&"hit": -4.0,
+&"heal": -6.0,
+&"step": -18.0,
+&"defeat": -4.0
+})
+sfx_pitch_variation = Dictionary[StringName, float]({
+&"step": 0.08,
+&"hit": 0.05
+})
+sfx_cooldown = Dictionary[StringName, float]({
+&"step": 0.12,
+&"hit": 0.05
+})

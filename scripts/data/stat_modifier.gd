@@ -22,18 +22,18 @@ enum Stat {
 
 ## e.g. "+2 MP", "-1 AP", "+25% damage taken", "+10 Power", "+15% Fire resistance".
 func describe() -> String:
-	var sign_text := "+" if amount > 0 else ""
+	var signed := ("+" if amount > 0 else "") + str(amount)
 	match stat:
-		Stat.AP: return "%s%d AP" % [sign_text, amount]
-		Stat.MP: return "%s%d MP" % [sign_text, amount]
-		Stat.DAMAGE_TAKEN_PERCENT: return "%s%d%% damage taken" % [sign_text, amount]
-		Stat.POWER: return "%s%d Power" % [sign_text, amount]
+		Stat.AP: return tr("%s AP") % signed
+		Stat.MP: return tr("%s MP") % signed
+		Stat.DAMAGE_TAKEN_PERCENT: return tr("%s%% damage taken") % signed
+		Stat.POWER: return tr("%s Power") % signed
 		Stat.RESISTANCE_PERCENT:
-			var type_name := damage_type.display_name if damage_type != null else "?"
-			return "%s%d%% %s resistance" % [sign_text, amount, type_name]
-		Stat.MAX_HP: return "%s%d HP" % [sign_text, amount]
-		Stat.INITIATIVE: return "%s%d initiative" % [sign_text, amount]
-	return "%s%d %s" % [sign_text, amount, Stat.keys()[stat].to_lower()]  # A stat added later.
+			var type_name := tr(damage_type.display_name) if damage_type != null else "?"
+			return tr("%s%% %s resistance") % [signed, type_name]
+		Stat.MAX_HP: return tr("%s HP") % signed
+		Stat.INITIATIVE: return tr("%s initiative") % signed
+	return "%s %s" % [signed, Stat.keys()[stat].to_lower()]  # A stat added later: no text to translate yet.
 
 
 ## Stats that exist per damage type (they need a damage_type; the others must not have one).

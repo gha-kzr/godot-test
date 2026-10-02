@@ -23,3 +23,4 @@ icon = ExtResource("5_330tk")
 needs_line_of_sight = false
 area = SubResource("Resource_madm1")
 effects = Array[ExtResource("2_vdsym")]([SubResource("Resource_cdp04")])
+impact_delay = 0.3

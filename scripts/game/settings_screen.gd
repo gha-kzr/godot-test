@@ -1,21 +1,28 @@
 class_name SettingsScreen
 extends Screen
-## Display (window mode, UI scale), controls (rebinding), game (reset save, show hints
-## again) and credits. Edits the Settings it was given in place and says so with `changed`;
+## Display (language, window mode, UI scale), audio (volumes, mute), controls (rebinding), game (reset save, show hints
+## again) and a button to the credits screen. Edits the Settings it was given in place and says so with `changed`;
 ## the Game root applies and saves them. Esc goes back, except while a key is being
 ## captured, where it cancels the capture.
 
 signal changed
+## An audio slider moved (mid-drag too): apply it live; `changed` follows once it is released.
+signal audio_live
+signal credits_pressed
 signal reset_save_confirmed
-
-const CREDITS_PATH := "res://CREDITS.md"
-const CREDITS_FALLBACK := "Credits are listed in CREDITS.md."
 
 var _settings: Settings
 ## The action waiting for its new key, or &"".
 var _capturing: StringName = &""
+## An audio slider's knob is being dragged.
+var _dragging := false
 var _key_buttons: Dictionary[StringName, Button] = {}
 
+@onready var _language: OptionButton = %Language
+@onready var _master: HSlider = %MasterVolume
+@onready var _music: HSlider = %MusicVolume
+@onready var _effects: HSlider = %EffectsVolume
+@onready var _muted: CheckButton = %Muted
 @onready var _window_row: HBoxContainer = %WindowRow
 @onready var _window_mode: OptionButton = %WindowMode
 @onready var _ui_scale: OptionButton = %UiScale
@@ -27,17 +34,32 @@ var _key_buttons: Dictionary[StringName, Button] = {}
 @onready var _confirm_yes: Button = %ConfirmYesButton
 @onready var _confirm_no: Button = %ConfirmNoButton
 @onready var _show_hints: Button = %ShowHintsButton
-@onready var _credits: Label = %Credits
+@onready var _credits_button: Button = %CreditsButton
 @onready var _back: Button = %BackButton
 
 
 func _ready() -> void:
 	_back.pressed.connect(back_pressed.emit)
+	_language.add_item("Automatic")  # Index 0; the others are the languages, named in themselves.
+	for code in Localization.LANGUAGES:
+		_language.add_item(Localization.LANGUAGES[code])
+		_language.set_item_metadata(_language.item_count - 1, code)
+		_language.set_item_auto_translate_mode(_language.item_count - 1, Node.AUTO_TRANSLATE_MODE_DISABLED)
+	_language.item_selected.connect(_on_language_selected)
 	_window_mode.add_item("Windowed", Settings.WindowMode.WINDOWED)
 	_window_mode.add_item("Fullscreen", Settings.WindowMode.FULLSCREEN)
 	for scale_value in Settings.UI_SCALES:
 		_ui_scale.add_item("%d%%" % roundi(scale_value * 100.0))
 	_window_row.visible = SettingsApplier.supports_window_mode()
+	for pair: Array in [[_master, "master_volume"], [_music, "music_volume"], [_effects, "effects_volume"]]:
+		var slider := pair[0] as HSlider
+		var field: String = pair[1]
+		slider.value_changed.connect(func(value: float) -> void: _on_volume_changed(field, value, slider))
+		slider.drag_started.connect(func() -> void: _dragging = true)
+		slider.drag_ended.connect(func(_moved: bool) -> void:
+			_dragging = false
+			changed.emit())  # Saved once, when the knob is let go.
+	_muted.toggled.connect(_on_muted_toggled)
 	_window_mode.item_selected.connect(_on_window_mode_selected)
 	_ui_scale.item_selected.connect(_on_ui_scale_selected)
 	_reset_keys.pressed.connect(_on_reset_keys)
@@ -45,19 +67,42 @@ func _ready() -> void:
 	_confirm_yes.pressed.connect(_on_reset_save_confirmed)
 	_confirm_no.pressed.connect(_hide_confirm)
 	_show_hints.pressed.connect(_on_show_hints)
-	_credits.text = credits_text()
+	_credits_button.pressed.connect(credits_pressed.emit)
 	_confirm_row.hide()
 	_message.text = ""
+
+
+## The key rows' names are built in code, so a language change rebuilds them.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and _settings != null and is_node_ready():
+		_build_bindings()
+		_link_focus()
 
 
 ## Shows `settings` (edited in place from now on).
 func show_settings(settings: Settings) -> void:
 	_settings = settings
+	_language.select(0)
+	for index in range(1, _language.item_count):
+		if _language.get_item_metadata(index) == settings.language:
+			_language.select(index)
+	_master.set_value_no_signal(settings.master_volume)
+	_music.set_value_no_signal(settings.music_volume)
+	_effects.set_value_no_signal(settings.effects_volume)
+	_muted.set_pressed_no_signal(settings.muted)
 	_window_mode.select(_window_mode.get_item_index(settings.window_mode))
 	_ui_scale.select(Settings.UI_SCALES.find(settings.ui_scale))
 	_build_bindings()
 	_hide_confirm()
 	_link_focus()
+
+
+## Shows the audio settings again (the mute button in the corner changed one).
+func sync_audio(settings: Settings) -> void:
+	_master.set_value_no_signal(settings.master_volume)
+	_music.set_value_no_signal(settings.music_volume)
+	_effects.set_value_no_signal(settings.effects_volume)
+	_muted.set_pressed_no_signal(settings.muted)
 
 
 ## A line under the controls for errors and confirmations ("" clears it).
@@ -72,7 +117,7 @@ func is_capturing() -> bool:
 ## Starts waiting for the key of `action` (what clicking its button does).
 func begin_capture(action: StringName) -> void:
 	_capturing = action
-	_message.text = "Press a key for %s (Esc to cancel)." % Settings.action_label(action)
+	_message.text = tr("Press a key for %s (Esc to cancel).") % Settings.action_label(action)
 	_refresh_bindings()
 
 
@@ -101,13 +146,14 @@ func _input(event: InputEvent) -> void:
 ## Links the controls top to bottom (arrows and Tab): the page scrolls, and Godot's
 ## geometric focus search doesn't reach controls scrolled out of view.
 func _link_focus() -> void:
-	var chain: Array[Control] = [_back]
+	var chain: Array[Control] = [_back, _language]
 	if _window_row.visible:
 		chain.append(_window_mode)
 	chain.append(_ui_scale)
+	chain.append_array([_master, _music, _effects, _muted])
 	for action in Settings.REBINDABLE:
 		chain.append(_key_buttons[action])
-	chain.append_array([_reset_keys, _show_hints, _reset_save])
+	chain.append_array([_reset_keys, _show_hints, _reset_save, _credits_button])
 	for i in chain.size():
 		var control := chain[i]
 		var above := chain[maxi(i - 1, 0)]
@@ -144,6 +190,24 @@ func _build_bindings() -> void:
 func _refresh_bindings() -> void:
 	for action in _key_buttons:
 		_key_buttons[action].text = "Press a key..." if action == _capturing else SettingsApplier.key_text(action)
+
+
+func _on_language_selected(index: int) -> void:
+	_settings.language = "" if index == 0 else str(_language.get_item_metadata(index))
+	changed.emit()
+
+
+func _on_volume_changed(field: String, value: float, _slider: HSlider) -> void:
+	_settings.set(field, value)
+	if _dragging:
+		audio_live.emit()  # Heard at once; saved when released.
+	else:
+		changed.emit()  # A key press or a programmatic change: no drag to wait for.
+
+
+func _on_muted_toggled(pressed: bool) -> void:
+	_settings.muted = pressed
+	changed.emit()
 
 
 func _on_window_mode_selected(index: int) -> void:
@@ -188,35 +252,3 @@ func _on_show_hints() -> void:
 	_settings.dismissed_hints.clear()
 	_message.text = "Hints will show again."
 	changed.emit()
-
-
-## The credits as plain lines, from CREDITS.md: its tables, bullet lists and headings (other prose is
-## instructions for contributors, not for players). A five-column asset row (Asset, Files, Source,
-## Author, License) reads "Asset — Source — Author — License": the link text names the source.
-## Markdown links and backticks are cleaned. Limits: no "|" inside a cell, no nested brackets.
-static func credits_text(path := CREDITS_PATH) -> String:
-	if not FileAccess.file_exists(path):
-		return CREDITS_FALLBACK
-	var link := RegEx.create_from_string("\\[([^\\]]*)\\]\\([^)]*\\)")
-	var lines: Array[String] = []
-	for raw in FileAccess.get_file_as_string(path).split("\n"):
-		var line := raw.strip_edges()
-		if line.begins_with("|"):
-			var cells: Array[String] = []
-			for cell in line.trim_prefix("|").trim_suffix("|").split("|"):
-				cells.append(link.sub(cell.strip_edges(), "$1", true).replace("`", ""))
-			if cells.all(func(c: String) -> bool: return c.replace("-", "").replace(":", "").is_empty()):
-				continue  # The |---|---| separator.
-			if cells.size() == 5:
-				cells = [cells[0], cells[2], cells[3], cells[4]]
-			line = " — ".join(cells)
-		elif line.begins_with("- ") or line.begins_with("* "):
-			line = link.sub(line.substr(2), "$1", true).replace("`", "")
-		elif line.begins_with("#"):
-			line = line.lstrip("# ")
-			if not lines.is_empty():
-				lines.append("")
-		else:
-			continue  # Prose: for contributors.
-		lines.append(line)
-	return "\n".join(lines)

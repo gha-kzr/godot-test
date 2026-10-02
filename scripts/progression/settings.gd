@@ -1,7 +1,7 @@
 @tool
 class_name Settings
 extends RefCounted
-## Player preferences: window mode, UI scale, rebound keys and the hints already seen.
+## Player preferences: language, volumes, window mode, UI scale, rebound keys and the hints already seen.
 ## Plain data; SettingsStore saves it (user://settings.cfg, apart from the profile so
 ## resetting the save keeps it) and SettingsApplier puts it into effect.
 
@@ -24,6 +24,13 @@ const MODIFIER_KEYS: Array[Key] = [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]
 ## Fixed actions on keys that a rebindable action must not share (spells past the fifth).
 const FIXED_KEYED_ACTIONS: Array[StringName] = [&"spell_6", &"spell_7", &"spell_8", &"spell_9"]
 
+## A key of Localization.LANGUAGES, or "" to follow the system's language.
+var language := ""
+## Loudness sliders, 0 to 1: everything, the music, the effects; and a mute for all.
+var master_volume := 0.8
+var music_volume := 0.5
+var effects_volume := 0.8
+var muted := false
 var window_mode := WindowMode.WINDOWED
 var ui_scale := 1.0
 ## Action → physical keycode, only for actions the player changed.
@@ -46,7 +53,8 @@ static func nearest_scale(value: float) -> float:
 	return best
 
 
+## The action's name in the current language (static: no `tr()`, so TranslationServer.translate).
 static func action_label(action: StringName) -> String:
 	if action in FIXED_KEYED_ACTIONS:
-		return "Spell %s" % str(action).trim_prefix("spell_")
-	return ACTION_LABELS.get(action, str(action))
+		return TranslationServer.translate("Spell %s") % str(action).trim_prefix("spell_")
+	return TranslationServer.translate(ACTION_LABELS.get(action, str(action)))

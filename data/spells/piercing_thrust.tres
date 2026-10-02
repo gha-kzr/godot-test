@@ -26,3 +26,4 @@ ap_cost = 4
 needs_line_of_sight = false
 area = SubResource("Resource_fb6bh")
 effects = Array[ExtResource("2_hw5ua")]([SubResource("Resource_2qpxk")])
+impact_delay = 0.3
