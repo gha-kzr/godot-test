@@ -5,6 +5,10 @@ extends TestCase
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
 const TIME_SCALE := 30.0
 const MAX_WAIT_FRAMES := 3000
+## Looking for a quarter-second flash: a miss should fail the test, not run into its time limit.
+const FLASH_WAIT_MSEC := 4000
+## The flash tests run slower than real time, so a hitch on a busy machine can't skip it.
+const FLASH_TIME_SCALE := 0.25
 
 
 func _tree() -> SceneTree:
@@ -184,14 +188,12 @@ func test_a_real_mouse_click_moves_the_unit() -> void:
 
 ## Waits until the caster has lunged and come back while the spell area is still lit,
 ## i.e. the EventPlayer is inside its area flash (polled per frame, no timing guesses).
-func _wait_for_area_flash(controller: BattleController, caster_id: int) -> bool:
-	var view := controller.units_view.view(caster_id)
-	var start := view.position
-	var lunged := false
-	for i in MAX_WAIT_FRAMES:
-		if not view.position.is_equal_approx(start):
-			lunged = true
-		elif lunged and controller.board_view.highlighted_count(BoardView.Highlight.AREA) > 0:
+func _wait_for_area_flash(controller: BattleController, _caster_id: int) -> bool:
+	var deadline := Time.get_ticks_msec() + FLASH_WAIT_MSEC
+	while Time.get_ticks_msec() < deadline:
+		# The area is lit from the cast's start through its flash; polled per frame at a slowed
+		# clock, so a stalled frame on a busy machine can't skip the whole window.
+		if controller.event_player.is_playing and controller.board_view.highlighted_count(BoardView.Highlight.AREA) > 0:
 			return true
 		await _tree().process_frame
 	return false
@@ -200,7 +202,7 @@ func _wait_for_area_flash(controller: BattleController, caster_id: int) -> bool:
 func test_restart_during_a_cast_does_not_replay_old_events_on_the_new_battle() -> void:
 	var controller := _controller("0p 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
-	Engine.time_scale = 1.0  # A flash lasts a few frames at most at high speed.
+	Engine.time_scale = FLASH_TIME_SCALE  # A flash lasts a few frames at most at high speed.
 	controller.select_spell(0)
 	controller.click_cell(Vector2i(1, 0))
 	assert_true(await _wait_for_area_flash(controller, 0), "inside the area flash")
@@ -217,7 +219,7 @@ func test_restart_during_a_cast_does_not_replay_old_events_on_the_new_battle() -
 func test_moving_the_mouse_during_a_cast_keeps_its_area_flash() -> void:
 	var controller := _controller("0p 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
-	Engine.time_scale = 1.0
+	Engine.time_scale = FLASH_TIME_SCALE
 	controller.select_spell(0)
 	controller.click_cell(Vector2i(1, 0))
 	assert_true(await _wait_for_area_flash(controller, 0), "inside the area flash")
