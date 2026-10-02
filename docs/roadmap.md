@@ -24,6 +24,7 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 5d | Playtest polish | Camera pan, recenter and follow, focus a unit from the turn order, XP gain display, drop a rune | [decisions](decisions/2026-09-30-playtest-polish.md) · [plan](plans/2026-09-30-playtest-polish.md) |
 | 6a | Art pass | Quaternius character models with a shared animation set, toon board with rock obstacles, particle effects, elite and boss scale | [decisions](decisions/2026-10-01-art.md) · [plan](plans/2026-10-01-art.md) |
 | 6b | Feel and language | French translation (gettext, extraction tool, tests), audio (sound effects, hub / battle / boss music, volume settings), camera follows walking units, screen shake and status auras, per-spell projectiles, timing and effects, the spell stage | [decisions](decisions/2026-10-02-feel-and-language.md) · [plan](plans/2026-10-02-feel-and-language.md) |
+| 6c | Progression and balance | Level cap 100 with a generated XP curve and growth rule, enemy levels that follow the party's pace, a sturdier Knight, area spells worth casting, stages between the floors around them, pin-on-attack fix, cast / death / victory sounds | [decisions](decisions/2026-10-02-progression-and-balance.md) · [plan](plans/2026-10-02-progression-and-balance.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)

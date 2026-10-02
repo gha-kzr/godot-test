@@ -50,7 +50,7 @@ heroes will know more spells than they can bring: the player picks up to **5 act
 
 heroes cap at level 10 (the XP table has 10 thresholds and the first tower reaches floor 10 at first, then 20, 30…). Raise it (20? 30?) with the XP curve, per-level rewards (stats, spells, the 4th spell at level 3 and +1 MP at level 6 today), enemy scaling per floor and the hub / run-screen displays; needs a balance pass and more `LevelReward` content per hero (so it pairs with the active-spell loadout item, which is how new spells would be handled).
 
-**Owner's note (playtest, floor 20):** this one is wanted soon, not only at milestone 8: the cap is reached quickly and the fun stops, so raising it and re-tuning enemy levels per floor should come early (see the balance observations below).
+**Done in milestone 6c** (cap 100, generated XP curve, growth rule for stats; new spells still wait for the loadout). Original note: this one was wanted soon, not only at milestone 8: the cap is reached quickly and the fun stops, so raising it and re-tuning enemy levels per floor should come early (see the balance observations below).
 
 ## Movement spells: teleport, jump and more
 
