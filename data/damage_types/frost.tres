@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DamageType" format=3 uid="uid://cgq03gsraslcu"]
+
+[ext_resource type="PackedScene" uid="uid://dcu8b5djg2xen" path="res://scenes/fx/impact_frost.tscn" id="1_08ls7"]
+[ext_resource type="Script" uid="uid://iege8qur066y" path="res://scripts/data/damage_type.gd" id="2_utebh"]
+
+[resource]
+script = ExtResource("2_utebh")
+display_name = "Frost"
+color = Color(0.55, 0.82, 1, 1)
+impact_effect = ExtResource("1_08ls7")
+sort_order = 4

@@ -448,3 +448,14 @@ func test_the_event_player_plays_a_displacement() -> void:
 	await stage.player.play([displaced] as Array[BattleEvents.Event])
 	_assert_in_sync(stage)
 	_done(stage)
+
+
+func test_a_charge_dashes_then_swings_and_ends_in_sync() -> void:
+	var stage := _stage("0p 0 0 0e")
+	var charge := load("res://data/spells/charge.tres") as SpellData
+	stage.battle.state.units[0].data.spells = [charge] as Array[SpellData]
+	var result := stage.battle.perform(BattleActions.CastSpell.new(0, 0, Vector2i(3, 0)))
+	assert_true(result.ok(), result.error)
+	await stage.player.play(result.events)
+	_assert_in_sync(stage)
+	_done(stage)

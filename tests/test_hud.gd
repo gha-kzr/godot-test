@@ -436,7 +436,7 @@ func test_unit_info_reads_power_and_resistances() -> void:
 			[BattleFixtures.unit("E0")] as Array[UnitData], 1, [[ward, BattleFixtures.modifier(StatModifier.Stat.POWER, 9)] as Array[StatModifier]])
 	var info := UnitInfo.from_unit(state.units[0])
 	assert_eq(info.power, 9)
-	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Ice"], "every game type in order, then the unit's own")
+	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Holy", "Frost", "Ice"], "every game type in order, then the unit's own")
 	assert_eq(info.resistances["Physical"], 0, "zeros included")
 	assert_eq(info.resistances["Ice"], 25)
 

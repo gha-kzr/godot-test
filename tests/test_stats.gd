@@ -183,7 +183,7 @@ func test_innate_modifiers_apply_in_every_battle() -> void:
 
 func test_the_damage_type_catalog_lists_every_type_in_order() -> void:
 	var names := DamageType.all().map(func(t: DamageType) -> String: return t.display_name)
-	assert_eq(names, ["Physical", "Fire", "Poison"])
+	assert_eq(names, ["Physical", "Fire", "Poison", "Holy", "Frost"])
 
 
 func test_power_scaling_per_effect() -> void:

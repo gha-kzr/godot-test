@@ -301,6 +301,10 @@ msgstr ""
 msgid "Back to the title"
 msgstr ""
 
+#: data/spells/backslash.tres
+msgid "Backslash"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Battle"
 msgstr ""
@@ -315,6 +319,10 @@ msgstr ""
 
 #: scripts/game/title_screen.gd
 msgid "Best floor: %d"
+msgstr ""
+
+#: data/spells/blink.tres
+msgid "Blink"
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -341,8 +349,16 @@ msgstr ""
 msgid "Brute"
 msgstr ""
 
+#: data/spells/charge.tres
+msgid "Charge"
+msgstr ""
+
 #: scripts/data/move_effect.gd
 msgid "Charges in a straight line next to the target"
+msgstr ""
+
+#: data/statuses/chilled.tres
+msgid "Chilled"
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -431,6 +447,10 @@ msgstr ""
 
 #: scenes/game/settings_screen.tscn
 msgid "Display"
+msgstr ""
+
+#: data/statuses/dread.tres
+msgid "Dread"
 msgstr ""
 
 #: scripts/game/hub/rune_stash.gd
@@ -557,6 +577,14 @@ msgstr ""
 msgid "From floor %d"
 msgstr ""
 
+#: data/damage_types/frost.tres
+msgid "Frost"
+msgstr ""
+
+#: data/spells/frost_lance.tres
+msgid "Frost Lance"
+msgstr ""
+
 #: scripts/game/run_screen.gd
 msgid "Full heal — every hero back to full HP"
 msgstr ""
@@ -575,6 +603,10 @@ msgstr ""
 
 #: scenes/game/hint_card.tscn
 msgid "Got it"
+msgstr ""
+
+#: data/spells/grapple_shot.tres
+msgid "Grapple Shot"
 msgstr ""
 
 #: data/spells/ground_slam.tres
@@ -609,6 +641,10 @@ msgstr ""
 msgid "Hints will show again."
 msgstr ""
 
+#: data/damage_types/holy.tres
+msgid "Holy"
+msgstr ""
+
 #: scripts/game/hub/hero_panel.gd
 msgid "HP %d   AP %d   MP %d   Initiative %d"
 msgstr ""
@@ -619,6 +655,10 @@ msgstr ""
 
 #: scripts/data/glossary.gd
 msgid "HP: health. At 0 the unit falls."
+msgstr ""
+
+#: data/spells/hunters_mark.tres
+msgid "Hunter's Mark"
 msgstr ""
 
 #: scripts/data/glossary.gd
@@ -701,6 +741,10 @@ msgstr ""
 
 #: data/units/mage.tres
 msgid "Mage"
+msgstr ""
+
+#: data/statuses/marked.tres
+msgid "Marked"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -943,6 +987,10 @@ msgstr ""
 msgid "Regeneration"
 msgstr ""
 
+#: data/spells/repulse.tres
+msgid "Repulse"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Reset keys"
 msgstr ""
@@ -1027,6 +1075,10 @@ msgstr ""
 msgid "Settings couldn't be saved."
 msgstr ""
 
+#: data/spells/shield_bash.tres
+msgid "Shield Bash"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Show hints again"
 msgstr ""
@@ -1053,6 +1105,10 @@ msgstr ""
 
 #: data/spells/smash.tres
 msgid "Smash"
+msgstr ""
+
+#: data/spells/smite.tres
+msgid "Smite"
 msgstr ""
 
 #: scripts/view/hud.gd scenes/battle/hud.tscn

@@ -233,6 +233,9 @@ msgstr "Retour à l'équipe"
 msgid "Back to the title"
 msgstr "Retour au titre"
 
+msgid "Backslash"
+msgstr "Taillade arrière"
+
 msgid "Battle"
 msgstr "Combat"
 
@@ -244,6 +247,9 @@ msgstr "Vitesse des combats"
 
 msgid "Best floor: %d"
 msgstr "Meilleur étage : %d"
+
+msgid "Blink"
+msgstr "Clignement"
 
 msgid "Boons: %s"
 msgstr "Bienfaits : %s"
@@ -263,8 +269,14 @@ msgstr "Amenez un héros au niveau 30."
 msgid "Brute"
 msgstr "Brute"
 
+msgid "Charge"
+msgstr "Charge"
+
 msgid "Charges in a straight line next to the target"
 msgstr "Charge en ligne droite jusqu'à la cible"
+
+msgid "Chilled"
+msgstr "Gelé"
 
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr "Choisissez une cible pour %s (cases orange). Échap pour annuler"
@@ -331,6 +343,9 @@ msgstr "Défaite. L'ascension s'arrête ; les héros gardent leurs niveaux et le
 
 msgid "Display"
 msgstr "Affichage"
+
+msgid "Dread"
+msgstr "Effroi"
 
 msgid "Drop"
 msgstr "Jeter"
@@ -425,6 +440,12 @@ msgstr "Trouvé : %s."
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
 
+msgid "Frost"
+msgstr "Givre"
+
+msgid "Frost Lance"
+msgstr "Lance de givre"
+
 msgid "Full heal — every hero back to full HP"
 msgstr "Soin complet — chaque héros retrouve tous ses PV"
 
@@ -439,6 +460,9 @@ msgstr "Jeu"
 
 msgid "Got it"
 msgstr "Compris"
+
+msgid "Grapple Shot"
+msgstr "Tir grappin"
 
 msgid "Ground Slam"
 msgstr "Fracas du sol"
@@ -464,6 +488,9 @@ msgstr "Héros"
 msgid "Hints will show again."
 msgstr "Les astuces s'afficheront à nouveau."
 
+msgid "Holy"
+msgstr "Sacré"
+
 msgid "HP %d   AP %d   MP %d   Initiative %d"
 msgstr "PV %d   PA %d   PM %d   Initiative %d"
 
@@ -472,6 +499,9 @@ msgstr "PV %d / %d"
 
 msgid "HP: health. At 0 the unit falls."
 msgstr "PV : points de vie. À 0, l'unité tombe."
+
+msgid "Hunter's Mark"
+msgstr "Marque du chasseur"
 
 msgid "Initiative: the higher it is, the earlier the unit plays."
 msgstr "Initiative : plus elle est haute, plus l'unité joue tôt."
@@ -534,6 +564,9 @@ msgstr "Ligne"
 
 msgid "Mage"
 msgstr "Mage"
+
+msgid "Marked"
+msgstr "Marqué"
 
 msgid "Master volume"
 msgstr "Volume général"
@@ -716,6 +749,9 @@ msgstr "Recentrer la caméra"
 msgid "Regeneration"
 msgstr "Régénération"
 
+msgid "Repulse"
+msgstr "Répulsion"
+
 msgid "Reset keys"
 msgstr "Réinitialiser les touches"
 
@@ -779,6 +815,9 @@ msgstr "Paramètres"
 msgid "Settings couldn't be saved."
 msgstr "Les paramètres n'ont pas pu être sauvegardés."
 
+msgid "Shield Bash"
+msgstr "Coup de bouclier"
+
 msgid "Show hints again"
 msgstr "Réafficher les astuces"
 
@@ -799,6 +838,9 @@ msgstr "Entaille"
 
 msgid "Smash"
 msgstr "Écrasement"
+
+msgid "Smite"
+msgstr "Châtiment"
 
 msgid "Speed x1"
 msgstr "Vitesse x1"

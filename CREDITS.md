@@ -14,10 +14,10 @@ whenever an external file is added (downloaded, bought or copied), in the same c
 
 | Author | Icons (game-icons.net name → file) |
 |---|---|
-| Lorc | arrow-flights → `arrow`, broken-bone → `crippling_blow`, fireball → `fireball`, earth-crack → `ground_slam`, foot-trip → `hamstring`, spear-hook → `piercing_thrust`, poison-bottle → `poison_arrow`, sword-slice → `slash`, hammer-drop → `smash`, arrow-cluster → `volley`, sword-spin → `whirlwind`, bleeding-wound → `status_crippled`, shield-reflect → `status_guarded`, skull-crossed-bones → `skull`, crossed-swords → `spell_default`, lightning-tear → `status_default` |
+| Lorc | arrow-flights → `arrow`, broken-bone → `crippling_blow`, fireball → `fireball`, earth-crack → `ground_slam`, foot-trip → `hamstring`, spear-hook → `piercing_thrust`, poison-bottle → `poison_arrow`, sword-slice → `slash`, hammer-drop → `smash`, arrow-cluster → `volley`, sword-spin → `whirlwind`, bleeding-wound → `status_crippled`, shield-reflect → `status_guarded`, skull-crossed-bones → `skull`, crossed-swords → `spell_default`, lightning-tear → `status_default`, sunbeams → `smite`, teleport → `blink`, sonic-boom → `repulse`, ice-spear → `frost_lance`, backstab → `backslash`, grapple → `grapple_shot`, on-target → `hunters_mark`, snowflake-2 → `status_chilled`, terror → `status_dread`, heavy-arrow → `bone_arrow`, arrowed → `pinning_shot`, crossed-bones → `bone_rain`, claw-slashes → `rend`, gluttonous-smile → `devour`, frozen-orb → `chill_touch`, screaming → `wail` |
 | Carl Olsen | flame → `firebolt` |
-| Delapouite | healing → `mend` |
-| Sbed | shield → `guard`, regeneration → `regeneration`, poison-cloud → `status_poison` |
+| Delapouite | healing → `mend`, charging-bull → `charge`, shield-bash → `shield_bash` |
+| Sbed | shield → `guard`, regeneration → `regeneration`, poison-cloud → `status_poison`, targeted → `status_marked` |
 | Zeromancer | heart-plus → `status_regeneration` |
 | Sound effects: click, hit, footstep, defeat jingle | `assets/audio/sfx/*.ogg` | [Interface Sounds](https://kenney.nl/assets/interface-sounds), [Impact Sounds](https://kenney.nl/assets/impact-sounds), [Music Jingles](https://kenney.nl/assets/music-jingles) (source notes and file hashes: `assets/audio/SOURCE.md`) | Kenney (kenney.nl) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Music: hub track | `assets/audio/music/hub.mp3` | [The Field Of Dreams](https://opengameart.org/content/the-field-of-dreams) | pauliuw | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |

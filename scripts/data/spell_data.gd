@@ -109,6 +109,11 @@ func cast_sound_event() -> StringName:
 	return &"cast"
 
 
+## Whether the spell first moves its caster (a charge): the view plays the cast on arrival.
+func moves_caster_first() -> bool:
+	return not effects.is_empty() and effects[0] is MoveEffect and (effects[0] as MoveEffect).moves_caster()
+
+
 ## The icon to show: its own, else the default spell icon.
 func display_icon() -> Texture2D:
 	return icon if icon != null else load("res://ui/icons/spell_default.svg") as Texture2D

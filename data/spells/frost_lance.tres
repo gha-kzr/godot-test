@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bbqgpirah7caa"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_ecbc5"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_v71gh"]
+[ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="3_l8w6d"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_h8tei"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="5_ch6hf"]
+[ext_resource type="Resource" uid="uid://bioj3ikg8t65q" path="res://data/statuses/chilled.tres" id="6_hspdl"]
+[ext_resource type="Texture2D" uid="uid://dr55yafiisyi7" path="res://ui/icons/frost_lance.svg" id="7_yc3nu"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_5w3ca"]
+
+[sub_resource type="Resource" id="Resource_qmj53"]
+script = ExtResource("1_ecbc5")
+kind = 3
+size = 3
+
+[sub_resource type="Resource" id="Resource_1750c"]
+script = ExtResource("4_h8tei")
+min_amount = 4
+max_amount = 5
+damage_type = ExtResource("3_l8w6d")
+
+[sub_resource type="Resource" id="Resource_w1xy0"]
+script = ExtResource("5_ch6hf")
+status = ExtResource("6_hspdl")
+
+[resource]
+script = ExtResource("8_5w3ca")
+display_name = "Frost Lance"
+icon = ExtResource("7_yc3nu")
+cooldown = 1
+min_range = 2
+max_range = 5
+area = SubResource("Resource_qmj53")
+effects = Array[ExtResource("2_v71gh")]([SubResource("Resource_1750c"), SubResource("Resource_w1xy0")])

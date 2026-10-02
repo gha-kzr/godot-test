@@ -6,6 +6,9 @@
 [ext_resource type="Resource" uid="uid://cj5peyqoj2mrh" path="res://data/spells/whirlwind.tres" id="4_huhsi"]
 [ext_resource type="Script" uid="uid://k0qhv5lhw2yq" path="res://scripts/data/hero_data.gd" id="5_1xxd6"]
 [ext_resource type="Resource" uid="uid://mkham6vekv07" path="res://data/units/knight.tres" id="6_avtmt"]
+[ext_resource type="Resource" uid="uid://c8y0cq2no5pt6" path="res://data/spells/smite.tres" id="m8_smite"]
+[ext_resource type="Resource" uid="uid://b58teaxapjhbm" path="res://data/spells/charge.tres" id="m8_charge"]
+[ext_resource type="Resource" uid="uid://dlpkk1xkw656f" path="res://data/spells/shield_bash.tres" id="m8_shield_bash"]
 
 [sub_resource type="Resource" id="Resource_a5eu4"]
 script = ExtResource("2_5ejea")
@@ -77,6 +80,7 @@ amount = 2
 [sub_resource type="Resource" id="Resource_ww6jl"]
 script = ExtResource("1_a5eu4")
 modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_4q245"), SubResource("Resource_x4l48")])
+spells = Array[ExtResource("3_8jq1i")]([ExtResource("m8_smite")])
 
 [sub_resource type="Resource" id="Resource_2v6ik"]
 script = ExtResource("2_5ejea")
@@ -137,6 +141,7 @@ amount = 2
 [sub_resource type="Resource" id="Resource_rh1t3"]
 script = ExtResource("1_a5eu4")
 modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_tqh27"), SubResource("Resource_jkiqr")])
+spells = Array[ExtResource("3_8jq1i")]([ExtResource("m8_charge")])
 
 [sub_resource type="Resource" id="Resource_7j7xb"]
 script = ExtResource("2_5ejea")
@@ -169,12 +174,17 @@ amount = 1
 script = ExtResource("1_a5eu4")
 modifiers = Array[ExtResource("2_5ejea")]([SubResource("Resource_avtmt")])
 
+[sub_resource type="Resource" id="Resource_m8_14"]
+script = ExtResource("1_a5eu4")
+spells = Array[ExtResource("3_8jq1i")]([ExtResource("m8_shield_bash")])
+
 [resource]
 script = ExtResource("5_1xxd6")
 unit = ExtResource("6_avtmt")
 level_rewards = Array[ExtResource("1_a5eu4")]([SubResource("Resource_pb4jf"), SubResource("Resource_atr1p"), SubResource("Resource_evlkk"), SubResource("Resource_ww6jl"), SubResource("Resource_n3nf4"), SubResource("Resource_w0u82"), SubResource("Resource_roctw"), SubResource("Resource_rh1t3"), SubResource("Resource_wtv1j")])
 growth_reward = SubResource("Resource_8jq1i")
 milestone_rewards = Dictionary[int, ExtResource("1_a5eu4")]({
+14: SubResource("Resource_m8_14"),
 15: SubResource("Resource_1xxd6"),
 20: SubResource("Resource_e2xk8")
 })

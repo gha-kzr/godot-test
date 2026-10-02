@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://cxm3c06podrj4"]
+
+[ext_resource type="PackedScene" uid="uid://bw7w3vcte8hhb" path="res://scenes/fx/aura_marked.tscn" id="1_jcb1s"]
+[ext_resource type="Texture2D" uid="uid://dtay4o818nmu2" path="res://ui/icons/status_marked.svg" id="2_rpnnk"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="3_qcpid"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="4_oy4h8"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="5_p6p4l"]
+
+[sub_resource type="Resource" id="Resource_3m3ik"]
+script = ExtResource("3_qcpid")
+stat = 2
+amount = 20
+
+[resource]
+script = ExtResource("4_oy4h8")
+display_name = "Marked"
+icon = ExtResource("2_rpnnk")
+short_label = "M"
+aura_effect = ExtResource("1_jcb1s")
+color = Color(1, 0.35, 0.3, 1)
+modifiers = Array[ExtResource("3_qcpid")]([SubResource("Resource_3m3ik")])
