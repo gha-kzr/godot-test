@@ -350,6 +350,9 @@ msgstr "Termine votre tour tout seul quand un héros ne peut ni se déplacer ni 
 msgid "Epic"
 msgstr "Épique"
 
+msgid "Every %d turns"
+msgstr "Tous les %d tours"
+
 msgid "Fast (x2)"
 msgstr "Rapide (x2)"
 
@@ -574,6 +577,9 @@ msgstr "Rien de ce combat n'est conservé : il recommencera depuis le début qua
 
 msgid "Nothing left to do: end your turn (%s)"
 msgstr "Plus rien à faire : terminez votre tour (%s)"
+
+msgid "Once per turn"
+msgstr "Une fois par tour"
 
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
 msgstr "Un seul combat. Le réussir permet à la tour de monter jusqu'à l'étage %d et de commencer à l'étage %d."

@@ -457,6 +457,10 @@ msgstr ""
 msgid "Epic"
 msgstr ""
 
+#: scripts/view/hud/spell_bar.gd
+msgid "Every %d turns"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Fast (x2)"
 msgstr ""
@@ -755,6 +759,10 @@ msgstr ""
 
 #: scripts/view/battle_controller.gd
 msgid "Nothing left to do: end your turn (%s)"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Once per turn"
 msgstr ""
 
 #: scripts/game/hub/destination_bar.gd

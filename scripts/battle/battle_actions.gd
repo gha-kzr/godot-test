@@ -70,9 +70,11 @@ class CastSpell extends Action:
 		spell_index = spell_slot
 		target = target_cell
 
-	## Whether the unit has that spell and enough AP for it (range aside). Shared with the UI.
+	## Whether the unit has that spell, enough AP for it and no cooldown on it (range aside).
+	## Shared with the UI.
 	static func can_afford(unit: UnitState, slot: int) -> bool:
-		return slot >= 0 and slot < unit.data.spells.size() and unit.ap >= unit.data.spells[slot].ap_cost
+		return slot >= 0 and slot < unit.data.spells.size() and unit.ap >= unit.data.spells[slot].ap_cost \
+				and unit.cooldown_left(unit.data.spells[slot]) == 0
 
 	func _validate(state: BattleState) -> String:
 		var unit := state.units[actor_id]
@@ -81,6 +83,8 @@ class CastSpell extends Action:
 		var spell := unit.data.spells[spell_index]
 		if unit.ap < spell.ap_cost:
 			return "%s needs %d AP, unit has %d" % [spell.display_name, spell.ap_cost, unit.ap]
+		if unit.cooldown_left(spell) > 0:
+			return "%s is on cooldown for %d turns" % [spell.display_name, unit.cooldown_left(spell)]
 		if not Targeting.can_target(state, actor_id, spell, target):
 			return "%s can't target %s" % [spell.display_name, target]
 		return ""
@@ -89,6 +93,8 @@ class CastSpell extends Action:
 		var caster := state.units[actor_id]
 		var spell := caster.data.spells[spell_index]
 		caster.ap -= spell.ap_cost
+		if spell.cooldown > 0:
+			caster.cooldowns[spell] = spell.cooldown
 		var area := Targeting.area_cells(state.grid, spell.area, caster.cell, target)
 		var events: Array[BattleEvents.Event] = [BattleEvents.SpellCast.new(actor_id, spell, target, area, spell.ap_cost)]
 		# Targets are fixed before any effect lands, in area order.

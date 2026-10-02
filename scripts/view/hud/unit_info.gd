@@ -20,6 +20,8 @@ var base_ap := 0
 var base_mp := 0
 var statuses: Array[StatusInfo] = []
 var spells: Array[SpellData] = []
+## Per spell slot: turns before it can be cast again (0: ready).
+var cooldowns: Array[int] = []
 var power := 0
 ## A hero's XP towards its next level, for menus (xp_max 0: not shown, as in battle).
 var xp_value := 0
@@ -49,6 +51,8 @@ static func from_unit(unit: UnitState, hero_level := 0) -> UnitInfo:
 	for status in unit.statuses:
 		info.statuses.append(StatusInfo.from_data(status.data, status.turns_left, status.counting))
 	info.spells = unit.data.spells
+	for spell in unit.data.spells:
+		info.cooldowns.append(unit.cooldown_left(spell))
 	info.power = unit.power()
 	var types := DamageType.all().duplicate()
 	for type in unit.resistance_types():  # A type outside the catalog still shows.

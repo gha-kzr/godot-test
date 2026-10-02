@@ -33,6 +33,8 @@ var ai_profile: AIProfile
 var moved := false
 var moved_from: Vector2i
 var moved_cost := 0
+## Spells waiting to be cast again: spell → turns left (counted down at turn start).
+var cooldowns: Dictionary[SpellData, int] = {}
 ## Name shown in the HUD, e.g. "Brute Lv 5 · Elite".
 var label := ""
 var visual_scale := 1.0
@@ -58,6 +60,15 @@ func start_turn() -> void:
 	ap = max_ap()
 	mp = max_mp()
 	commit_position()
+	for spell: SpellData in cooldowns.keys():
+		cooldowns[spell] -= 1
+		if cooldowns[spell] <= 0:
+			cooldowns.erase(spell)
+
+
+## Turns before `spell` can be cast again (0: now).
+func cooldown_left(spell: SpellData) -> int:
+	return cooldowns.get(spell, 0)
 
 
 ## Where the current move segment started: the cell the unit's reach floods from.
@@ -172,6 +183,7 @@ func clone() -> UnitState:
 	copy.moved = moved
 	copy.moved_from = moved_from
 	copy.moved_cost = moved_cost
+	copy.cooldowns = cooldowns.duplicate()
 	for status in statuses:
 		copy.statuses.append(status.clone())
 	copy.permanent_modifiers = permanent_modifiers.duplicate()

@@ -839,7 +839,7 @@ func _refresh_hud() -> void:
 	_show_turn()
 	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
 	if active != null:
-		hud.show_spells(active.spells, active.ap)
+		hud.show_spells(active.spells, active.ap, active.cooldowns)
 
 
 ## Shows the model's turn in the HUD: order, active card, AP for the spell bar, inspect
@@ -850,6 +850,7 @@ func _show_turn() -> void:
 	if active != null:
 		hud.show_unit(active)
 		hud.set_spell_ap(active.ap)
+		hud.set_spell_cooldowns(active.cooldowns)
 	_update_inspected()
 
 

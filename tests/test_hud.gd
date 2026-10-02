@@ -625,3 +625,15 @@ func test_the_inspect_card_can_sit_on_either_edge() -> void:
 	assert_eq([card.anchor_left, card.anchor_right, card.offset_left, card.offset_right], [1.0, 1.0, -262.0, -12.0])
 	assert_eq(card.grow_horizontal, Control.GROW_DIRECTION_BEGIN)
 	hud.free()
+
+
+func test_a_spell_waiting_for_its_cooldown_shows_its_turns_and_is_disabled() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10, [2, 0] as Array[int])
+	assert_true(_spell_button(hud, 0).disabled, "waiting")
+	assert_eq(hud.get_node("%SpellBar").cooldown_text(0), "2")
+	assert_false(_spell_button(hud, 1).disabled)
+	assert_eq(hud.get_node("%SpellBar").cooldown_text(1), "")
+	hud.set_spell_cooldowns([0, 0] as Array[int])
+	assert_false(_spell_button(hud, 0).disabled, "ready again")
+	hud.free()

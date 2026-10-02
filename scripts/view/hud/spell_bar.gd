@@ -15,6 +15,7 @@ const SLOT_SIZE := Vector2(64, 64)
 const HEAL_TINT := Color(0.55, 1.0, 0.6)
 
 var _spell_costs: Array[int] = []
+var _cooldowns: Array[int] = []
 var _ap := 0
 var _locked := false
 
@@ -29,8 +30,9 @@ func _ready() -> void:
 	_details.hide()
 
 
-## One slot per spell; spells costing more than `ap` are disabled.
-func show_spells(spells: Array[SpellData], ap: int) -> void:
+## One slot per spell; spells costing more than `ap`, or with turns of cooldown left
+## (`cooldowns`, per slot; empty: none), are disabled.
+func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
 	hide_details()
 	# Removed at once, freed at the end of the frame: a slot may be rebuilt from inside its own `pressed`.
 	for child in _slots.get_children():
@@ -41,7 +43,7 @@ func show_spells(spells: Array[SpellData], ap: int) -> void:
 	for i in spells.size():
 		_spell_costs.append(spells[i].ap_cost)
 		_slots.add_child(_make_slot(spells[i], i))
-	_refresh()
+	set_cooldowns(cooldowns)
 
 
 ## Shows which spell is being aimed (-1 for none). Doesn't emit spell_pressed.
@@ -55,6 +57,18 @@ func set_selected(index: int) -> void:
 func set_ap(ap: int) -> void:
 	_ap = ap
 	_refresh()
+
+
+## Turns of cooldown left per slot (missing slots: ready); shown on the slot.
+func set_cooldowns(cooldowns: Array[int]) -> void:
+	_cooldowns.assign(cooldowns)
+	_cooldowns.resize(_spell_costs.size())  # New entries are 0.
+	_refresh()
+
+
+## The number shown on a slot waiting for its cooldown ("" when ready).
+func cooldown_text(index: int) -> String:
+	return (slot(index).get_node("Cooldown") as Label).text
 
 
 ## Locked: no spell can be picked (not the player's turn, placement, animations).
@@ -102,6 +116,10 @@ static func detail_lines(spell: SpellData) -> Array[String]:
 		range_text = TranslationServer.translate("Range %s")
 	range_text = range_text % range_amount
 	lines.append(range_text)
+	if spell.cooldown == 1:
+		lines.append(TranslationServer.translate("Once per turn"))
+	elif spell.cooldown > 1:
+		lines.append(TranslationServer.translate("Every %d turns") % spell.cooldown)
 	if spell.area != null and spell.area.kind != AreaShape.Kind.SINGLE:
 		lines.append(TranslationServer.translate("%s area %d") % [TranslationServer.translate(AreaShape.Kind.keys()[spell.area.kind].capitalize()), spell.area.size])
 	for effect in spell.effects:
@@ -145,6 +163,14 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	cost.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	button.add_child(cost)
+	var cooldown := Label.new()
+	cooldown.name = "Cooldown"
+	cooldown.theme_type_variation = &"HeaderLabel"
+	cooldown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cooldown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	cooldown.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(cooldown)
 	if index < MAX_KEYED_SLOTS:
 		var action := StringName("spell_%d" % (index + 1))
 		var key := Label.new()
@@ -164,8 +190,10 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 func _refresh() -> void:
 	for i in _slots.get_child_count():
 		var slot_button := _slots.get_child(i) as Button
-		slot_button.disabled = _locked or _spell_costs[i] > _ap
+		var waiting := _cooldowns[i] if i < _cooldowns.size() else 0
+		slot_button.disabled = _locked or _spell_costs[i] > _ap or waiting > 0
 		(slot_button.get_node("Icon") as TextureRect).self_modulate.a = 0.4 if slot_button.disabled else 1.0
+		(slot_button.get_node("Cooldown") as Label).text = str(waiting) if waiting > 0 else ""
 
 
 static func _action_shortcut(action: StringName) -> Shortcut:
