@@ -365,6 +365,10 @@ msgstr ""
 msgid "Clear the previous stage first."
 msgstr ""
 
+#: scripts/game/hub/hero_panel.gd
+msgid "Click a spell below to put it in this slot, or another slot to swap them."
+msgstr ""
+
 #: scripts/view/battle_controller.gd
 msgid "Click a teal cell to place %s (Esc to deselect)"
 msgstr ""
@@ -645,6 +649,10 @@ msgstr ""
 msgid "Knight"
 msgstr ""
 
+#: scenes/game/hub/hero_panel.tscn
+msgid "Known, not in the loadout:"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Language"
 msgstr ""
@@ -801,6 +809,10 @@ msgstr ""
 
 #: scripts/game/game.gd
 msgid "Pick a boon, or heal the party instead."
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Pick a slot first, then this spell to put it there."
 msgstr ""
 
 #: data/spells/piercing_thrust.tres
@@ -1145,6 +1157,10 @@ msgstr ""
 
 #: scripts/progression/profile.gd
 msgid "That rune slot isn't free."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That spell can't go there."
 msgstr ""
 
 #: scripts/game/game.gd

@@ -221,6 +221,7 @@ func show_party(message := "") -> void:
 	party.abandon_pressed.connect(_on_abandon_pressed)
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
+	party.loadout_requested.connect(_on_loadout_requested)
 	party.drop_requested.connect(_on_drop_requested)
 	party.achievements_pressed.connect(show_achievements)
 	party.tutorial = tutorial
@@ -394,6 +395,16 @@ func _on_unequip_requested(hero_index: int, slot: int) -> void:
 		return
 	RunDirector.materialize_hp(profile)
 	_finish_rune_change(profile.unequip(hero_index, slot))
+
+
+## A spell changes slots, on the hub only (also between floors, never during a fight).
+func _on_loadout_requested(hero_index: int, slot: int, spell: SpellData) -> void:
+	if not screen is PartyScreen:
+		return
+	var error := profile.assign_spell(hero_index, slot, spell)
+	if error.is_empty() and not _save():
+		error = tr("Progress couldn't be saved.")
+	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 
 ## A rune is thrown away for good, on the hub only (never during a fight). Maxima don't change

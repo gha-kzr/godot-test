@@ -141,8 +141,8 @@ func test_heroes_grow_with_levels() -> void:
 	profile.heroes[1].level = 3
 	assert_eq(profile.heroes[1].spells().back().display_name, "Regeneration")
 	for record in profile.heroes:
-		record.level = 10
-		assert_true(record.spells().size() <= HeroData.MAX_SPELLS, "%s within the spell cap" % record.hero.display_name())
+		record.level = 100
+		assert_true(record.spells().size() <= HeroRecord.LOADOUT_SLOTS, "%s within the loadout" % record.hero.display_name())
 
 
 func test_enemies_give_xp_and_loot() -> void:

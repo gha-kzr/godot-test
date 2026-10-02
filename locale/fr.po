@@ -281,6 +281,9 @@ msgstr "Terminez toutes les épreuves."
 msgid "Clear the previous stage first."
 msgstr "Terminez d'abord l'épreuve précédente."
 
+msgid "Click a spell below to put it in this slot, or another slot to swap them."
+msgstr "Cliquez sur un sort ci-dessous pour le mettre dans cet emplacement, ou sur un autre emplacement pour les échanger."
+
 msgid "Click a teal cell to place %s (Esc to deselect)"
 msgstr "Cliquez sur une case turquoise pour placer %s (Échap pour désélectionner)"
 
@@ -491,6 +494,9 @@ msgstr "Touches réinitialisées."
 msgid "Knight"
 msgstr "Chevalier"
 
+msgid "Known, not in the loadout:"
+msgstr "Connus, hors de la sélection :"
+
 msgid "Language"
 msgstr "Langue"
 
@@ -609,6 +615,9 @@ msgstr "Physique"
 
 msgid "Pick a boon, or heal the party instead."
 msgstr "Choisissez un bienfait, ou soignez l'équipe à la place."
+
+msgid "Pick a slot first, then this spell to put it there."
+msgstr "Choisissez d'abord un emplacement, puis ce sort pour l'y mettre."
 
 msgid "Piercing Thrust"
 msgstr "Estocade perçante"
@@ -868,6 +877,9 @@ msgstr "Cet emplacement de rune est vide."
 
 msgid "That rune slot isn't free."
 msgstr "Cet emplacement de rune n'est pas libre."
+
+msgid "That spell can't go there."
+msgstr "Ce sort ne peut pas aller là."
 
 msgid "The battle couldn't start (see the log)."
 msgstr "Le combat n'a pas pu démarrer (voir le journal)."
