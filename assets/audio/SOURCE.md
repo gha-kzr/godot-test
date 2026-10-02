@@ -17,6 +17,7 @@ The packs' `License.txt` files are next to the sounds (`sfx/License-Kenney-*.txt
 
 | Sound | Author | Page | File used | Archive SHA-256 |
 |---|---|---|---|---|
+| `sfx/heal.wav` | Someoneman | https://opengameart.org/content/cure-magic | `Cure4.wav` | `5a0d60a13444d719d05bb496aceac3d749a925259297f1828a51563ee2e465d8` |
 | `sfx/cast_fire.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `spell_fire_01.ogg` | `1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd` |
 | `sfx/cast_poison.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `creature_slime_01.ogg` | (same archive) |
 | `sfx/death.ogg` | rubberduck | https://opengameart.org/content/80-cc0-rpg-sfx | `creature_die_01.ogg` | (same archive) |
@@ -36,6 +37,7 @@ The packs' `License.txt` files are next to the sounds (`sfx/License-Kenney-*.txt
 ## File hashes (SHA-256)
 
 ```
+5d322662f6bcd8ae30867b8f88ead17471c47d7622d31d6e87e81f5bcf54dddb  sfx/heal.wav
 02fa3a2c6e79e868e546802f45127c5cdda69aba6d5a24ac997ea66f81a816cb  sfx/cast_fire.ogg
 3992598c814de25c318780e506aeda673a7e410b7b3c4f0793883483ff9766b8  sfx/cast_fireball.wav
 9a15c881345c1ce1c39cc31f52f081c8c4dc81fa41111e0079400f39d3ba0e45  sfx/cast_physical.wav

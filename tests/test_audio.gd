@@ -300,7 +300,7 @@ func test_boss_floors_and_stages_get_the_boss_music_and_other_floors_the_battle_
 
 func test_the_shipped_sounds_are_in_the_set_and_credited() -> void:
 	var set := load("res://data/audio/audio_set.tres") as AudioSet
-	for event: StringName in [&"ui_click", &"hit", &"step", &"defeat", &"cast", &"cast_fire", &"cast_fireball", &"cast_physical", &"cast_poison", &"death", &"victory"]:
+	for event: StringName in [&"ui_click", &"hit", &"heal", &"step", &"defeat", &"cast", &"cast_fire", &"cast_fireball", &"cast_physical", &"cast_poison", &"death", &"victory"]:
 		assert_true(set.sfx.get(event) != null, "a sound for %s" % event)
 	for track: StringName in [&"hub", &"battle", &"boss"]:
 		assert_true(set.music.get(track) != null, "a track for %s" % track)
@@ -490,12 +490,12 @@ func test_the_next_screens_music_cuts_off_a_fanfare_still_playing() -> void:
 	other.free()
 
 
-func test_the_music_plays_below_full_scale_so_spell_sounds_stand_out_and_heal_is_silent() -> void:
+func test_the_music_plays_below_full_scale_so_spell_sounds_stand_out_and_heal_stays_gentle() -> void:
 	var set := load("res://data/audio/audio_set.tres") as AudioSet
 	assert_true(set.music_gain_db < 0.0, "music at %f dB" % set.music_gain_db)
 	for event: StringName in [&"cast", &"cast_fire", &"cast_fireball", &"cast_physical", &"cast_poison"]:
 		assert_true(set.sfx_gain_db.get(event, 0.0) > set.music_gain_db - 6.0, "%s isn't buried under the music" % event)
-	assert_false(set.sfx.has(&"heal"), "the heal sound was found disturbing: silent")
+	assert_true(set.sfx_gain_db.get(&"heal", 0.0) <= -6.0, "the heal sound is kept gentle (the first one was found disturbing)")
 	var service := _service()
 	service.audio_set.music_gain_db = -12.0
 	service.play_music(&"hub")
