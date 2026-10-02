@@ -21,7 +21,8 @@ func test_expected_amounts_follow_power_scaling_and_resistance() -> void:
 	assert_eq(SpellPreview.expected_amount(spell, 0, 0), 10.0)
 	assert_eq(SpellPreview.expected_amount(spell, 50, 0), 15.0)
 	assert_eq(SpellPreview.expected_amount(spell, 50, 20), 12.0)
-	assert_eq(SpellPreview.expected_amount(spell, 0, 90), 5.0, "resistance capped at 50%")
+	assert_eq(SpellPreview.expected_amount(spell, 0, 90), 1.0, "90 % resisted")
+	assert_eq(SpellPreview.expected_amount(spell, 0, 120), 0.0, "capped at immunity")
 	spell.effects[0].power_scaling = 0
 	assert_eq(SpellPreview.expected_amount(spell, 50, 0), 10.0)
 	var mend := load("res://data/spells/mend.tres") as SpellData

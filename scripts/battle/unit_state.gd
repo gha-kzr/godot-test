@@ -6,8 +6,9 @@ extends RefCounted
 ## change numbers through modifiers that are added up when asked (max_hp(), power(),
 ## resistance_percent(), …); nothing derived is stored, so expiry has nothing to undo.
 
-## Resistance never goes past this, so nothing becomes immune.
-const MAX_RESISTANCE_PERCENT := 50
+## Resistance never goes past these: a hero is never immune, an enemy at 100 % is.
+const MAX_HERO_RESISTANCE_PERCENT := 75
+const MAX_ENEMY_RESISTANCE_PERCENT := 100
 
 enum Team { PLAYER, ENEMY }
 
@@ -117,12 +118,16 @@ func power() -> int:
 	return stat_bonus(StatModifier.Stat.POWER)
 
 
-## Percent less damage of that type taken, at most MAX_RESISTANCE_PERCENT (may be
+## Percent less damage of that type taken, at most max_resistance_percent() (may be
 ## negative: a weakness). Untyped damage (null) is never resisted.
 func resistance_percent(damage_type: DamageType) -> int:
 	if damage_type == null:
 		return 0
-	return mini(MAX_RESISTANCE_PERCENT, stat_bonus(StatModifier.Stat.RESISTANCE_PERCENT, damage_type))
+	return mini(max_resistance_percent(), stat_bonus(StatModifier.Stat.RESISTANCE_PERCENT, damage_type))
+
+
+func max_resistance_percent() -> int:
+	return MAX_HERO_RESISTANCE_PERCENT if team == Team.PLAYER else MAX_ENEMY_RESISTANCE_PERCENT
 
 
 func max_ap() -> int:

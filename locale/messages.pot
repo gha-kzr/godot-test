@@ -109,6 +109,10 @@ msgstr ""
 msgid "%s HP"
 msgstr ""
 
+#: scripts/view/hud/unit_info.gd
+msgid "%s immune"
+msgstr ""
+
 #: scripts/data/stat_modifier.gd
 msgid "%s initiative"
 msgstr ""
@@ -940,7 +944,7 @@ msgid "Resistance: %s"
 msgstr ""
 
 #: scripts/data/glossary.gd
-msgid "Resistance: percent less damage of one type (never more than half)."
+msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
 msgstr ""
 
 #: scripts/view/hud.gd

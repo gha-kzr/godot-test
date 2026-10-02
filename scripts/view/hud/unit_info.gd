@@ -74,5 +74,8 @@ func title_text() -> String:
 func combat_stats_text() -> String:
 	var resist: Array[String] = []
 	for type_name in resistances:
-		resist.append("%s %+d%%" % [tr(type_name), resistances[type_name]])
+		if resistances[type_name] >= UnitState.MAX_ENEMY_RESISTANCE_PERCENT:
+			resist.append(tr("%s immune") % tr(type_name))
+		else:
+			resist.append("%s %+d%%" % [tr(type_name), resistances[type_name]])
 	return tr("Power: All %+d%%\nResist: %s") % [power, ", ".join(resist) if not resist.is_empty() else tr("none")]

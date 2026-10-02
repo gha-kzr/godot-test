@@ -48,7 +48,7 @@ static func expected_amount(spell: SpellData, power: int, resistance: int) -> fl
 		if effect is DamageEffect:
 			var damage := effect as DamageEffect
 			var resisted := resistance if damage.damage_type != null else 0
-			total += damage.average_roll() * damage.power_multiplier(power) * (100.0 - mini(resisted, UnitState.MAX_RESISTANCE_PERCENT)) / 100.0
+			total += damage.average_roll() * damage.power_multiplier(power) * (100.0 - mini(resisted, UnitState.MAX_ENEMY_RESISTANCE_PERCENT)) / 100.0
 		elif effect is HealEffect:
 			var heal := effect as HealEffect
 			total -= heal.average_roll() * maxf(0.0, 100.0 + power * heal.power_scaling / 100.0) / 100.0

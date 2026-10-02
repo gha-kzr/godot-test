@@ -89,6 +89,9 @@ msgstr "%s n'a plus d'emplacement de rune libre."
 msgid "%s HP"
 msgstr "%s PV"
 
+msgid "%s immune"
+msgstr "%s : immunisé"
+
 msgid "%s initiative"
 msgstr "%s initiative"
 
@@ -713,8 +716,8 @@ msgstr "Effacer la sauvegarde"
 msgid "Resistance: %s"
 msgstr "Résistance : %s"
 
-msgid "Resistance: percent less damage of one type (never more than half)."
-msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus de la moitié)."
+msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
+msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus des trois quarts pour les héros ; un ennemi peut être immunisé)."
 
 msgid "Round %d"
 msgstr "Round %d"
