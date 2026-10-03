@@ -109,6 +109,12 @@ func cast_sound_event() -> StringName:
 	return &"cast"
 
 
+## Whether the spell must be aimed at a free cell (a teleport or a jump lands there).
+func aims_at_free_cell() -> bool:
+	return effects.any(func(effect: EffectData) -> bool:
+		return effect is MoveEffect and (effect as MoveEffect).kind in [MoveEffect.Kind.TELEPORT, MoveEffect.Kind.JUMP])
+
+
 ## Whether the spell first moves its caster (a charge): the view plays the cast on arrival.
 func moves_caster_first() -> bool:
 	return not effects.is_empty() and effects[0] is MoveEffect and (effects[0] as MoveEffect).moves_caster()

@@ -91,3 +91,13 @@ func test_the_stage_reloads_a_spell_whose_file_changed() -> void:
 		await _tree().process_frame
 	assert_eq(stage.spell.impact_delay, 0.9, "the saved change was picked up by itself")
 	stage.free()
+
+
+func test_a_teleport_lands_on_the_free_cell_next_to_the_dummy() -> void:
+	var blink := load("res://data/spells/blink.tres") as SpellData
+	var state := SpellStage.build_state(blink, load("res://data/units/mage.tres"), load("res://data/units/brute.tres"))
+	var battle := Battle.new(state)
+	battle.start()
+	var result := battle.perform(BattleActions.CastSpell.new(0, 0, SpellStage.target_cell(blink, false)))
+	assert_true(result.ok(), result.error)
+	assert_eq(state.units[0].cell, SpellStage.target_cell(blink, false))
