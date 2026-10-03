@@ -883,6 +883,10 @@ msgstr ""
 msgid "Piercing Thrust"
 msgstr ""
 
+#: data/statuses/pinned.tres
+msgid "Pinned"
+msgstr ""
+
 #: data/spells/pinning_shot.tres
 msgid "Pinning Shot"
 msgstr ""

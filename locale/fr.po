@@ -670,6 +670,9 @@ msgstr "Choisissez d'abord un emplacement, puis ce sort pour l'y mettre."
 msgid "Piercing Thrust"
 msgstr "Estocade perçante"
 
+msgid "Pinned"
+msgstr "Cloué"
+
 msgid "Pinning Shot"
 msgstr "Tir clouant"
 
