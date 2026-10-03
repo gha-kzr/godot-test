@@ -102,6 +102,8 @@ func setup(unit: UnitState, board: BoardView) -> void:
 		_model = UnitModel.new()
 		_body.add_child(_model)
 		_model.setup(unit.data.model_scene, unit.data.model_scale, unit.data.skin_color)
+		if unit.data.held_item != null:
+			_model.hold(unit.data.held_item, unit.data.held_item_replaces, unit.data.held_item_scale, unit.data.held_item_rotation)
 	else:
 		_material = StandardMaterial3D.new()
 		_material.albedo_color = unit.data.color

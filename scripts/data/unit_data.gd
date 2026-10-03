@@ -28,6 +28,13 @@ extends Resource
 @export_range(0.3, 4.0) var model_height := 1.1
 ## Replaces the model's "Skin" material color; alpha 0 keeps the pack's own.
 @export var skin_color := Color(0, 0, 0, 0)
+## A prop the model holds instead of one of its own parts (a bow instead of the Skeleton's
+## dagger): `held_item` takes the place, bone and orientation of the model's node named
+## `held_item_replaces` (hidden), at `held_item_scale`, turned by `held_item_rotation` degrees.
+@export var held_item: PackedScene
+@export var held_item_replaces := ""
+@export var held_item_scale := 1.0
+@export var held_item_rotation := Vector3.ZERO
 
 
 func get_validation_errors() -> PackedStringArray:

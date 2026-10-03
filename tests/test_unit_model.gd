@@ -149,3 +149,22 @@ func test_the_monsters_have_the_animations_the_game_needs() -> void:
 		for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death"]:
 			assert_true(model.has_animation(logical), "%s: %s" % [path.get_file(), logical])
 		model.free()
+
+
+func test_a_held_item_replaces_a_part_of_the_model() -> void:
+	var skeleton := load("res://data/units/skeleton_archer.tres") as UnitData
+	var model := _model(skeleton.model_scene)
+	model.hold(skeleton.held_item, skeleton.held_item_replaces, skeleton.held_item_scale, skeleton.held_item_rotation)
+	assert_false((model.find_child("Weapon_Dagger", true, false) as Node3D).visible, "the dagger is hidden")
+	var held := model.find_child("HeldItem", true, false) as Node3D
+	assert_true(held != null, "the bow is held")
+	assert_eq(held.get_parent(), model.find_child("Weapon_Dagger", true, false).get_parent(), "on the same bone")
+	model.free()
+
+
+func test_holding_in_place_of_a_missing_part_is_reported() -> void:
+	var model := _model()
+	expect_error("no part named")
+	model.hold(load("res://assets/quaternius/props/WoodenBow.glb"), "NoSuchPart", 1.0, Vector3.ZERO)
+	assert_true(model.find_child("HeldItem", true, false) == null)
+	model.free()
