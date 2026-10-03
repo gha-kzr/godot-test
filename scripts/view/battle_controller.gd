@@ -783,8 +783,12 @@ func _update_hover() -> void:
 				var spell := caster.data.spells[selected_spell]
 				cells = Targeting.area_cells(battle.state.grid, spell.area, caster.cell, _hovered_cell)
 				units_view.show_previews(DamagePreview.for_cast(battle.state, caster.id, selected_spell, _hovered_cell))
+				var landings: Array[Vector2i] = []
+				landings.assign(DamagePreview.landings(battle.state, caster.id, selected_spell, _hovered_cell).values())
+				board_view.show_highlight(BoardView.Highlight.LANDING, landings)
 			else:
 				units_view.clear_previews()
+				board_view.clear_highlight(BoardView.Highlight.LANDING)
 			board_view.show_highlight(BoardView.Highlight.AREA, cells)
 		# Other states: _set_state already cleared the hover highlights, and the AREA layer
 		# may be showing a cast's flash from the EventPlayer, which hover must not touch.

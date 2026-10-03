@@ -834,3 +834,17 @@ func test_the_winners_cheer_on_the_result_screen() -> void:
 	lost._begin_next()
 	var enemy_player := lost.units_view.view(1).model().find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	assert_true(enemy_player.current_animation.ends_with("|Victory"), "after a loss the enemies cheer: %s" % enemy_player.current_animation)
+
+
+func test_aiming_a_backslash_marks_where_the_hero_lands() -> void:
+	var hero := _fighter("P0", 200)
+	hero.spells = [load("res://data/spells/backslash.tres")] as Array[SpellData]
+	var controller := _controller("0 0e 0p 0 0 0", [hero], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.LANDING), 1, "the landing cell")
+	controller._hovered_cell = Vector2i(4, 0)  # Out of range.
+	controller._update_hover()
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.LANDING), 0)

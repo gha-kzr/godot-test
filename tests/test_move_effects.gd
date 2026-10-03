@@ -176,3 +176,16 @@ func test_validation_matches_who_moves() -> void:
 	assert_eq(effect.get_validation_errors().size(), 1, "a push moves its targets")
 	effect.target_filter = EffectData.TargetFilter.ENEMIES
 	assert_eq(effect.get_validation_errors().size(), 0)
+
+
+func test_the_preview_shows_where_units_land() -> void:
+	var backslash := _spell(MoveEffect.Kind.RETREAT, 1, 1, 3, EffectData.TargetFilter.CASTER, 4)
+	var state := BattleFixtures.state("0 0e 0p 0 0 0", 3)
+	state.units[0].data.spells = [backslash] as Array[SpellData]
+	Battle.new(state).start()
+	assert_eq(DamagePreview.landings(state, 0, 0, Vector2i(1, 0)), {0: Vector2i(5, 0)} as Dictionary[int, Vector2i], "the caster leaps back")
+	assert_eq(state.units[0].cell, Vector2i(2, 0), "the real state is untouched")
+	var push := _spell(MoveEffect.Kind.PUSH, 1, 1, 2)
+	state.units[0].data.spells = [push] as Array[SpellData]
+	assert_eq(DamagePreview.landings(state, 0, 0, Vector2i(1, 0)), {1: Vector2i(0, 0)} as Dictionary[int, Vector2i], "the target stops at the edge")
+	assert_eq(DamagePreview.landings(state, 0, 0, Vector2i(4, 0)), {} as Dictionary[int, Vector2i], "an illegal cast moves nobody")
