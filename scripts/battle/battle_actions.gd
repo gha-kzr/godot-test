@@ -42,13 +42,23 @@ class Move extends Action:
 			return "can't reach %s" % destination
 		return ""
 
+	## Repositioning (see UnitState): the cost counts from where the move segment started,
+	## so moving again re-spends from the segment's MP; the drawn path is the walk from
+	## where the unit stands (a straight slide when no walk leads there).
 	func apply(state: BattleState) -> Array[BattleEvents.Event]:
 		var reach := Movement.reach(state, actor_id)
 		var unit := state.units[actor_id]
-		var cost := reach.cost_to(destination)
+		var path := reach.path_to(destination) if not unit.moved else Movement.walk_path(state, actor_id, destination)
+		if path.is_empty():
+			path = [destination]
+		var mp_before := unit.mp
+		if not unit.moved:
+			unit.moved = true
+			unit.moved_from = unit.cell
+		unit.moved_cost = reach.cost_to(destination)
+		unit.mp = reach.origin_budget - unit.moved_cost
 		unit.cell = destination
-		unit.mp -= cost
-		return [BattleEvents.UnitMoved.new(actor_id, reach.path_to(destination), cost)]
+		return [BattleEvents.UnitMoved.new(actor_id, path, mp_before - unit.mp)]
 
 
 class CastSpell extends Action:
@@ -60,9 +70,11 @@ class CastSpell extends Action:
 		spell_index = spell_slot
 		target = target_cell
 
-	## Whether the unit has that spell and enough AP for it (range aside). Shared with the UI.
+	## Whether the unit has that spell, enough AP for it and no cooldown on it (range aside).
+	## Shared with the UI.
 	static func can_afford(unit: UnitState, slot: int) -> bool:
-		return slot >= 0 and slot < unit.data.spells.size() and unit.ap >= unit.data.spells[slot].ap_cost
+		return slot >= 0 and slot < unit.data.spells.size() and unit.ap >= unit.data.spells[slot].ap_cost \
+				and unit.cooldown_left(unit.data.spells[slot]) == 0
 
 	func _validate(state: BattleState) -> String:
 		var unit := state.units[actor_id]
@@ -71,6 +83,8 @@ class CastSpell extends Action:
 		var spell := unit.data.spells[spell_index]
 		if unit.ap < spell.ap_cost:
 			return "%s needs %d AP, unit has %d" % [spell.display_name, spell.ap_cost, unit.ap]
+		if unit.cooldown_left(spell) > 0:
+			return "%s is on cooldown for %d turns" % [spell.display_name, unit.cooldown_left(spell)]
 		if not Targeting.can_target(state, actor_id, spell, target):
 			return "%s can't target %s" % [spell.display_name, target]
 		return ""
@@ -79,6 +93,8 @@ class CastSpell extends Action:
 		var caster := state.units[actor_id]
 		var spell := caster.data.spells[spell_index]
 		caster.ap -= spell.ap_cost
+		if spell.cooldown > 0:
+			caster.cooldowns[spell] = spell.cooldown
 		var area := Targeting.area_cells(state.grid, spell.area, caster.cell, target)
 		var events: Array[BattleEvents.Event] = [BattleEvents.SpellCast.new(actor_id, spell, target, area, spell.ap_cost)]
 		# Targets are fixed before any effect lands, in area order.
@@ -91,7 +107,8 @@ class CastSpell extends Action:
 		for effect in spell.effects:
 			for target_id in _targets_of(effect, state, in_area):
 				if state.units[target_id].is_alive():  # Killed by an earlier effect: skipped.
-					events.append_array(effect.apply(state, actor_id, target_id))
+					events.append_array(effect.apply_cast(state, actor_id, target_id, target))
+		caster.commit_position()  # A cast ends free repositioning: the next move counts from here.
 		return events
 
 	## The units an effect applies to, by its target filter.

@@ -134,3 +134,60 @@ func test_an_action_animation_restarts_when_asked_again_and_returns_to_idle_by_i
 		await (Engine.get_main_loop() as SceneTree).process_frame
 	assert_true(player.assigned_animation.ends_with("|Death"), "but a death stays: %s" % player.assigned_animation)
 	model.free()
+
+
+func test_a_mangled_export_resolves_through_any_part_between_bars() -> void:
+	var model := _model(_scene_with_animations(["Arm|Arm|Arm|Idle|Arm|Idle", "Arm|Arm|Arm|Death|Arm|Dea", "Arm|Arm|Arm|Jump_Idle|Arm"] as Array[String]))
+	assert_true(model.has_animation(&"Idle"), "Idle in the middle")
+	assert_true(model.has_animation(&"Death"), "a truncated tail")
+	model.free()
+
+
+func test_the_monsters_have_the_animations_the_game_needs() -> void:
+	for path in ["res://assets/quaternius/monsters/Skeleton.glb", "res://assets/quaternius/monsters/Zombie.glb", "res://assets/quaternius/monsters/Ghost.glb"]:
+		var model := _model(load(path) as PackedScene)
+		for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death"]:
+			assert_true(model.has_animation(logical), "%s: %s" % [path.get_file(), logical])
+		model.free()
+
+
+func test_a_held_item_replaces_a_part_of_the_model() -> void:
+	var skeleton := load("res://data/units/skeleton_archer.tres") as UnitData
+	var model := _model(skeleton.model_scene)
+	model.hold(skeleton.held_item, skeleton.held_item_replaces, skeleton.held_item_scale, skeleton.held_item_rotation)
+	assert_false((model.find_child("Weapon_Dagger", true, false) as Node3D).visible, "the dagger is hidden")
+	var held := model.find_child("HeldItem", true, false) as Node3D
+	assert_true(held != null, "the bow is held")
+	assert_eq(held.get_parent(), model.find_child("Weapon_Dagger", true, false).get_parent(), "on the same bone")
+	model.free()
+
+
+func test_holding_in_place_of_a_missing_part_is_reported() -> void:
+	var model := _model()
+	expect_error("no part named")
+	model.hold(load("res://assets/quaternius/props/WoodenBow.glb"), "NoSuchPart", 1.0, Vector3.ZERO)
+	assert_true(model.find_child("HeldItem", true, false) == null)
+	model.free()
+
+
+func test_a_held_item_can_hang_from_a_bone() -> void:
+	var knight := load("res://data/units/knight.tres") as UnitData
+	var model := _model(knight.model_scene)
+	model.hold(knight.held_item, "", knight.held_item_scale, knight.held_item_rotation, knight.held_item_bone)
+	var attachment := model.find_child("HeldItemBone", true, false) as BoneAttachment3D
+	assert_true(attachment != null, "a bone attachment")
+	assert_eq(attachment.bone_name, "Fist.R")
+	assert_eq(attachment.get_node("HeldItem").get_parent(), attachment, "the sword hangs from it")
+	expect_error("no bone named")
+	model.hold(knight.held_item, "", 1.0, Vector3.ZERO, "NoSuchBone")
+	model.free()
+
+
+func test_every_hero_holds_its_weapon() -> void:
+	for hero in ["knight", "mage", "ranger"]:
+		var data := load("res://data/units/%s.tres" % hero) as UnitData
+		assert_true(data.held_item != null, "%s holds something" % hero)
+		var model := _model(data.model_scene)
+		model.hold(data.held_item, data.held_item_replaces, data.held_item_scale, data.held_item_rotation, data.held_item_bone, data.held_item_offset)
+		assert_true(model.find_child("HeldItem", true, false) != null, hero)
+		model.free()

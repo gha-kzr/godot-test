@@ -32,19 +32,24 @@ static func can_target(state: BattleState, caster_id: int, spell: SpellData, cel
 	var from := state.units[caster_id].cell
 	if not _in_range(state, from, spell, cell):
 		return false
-	return not spell.needs_line_of_sight or has_line_of_sight(state, from, cell)
+	if spell.needs_line_of_sight and not has_line_of_sight(state, from, cell):
+		return false
+	for effect in spell.effects:
+		if effect != null and not effect.allows_target(state, caster_id, cell):
+			return false
+	return true
 
 
-## Cells the spell could reach but for line of sight, so players see why they can't aim there.
+## Cells in the spell's range that it can't be aimed at: out of line of sight, or refused by
+## one of its effects (a charge with no unit in a clear straight line, a teleport onto a unit).
+## Shown faded, so players see the spell's reach and why they can't aim there.
 static func blocked_cells(state: BattleState, caster_id: int, spell: SpellData) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
-	if not spell.needs_line_of_sight:
-		return result
 	var from := state.units[caster_id].cell
 	for y in state.grid.size.y:
 		for x in state.grid.size.x:
 			var cell := Vector2i(x, y)
-			if _in_range(state, from, spell, cell) and not has_line_of_sight(state, from, cell):
+			if _in_range(state, from, spell, cell) and not can_target(state, caster_id, spell, cell):
 				result.append(cell)
 	return result
 
@@ -117,7 +122,7 @@ static func area_cells(grid: Grid, area: AreaShape, caster_cell: Vector2i, targe
 						cells.append(target + offset)
 		AreaShape.Kind.LINE:
 			# Extends away from the caster along the dominant axis; `size` cells in total.
-			var direction := _dominant_direction(target - caster_cell)
+			var direction := dominant_direction(target - caster_cell)
 			if direction != Vector2i.ZERO:
 				for i in range(1, area.size):
 					cells.append(target + direction * i)
@@ -144,7 +149,8 @@ static func _blocks(state: BattleState, cell: Vector2i, sight_height: float) -> 
 	return state.is_occupied(cell) or state.grid.height_at(cell) > sight_height
 
 
-static func _dominant_direction(offset: Vector2i) -> Vector2i:
+## The axis direction closest to `offset` (x wins a tie); zero for a zero offset.
+static func dominant_direction(offset: Vector2i) -> Vector2i:
 	if offset == Vector2i.ZERO:
 		return Vector2i.ZERO
 	if absi(offset.x) >= absi(offset.y):

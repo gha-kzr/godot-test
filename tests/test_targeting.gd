@@ -226,3 +226,15 @@ func test_a_block_on_a_plateau_rises_from_the_plateau() -> void:
 func test_the_edge_of_the_world_is_opaque() -> void:
 	var state := BattleFixtures.state("4p 0e")
 	assert_true(Targeting._blocks(state, Vector2i(-1, 0), 99.0), "out of bounds blocks whatever the sight height")
+
+
+func test_a_charge_without_a_target_still_shows_its_reach() -> void:
+	var state := BattleFixtures.state("0p 0 0 0 0\n0 0 0 0 0e")
+	var charge := load("res://data/spells/charge.tres") as SpellData
+	assert_eq(Targeting.targetable_cells(state, 0, charge), [] as Array[Vector2i], "nobody in a straight line")
+	var blocked := Targeting.blocked_cells(state, 0, charge)
+	assert_true(Vector2i(4, 0) in blocked and Vector2i(2, 0) in blocked, "its range, shaded")
+	assert_false(Vector2i(1, 0) in blocked, "range 2-4: the next cell isn't in it")
+	state.units[1].cell = Vector2i(4, 0)  # Now in line.
+	assert_eq(Targeting.targetable_cells(state, 0, charge), [Vector2i(4, 0)] as Array[Vector2i])
+	assert_false(Vector2i(4, 0) in Targeting.blocked_cells(state, 0, charge))

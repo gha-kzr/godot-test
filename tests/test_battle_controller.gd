@@ -15,7 +15,7 @@ func _tree() -> SceneTree:
 	return Engine.get_main_loop() as SceneTree
 
 
-## The slice battle (enemy Archer acts first), or a small custom one; placement is skipped
+## The slice battle (the enemy Skeleton Archer acts first), or a small custom one; placement is skipped
 ## (Ready) unless `ready` is false.
 func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = [], ready := true) -> BattleController:
 	Engine.time_scale = TIME_SCALE
@@ -139,12 +139,12 @@ func test_ending_the_turn_lets_the_enemy_act_and_can_lose() -> void:
 
 func test_input_is_ignored_outside_the_players_turn() -> void:
 	var controller := _controller()
-	assert_eq(controller.battle.state.current_unit().data.display_name, "Archer", "an enemy acts first")
+	assert_eq(controller.battle.state.current_unit().data.display_name, "Skeleton Archer", "an enemy acts first")
 	controller.end_turn()
 	controller.select_spell(0)
 	controller.click_cell(Vector2i(1, 8))
 	assert_true(controller.input_state in [BattleController.State.ANIMATING, BattleController.State.ENEMY_TURN])
-	assert_eq(controller.battle.state.current_unit().data.display_name, "Archer", "still the Archer's turn")
+	assert_eq(controller.battle.state.current_unit().data.display_name, "Skeleton Archer", "still its turn")
 
 
 func test_restart_mid_animation_starts_a_clean_battle() -> void:
@@ -834,3 +834,28 @@ func test_the_winners_cheer_on_the_result_screen() -> void:
 	lost._begin_next()
 	var enemy_player := lost.units_view.view(1).model().find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	assert_true(enemy_player.current_animation.ends_with("|Victory"), "after a loss the enemies cheer: %s" % enemy_player.current_animation)
+
+
+func test_aiming_a_backslash_marks_where_the_hero_lands() -> void:
+	var hero := _fighter("P0", 200)
+	hero.spells = [load("res://data/spells/backslash.tres")] as Array[SpellData]
+	var controller := _controller("0 0e 0p 0 0 0", [hero], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	controller._hovered_cell = Vector2i(1, 0)
+	controller._update_hover()
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.LANDING), 1, "the landing cell")
+	controller._hovered_cell = Vector2i(4, 0)  # Out of range.
+	controller._update_hover()
+	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.LANDING), 0)
+
+
+func test_a_spell_with_no_target_says_so_and_shades_its_reach() -> void:
+	var hero := _fighter("P0", 200)
+	hero.spells = [load("res://data/spells/charge.tres")] as Array[SpellData]
+	var controller := _controller("0p 0 0 0 0\n0 0 0 0 0e", [hero], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	assert_eq(controller.input_state, BattleController.State.TARGETING, "still aiming")
+	assert_true(controller._prompt_text().contains("no target"), controller._prompt_text())
+	assert_true(controller.board_view.highlighted_count(BoardView.Highlight.RANGE_BLOCKED) > 0, "its reach is shaded")

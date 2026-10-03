@@ -11,7 +11,7 @@ msgstr ""
 msgid "%d / %d unlocked"
 msgstr ""
 
-#: scripts/view/hud/spell_bar.gd
+#: scripts/game/spells_screen.gd scripts/view/hud/spell_bar.gd
 msgid "%d AP"
 msgstr ""
 
@@ -105,8 +105,16 @@ msgstr ""
 msgid "%s has no free rune slot."
 msgstr ""
 
+#: scripts/view/battle_controller.gd
+msgid "%s has no target from here (its reach is shaded). Esc to cancel"
+msgstr ""
+
 #: scripts/data/stat_modifier.gd
 msgid "%s HP"
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "%s immune"
 msgstr ""
 
 #: scripts/data/stat_modifier.gd
@@ -173,6 +181,10 @@ msgstr ""
 msgid "%s — level %d"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "%s — spells"
+msgstr ""
+
 #: scripts/data/stat_modifier.gd
 msgid "%s%% %s resistance"
 msgstr ""
@@ -197,7 +209,7 @@ msgstr ""
 msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
 msgstr ""
 
-#: scripts/game/hub/hero_panel.gd
+#: scripts/game/hub/hero_panel.gd scripts/game/spells_screen.gd
 msgid "(empty)"
 msgstr ""
 
@@ -219,6 +231,10 @@ msgstr ""
 
 #: scripts/progression/hints.gd
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "A spell learned later takes this slot."
 msgstr ""
 
 #: scripts/progression/hints.gd
@@ -265,10 +281,6 @@ msgstr ""
 msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr ""
 
-#: data/units/archer.tres
-msgid "Archer"
-msgstr ""
-
 #: data/spells/arrow.tres
 msgid "Arrow"
 msgstr ""
@@ -285,7 +297,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
+#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn scenes/game/spells_screen.tscn
 msgid "Back"
 msgstr ""
 
@@ -295,6 +307,10 @@ msgstr ""
 
 #: scenes/game/party_screen.tscn
 msgid "Back to the title"
+msgstr ""
+
+#: data/spells/backslash.tres
+msgid "Backslash"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -311,6 +327,18 @@ msgstr ""
 
 #: scripts/game/title_screen.gd
 msgid "Best floor: %d"
+msgstr ""
+
+#: data/spells/blink.tres
+msgid "Blink"
+msgstr ""
+
+#: data/spells/bone_arrow.tres
+msgid "Bone Arrow"
+msgstr ""
+
+#: data/spells/bone_rain.tres
+msgid "Bone Rain"
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -335,6 +363,36 @@ msgstr ""
 
 #: data/units/brute.tres
 msgid "Brute"
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "Cancel"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd scenes/game/hub/hero_panel.tscn
+msgid "Change spells"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Change spells (%d more known)"
+msgid_plural "Change spells (%d more known)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: data/spells/charge.tres
+msgid "Charge"
+msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Charges in a straight line next to the target"
+msgstr ""
+
+#: data/spells/chill_touch.tres
+msgid "Chill Touch"
+msgstr ""
+
+#: data/statuses/chilled.tres
+msgid "Chilled"
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -413,12 +471,24 @@ msgstr ""
 msgid "Cross"
 msgstr ""
 
+#: scripts/data/glossary.gd
+msgid "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes."
+msgstr ""
+
 #: scripts/run/run_director.gd
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr ""
 
+#: data/spells/devour.tres
+msgid "Devour"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Display"
+msgstr ""
+
+#: data/statuses/dread.tres
+msgid "Dread"
 msgstr ""
 
 #: scripts/game/hub/rune_stash.gd
@@ -455,6 +525,10 @@ msgstr ""
 
 #: scripts/data/rune_data.gd
 msgid "Epic"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Every %d turns"
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -541,6 +615,14 @@ msgstr ""
 msgid "From floor %d"
 msgstr ""
 
+#: data/damage_types/frost.tres
+msgid "Frost"
+msgstr ""
+
+#: data/spells/frost_lance.tres
+msgid "Frost Lance"
+msgstr ""
+
 #: scripts/game/run_screen.gd
 msgid "Full heal — every hero back to full HP"
 msgstr ""
@@ -557,8 +639,20 @@ msgstr ""
 msgid "Game"
 msgstr ""
 
+#: data/units/ghost.tres
+msgid "Ghost"
+msgstr ""
+
+#: data/units/ghoul.tres
+msgid "Ghoul"
+msgstr ""
+
 #: scenes/game/hint_card.tscn
 msgid "Got it"
+msgstr ""
+
+#: data/spells/grapple_shot.tres
+msgid "Grapple Shot"
 msgstr ""
 
 #: data/spells/ground_slam.tres
@@ -593,6 +687,10 @@ msgstr ""
 msgid "Hints will show again."
 msgstr ""
 
+#: data/damage_types/holy.tres
+msgid "Holy"
+msgstr ""
+
 #: scripts/game/hub/hero_panel.gd
 msgid "HP %d   AP %d   MP %d   Initiative %d"
 msgstr ""
@@ -603,6 +701,14 @@ msgstr ""
 
 #: scripts/data/glossary.gd
 msgid "HP: health. At 0 the unit falls."
+msgstr ""
+
+#: data/spells/hunters_mark.tres
+msgid "Hunter's Mark"
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "Initiative %d, damage taken %+d%%"
 msgstr ""
 
 #: scripts/data/glossary.gd
@@ -621,6 +727,10 @@ msgstr ""
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr ""
 
+#: scripts/data/move_effect.gd
+msgid "Jumps to the target cell (climbs up to %d levels)"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Keys reset."
 msgstr ""
@@ -629,9 +739,19 @@ msgstr ""
 msgid "Knight"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Known, not in the loadout"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Language"
 msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Leaps back %d cell"
+msgid_plural "Leaps back up to %d cells"
+msgstr[0] ""
+msgstr[1] ""
 
 #: scripts/data/level_reward.gd
 msgid "learns %s"
@@ -669,8 +789,16 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
+msgstr ""
+
 #: data/units/mage.tres
 msgid "Mage"
+msgstr ""
+
+#: data/statuses/marked.tres
+msgid "Marked"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -683,6 +811,10 @@ msgstr ""
 
 #: scenes/battle/hud.tscn
 msgid "Menu"
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "Move"
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -757,6 +889,10 @@ msgstr ""
 msgid "Nothing left to do: end your turn (%s)"
 msgstr ""
 
+#: scripts/view/hud/spell_bar.gd
+msgid "Once per turn"
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
 msgstr ""
@@ -781,6 +917,14 @@ msgstr ""
 msgid "Piercing Thrust"
 msgstr ""
 
+#: data/statuses/pinned.tres
+msgid "Pinned"
+msgstr ""
+
+#: data/spells/pinning_shot.tres
+msgid "Pinning Shot"
+msgstr ""
+
 #: scripts/view/battle_controller.gd
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr ""
@@ -802,7 +946,7 @@ msgid "Poison Arrow"
 msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
-msgid "Power %+d%%"
+msgid "Power %+d%%   Damage taken %+d%%"
 msgstr ""
 
 #: scripts/view/hud/unit_info.gd
@@ -821,8 +965,28 @@ msgstr ""
 msgid "Press a key..."
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Press Move on a spell to change the loadout."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "Progress couldn't be saved."
+msgstr ""
+
+#: scripts/data/move_effect.gd
+msgid "Pulls %d cell closer"
+msgid_plural "Pulls up to %d cells closer"
+msgstr[0] ""
+msgstr[1] ""
+
+#: scripts/data/move_effect.gd
+msgid "Pushes back %d cell"
+msgid_plural "Pushes back %d cells"
+msgstr[0] ""
+msgstr[1] ""
+
+#: scripts/game/spells_screen.gd
+msgid "Put here"
 msgstr ""
 
 #: scenes/game/title_screen.tscn
@@ -893,6 +1057,14 @@ msgstr ""
 msgid "Regeneration"
 msgstr ""
 
+#: data/spells/rend.tres
+msgid "Rend"
+msgstr ""
+
+#: data/spells/repulse.tres
+msgid "Repulse"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Reset keys"
 msgstr ""
@@ -906,7 +1078,7 @@ msgid "Resistance: %s"
 msgstr ""
 
 #: scripts/data/glossary.gd
-msgid "Resistance: percent less damage of one type (never more than half)."
+msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -977,6 +1149,10 @@ msgstr ""
 msgid "Settings couldn't be saved."
 msgstr ""
 
+#: data/spells/shield_bash.tres
+msgid "Shield Bash"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Show hints again"
 msgstr ""
@@ -987,6 +1163,10 @@ msgstr ""
 
 #: scripts/data/area_shape.gd
 msgid "Single"
+msgstr ""
+
+#: data/units/skeleton_archer.tres
+msgid "Skeleton Archer"
 msgstr ""
 
 #: scripts/game/tutorial_overlay.gd
@@ -1003,6 +1183,10 @@ msgstr ""
 
 #: data/spells/smash.tres
 msgid "Smash"
+msgstr ""
+
+#: data/spells/smite.tres
+msgid "Smite"
 msgstr ""
 
 #: scripts/view/hud.gd scenes/battle/hud.tscn
@@ -1045,7 +1229,7 @@ msgstr ""
 msgid "Spell 5"
 msgstr ""
 
-#: scenes/game/hub/hero_panel.tscn
+#: scenes/game/hub/hero_panel.tscn scenes/game/spells_screen.tscn
 msgid "Spells"
 msgstr ""
 
@@ -1089,6 +1273,10 @@ msgstr ""
 msgid "Swift Stride"
 msgstr ""
 
+#: scripts/data/move_effect.gd
+msgid "Teleports to the target cell"
+msgstr ""
+
 #: scripts/progression/profile.gd
 msgid "That hero isn't available."
 msgstr ""
@@ -1103,6 +1291,10 @@ msgstr ""
 
 #: scripts/progression/profile.gd
 msgid "That rune slot isn't free."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That spell can't go there."
 msgstr ""
 
 #: scripts/game/game.gd
@@ -1213,8 +1405,16 @@ msgstr ""
 msgid "Volley"
 msgstr ""
 
+#: data/spells/wail.tres
+msgid "Wail"
+msgstr ""
+
 #: scripts/progression/tutorial.gd
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "Where does %s go? Put here on a slot, or Cancel (Esc)."
 msgstr ""
 
 #: data/spells/whirlwind.tres

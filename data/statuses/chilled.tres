@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://bioj3ikg8t65q"]
+
+[ext_resource type="PackedScene" uid="uid://b644frleq8qxi" path="res://scenes/fx/aura_chilled.tscn" id="1_88tf4"]
+[ext_resource type="Texture2D" uid="uid://b0sjvplp1awhx" path="res://ui/icons/status_chilled.svg" id="2_n8sne"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="3_v7cjs"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="4_dk4ai"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="5_nccp5"]
+
+[sub_resource type="Resource" id="Resource_pw6qd"]
+script = ExtResource("3_v7cjs")
+amount = -1
+
+[resource]
+script = ExtResource("4_dk4ai")
+display_name = "Chilled"
+icon = ExtResource("2_n8sne")
+short_label = "C"
+aura_effect = ExtResource("1_88tf4")
+color = Color(0.6, 0.85, 1, 1)
+duration = 1
+modifiers = Array[ExtResource("3_v7cjs")]([SubResource("Resource_pw6qd")])

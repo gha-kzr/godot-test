@@ -21,6 +21,19 @@ enum TargetFilter {
 @abstract func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]
 
 
+## A cast applies its effects through this, with the cell the spell was aimed at; effects that
+## need it (a teleport's destination) override it. Status ticks call apply() directly.
+func apply_cast(state: BattleState, caster_id: int, target_id: int, _target_cell: Vector2i) -> Array[BattleEvents.Event]:
+	return apply(state, caster_id, target_id)
+
+
+## Whether a spell with this effect may be aimed at `cell`, beyond its range and sight (a
+## teleport needs a free cell). Targeting asks every effect, so the highlights, the AI and
+## validation agree.
+func allows_target(_state: BattleState, _caster_id: int, _cell: Vector2i) -> bool:
+	return true
+
+
 ## Short player-facing text, e.g. "5-7 damage". Every effect kind describes itself.
 @abstract func describe() -> String
 

@@ -50,6 +50,9 @@ extends Resource
 @export_range(0.0, 0.5, 0.01) var impact_shake := 0.0
 @export_group("")
 @export_range(0, 12) var ap_cost := 3
+## Turns the caster waits before casting it again: 0 none, 1 once per turn, 2 every other
+## turn, and so on (counted at the caster's turn starts).
+@export_range(0, 9) var cooldown := 0
 ## Manhattan distance from the caster. 0 allows targeting the caster's own cell.
 @export_range(0, 20) var min_range := 1
 @export_range(0, 20) var max_range := 1
@@ -104,6 +107,17 @@ func cast_sound_event() -> StringName:
 			if not type_sound.is_empty():
 				return type_sound
 	return &"cast"
+
+
+## Whether the spell must be aimed at a free cell (a teleport or a jump lands there).
+func aims_at_free_cell() -> bool:
+	return effects.any(func(effect: EffectData) -> bool:
+		return effect is MoveEffect and (effect as MoveEffect).kind in [MoveEffect.Kind.TELEPORT, MoveEffect.Kind.JUMP])
+
+
+## Whether the spell first moves its caster (a charge): the view plays the cast on arrival.
+func moves_caster_first() -> bool:
+	return not effects.is_empty() and effects[0] is MoveEffect and (effects[0] as MoveEffect).moves_caster()
 
 
 ## The icon to show: its own, else the default spell icon.

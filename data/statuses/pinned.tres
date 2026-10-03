@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://c0uoyelaw82p4"]
+
+[ext_resource type="PackedScene" uid="uid://bm2hkklm1scwh" path="res://scenes/fx/aura_crippled.tscn" id="1_vwkka"]
+[ext_resource type="Texture2D" uid="uid://blo52dox01h4s" path="res://ui/icons/pinning_shot.svg" id="2_30g3j"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="3_nv130"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="4_hdqg6"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="5_352yw"]
+
+[sub_resource type="Resource" id="Resource_l50dk"]
+script = ExtResource("3_nv130")
+amount = -2
+
+[resource]
+script = ExtResource("4_hdqg6")
+display_name = "Pinned"
+icon = ExtResource("2_30g3j")
+aura_effect = ExtResource("1_vwkka")
+short_label = "P"
+color = Color(0.85, 0.75, 0.55, 1)
+duration = 1
+modifiers = Array[ExtResource("3_nv130")]([SubResource("Resource_l50dk")])

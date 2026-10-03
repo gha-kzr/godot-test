@@ -21,7 +21,8 @@ func test_expected_amounts_follow_power_scaling_and_resistance() -> void:
 	assert_eq(SpellPreview.expected_amount(spell, 0, 0), 10.0)
 	assert_eq(SpellPreview.expected_amount(spell, 50, 0), 15.0)
 	assert_eq(SpellPreview.expected_amount(spell, 50, 20), 12.0)
-	assert_eq(SpellPreview.expected_amount(spell, 0, 90), 5.0, "resistance capped at 50%")
+	assert_eq(SpellPreview.expected_amount(spell, 0, 90), 1.0, "90 % resisted")
+	assert_eq(SpellPreview.expected_amount(spell, 0, 120), 0.0, "capped at immunity")
 	spell.effects[0].power_scaling = 0
 	assert_eq(SpellPreview.expected_amount(spell, 50, 0), 10.0)
 	var mend := load("res://data/spells/mend.tres") as SpellData
@@ -48,8 +49,8 @@ func test_enemy_rows_cover_levels_and_presets() -> void:
 
 
 func test_enemy_summary_lists_loot_odds() -> void:
-	var text := "\n".join(EnemyPreview.summary(load("res://data/enemies/archer.tres") as EnemyData))
-	assert_true(text.contains("Archer — +3 HP and +4 Power per level"), text)
+	var text := "\n".join(EnemyPreview.summary(load("res://data/enemies/skeleton_archer.tres") as EnemyData))
+	assert_true(text.contains("Skeleton Archer — +3 HP and +4 Power per level"), text)
 	assert_true(text.contains("Rune of Focus"), text)
 	assert_true(text.contains("per roll"), text)
 

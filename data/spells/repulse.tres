@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bpcfplsrf5h83"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_prvo5"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_678f4"]
+[ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="3_rsqu1"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_1d2cn"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="5_gps1t"]
+[ext_resource type="Texture2D" uid="uid://bpcr7aej2yhyp" path="res://ui/icons/repulse.svg" id="6_y6uta"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_sqijw"]
+
+[sub_resource type="Resource" id="Resource_s1bme"]
+script = ExtResource("1_prvo5")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_ccy8q"]
+script = ExtResource("4_1d2cn")
+min_amount = 3
+max_amount = 4
+damage_type = ExtResource("3_rsqu1")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_ipf3p"]
+script = ExtResource("5_gps1t")
+
+[resource]
+script = ExtResource("7_sqijw")
+display_name = "Repulse"
+icon = ExtResource("6_y6uta")
+cooldown = 2
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_s1bme")
+effects = Array[ExtResource("2_678f4")]([SubResource("Resource_ccy8q"), SubResource("Resource_ipf3p")])

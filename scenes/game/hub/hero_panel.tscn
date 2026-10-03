@@ -2,15 +2,43 @@
 
 [ext_resource type="Script" uid="uid://ddq73dm1vfuih" path="res://scripts/game/hub/hero_panel.gd" id="1_panel"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBox_next"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 1, 1, 0.07)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="HeroPanel" type="VBoxContainer"]
 theme_override_constants/separation = 8
 script = ExtResource("1_panel")
 
-[node name="HeroTitle" type="Label" parent="."]
+[node name="TitleRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeroTitle" type="Label" parent="TitleRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"
 text = "Hero"
+
+[node name="NextRewardBox" type="PanelContainer" parent="TitleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBox_next")
+
+[node name="NextReward" type="Label" parent="TitleRow/NextRewardBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+autowrap_mode = 3
 
 [node name="HpBar" type="ProgressBar" parent="."]
 unique_name_in_owner = true
@@ -56,22 +84,25 @@ unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="SpellsTitle" type="Label" parent="."]
+[node name="SpellsHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SpellsTitle" type="Label" parent="SpellsHeader"]
 layout_mode = 2
 theme_type_variation = &"PromptLabel"
 text = "Spells"
 
-[node name="Spells" type="HBoxContainer" parent="."]
+[node name="ChangeSpellsButton" type="Button" parent="SpellsHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Change spells"
+
+[node name="Spells" type="HFlowContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 
 [node name="SpellInfo" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"SmallLabel"
-autowrap_mode = 3
-
-[node name="NextReward" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"SmallLabel"

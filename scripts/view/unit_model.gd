@@ -3,18 +3,19 @@ extends Node3D
 ## A character model from an asset pack, behind one animation contract. The model's own
 ## AnimationPlayer is found by type; the animations the game needs are asked for by a logical
 ## name (Idle, Walk, Attack, Cast, Hit, Death, Victory, Defeat) and resolved to whatever the
-## model calls them: the part of a name after a "|" (Blender's "Armature|Idle") is compared
-## against candidates, so models from different packs work, and a missing animation just
+## model calls them: each part of a name between "|" (Blender's "Armature|Idle", or a mangled
+## export's "Armature|Armature|Idle|Armature|Id") is compared against candidates, so models
+## from different packs work, and a missing animation just
 ## does nothing (the caller falls back to a tween). Also re-colors the skin material and
 ## flashes the model (hit feedback). Adding a hero or enemy is a model file plus data.
 
 ## Logical name → candidate animation names, in order of preference.
 const ANIMATIONS := {
-	&"Idle": ["Idle"],
-	&"Walk": ["Walk", "Run"],
-	&"Attack": ["SwordSlash", "Punch"],
-	&"Cast": ["Shoot_OneHanded", "SwordSlash"],
-	&"Hit": ["RecieveHit", "HitRecieve", "Hit"],
+	&"Idle": ["Idle", "Flying_Idle"],
+	&"Walk": ["Walk", "Run", "Fast_Flying"],
+	&"Attack": ["SwordSlash", "Sword", "Punch", "Attack"],
+	&"Cast": ["Shoot_OneHanded", "SwordSlash", "Sword", "Punch", "Attack"],
+	&"Hit": ["RecieveHit", "HitRecieve", "HitReact", "Hit"],
 	&"Death": ["Death"],
 	&"Victory": ["Victory"],
 	&"Defeat": ["Defeat"],
@@ -55,6 +56,44 @@ func setup(scene: PackedScene, model_scale: float, skin_color: Color) -> void:
 				_player.get_animation(real).loop_mode = Animation.LOOP_LINEAR if logical in LOOPING else Animation.LOOP_NONE
 		_player.animation_finished.connect(_on_animation_finished)
 	play(&"Idle")
+
+
+## Gives the model `item` to hold (see UnitData.held_item): in place of its part named
+## `replaces` (hidden; the item is added beside it, so it follows the same bone, with the
+## part's transform), or else on the bone `bone`; then `item_scale`, `rotation_degrees` and
+## `offset` on top. A missing part or bone is reported and nothing changes.
+func hold(item: PackedScene, replaces: String, item_scale: float, rotation_degrees: Vector3,
+		bone := "", offset := Vector3.ZERO) -> void:
+	if item == null:
+		return
+	var place := Transform3D(Basis.from_euler(rotation_degrees * PI / 180.0).scaled(Vector3.ONE * item_scale), offset)
+	var parent: Node3D
+	var base := Transform3D.IDENTITY
+	if not replaces.is_empty():
+		var part := find_child(replaces, true, false) as Node3D
+		if part == null:
+			push_error("UnitModel: no part named '%s' to replace" % replaces)
+			return
+		part.hide()
+		parent = part.get_parent() as Node3D
+		base = part.transform
+	else:
+		var skeletons := find_children("*", "Skeleton3D", true, false)
+		var skeleton := skeletons[0] as Skeleton3D if not skeletons.is_empty() else null
+		if skeleton == null or skeleton.find_bone(bone) == -1:
+			push_error("UnitModel: no bone named '%s' to hold an item" % bone)
+			return
+		var attachment := BoneAttachment3D.new()
+		attachment.name = "HeldItemBone"
+		attachment.bone_name = bone
+		skeleton.add_child(attachment)
+		parent = attachment
+	var held := item.instantiate() as Node3D
+	held.name = "HeldItem"
+	held.transform = base * place
+	parent.add_child(held)
+	for mesh in held.find_children("*", "MeshInstance3D", true, false):
+		_meshes.append(mesh as MeshInstance3D)  # It flashes with the body.
 
 
 ## Back to a clean standing model: no flash, no held Death or Walk pose (a revived or re-synced
@@ -195,7 +234,7 @@ func _on_animation_finished(animation: StringName) -> void:
 func _resolve(logical: StringName) -> String:
 	for candidate: String in ANIMATIONS[logical]:
 		for animation in _player.get_animation_list():
-			if animation == candidate or animation.ends_with("|" + candidate):
+			if candidate in animation.split("|"):
 				return animation
 	return ""
 

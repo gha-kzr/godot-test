@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://mm2oow61uiin" path="res://data/spells/volley.tres" id="4_yuw5u"]
 [ext_resource type="Resource" uid="uid://c0lpi0wcttyeh" path="res://data/spells/poison_arrow.tres" id="5_4h3xc"]
 [ext_resource type="PackedScene" uid="uid://d3dclyf0ney4w" path="res://assets/quaternius/characters/Elf.fbx" id="99_model"]
+[ext_resource type="PackedScene" uid="uid://dsyhqrft5rhir" path="res://assets/quaternius/props/WoodenBow.glb" id="held_prop"]
 
 [resource]
 script = ExtResource("1_v46hb")
@@ -18,3 +19,7 @@ model_scene = ExtResource("99_model")
 model_scale = 0.5
 model_height = 1.4
 skin_color = Color(0.98, 0.86, 0.72, 1)
+held_item = ExtResource("held_prop")
+held_item_bone = "Fist.R"
+held_item_scale = 0.014
+held_item_rotation = Vector3(83, 6, 19)

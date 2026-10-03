@@ -68,9 +68,12 @@ func test_resistance_is_per_type_and_capped() -> void:
 	assert_eq(_dealt(state, _damage(10, fire)), 7, "30% fire resistance")
 	assert_eq(_dealt(state, _damage(10, physical)), 10, "other types untouched")
 	assert_eq(_dealt(state, _damage(10)), 10, "untyped damage is never resisted")
-	state.units[1].permanent_modifiers.append(_modifier(Stat.RESISTANCE_PERCENT, 40, fire))
-	assert_eq(state.units[1].resistance_percent(fire), UnitState.MAX_RESISTANCE_PERCENT, "capped")
-	assert_eq(_dealt(state, _damage(10, fire)), 5)
+	state.units[1].permanent_modifiers.append(_modifier(Stat.RESISTANCE_PERCENT, 80, fire))
+	assert_eq(state.units[1].resistance_percent(fire), 100, "an enemy is capped at immunity")
+	assert_eq(_dealt(state, _damage(10, fire)), 0, "immune")
+	state.units[0].permanent_modifiers.assign([_modifier(Stat.RESISTANCE_PERCENT, 110, fire)])
+	assert_eq(state.units[0].resistance_percent(fire), 75, "a hero at 75 %")
+	assert_true(UnitInfo.from_unit(state.units[1]).combat_stats_text().contains("Fire immune"), "the card says so")
 
 
 func test_negative_resistance_is_a_weakness() -> void:
@@ -180,7 +183,7 @@ func test_innate_modifiers_apply_in_every_battle() -> void:
 
 func test_the_damage_type_catalog_lists_every_type_in_order() -> void:
 	var names := DamageType.all().map(func(t: DamageType) -> String: return t.display_name)
-	assert_eq(names, ["Physical", "Fire", "Poison"])
+	assert_eq(names, ["Physical", "Fire", "Poison", "Holy", "Frost"])
 
 
 func test_power_scaling_per_effect() -> void:

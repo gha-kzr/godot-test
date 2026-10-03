@@ -21,6 +21,9 @@ class Build:
 @export_range(0, 9999) var xp_base := 10
 @export_range(0, 999) var xp_per_level := 3
 @export var loot_table: LootTable
+## How many a generated floor may have at most (0: no limit), e.g. one Ghost, so a party
+## that can't hurt it is never walled.
+@export_range(0, 10) var max_per_floor := 0
 
 
 func display_name() -> String:

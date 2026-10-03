@@ -729,8 +729,10 @@ func _prompt_text() -> String:
 				return tr("Nothing left to do: end your turn (%s)") % SettingsApplier.key_text(&"end_turn")
 			return tr("Move to a blue cell or pick a spell (%s)") % _spell_keys_text(battle.state.current_unit().data.spells.size())
 		State.TARGETING:
-			return tr("Choose a target for %s (orange cells). Esc to cancel") % \
-					tr(battle.state.current_unit().data.spells[selected_spell].display_name)
+			var spell_name := tr(battle.state.current_unit().data.spells[selected_spell].display_name)
+			if _targetable.is_empty():
+				return tr("%s has no target from here (its reach is shaded). Esc to cancel") % spell_name
+			return tr("Choose a target for %s (orange cells). Esc to cancel") % spell_name
 		State.ENEMY_TURN:
 			return tr("%s is acting...") % tr(battle.state.current_unit().label)
 	return ""
@@ -743,11 +745,12 @@ func _spell_keys_text(spell_count: int) -> String:
 	return first if count == 1 else "%s-%s" % [first, SettingsApplier.key_text(StringName("spell_%d" % count))]
 
 
-## The acting hero can neither move nor afford any spell.
+## The acting hero can't afford any spell and has no MP left (repositioning back alone
+## wouldn't help).
 func _nothing_left_to_do() -> bool:
-	if _reach != null and not _reach.cells().is_empty():
-		return false
 	var unit := battle.state.current_unit()
+	if unit.mp > 0 and _reach != null and not _reach.cells().is_empty():
+		return false
 	for slot in unit.data.spells.size():
 		if BattleActions.CastSpell.can_afford(unit, slot):
 			return false
@@ -769,9 +772,12 @@ func _update_hover() -> void:
 		State.IDLE:
 			board_view.clear_path_cost()
 			if _reach != null and _reach.can_reach(_hovered_cell):
-				cells = _reach.path_to(_hovered_cell)
+				# The walk from where the hero stands; the cost counts from where its move started.
+				var unit_id := battle.state.current_unit().id
+				cells = Movement.walk_path(battle.state, unit_id, _hovered_cell) \
+						if _reach.origin != _reach.standing else _reach.path_to(_hovered_cell)
 				board_view.show_path_cost(_hovered_cell, _reach.cost_to(_hovered_cell),
-						Movement.climbing_steps(battle.state.grid, _reach.origin, cells))
+						Movement.climbing_steps(battle.state.grid, _reach.standing, cells))
 			board_view.show_highlight(BoardView.Highlight.PATH, cells)
 		State.TARGETING:
 			if _targetable.has(_hovered_cell):
@@ -779,8 +785,12 @@ func _update_hover() -> void:
 				var spell := caster.data.spells[selected_spell]
 				cells = Targeting.area_cells(battle.state.grid, spell.area, caster.cell, _hovered_cell)
 				units_view.show_previews(DamagePreview.for_cast(battle.state, caster.id, selected_spell, _hovered_cell))
+				var landings: Array[Vector2i] = []
+				landings.assign(DamagePreview.landings(battle.state, caster.id, selected_spell, _hovered_cell).values())
+				board_view.show_highlight(BoardView.Highlight.LANDING, landings)
 			else:
 				units_view.clear_previews()
+				board_view.clear_highlight(BoardView.Highlight.LANDING)
 			board_view.show_highlight(BoardView.Highlight.AREA, cells)
 		# Other states: _set_state already cleared the hover highlights, and the AREA layer
 		# may be showing a cast's flash from the EventPlayer, which hover must not touch.
@@ -835,7 +845,7 @@ func _refresh_hud() -> void:
 	_show_turn()
 	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
 	if active != null:
-		hud.show_spells(active.spells, active.ap)
+		hud.show_spells(active.spells, active.ap, active.cooldowns)
 
 
 ## Shows the model's turn in the HUD: order, active card, AP for the spell bar, inspect
@@ -846,6 +856,7 @@ func _show_turn() -> void:
 	if active != null:
 		hud.show_unit(active)
 		hud.set_spell_ap(active.ap)
+		hud.set_spell_cooldowns(active.cooldowns)
 	_update_inspected()
 
 

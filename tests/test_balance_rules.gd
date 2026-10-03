@@ -31,7 +31,7 @@ func _enemy_stats(enemy: EnemyData, level: int) -> Vector2i:
 
 func test_a_level_n_enemy_is_slightly_weaker_than_the_level_n_hero_it_resembles() -> void:
 	var roster := _roster()
-	var pairs := [["res://data/enemies/brute.tres", 0], ["res://data/enemies/archer.tres", 2]]  # Knight, Ranger.
+	var pairs := [["res://data/enemies/brute.tres", 0], ["res://data/enemies/skeleton_archer.tres", 2]]  # Knight, Ranger.
 	for pair in pairs:
 		var enemy := load(pair[0]) as EnemyData
 		var hero := roster.heroes[pair[1]]

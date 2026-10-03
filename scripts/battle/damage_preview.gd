@@ -73,6 +73,23 @@ static func for_cast(state: BattleState, caster_id: int, spell_index: int, targe
 	return result
 
 
+## Where the cast would move units (a leap back, a charge, a push): unit id → its new cell.
+## Empty if the cast isn't legal or moves nobody. Positions don't depend on the rolls, but a
+## unit killed first isn't moved, so the cast is played with every roll at its lowest.
+static func landings(state: BattleState, caster_id: int, spell_index: int, target: Vector2i) -> Dictionary[int, Vector2i]:
+	var result: Dictionary[int, Vector2i] = {}
+	var action := BattleActions.CastSpell.new(caster_id, spell_index, target)
+	if not action.validate(state).is_empty():
+		return result
+	var simulated := state.clone()
+	simulated.roll_bound = BattleState.RollBound.LOWEST
+	for event in action.apply(simulated):
+		if event is BattleEvents.UnitDisplaced:
+			var displaced := event as BattleEvents.UnitDisplaced
+			result[displaced.unit_id] = displaced.to()
+	return result
+
+
 static func _entry(entries: Dictionary[int, Entry], unit_id: int) -> Entry:
 	if not entries.has(unit_id):
 		var entry := Entry.new()

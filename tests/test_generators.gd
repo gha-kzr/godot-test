@@ -143,3 +143,31 @@ func test_generated_blocks_stand_on_their_plateau() -> void:
 			if pattern.search(token.strip_edges()) != null:
 				raised += 1
 	assert_true(raised > 0, "some generated blocks sit on raised ground, not sunk to level 0")
+
+
+func test_a_floor_has_at_most_one_ghost_and_it_is_never_the_boss() -> void:
+	var tower := load("res://data/tower/tower.tres") as TowerConfig
+	var ghost := load("res://data/enemies/ghost.tres") as EnemyData
+	assert_eq(ghost.max_per_floor, 1)
+	var seen := 0
+	for floor_number in range(25, 125):
+		var encounter := FloorGenerator.encounter(tower, floor_number)
+		var ghosts := encounter.spawns.filter(func(s: EncounterSpawn) -> bool: return s.enemy == ghost).size()
+		assert_true(ghosts <= 1, "floor %d: %d ghosts" % [floor_number, ghosts])
+		seen += ghosts
+		if TowerConfig.is_boss_floor(floor_number):
+			assert_ne(encounter.spawns[0].enemy, ghost, "floor %d: the boss isn't a ghost" % floor_number)
+	assert_true(seen > 10, "ghosts do appear (%d)" % seen)
+	for band in tower.bands:
+		assert_false(ghost in band.boss_pool, "no ghost boss from floor %d" % band.from_floor)
+
+
+func test_the_cap_holds_even_when_the_pool_draws_it_every_time() -> void:
+	var tower := (load("res://data/tower/tower.tres") as TowerConfig).duplicate(true) as TowerConfig
+	var ghost := load("res://data/enemies/ghost.tres") as EnemyData
+	var brute := load("res://data/enemies/brute.tres") as EnemyData
+	for band in tower.bands:
+		band.enemy_pool = [ghost, ghost, ghost, ghost, brute] as Array[EnemyData]
+	for floor_number in range(1, 40):
+		var encounter := FloorGenerator.encounter(tower, floor_number)
+		assert_true(encounter.spawns.filter(func(s: EncounterSpawn) -> bool: return s.enemy == ghost).size() <= 1, "floor %d" % floor_number)

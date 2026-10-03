@@ -3,16 +3,13 @@ class_name HeroData
 extends Resource
 ## A playable hero: its base unit (stats and starting kit) and what each level brings.
 
-## Spells a hero can hold at most (base kit + unlocks).
-const MAX_SPELLS := 4
-
 @export var unit: UnitData
 ## Index 0 is reaching level 2, index 1 level 3, and so on.
 @export var level_rewards: Array[LevelReward] = []
 ## What every level past the table brings (stats only: a very high level cap needs no authored
 ## rewards for each level). Spells in it are ignored.
 @export var growth_reward: LevelReward
-## Extra rewards at particular levels past the table (e.g. 15: +1 MP, 20: +1 AP).
+## Extra rewards at particular levels past the table (e.g. 15: +1 MP, 20: +1 AP, or a spell).
 @export var milestone_rewards: Dictionary[int, LevelReward] = {}
 
 
@@ -36,6 +33,7 @@ func reward_for(level: int) -> LevelReward:
 	var milestone: LevelReward = milestone_rewards.get(level)
 	if milestone != null:
 		reward.modifiers.append_array(milestone.modifiers)
+		reward.spells.append_array(milestone.spells)
 	return reward
 
 
@@ -45,13 +43,13 @@ func get_validation_errors() -> PackedStringArray:
 		return PackedStringArray(["hero has no unit"])
 	for error in unit.get_validation_errors():
 		errors.append(error)
-	var spell_count := unit.spells.size()
+	var spells: Array[SpellData] = unit.spells.duplicate()
 	for i in level_rewards.size():
 		var reward := level_rewards[i]
 		if reward == null:
 			errors.append("%s: empty reward for level %d" % [display_name(), i + 2])
 			continue
-		spell_count += reward.spells.size()
+		spells.append_array(reward.spells)
 		for error in reward.get_validation_errors():
 			errors.append("%s level %d: %s" % [display_name(), i + 2, error])
 	if growth_reward != null:
@@ -65,11 +63,14 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("%s: empty milestone at level %d" % [display_name(), level])
 		elif level <= level_rewards.size() + 1:
 			errors.append("%s: milestone at level %d is inside the reward table" % [display_name(), level])
-		elif not milestone.spells.is_empty():
-			errors.append("%s: the milestone at level %d can't unlock spells" % [display_name(), level])
 		else:
+			spells.append_array(milestone.spells)
 			for error in milestone.get_validation_errors():
 				errors.append("%s milestone %d: %s" % [display_name(), level, error])
-	if spell_count > MAX_SPELLS:
-		errors.append("%s: %d spells in total, at most %d" % [display_name(), spell_count, MAX_SPELLS])
+	for i in spells.size():
+		if spells[i] != null and spells.find(spells[i]) != i:
+			errors.append("%s learns %s twice" % [display_name(), spells[i].display_name])
+	for spell in spells:
+		if spell != null and spell.ap_cost > unit.ap:
+			errors.append("%s: %s costs %d AP but the hero has %d at level 1" % [display_name(), spell.display_name, spell.ap_cost, unit.ap])
 	return errors

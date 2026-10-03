@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dlob7c217iah0"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_4not8"]
+[ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="2_cjn0t"]
+[ext_resource type="Resource" uid="uid://bpx5i7f4hovmg" path="res://data/damage_types/poison.tres" id="3_6417e"]
+[ext_resource type="PackedScene" uid="uid://ejsc2gka0y3g" path="res://assets/quaternius/monsters/Zombie.glb" id="4_rtmyb"]
+[ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_pqc82"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_l8dxe"]
+[ext_resource type="Resource" uid="uid://ljmd26clkr6d" path="res://data/spells/rend.tres" id="7_feakb"]
+[ext_resource type="Resource" uid="uid://c38v8hqfe2ved" path="res://data/spells/devour.tres" id="8_7l7lw"]
+
+[sub_resource type="Resource" id="Resource_dm441"]
+script = ExtResource("1_4not8")
+stat = 4
+amount = -25
+damage_type = ExtResource("2_cjn0t")
+
+[sub_resource type="Resource" id="Resource_wdrua"]
+script = ExtResource("1_4not8")
+stat = 4
+amount = 50
+damage_type = ExtResource("3_6417e")
+
+[resource]
+script = ExtResource("5_pqc82")
+display_name = "Ghoul"
+max_hp = 48
+mp = 2
+initiative = 95
+spells = Array[ExtResource("6_l8dxe")]([ExtResource("7_feakb"), ExtResource("8_7l7lw")])
+innate_modifiers = Array[ExtResource("1_4not8")]([SubResource("Resource_dm441"), SubResource("Resource_wdrua")])
+color = Color(0.5, 0.75, 0.35, 1)
+model_scene = ExtResource("4_rtmyb")
+model_scale = 1.1
+model_height = 1.4

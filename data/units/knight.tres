@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://c4ktapn8lviu2" path="res://data/spells/piercing_thrust.tres" id="4_10phg"]
 [ext_resource type="Resource" uid="uid://c0tntaelyfj11" path="res://data/spells/guard.tres" id="5_ee11w"]
 [ext_resource type="PackedScene" uid="uid://r883rq5adjyp" path="res://assets/quaternius/characters/Knight_Male.fbx" id="99_model"]
+[ext_resource type="PackedScene" uid="uid://cntesu5ysg2lm" path="res://assets/quaternius/props/Sword.glb" id="held_prop"]
 
 [sub_resource type="Resource" id="Resource_25s5j"]
 script = ExtResource("1_7apsc")
@@ -27,3 +28,7 @@ model_scene = ExtResource("99_model")
 model_scale = 0.5
 model_height = 1.35
 skin_color = Color(0.95, 0.78, 0.64, 1)
+held_item = ExtResource("held_prop")
+held_item_bone = "Fist.R"
+held_item_scale = 0.011
+held_item_rotation = Vector3(53, -10, 4)

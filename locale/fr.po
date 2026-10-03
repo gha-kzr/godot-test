@@ -86,8 +86,14 @@ msgstr "%s pendant %s (%s)"
 msgid "%s has no free rune slot."
 msgstr "%s n'a plus d'emplacement de rune libre."
 
+msgid "%s has no target from here (its reach is shaded). Esc to cancel"
+msgstr "%s n'a aucune cible d'ici (sa portée est grisée). Échap pour annuler"
+
 msgid "%s HP"
 msgstr "%s PV"
+
+msgid "%s immune"
+msgstr "%s : immunisé"
 
 msgid "%s initiative"
 msgstr "%s initiative"
@@ -137,6 +143,9 @@ msgstr "%s · Round %d"
 msgid "%s — level %d"
 msgstr "%s — niveau %d"
 
+msgid "%s — spells"
+msgstr "%s — sorts"
+
 msgid "%s%% %s resistance"
 msgstr "%s%% résistance (%s)"
 
@@ -173,6 +182,9 @@ msgstr "Un étage de boss ! Le boss est bien plus fort. Le vaincre offre un bien
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
 msgstr "Un héros a gagné un niveau : ses stats augmentent, et certains niveaux enseignent un nouveau sort."
 
+msgid "A spell learned later takes this slot."
+msgstr "Un sort appris plus tard prendra cet emplacement."
+
 msgid "A stage: one hard boss fight. Win it to raise the tower's top floor and start your climbs higher."
 msgstr "Une épreuve : un seul combat de boss difficile. Gagnez-le pour monter le sommet de la tour et commencer vos ascensions plus haut."
 
@@ -206,9 +218,6 @@ msgstr "PA 0 / 0"
 msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr "PA : points d'action. Chaque sort en coûte ; ils se rechargent à chaque tour."
 
-msgid "Archer"
-msgstr "Archer"
-
 msgid "Arrow"
 msgstr "Flèche"
 
@@ -230,6 +239,9 @@ msgstr "Retour à l'équipe"
 msgid "Back to the title"
 msgstr "Retour au titre"
 
+msgid "Backslash"
+msgstr "Taillade arrière"
+
 msgid "Battle"
 msgstr "Combat"
 
@@ -241,6 +253,15 @@ msgstr "Vitesse des combats"
 
 msgid "Best floor: %d"
 msgstr "Meilleur étage : %d"
+
+msgid "Blink"
+msgstr "Clignement"
+
+msgid "Bone Arrow"
+msgstr "Flèche d'os"
+
+msgid "Bone Rain"
+msgstr "Pluie d'os"
 
 msgid "Boons: %s"
 msgstr "Bienfaits : %s"
@@ -259,6 +280,29 @@ msgstr "Amenez un héros au niveau 30."
 
 msgid "Brute"
 msgstr "Brute"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Change spells"
+msgstr "Changer les sorts"
+
+msgid "Change spells (%d more known)"
+msgid_plural "Change spells (%d more known)"
+msgstr[0] "Changer les sorts (%d autre connu)"
+msgstr[1] "Changer les sorts (%d autres connus)"
+
+msgid "Charge"
+msgstr "Charge"
+
+msgid "Charges in a straight line next to the target"
+msgstr "Charge en ligne droite jusqu'à la cible"
+
+msgid "Chill Touch"
+msgstr "Toucher glacial"
+
+msgid "Chilled"
+msgstr "Gelé"
 
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr "Choisissez une cible pour %s (cases orange). Échap pour annuler"
@@ -317,11 +361,20 @@ msgstr "Coup handicapant"
 msgid "Cross"
 msgstr "Croix"
 
+msgid "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes."
+msgstr "Dégâts subis : pourcentage de dégâts en plus (ou, sous 0, en moins) que l'unité subit, selon ses effets et ses runes."
+
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr "Défaite. L'ascension s'arrête ; les héros gardent leurs niveaux et leurs runes."
 
+msgid "Devour"
+msgstr "Dévorer"
+
 msgid "Display"
 msgstr "Affichage"
+
+msgid "Dread"
+msgstr "Effroi"
 
 msgid "Drop"
 msgstr "Jeter"
@@ -349,6 +402,9 @@ msgstr "Termine votre tour tout seul quand un héros ne peut ni se déplacer ni 
 
 msgid "Epic"
 msgstr "Épique"
+
+msgid "Every %d turns"
+msgstr "Tous les %d tours"
 
 msgid "Fast (x2)"
 msgstr "Rapide (x2)"
@@ -413,6 +469,12 @@ msgstr "Trouvé : %s."
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
 
+msgid "Frost"
+msgstr "Givre"
+
+msgid "Frost Lance"
+msgstr "Lance de givre"
+
 msgid "Full heal — every hero back to full HP"
 msgstr "Soin complet — chaque héros retrouve tous ses PV"
 
@@ -425,8 +487,17 @@ msgstr "Pleinement runé"
 msgid "Game"
 msgstr "Jeu"
 
+msgid "Ghost"
+msgstr "Spectre"
+
+msgid "Ghoul"
+msgstr "Goule"
+
 msgid "Got it"
 msgstr "Compris"
+
+msgid "Grapple Shot"
+msgstr "Tir grappin"
 
 msgid "Ground Slam"
 msgstr "Fracas du sol"
@@ -452,6 +523,9 @@ msgstr "Héros"
 msgid "Hints will show again."
 msgstr "Les astuces s'afficheront à nouveau."
 
+msgid "Holy"
+msgstr "Sacré"
+
 msgid "HP %d   AP %d   MP %d   Initiative %d"
 msgstr "PV %d   PA %d   PM %d   Initiative %d"
 
@@ -460,6 +534,12 @@ msgstr "PV %d / %d"
 
 msgid "HP: health. At 0 the unit falls."
 msgstr "PV : points de vie. À 0, l'unité tombe."
+
+msgid "Hunter's Mark"
+msgstr "Marque du chasseur"
+
+msgid "Initiative %d, damage taken %+d%%"
+msgstr "Initiative %d, dégâts subis %+d%%"
 
 msgid "Initiative: the higher it is, the earlier the unit plays."
 msgstr "Initiative : plus elle est haute, plus l'unité joue tôt."
@@ -473,14 +553,25 @@ msgstr "Garde de fer"
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr "C'est votre tour. Les cases bleues sont celles où vous pouvez marcher : chaque pas coûte des PM. Cliquez sur l'une d'elles."
 
+msgid "Jumps to the target cell (climbs up to %d levels)"
+msgstr "Saute sur la case ciblée (monte jusqu'à %d niveaux)"
+
 msgid "Keys reset."
 msgstr "Touches réinitialisées."
 
 msgid "Knight"
 msgstr "Chevalier"
 
+msgid "Known, not in the loadout"
+msgstr "Connus, hors de la sélection"
+
 msgid "Language"
 msgstr "Langue"
+
+msgid "Leaps back %d cell"
+msgid_plural "Leaps back up to %d cells"
+msgstr[0] "Bondit de %d case en arrière"
+msgstr[1] "Bondit jusqu'à %d cases en arrière"
 
 msgid "learns %s"
 msgstr "apprend %s"
@@ -509,8 +600,14 @@ msgstr "Niveau supérieur ! (+%d XP)"
 msgid "Line"
 msgstr "Ligne"
 
+msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
+msgstr "Sélection : les sorts emmenés au combat (l'emplacement 1 est la touche 1)"
+
 msgid "Mage"
 msgstr "Mage"
+
+msgid "Marked"
+msgstr "Marqué"
 
 msgid "Master volume"
 msgstr "Volume général"
@@ -520,6 +617,9 @@ msgstr "Soin"
 
 msgid "Menu"
 msgstr "Menu"
+
+msgid "Move"
+msgstr "Déplacer"
 
 msgid "Move to a blue cell or pick a spell (%s)"
 msgstr "Déplacez-vous sur une case bleue ou choisissez un sort (%s)"
@@ -575,6 +675,9 @@ msgstr "Rien de ce combat n'est conservé : il recommencera depuis le début qua
 msgid "Nothing left to do: end your turn (%s)"
 msgstr "Plus rien à faire : terminez votre tour (%s)"
 
+msgid "Once per turn"
+msgstr "Une fois par tour"
+
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
 msgstr "Un seul combat. Le réussir permet à la tour de monter jusqu'à l'étage %d et de commencer à l'étage %d."
 
@@ -593,6 +696,12 @@ msgstr "Choisissez un bienfait, ou soignez l'équipe à la place."
 msgid "Piercing Thrust"
 msgstr "Estocade perçante"
 
+msgid "Pinned"
+msgstr "Cloué"
+
+msgid "Pinning Shot"
+msgstr "Tir clouant"
+
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr "Placez vos héros : cliquez sur l'un, puis sur une case turquoise. Prêt (%s) pour combattre"
 
@@ -608,8 +717,8 @@ msgstr "Poison"
 msgid "Poison Arrow"
 msgstr "Flèche empoisonnée"
 
-msgid "Power %+d%%"
-msgstr "Puissance %+d%%"
+msgid "Power %+d%%   Damage taken %+d%%"
+msgstr "Puissance %+d%%   Dégâts subis %+d%%"
 
 msgid "Power: All %+d%%\nResist: %s"
 msgstr "Puissance : tous %+d%%\nRésist. : %s"
@@ -623,8 +732,24 @@ msgstr "Appuyez sur une touche pour %s (Échap pour annuler)."
 msgid "Press a key..."
 msgstr "Appuyez sur une touche..."
 
+msgid "Press Move on a spell to change the loadout."
+msgstr "Appuyez sur Déplacer sur un sort pour changer la sélection."
+
 msgid "Progress couldn't be saved."
 msgstr "La progression n'a pas pu être sauvegardée."
+
+msgid "Pulls %d cell closer"
+msgid_plural "Pulls up to %d cells closer"
+msgstr[0] "Attire de %d case"
+msgstr[1] "Attire de %d cases au plus"
+
+msgid "Pushes back %d cell"
+msgid_plural "Pushes back %d cells"
+msgstr[0] "Repousse de %d case"
+msgstr[1] "Repousse de %d cases"
+
+msgid "Put here"
+msgstr "Mettre ici"
 
 msgid "Quit"
 msgstr "Quitter"
@@ -677,6 +802,12 @@ msgstr "Recentrer la caméra"
 msgid "Regeneration"
 msgstr "Régénération"
 
+msgid "Rend"
+msgstr "Lacérer"
+
+msgid "Repulse"
+msgstr "Répulsion"
+
 msgid "Reset keys"
 msgstr "Réinitialiser les touches"
 
@@ -686,8 +817,8 @@ msgstr "Effacer la sauvegarde"
 msgid "Resistance: %s"
 msgstr "Résistance : %s"
 
-msgid "Resistance: percent less damage of one type (never more than half)."
-msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus de la moitié)."
+msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
+msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus des trois quarts pour les héros ; un ennemi peut être immunisé)."
 
 msgid "Round %d"
 msgstr "Round %d"
@@ -740,6 +871,9 @@ msgstr "Paramètres"
 msgid "Settings couldn't be saved."
 msgstr "Les paramètres n'ont pas pu être sauvegardés."
 
+msgid "Shield Bash"
+msgstr "Coup de bouclier"
+
 msgid "Show hints again"
 msgstr "Réafficher les astuces"
 
@@ -748,6 +882,9 @@ msgstr "Vue de côté (%s)"
 
 msgid "Single"
 msgstr "Simple"
+
+msgid "Skeleton Archer"
+msgstr "Archer squelette"
 
 msgid "Skip tutorial"
 msgstr "Passer le tutoriel"
@@ -760,6 +897,9 @@ msgstr "Entaille"
 
 msgid "Smash"
 msgstr "Écrasement"
+
+msgid "Smite"
+msgstr "Châtiment"
 
 msgid "Speed x1"
 msgstr "Vitesse x1"
@@ -824,6 +964,9 @@ msgstr "Poussée"
 msgid "Swift Stride"
 msgstr "Foulée rapide"
 
+msgid "Teleports to the target cell"
+msgstr "Se téléporte sur la case ciblée"
+
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."
 
@@ -835,6 +978,9 @@ msgstr "Cet emplacement de rune est vide."
 
 msgid "That rune slot isn't free."
 msgstr "Cet emplacement de rune n'est pas libre."
+
+msgid "That spell can't go there."
+msgstr "Ce sort ne peut pas aller là."
 
 msgid "The battle couldn't start (see the log)."
 msgstr "Le combat n'a pas pu démarrer (voir le journal)."
@@ -917,8 +1063,14 @@ msgstr "Vigueur"
 msgid "Volley"
 msgstr "Volée"
 
+msgid "Wail"
+msgstr "Lamentation"
+
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
 msgstr "Quand vous avez fini, terminez votre tour ({end_turn}). Les ennemis jouent ensuite."
+
+msgid "Where does %s go? Put here on a slot, or Cancel (Esc)."
+msgstr "Où va %s ? Mettre ici sur un emplacement, ou Annuler (Échap)."
 
 msgid "Whirlwind"
 msgstr "Tourbillon"

@@ -591,3 +591,21 @@ func test_the_shipped_branding_is_found_and_the_start_screen_shows_it() -> void:
 	start.apply_branding(null)
 	assert_true(start.get_node("%TitleLabel").visible and not start.get_node("%Picture").visible)
 	start.free()
+
+
+func test_the_spells_screen_changes_the_loadout_and_saves_it() -> void:
+	var game := _game()
+	var knight := game.profile.heroes[0]
+	knight.level = 3  # Slash, Piercing Thrust, Guard, Whirlwind.
+	knight.xp = game.roster.config.xp_for_level(3)  # A save recomputes the level from XP.
+	(game.screen as PartyScreen).spells_pressed.emit(0)
+	assert_true(game.screen is SpellsScreen, "the spells screen opens")
+	var screen := game.screen as SpellsScreen
+	(screen.find_child("Slot4", true, false).find_child("Move", true, false) as Button).pressed.emit()
+	(screen.find_child("Slot1", true, false).find_child("PutHere", true, false) as Button).pressed.emit()
+	assert_eq(knight.spells()[0].display_name, "Whirlwind", "swapped")
+	assert_eq(_saved(game).heroes[0].spells()[0].display_name, "Whirlwind", "and saved")
+	assert_true(game.screen is SpellsScreen, "still on the spells screen")
+	game.screen.back_pressed.emit()
+	assert_true(game.screen is PartyScreen, "back to the hub")
+	game.free()

@@ -10,7 +10,7 @@ extends Node3D
 ## a unit's body picks its cell even where the body hides the ground behind it.
 
 ## Declared in drawing order: later kinds lie above earlier ones.
-enum Highlight { ZONE, REACH, RANGE_BLOCKED, PATH, RANGE, AREA }
+enum Highlight { ZONE, REACH, RANGE_BLOCKED, PATH, RANGE, AREA, LANDING }
 
 const NO_CELL := Vector2i(-1, -1)
 const CELL_SIZE := 1.0
@@ -358,6 +358,7 @@ func _highlight_color(kind: Highlight) -> Color:
 		Highlight.PATH: return active_theme().path_color
 		Highlight.RANGE: return active_theme().range_color
 		Highlight.RANGE_BLOCKED: return active_theme().range_blocked_color
+		Highlight.LANDING: return active_theme().landing_color
 		_: return active_theme().area_color
 
 

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DamageType" format=3 uid="uid://b4jrpxctg8xvs"]
+
+[ext_resource type="PackedScene" uid="uid://c8fyhwxqir8l8" path="res://scenes/fx/impact_holy.tscn" id="1_kmdda"]
+[ext_resource type="Script" uid="uid://iege8qur066y" path="res://scripts/data/damage_type.gd" id="2_e4kxv"]
+
+[resource]
+script = ExtResource("2_e4kxv")
+display_name = "Holy"
+color = Color(1, 0.88, 0.45, 1)
+impact_effect = ExtResource("1_kmdda")
+sort_order = 3

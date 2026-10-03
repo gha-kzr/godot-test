@@ -154,9 +154,10 @@ func test_equip_errors() -> void:
 func test_validation() -> void:
 	var hero := _hero("Knight")
 	assert_eq(hero.get_validation_errors(), PackedStringArray())
-	for i in 4:
-		hero.level_rewards[i].spells = [BattleFixtures.damage_spell()] as Array[SpellData]
-	assert_true(Array(hero.get_validation_errors()).any(func(e: String) -> bool: return "at most 4" in e))
+	var twice := BattleFixtures.damage_spell()
+	for i in 2:
+		hero.level_rewards[i].spells = [twice] as Array[SpellData]
+	assert_true(Array(hero.get_validation_errors()).any(func(e: String) -> bool: return "learns Hit twice" in e))
 	var roster := Roster.new()
 	roster.heroes = [_hero("A")] as Array[HeroData]
 	roster.starting_party = [0, 3] as Array[int]

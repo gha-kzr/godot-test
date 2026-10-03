@@ -415,13 +415,16 @@ func test_power_and_resistances_always_show() -> void:
 	var info := _info("Knight")
 	hud.show_unit(info)
 	assert_true(_active(hud, "Rows/CombatStats").visible, "always shown")
-	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +0%\nResist: none")
+	assert_eq(_active(hud, "Rows/CombatStats").text, "Initiative 0, damage taken +0%\nPower: All +0%\nResist: none")
 	info.power = 8
+	info.initiative = 110
+	info.damage_taken = -30
 	info.resistances = {"Physical": 0, "Fire": 20, "Poison": -10}
 	hud.show_unit(info)
-	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	var expected := "Initiative 110, damage taken -30%\nPower: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%"
+	assert_eq(_active(hud, "Rows/CombatStats").text, expected)
 	hud.show_inspected(info)
-	assert_eq((hud.get_node("%InspectCard/Rows/CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	assert_eq((hud.get_node("%InspectCard/Rows/CombatStats") as Label).text, expected)
 	hud.free()
 
 
@@ -436,7 +439,7 @@ func test_unit_info_reads_power_and_resistances() -> void:
 			[BattleFixtures.unit("E0")] as Array[UnitData], 1, [[ward, BattleFixtures.modifier(StatModifier.Stat.POWER, 9)] as Array[StatModifier]])
 	var info := UnitInfo.from_unit(state.units[0])
 	assert_eq(info.power, 9)
-	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Ice"], "every game type in order, then the unit's own")
+	assert_eq(info.resistances.keys(), ["Physical", "Fire", "Poison", "Holy", "Frost", "Ice"], "every game type in order, then the unit's own")
 	assert_eq(info.resistances["Physical"], 0, "zeros included")
 	assert_eq(info.resistances["Ice"], 25)
 
@@ -624,4 +627,16 @@ func test_the_inspect_card_can_sit_on_either_edge() -> void:
 	hud.set_inspect_side(false)
 	assert_eq([card.anchor_left, card.anchor_right, card.offset_left, card.offset_right], [1.0, 1.0, -262.0, -12.0])
 	assert_eq(card.grow_horizontal, Control.GROW_DIRECTION_BEGIN)
+	hud.free()
+
+
+func test_a_spell_waiting_for_its_cooldown_shows_its_turns_and_is_disabled() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10, [2, 0] as Array[int])
+	assert_true(_spell_button(hud, 0).disabled, "waiting")
+	assert_eq(hud.get_node("%SpellBar").cooldown_text(0), "2")
+	assert_false(_spell_button(hud, 1).disabled)
+	assert_eq(hud.get_node("%SpellBar").cooldown_text(1), "")
+	hud.set_spell_cooldowns([0, 0] as Array[int])
+	assert_false(_spell_button(hud, 0).disabled, "ready again")
 	hud.free()

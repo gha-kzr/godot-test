@@ -29,6 +29,8 @@ extends Resource
 ## In range but out of line of sight: shown faded, so it's clear why it can't be aimed at.
 @export var range_blocked_color := Color(0.35, 0.18, 0.1, 0.45)
 @export var area_color := Color(1.0, 0.2, 0.15, 0.55)
+## Where the aimed spell would move a unit (Backslash's landing, a push's end).
+@export var landing_color := Color(0.35, 0.95, 1.0, 0.75)
 
 @export_group("Scenes")
 ## Replaces a floor cell's placeholder column. Instanced with its origin at the cell's

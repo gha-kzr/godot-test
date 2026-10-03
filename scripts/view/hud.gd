@@ -196,14 +196,19 @@ func close_order_overlay() -> bool:
 	return true
 
 
-## One slot per spell; spells costing more than `ap` are disabled.
-func show_spells(spells: Array[SpellData], ap: int) -> void:
-	_spell_bar.show_spells(spells, ap)
+## One slot per spell; spells costing more than `ap`, or waiting for their cooldown, are disabled.
+func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
+	_spell_bar.show_spells(spells, ap, cooldowns)
 
 
 ## The active unit's AP changed (spells it can't afford are disabled).
 func set_spell_ap(ap: int) -> void:
 	_spell_bar.set_ap(ap)
+
+
+## The active unit's cooldowns changed (per slot; waiting spells are disabled).
+func set_spell_cooldowns(cooldowns: Array[int]) -> void:
+	_spell_bar.set_cooldowns(cooldowns)
 
 
 ## Shows which spell is being aimed (-1 for none). Doesn't emit spell_selected.

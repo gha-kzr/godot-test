@@ -15,41 +15,48 @@ const STEP_COST := 1
 const CLIMB_COST_PER_LEVEL := 1
 
 
-## Result of a flood fill from one unit's cell. Read-only.
+## Result of a flood fill from where a unit's move segment started. Read-only.
 class Reach:
+	## Where the flood started: the unit's cell, or where it stood before repositioning.
 	var origin: Vector2i
+	## Where the unit stands now (not a destination; the origin is one after a move).
+	var standing: Vector2i
+	## The MP the flood had from the origin (the unit's MP plus any repositioning refund).
+	var origin_budget: int
 	var _costs: Dictionary[Vector2i, int]
 	var _came_from: Dictionary[Vector2i, Vector2i]
 	## Cells walked through but not ends of a move (allies stand there).
 	var _pass_only: Dictionary[Vector2i, bool]
 
 	func _init(start: Vector2i, costs: Dictionary[Vector2i, int], came_from: Dictionary[Vector2i, Vector2i],
-			pass_only: Dictionary[Vector2i, bool] = {}) -> void:
+			pass_only: Dictionary[Vector2i, bool] = {}, standing_cell := start, budget := 0) -> void:
 		origin = start
+		standing = standing_cell
+		origin_budget = budget
 		_costs = costs
 		_came_from = came_from
 		_pass_only = pass_only
 
-	## Reachable destination cells, excluding the origin.
+	## Reachable destination cells, excluding where the unit stands.
 	func cells() -> Array[Vector2i]:
 		var result: Array[Vector2i] = []
 		for cell in _costs:
-			if cell != origin and cell not in _pass_only:
+			if cell != standing and cell not in _pass_only:
 				result.append(cell)
 		return result
 
 	func can_reach(cell: Vector2i) -> bool:
-		return cell != origin and _costs.has(cell) and cell not in _pass_only
+		return cell != standing and _costs.has(cell) and cell not in _pass_only
 
-	## MP needed to reach the cell, or -1 if unreachable (or an ally stands there).
+	## MP needed to reach the cell from the origin, or -1 if unreachable (or an ally stands there).
 	func cost_to(cell: Vector2i) -> int:
 		return _costs.get(cell, -1) if cell not in _pass_only else -1
 
-	## Cells to walk through, excluding the origin and including the destination.
-	## Empty if unreachable.
+	## Cells to walk through from the origin, excluding it and including the destination.
+	## Empty if unreachable (or the origin itself).
 	func path_to(cell: Vector2i) -> Array[Vector2i]:
 		var path: Array[Vector2i] = []
-		if not can_reach(cell):
+		if not can_reach(cell) or cell == origin:
 			return path
 		var current := cell
 		while current != origin:
@@ -82,16 +89,31 @@ static func step_cost(grid: Grid, from: Vector2i, to: Vector2i) -> int:
 	return STEP_COST + maxi(rise, 0) * CLIMB_COST_PER_LEVEL
 
 
-## Every cell the unit can end its move on with its current MP.
+## Every cell the unit can end its move on: what its move segment's MP reaches from where
+## the segment started (its cell, or where it stood before repositioning; see UnitState).
 ## Enemies block their cells; allies can be walked through but not stopped on.
 ## Takes a unit id, not a UnitState: the unit is looked up in `state`, so the same call
 ## works on the real state and on AI clones.
 static func reach(state: BattleState, unit_id: int) -> Reach:
 	var unit := state.units[unit_id]
-	var costs: Dictionary[Vector2i, int] = {unit.cell: 0}
+	var start := unit.move_start()
+	return _flood(state, unit_id, start, unit.move_budget(), unit.cell)
+
+
+## The cells a unit would walk through from where it stands to `to` (excluding its cell,
+## including `to`), with no MP limit: how a repositioning move is drawn. Empty if no walk
+## leads there (e.g. back up a drop it can't climb).
+static func walk_path(state: BattleState, unit_id: int, to: Vector2i) -> Array[Vector2i]:
+	var unit := state.units[unit_id]
+	return _flood(state, unit_id, unit.cell, 1 << 20, unit.cell).path_to(to)
+
+
+static func _flood(state: BattleState, unit_id: int, start: Vector2i, budget: int, standing: Vector2i) -> Reach:
+	var unit := state.units[unit_id]
+	var costs: Dictionary[Vector2i, int] = {start: 0}
 	var came_from: Dictionary[Vector2i, Vector2i] = {}
 	var pass_only: Dictionary[Vector2i, bool] = {}
-	var frontier: Array[Vector2i] = [unit.cell]
+	var frontier: Array[Vector2i] = [start]
 
 	while not frontier.is_empty():
 		var current := _pop_cheapest(frontier, costs)
@@ -105,14 +127,14 @@ static func reach(state: BattleState, unit_id: int) -> Reach:
 					continue
 				pass_only[next] = true
 			var cost := costs[current] + step
-			if cost > unit.mp:
+			if cost > budget:
 				continue
 			if not costs.has(next) or cost < costs[next]:
 				costs[next] = cost
 				came_from[next] = current
 				if next not in frontier:
 					frontier.append(next)
-	return Reach.new(unit.cell, costs, came_from, pass_only)
+	return Reach.new(start, costs, came_from, pass_only, standing, budget)
 
 
 ## Linear scan is fine at battle-map sizes (~100 cells). First-in wins ties,

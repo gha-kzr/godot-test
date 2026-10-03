@@ -9,6 +9,8 @@ extends RefCounted
 ## then returns the first step of the best plan:
 ## a Move to that position, or the cast itself. With nothing worth casting, it walks
 ## toward the nearest opponent. Team-agnostic: opponents are the units of the other team.
+## It decides once per move segment: after a move it never repositions before casting (no
+## rethinking, and the turn always ends), but it can move again after a cast.
 
 ## Distance of cells from which no opponent can be reached.
 const FAR_AWAY := 1 << 30
@@ -48,7 +50,8 @@ static func choose_next(state: BattleState, unit_id: int, profile: AIProfile = n
 static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, profile: AIProfile) -> Plan:
 	var unit := state.units[unit_id]
 	var positions: Array[Vector2i] = [unit.cell]
-	positions.append_array(reach.cells())
+	if not unit.moved:
+		positions.append_array(reach.cells())
 	# Damage and heals use the average roll, so the AI decides on what usually happens.
 	# Any other randomness gets dice seeded apart from the real RNG, so the AI never
 	# sees a future roll.
@@ -60,11 +63,11 @@ static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, 
 		var moved := state.clone()
 		moved.use_average_rolls = true
 		moved.units[unit_id].cell = cell
-		moved.units[unit_id].mp -= reach.cost_to(cell)
+		moved.units[unit_id].mp = reach.origin_budget - reach.cost_to(cell)
 		for spell_index in unit.data.spells.size():
 			var spell := unit.data.spells[spell_index]
 			# A free spell could be cast forever; skipping it guarantees the turn ends.
-			if spell.ap_cost <= 0 or spell.ap_cost > unit.ap:
+			if spell.ap_cost <= 0 or not BattleActions.CastSpell.can_afford(unit, spell_index):
 				continue
 			for target in Targeting.targetable_cells(moved, unit_id, spell):
 				if not _area_hits_a_unit(moved, spell, cell, target):
@@ -177,6 +180,8 @@ static func _statuses_benefit(state: BattleState, unit: UnitState, profile: AIPr
 ## if no cell in reach gets closer.
 static func _approach(state: BattleState, unit_id: int, reach: Movement.Reach) -> Vector2i:
 	var unit := state.units[unit_id]
+	if unit.moved:
+		return unit.cell  # Already moved this segment: no second thoughts.
 	var opponents: Array[Vector2i] = []
 	for other in state.units:
 		if other.is_alive() and other.team != unit.team:

@@ -72,6 +72,7 @@ func _end_turn(unit: UnitState) -> Array[BattleEvents.Event]:
 		if status.turns_left <= 0:
 			unit.statuses.erase(status)
 			events.append(BattleEvents.StatusExpired.new(unit.id, status.data))
+	unit.commit_position()
 	events.append(BattleEvents.TurnEnded.new(unit.id))
 	return events
 

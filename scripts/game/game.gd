@@ -13,6 +13,7 @@ const TITLE_SCENE := preload("res://scenes/game/title_screen.tscn")
 const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
 const START_SCENE := preload("res://scenes/game/start_screen.tscn")
 const ACHIEVEMENTS_SCENE := preload("res://scenes/game/achievements_screen.tscn")
+const SPELLS_SCENE := preload("res://scenes/game/spells_screen.tscn")
 const CREDITS_SCENE := preload("res://scenes/game/credits_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
@@ -221,6 +222,7 @@ func show_party(message := "") -> void:
 	party.abandon_pressed.connect(_on_abandon_pressed)
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
+	party.spells_pressed.connect(show_spells)
 	party.drop_requested.connect(_on_drop_requested)
 	party.achievements_pressed.connect(show_achievements)
 	party.tutorial = tutorial
@@ -394,6 +396,30 @@ func _on_unequip_requested(hero_index: int, slot: int) -> void:
 		return
 	RunDirector.materialize_hp(profile)
 	_finish_rune_change(profile.unequip(hero_index, slot))
+
+
+## A hero's spells, to read and to change the loadout; back (or Esc) returns to the hub.
+func show_spells(hero_index: int) -> void:
+	if hero_index < 0 or hero_index >= profile.heroes.size():
+		return
+	var spells_screen := SPELLS_SCENE.instantiate() as SpellsScreen
+	_replace_screen(spells_screen)
+	spells_screen.show_spells(profile.heroes[hero_index])
+	spells_screen.back_pressed.connect(show_party)
+	spells_screen.assign_requested.connect(_on_loadout_requested.bind(hero_index))
+
+
+## A spell changes slots, from the spells screen (reached from the hub: also between floors,
+## never during a fight). Saved at once, like a rune change.
+func _on_loadout_requested(slot: int, spell: SpellData, hero_index: int) -> void:
+	if not screen is SpellsScreen:
+		return
+	var error := profile.assign_spell(hero_index, slot, spell)
+	if error.is_empty() and not _save():
+		error = tr("Progress couldn't be saved.")
+	(screen as SpellsScreen).show_spells(profile.heroes[hero_index])
+	if not error.is_empty():
+		_show_toast(error)
 
 
 ## A rune is thrown away for good, on the hub only (never during a fight). Maxima don't change

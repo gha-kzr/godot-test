@@ -55,6 +55,8 @@ func apply(event: BattleEvents.Event) -> void:
 		var info := infos[started.unit_id]
 		info.ap = started.ap
 		info.mp = started.mp
+		for slot in info.cooldowns.size():
+			info.cooldowns[slot] = maxi(0, info.cooldowns[slot] - 1)
 		for status in info.statuses:
 			status.counting = true
 	elif event is BattleEvents.TurnEnded:
@@ -68,7 +70,11 @@ func apply(event: BattleEvents.Event) -> void:
 		infos[moved.unit_id].mp -= moved.mp_spent
 	elif event is BattleEvents.SpellCast:
 		var cast := event as BattleEvents.SpellCast
-		infos[cast.caster_id].ap -= cast.ap_spent
+		var caster := infos[cast.caster_id]
+		caster.ap -= cast.ap_spent
+		var slot := caster.spells.find(cast.spell)
+		if slot != -1 and cast.spell.cooldown > 0:
+			caster.cooldowns[slot] = cast.spell.cooldown
 	elif event is BattleEvents.DamageDealt:
 		var hit := event as BattleEvents.DamageDealt
 		infos[hit.unit_id].hp = hit.hp_after

@@ -60,8 +60,9 @@ var _unit_paths: Array[String] = []
 
 
 ## The battle a stage plays: a flat board, `caster` (a player, at the left) with `spell` as its
-## only spell, and `target` (an enemy) `distance` cells away, both with plenty of HP. Returns
-## null when the spell can't be set up.
+## only spell, and `target` (an enemy) `distance` cells away (one row lower for a spell that
+## lands on a free cell, a teleport), both with plenty of HP. Returns null when the spell can't
+## be set up.
 static func build_state(spell_data: SpellData, caster: UnitData, target: UnitData, self_cast := false) -> BattleState:
 	if spell_data == null or caster == null or target == null:
 		return null
@@ -74,7 +75,7 @@ static func build_state(spell_data: SpellData, caster: UnitData, target: UnitDat
 			var token := "0"
 			if Vector2i(x, y) == CASTER_CELL:
 				token = "0p"
-			elif Vector2i(x, y) == CASTER_CELL + Vector2i(distance, 0):
+			elif Vector2i(x, y) == CASTER_CELL + Vector2i(distance, 1 if spell_data.aims_at_free_cell() else 0):
 				token = "0e"
 			tokens.append(token)
 		rows.append(" ".join(tokens))
@@ -86,6 +87,7 @@ static func build_state(spell_data: SpellData, caster: UnitData, target: UnitDat
 	hero.max_hp = STAGE_HP
 	var dummy := target.duplicate() as UnitData
 	dummy.max_hp = STAGE_HP
+	hero.initiative = maxi(hero.initiative, dummy.initiative + 1)  # The caster acts first.
 	return BattleState.create(map.parse(), [hero] as Array[UnitData], [dummy] as Array[UnitData], 1)
 
 

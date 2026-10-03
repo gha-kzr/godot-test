@@ -48,7 +48,11 @@ func test_same_seeds_same_results() -> void:
 
 
 func test_levels_and_presets_move_the_win_rate() -> void:
-	var encounter := load(SLICE) as Encounter
+	# The slice's enemies at level 5: level 1 heroes lose there, level 10 heroes win (the
+	# slice itself, at level 1, is won at both levels).
+	var encounter := (load(SLICE) as Encounter).duplicate_deep(Resource.DEEP_DUPLICATE_INTERNAL) as Encounter
+	for spawn in encounter.spawns:
+		spawn.level = 5
 	var strong := _party(10)
 	var high := BalanceLab.run(strong[0], strong[1], encounter, 3).win_rate()
 	var weak := _party(1)

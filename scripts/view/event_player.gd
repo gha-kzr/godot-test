@@ -22,6 +22,8 @@ const GROUND_FX_HEIGHT := 0.3
 ## A hit of at least this share of the target's max HP shakes the camera.
 const BIG_HIT_SHARE := 0.25
 ## How high above its cell a falling projectile starts.
+## A teleport's flash where the unit reappears.
+const BLINK_TINT := Color(0.6, 0.8, 1.0)
 const SKY_HEIGHT := 7.0
 const SHAKE_MIN := 0.08
 const SHAKE_MAX := 0.22
@@ -35,6 +37,8 @@ var is_playing := false
 ## The spell whose effects are being played (set by its SpellCast, cleared by the next turn
 ## event or status tick), so its impact effect can replace the damage type's.
 var _spell: SpellData
+## A cast whose caster moves first (a charge): played when it lands.
+var _cast_on_arrival: BattleEvents.SpellCast
 var _units: UnitsView
 var _board: BoardView
 ## Eases after a unit that walks off screen (optional).
@@ -89,6 +93,7 @@ func _spawn_ground_fx(cast: BattleEvents.SpellCast) -> void:
 func stop() -> void:
 	_generation += 1
 	is_playing = false
+	_cast_on_arrival = null
 	if _camera != null:
 		_camera.stop_following()
 	if _board != null:
@@ -205,12 +210,28 @@ func _track_spell(event: BattleEvents.Event) -> void:
 ## animation. Events with no board animation (turns, battle end) just pass through; the
 ## HUD and controller react to them through event_played.
 func _play_event(event: BattleEvents.Event) -> void:
+	if _cast_on_arrival != null and event is not BattleEvents.UnitDisplaced:
+		# The caster didn't move after all (a charge from the next cell): swing now.
+		var pending := _cast_on_arrival
+		_cast_on_arrival = null
+		var caster := _units.find_view(pending.caster_id)
+		if caster != null and is_instance_valid(caster):
+			await _play_cast(caster, pending)
 	_track_spell(event)
 	var view := _units.find_view(event.subject_id())
 	if view == null or not is_instance_valid(view):
 		return
 	if event is BattleEvents.UnitMoved:
 		await _play_move(view, (event as BattleEvents.UnitMoved).path)
+	elif event is BattleEvents.UnitDisplaced:
+		var displaced := event as BattleEvents.UnitDisplaced
+		await view.play_displaced(displaced.path, displaced.kind)
+		if fx != null and displaced.kind == MoveEffect.Kind.TELEPORT:
+			view.spawn_fx(fx.status_applied, BLINK_TINT)  # A flash where it reappears.
+		if _cast_on_arrival != null and _cast_on_arrival.caster_id == displaced.unit_id and is_instance_valid(view):
+			var cast := _cast_on_arrival
+			_cast_on_arrival = null
+			await _play_cast(view, cast)
 	elif event is BattleEvents.UnitPlaced:
 		await view.play_place((event as BattleEvents.UnitPlaced).cell)
 	elif event is BattleEvents.SpellCast:
@@ -219,7 +240,11 @@ func _play_event(event: BattleEvents.Event) -> void:
 		sound.emit(cast.spell.cast_sound_event())
 		view.spawn_fx(cast.spell.cast_effect)
 		_board.show_highlight(BoardView.Highlight.AREA, cast.area)
-		await _play_cast(view, cast)
+		_cast_on_arrival = null
+		if cast.spell.moves_caster_first():
+			_cast_on_arrival = cast  # The swing comes after the dash.
+		else:
+			await _play_cast(view, cast)
 		if generation_before == _generation:
 			_spawn_ground_fx(cast)  # Where the effects land, when they land (after a projectile's flight).
 	elif event is BattleEvents.DamageDealt:

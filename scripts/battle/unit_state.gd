@@ -6,8 +6,9 @@ extends RefCounted
 ## change numbers through modifiers that are added up when asked (max_hp(), power(),
 ## resistance_percent(), …); nothing derived is stored, so expiry has nothing to undo.
 
-## Resistance never goes past this, so nothing becomes immune.
-const MAX_RESISTANCE_PERCENT := 50
+## Resistance never goes past these: a hero is never immune, an enemy at 100 % is.
+const MAX_HERO_RESISTANCE_PERCENT := 75
+const MAX_ENEMY_RESISTANCE_PERCENT := 100
 
 enum Team { PLAYER, ENEMY }
 
@@ -27,6 +28,14 @@ var permanent_modifiers: Array[StatModifier] = []
 var reward: UnitReward
 ## Overrides the encounter's AI profile (e.g. a boss preset); null: the encounter's.
 var ai_profile: AIProfile
+## Repositioning: since its last cast (or its turn start) the unit has moved from
+## `moved_from`, spending `moved_cost` MP. Until it casts, it may move anywhere that cell
+## could reach with that MP back (moving back refunds it); a cast commits the position.
+var moved := false
+var moved_from: Vector2i
+var moved_cost := 0
+## Spells waiting to be cast again: spell → turns left (counted down at turn start).
+var cooldowns: Dictionary[SpellData, int] = {}
 ## Name shown in the HUD, e.g. "Brute Lv 5 · Elite".
 var label := ""
 var visual_scale := 1.0
@@ -51,6 +60,32 @@ func is_alive() -> bool:
 func start_turn() -> void:
 	ap = max_ap()
 	mp = max_mp()
+	commit_position()
+	for spell: SpellData in cooldowns.keys():
+		cooldowns[spell] -= 1
+		if cooldowns[spell] <= 0:
+			cooldowns.erase(spell)
+
+
+## Turns before `spell` can be cast again (0: now).
+func cooldown_left(spell: SpellData) -> int:
+	return cooldowns.get(spell, 0)
+
+
+## Where the current move segment started: the cell the unit's reach floods from.
+func move_start() -> Vector2i:
+	return moved_from if moved else cell
+
+
+## The MP of the current move segment: what is left plus what repositioning would refund.
+func move_budget() -> int:
+	return mp + (moved_cost if moved else 0)
+
+
+## Ends the move segment (a cast, a turn start): the next move counts from here.
+func commit_position() -> void:
+	moved = false
+	moved_cost = 0
 
 
 ## Sum of the permanent and status modifiers for one stat (and damage type, for
@@ -83,12 +118,16 @@ func power() -> int:
 	return stat_bonus(StatModifier.Stat.POWER)
 
 
-## Percent less damage of that type taken, at most MAX_RESISTANCE_PERCENT (may be
+## Percent less damage of that type taken, at most max_resistance_percent() (may be
 ## negative: a weakness). Untyped damage (null) is never resisted.
 func resistance_percent(damage_type: DamageType) -> int:
 	if damage_type == null:
 		return 0
-	return mini(MAX_RESISTANCE_PERCENT, stat_bonus(StatModifier.Stat.RESISTANCE_PERCENT, damage_type))
+	return mini(max_resistance_percent(), stat_bonus(StatModifier.Stat.RESISTANCE_PERCENT, damage_type))
+
+
+func max_resistance_percent() -> int:
+	return MAX_HERO_RESISTANCE_PERCENT if team == Team.PLAYER else MAX_ENEMY_RESISTANCE_PERCENT
 
 
 func max_ap() -> int:
@@ -146,6 +185,10 @@ func clone() -> UnitState:
 	copy.hp = hp
 	copy.ap = ap
 	copy.mp = mp
+	copy.moved = moved
+	copy.moved_from = moved_from
+	copy.moved_cost = moved_cost
+	copy.cooldowns = cooldowns.duplicate()
 	for status in statuses:
 		copy.statuses.append(status.clone())
 	copy.permanent_modifiers = permanent_modifiers.duplicate()

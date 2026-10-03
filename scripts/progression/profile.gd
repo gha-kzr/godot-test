@@ -114,6 +114,15 @@ func equip(hero_index: int, stash_index: int, slot := -1) -> String:
 	return ""
 
 
+## Puts a known spell in a hero's filled loadout slot (swapping with that spell's own slot,
+## or replacing an inactive one: see HeroRecord.assign_spell). Returns an error, or "".
+func assign_spell(hero_index: int, slot: int, spell: SpellData) -> String:
+	if hero_index < 0 or hero_index >= heroes.size() or not is_unlocked(hero_index):
+		return tr("That hero isn't available.")
+	var error := heroes[hero_index].assign_spell(slot, spell)
+	return tr("That spell can't go there.") if not error.is_empty() else ""
+
+
 ## Throws a rune of the stash away for good: no undo, no refund (there is no currency). Returns
 ## an error message, or "".
 func drop_rune(stash_index: int) -> String:
@@ -146,6 +155,7 @@ func apply_rewards(rewards: BattleRewards) -> Array[LevelUp]:
 		if new_level > record.level:
 			level_ups.append(LevelUp.new(index, record.level, new_level))
 			record.level = new_level
+			record.settle_loadout()  # A newly learned spell takes a free slot.
 	stash.append_array(rewards.runes)
 	return level_ups
 
@@ -183,7 +193,8 @@ func to_dict() -> Dictionary:
 		var rune_refs: Array = []
 		for rune in record.runes:
 			rune_refs.append(_ref(rune) if rune != null else null)
-		hero_entries.append({"hero": _ref(record.hero), "xp": record.xp, "runes": rune_refs})
+		hero_entries.append({"hero": _ref(record.hero), "xp": record.xp, "runes": rune_refs,
+				"loadout": record.spells().map(func(spell: SpellData) -> Dictionary: return _ref(spell))})
 	var stash_refs: Array = []
 	for rune in stash:
 		stash_refs.append(_ref(rune))
@@ -220,6 +231,11 @@ static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 		var rune_paths := _array(entry, "runes")
 		for slot in mini(rune_paths.size(), HeroRecord.RUNE_SLOTS):
 			record.runes[slot] = _load_rune(rune_paths[slot])
+		var spell_refs := _array(entry, "loadout")
+		for slot in mini(spell_refs.size(), HeroRecord.LOADOUT_SLOTS):
+			var path := _resolve_path(spell_refs[slot])
+			record.loadout[slot] = load(path) as SpellData if not path.is_empty() and ResourceLoader.exists(path) else null
+		record.settle_loadout()  # Spells it no longer knows are dropped, new ones fill in.
 	for index in profile._saved_heroes(_array(data, "unlocked"), version):
 		if index not in profile.unlocked:
 			profile.unlocked.append(index)

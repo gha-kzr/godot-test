@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ca13lktw1wncr"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_k7cu8"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_8docf"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="3_pj6rd"]
+[ext_resource type="Texture2D" uid="uid://ble3bjc5ty5k" path="res://ui/icons/blink.svg" id="4_ij75y"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="5_rowgw"]
+
+[sub_resource type="Resource" id="Resource_fvpar"]
+script = ExtResource("1_k7cu8")
+
+[sub_resource type="Resource" id="Resource_s6hpt"]
+script = ExtResource("3_pj6rd")
+kind = 0
+target_filter = 3
+
+[resource]
+script = ExtResource("5_rowgw")
+display_name = "Blink"
+icon = ExtResource("4_ij75y")
+ap_cost = 2
+cooldown = 3
+max_range = 4
+needs_line_of_sight = false
+area = SubResource("Resource_fvpar")
+effects = Array[ExtResource("2_8docf")]([SubResource("Resource_s6hpt")])

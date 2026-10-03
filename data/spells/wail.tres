@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://b75kumhcl5guq"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_4x6vs"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_e4yv1"]
+[ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="3_1a3dk"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_iixfd"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="5_7qs2w"]
+[ext_resource type="Resource" uid="uid://cm0dtphnapayh" path="res://data/statuses/dread.tres" id="6_556ew"]
+[ext_resource type="Texture2D" uid="uid://driqtyg8gedmj" path="res://ui/icons/wail.svg" id="7_s56bj"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_wl4o2"]
+
+[sub_resource type="Resource" id="Resource_jj3t1"]
+script = ExtResource("1_4x6vs")
+kind = 2
+size = 2
+
+[sub_resource type="Resource" id="Resource_0pjbg"]
+script = ExtResource("4_iixfd")
+min_amount = 2
+max_amount = 3
+damage_type = ExtResource("3_1a3dk")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_j38ep"]
+script = ExtResource("5_7qs2w")
+status = ExtResource("6_556ew")
+target_filter = 2
+
+[resource]
+script = ExtResource("8_wl4o2")
+display_name = "Wail"
+icon = ExtResource("7_s56bj")
+cooldown = 2
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_jj3t1")
+effects = Array[ExtResource("2_e4yv1")]([SubResource("Resource_0pjbg"), SubResource("Resource_j38ep")])

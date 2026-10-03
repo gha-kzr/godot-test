@@ -56,7 +56,7 @@ func _set_tooltips() -> void:
 		var label := pair[0] as Label
 		label.tooltip_text = Glossary.tip(pair[1])
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
-	_combat_stats.tooltip_text = Glossary.tips([&"power", &"resistance"] as Array[StringName])
+	_combat_stats.tooltip_text = Glossary.tips([&"initiative", &"damage_taken", &"power", &"resistance"] as Array[StringName])
 	_combat_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 
 
