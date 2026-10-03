@@ -415,13 +415,16 @@ func test_power_and_resistances_always_show() -> void:
 	var info := _info("Knight")
 	hud.show_unit(info)
 	assert_true(_active(hud, "Rows/CombatStats").visible, "always shown")
-	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +0%\nResist: none")
+	assert_eq(_active(hud, "Rows/CombatStats").text, "Initiative 0, damage taken +0%\nPower: All +0%\nResist: none")
 	info.power = 8
+	info.initiative = 110
+	info.damage_taken = -30
 	info.resistances = {"Physical": 0, "Fire": 20, "Poison": -10}
 	hud.show_unit(info)
-	assert_eq(_active(hud, "Rows/CombatStats").text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	var expected := "Initiative 110, damage taken -30%\nPower: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%"
+	assert_eq(_active(hud, "Rows/CombatStats").text, expected)
 	hud.show_inspected(info)
-	assert_eq((hud.get_node("%InspectCard/Rows/CombatStats") as Label).text, "Power: All +8%\nResist: Physical +0%, Fire +20%, Poison -10%")
+	assert_eq((hud.get_node("%InspectCard/Rows/CombatStats") as Label).text, expected)
 	hud.free()
 
 

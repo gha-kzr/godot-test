@@ -358,6 +358,9 @@ msgstr "Coup handicapant"
 msgid "Cross"
 msgstr "Croix"
 
+msgid "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes."
+msgstr "Dégâts subis : pourcentage de dégâts en plus (ou, sous 0, en moins) que l'unité subit, selon ses effets et ses runes."
+
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr "Défaite. L'ascension s'arrête ; les héros gardent leurs niveaux et leurs runes."
 
@@ -531,6 +534,9 @@ msgstr "PV : points de vie. À 0, l'unité tombe."
 
 msgid "Hunter's Mark"
 msgstr "Marque du chasseur"
+
+msgid "Initiative %d, damage taken %+d%%"
+msgstr "Initiative %d, dégâts subis %+d%%"
 
 msgid "Initiative: the higher it is, the earlier the unit plays."
 msgstr "Initiative : plus elle est haute, plus l'unité joue tôt."
@@ -708,8 +714,8 @@ msgstr "Poison"
 msgid "Poison Arrow"
 msgstr "Flèche empoisonnée"
 
-msgid "Power %+d%%"
-msgstr "Puissance %+d%%"
+msgid "Power %+d%%   Damage taken %+d%%"
+msgstr "Puissance %+d%%   Dégâts subis %+d%%"
 
 msgid "Power: All %+d%%\nResist: %s"
 msgstr "Puissance : tous %+d%%\nRésist. : %s"

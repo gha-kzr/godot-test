@@ -467,6 +467,10 @@ msgstr ""
 msgid "Cross"
 msgstr ""
 
+#: scripts/data/glossary.gd
+msgid "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes."
+msgstr ""
+
 #: scripts/run/run_director.gd
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr ""
@@ -697,6 +701,10 @@ msgstr ""
 
 #: data/spells/hunters_mark.tres
 msgid "Hunter's Mark"
+msgstr ""
+
+#: scripts/view/hud/unit_info.gd
+msgid "Initiative %d, damage taken %+d%%"
 msgstr ""
 
 #: scripts/data/glossary.gd
@@ -934,7 +942,7 @@ msgid "Poison Arrow"
 msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
-msgid "Power %+d%%"
+msgid "Power %+d%%   Damage taken %+d%%"
 msgstr ""
 
 #: scripts/view/hud/unit_info.gd

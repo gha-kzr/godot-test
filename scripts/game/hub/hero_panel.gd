@@ -41,17 +41,18 @@ func show_hero(profile: Profile, hero_index: int) -> void:
 	_xp_label.text = profile.xp_text(hero_index)
 	var lines: Array[String] = [
 		tr("HP %d   AP %d   MP %d   Initiative %d") % [stats.max_hp(), stats.max_ap(), stats.max_mp(), stats.initiative()],
-		tr("Power %+d%%") % stats.power(),
+		tr("Power %+d%%   Damage taken %+d%%") % [stats.power(), stats.damage_taken_percent() - 100],
 	]
 	var resistances: Array[String] = []
-	for type in stats.resistance_types():
-		var value := stats.resistance_percent(type)
-		if value != 0:
-			resistances.append("%s %+d%%" % [tr(type.display_name), value])
-	if not resistances.is_empty():
-		lines.append(tr("Resistance: %s") % ", ".join(resistances))
+	var types := DamageType.all().duplicate()
+	for type in stats.resistance_types():  # A type outside the catalog still shows.
+		if type not in types:
+			types.append(type)
+	for type in types:
+		resistances.append("%s %+d%%" % [tr(type.display_name), stats.resistance_percent(type)])
+	lines.append(tr("Resistance: %s") % ", ".join(resistances))
 	_stats.text = "\n".join(lines)
-	_stats.tooltip_text = Glossary.tips([&"hp", &"ap", &"mp", &"initiative", &"power", &"resistance"] as Array[StringName])
+	_stats.tooltip_text = Glossary.tips([&"hp", &"ap", &"mp", &"initiative", &"power", &"damage_taken", &"resistance"] as Array[StringName])
 	_stats.mouse_filter = Control.MOUSE_FILTER_PASS
 	_show_spells(record)
 	var reward := record.hero.reward_for(record.level + 1)

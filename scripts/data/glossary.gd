@@ -11,6 +11,7 @@ const TEXTS: Dictionary[StringName, String] = {
 	&"power": "Power: percent added to the damage and heals of the unit's spells.",
 	&"resistance": "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune).",
 	&"initiative": "Initiative: the higher it is, the earlier the unit plays.",
+	&"damage_taken": "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes.",
 }
 
 

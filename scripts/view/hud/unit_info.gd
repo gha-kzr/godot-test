@@ -23,6 +23,9 @@ var spells: Array[SpellData] = []
 ## Per spell slot: turns before it can be cast again (0: ready).
 var cooldowns: Array[int] = []
 var power := 0
+var initiative := 0
+## Percent added to the damage the unit takes (0: normal; a Guard's -30, a Mark's +20).
+var damage_taken := 0
 ## A hero's XP towards its next level, for menus (xp_max 0: not shown, as in battle).
 var xp_value := 0
 var xp_max := 0
@@ -54,6 +57,8 @@ static func from_unit(unit: UnitState, hero_level := 0) -> UnitInfo:
 	for spell in unit.data.spells:
 		info.cooldowns.append(unit.cooldown_left(spell))
 	info.power = unit.power()
+	info.initiative = unit.initiative()
+	info.damage_taken = unit.damage_taken_percent() - 100
 	var types := DamageType.all().duplicate()
 	for type in unit.resistance_types():  # A type outside the catalog still shows.
 		if type not in types:
@@ -68,9 +73,9 @@ func title_text() -> String:
 	return tr("%s · Lv %d") % [tr(display_name), level] if level > 0 else tr(display_name)
 
 
-## Two lines, e.g. "Power: All +8%" and "Resist: Physical +0%, Fire +20%, Poison +0%".
-## Every damage type is listed, zeros included, so nothing reads as missing. "All"
-## leaves room for per-type power later.
+## Three lines, e.g. "Initiative 110, damage taken +0%", "Power: All +8%" and "Resist:
+## Physical +0%, Fire +20%, …". Every stat and damage type is listed, zeros included, so
+## nothing reads as missing. "All" leaves room for per-type power later.
 func combat_stats_text() -> String:
 	var resist: Array[String] = []
 	for type_name in resistances:
@@ -78,4 +83,5 @@ func combat_stats_text() -> String:
 			resist.append(tr("%s immune") % tr(type_name))
 		else:
 			resist.append("%s %+d%%" % [tr(type_name), resistances[type_name]])
-	return tr("Power: All %+d%%\nResist: %s") % [power, ", ".join(resist) if not resist.is_empty() else tr("none")]
+	return "%s\n%s" % [tr("Initiative %d, damage taken %+d%%") % [initiative, damage_taken],
+			tr("Power: All %+d%%\nResist: %s") % [power, ", ".join(resist) if not resist.is_empty() else tr("none")]]
