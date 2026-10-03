@@ -20,5 +20,5 @@ model_height = 1.45
 skin_color = Color(0.96, 0.8, 0.68, 1)
 held_item = ExtResource("held_prop")
 held_item_bone = "Fist.R"
-held_item_scale = 0.008
+held_item_scale = 0.0115
 held_item_rotation = Vector3(-6, -14, -178)
