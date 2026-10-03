@@ -34,7 +34,8 @@ Settled with the owner in three grill rounds. "Sound and animation leftovers" le
 ## After the owner's first look
 - **Spells screen** instead of picking on the hub: the hub's two-click pick swapped spells by accident when the player only wanted to read them. A dedicated screen shows every description at once; changes need an explicit Move, then Put here. The hub keeps a read-only list of the active spells and a Change spells button.
 - **Next level** box under the stats, on a lighter background.
-- **Landing preview:** aiming a spell that moves units marks where they would land (DamagePreview.landings, a LANDING board highlight).
+- **Landing preview:** aiming a spell that moves units marks where they would land (DamagePreview.landings, a LANDING board highlight). It plays the cast with the lowest rolls: a pushed target that might die is shown where it lands if it survives (the skull says it may not).
+- **Second look:** the Skeleton Archer holds a bow (Quaternius's Wooden Bow, CC0) instead of its dagger (`UnitData.held_item`); every stat shows, zeros included (initiative and damage taken on unit cards, every resistance on the hub); the next level sits beside the hero's title; descriptions line up on the spells screen; a spell with no target from where the hero stands shades its reach and says so (blocked cells now include the ones its effects refuse).
 
 ## Saves
 Beta: no backward compatibility. A save without loadouts gets the default one (the first known spells in learning order).

@@ -105,6 +105,10 @@ msgstr ""
 msgid "%s has no free rune slot."
 msgstr ""
 
+#: scripts/view/battle_controller.gd
+msgid "%s has no target from here (its reach is shaded). Esc to cancel"
+msgstr ""
+
 #: scripts/data/stat_modifier.gd
 msgid "%s HP"
 msgstr ""

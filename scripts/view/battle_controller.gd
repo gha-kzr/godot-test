@@ -729,8 +729,10 @@ func _prompt_text() -> String:
 				return tr("Nothing left to do: end your turn (%s)") % SettingsApplier.key_text(&"end_turn")
 			return tr("Move to a blue cell or pick a spell (%s)") % _spell_keys_text(battle.state.current_unit().data.spells.size())
 		State.TARGETING:
-			return tr("Choose a target for %s (orange cells). Esc to cancel") % \
-					tr(battle.state.current_unit().data.spells[selected_spell].display_name)
+			var spell_name := tr(battle.state.current_unit().data.spells[selected_spell].display_name)
+			if _targetable.is_empty():
+				return tr("%s has no target from here (its reach is shaded). Esc to cancel") % spell_name
+			return tr("Choose a target for %s (orange cells). Esc to cancel") % spell_name
 		State.ENEMY_TURN:
 			return tr("%s is acting...") % tr(battle.state.current_unit().label)
 	return ""

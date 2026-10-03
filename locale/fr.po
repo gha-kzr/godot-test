@@ -86,6 +86,9 @@ msgstr "%s pendant %s (%s)"
 msgid "%s has no free rune slot."
 msgstr "%s n'a plus d'emplacement de rune libre."
 
+msgid "%s has no target from here (its reach is shaded). Esc to cancel"
+msgstr "%s n'a aucune cible d'ici (sa portée est grisée). Échap pour annuler"
+
 msgid "%s HP"
 msgstr "%s PV"
 

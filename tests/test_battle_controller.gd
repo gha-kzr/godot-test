@@ -848,3 +848,14 @@ func test_aiming_a_backslash_marks_where_the_hero_lands() -> void:
 	controller._hovered_cell = Vector2i(4, 0)  # Out of range.
 	controller._update_hover()
 	assert_eq(controller.board_view.highlighted_count(BoardView.Highlight.LANDING), 0)
+
+
+func test_a_spell_with_no_target_says_so_and_shades_its_reach() -> void:
+	var hero := _fighter("P0", 200)
+	hero.spells = [load("res://data/spells/charge.tres")] as Array[SpellData]
+	var controller := _controller("0p 0 0 0 0\n0 0 0 0 0e", [hero], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	assert_eq(controller.input_state, BattleController.State.TARGETING, "still aiming")
+	assert_true(controller._prompt_text().contains("no target"), controller._prompt_text())
+	assert_true(controller.board_view.highlighted_count(BoardView.Highlight.RANGE_BLOCKED) > 0, "its reach is shaded")

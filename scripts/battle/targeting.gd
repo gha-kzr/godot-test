@@ -40,16 +40,16 @@ static func can_target(state: BattleState, caster_id: int, spell: SpellData, cel
 	return true
 
 
-## Cells the spell could reach but for line of sight, so players see why they can't aim there.
+## Cells in the spell's range that it can't be aimed at: out of line of sight, or refused by
+## one of its effects (a charge with no unit in a clear straight line, a teleport onto a unit).
+## Shown faded, so players see the spell's reach and why they can't aim there.
 static func blocked_cells(state: BattleState, caster_id: int, spell: SpellData) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
-	if not spell.needs_line_of_sight:
-		return result
 	var from := state.units[caster_id].cell
 	for y in state.grid.size.y:
 		for x in state.grid.size.x:
 			var cell := Vector2i(x, y)
-			if _in_range(state, from, spell, cell) and not has_line_of_sight(state, from, cell):
+			if _in_range(state, from, spell, cell) and not can_target(state, caster_id, spell, cell):
 				result.append(cell)
 	return result
 
