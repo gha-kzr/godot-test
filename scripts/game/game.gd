@@ -29,8 +29,9 @@ const AUDIO_SET := preload("res://data/audio/audio_set.tres")
 @export var tower: TowerConfig
 @export var save_path := SaveStore.DEFAULT_PATH
 @export var settings_path := SettingsStore.DEFAULT_PATH
-## Ask for a click before the title (browsers keep sound off until one): on in a web build.
-@export var require_click_to_start := OS.has_feature("web")
+## Ask for a click before the title (browsers keep sound off until one), on every platform so
+## the web and desktop versions open the same way; tests turn it off to start on the title.
+@export var require_click_to_start := true
 ## 0 picks a random seed per battle (floors are deterministic anyway; this is the dice).
 @export var rng_seed := 0
 

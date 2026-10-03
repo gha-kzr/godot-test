@@ -23,6 +23,7 @@ func _open() -> Game:
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
 	game.rng_seed = 5
+	game.require_click_to_start = false  # Straight to the title.
 	_tree().root.add_child(game)
 	_press(game.screen, "PlayButton")  # Title → hub.
 	return game
@@ -263,6 +264,7 @@ func test_the_game_opens_on_the_title_and_play_opens_the_hub() -> void:
 	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
 	SaveStore.new(SAVE).delete()
 	var game := GAME_SCENE.instantiate() as Game
+	game.require_click_to_start = false  # Straight to the title.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
 	_tree().root.add_child(game)
@@ -512,22 +514,21 @@ func test_a_web_build_asks_for_a_click_before_the_title_and_the_music_waits_for_
 	var game := GAME_SCENE.instantiate() as Game
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
-	game.require_click_to_start = true
 	_tree().root.add_child(game)
-	assert_true(game.screen is StartScreen, "the start screen first")
+	assert_true(game.screen is StartScreen, "the start screen first, on every platform")
 	assert_eq(game.audio.current_music, &"", "no music before the click")
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true
-	game.screen._unhandled_input(click)
+	game.screen._gui_input(click)
 	assert_true(game.screen is TitleScreen, "the click goes on to the title")
 	assert_eq(game.audio.current_music, &"hub", "and the title's music starts from the beginning")
 	game.free()
 
 
-func test_a_desktop_build_goes_straight_to_the_title() -> void:
-	var game := _game()
-	assert_true(game.screen is TitleScreen or game.screen is PartyScreen)
+func test_the_start_screen_is_on_by_default_everywhere() -> void:
+	var game := GAME_SCENE.instantiate() as Game
+	assert_true(game.require_click_to_start, "web and desktop open the same way")
 	game.free()
 
 
@@ -539,7 +540,7 @@ func test_the_start_screen_goes_on_with_a_key_or_a_tap_but_not_with_a_release_or
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
-	screen._unhandled_input(release)
+	screen._gui_input(release)
 	var held := InputEventKey.new()
 	held.keycode = KEY_A
 	held.pressed = true
@@ -552,7 +553,7 @@ func test_the_start_screen_goes_on_with_a_key_or_a_tap_but_not_with_a_release_or
 	screen._unhandled_input(key)
 	var tap := InputEventScreenTouch.new()
 	tap.pressed = true
-	screen._unhandled_input(tap)
+	screen._gui_input(tap)
 	assert_eq(starts[0], 2, "a key press and a tap do")
 	screen.free()
 
@@ -609,3 +610,20 @@ func test_the_spells_screen_changes_the_loadout_and_saves_it() -> void:
 	game.screen.back_pressed.emit()
 	assert_true(game.screen is PartyScreen, "back to the hub")
 	game.free()
+
+
+func test_a_real_click_anywhere_on_the_start_screen_goes_on() -> void:
+	# Through the viewport, as a player's click arrives (GUI routing first), not by calling a handler.
+	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
+	_tree().root.add_child(screen)
+	var starts := [0]
+	screen.started.connect(func() -> void: starts[0] += 1)
+	await _tree().process_frame
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.position = screen.get_viewport_rect().size / 2.0
+	click.global_position = click.position
+	screen.get_viewport().push_input(click)
+	assert_eq(starts[0], 1, "a left click starts")
+	screen.free()
