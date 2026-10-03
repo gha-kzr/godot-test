@@ -12,6 +12,7 @@ signal assign_requested(slot: int, spell: SpellData)
 const ROW_COLOR := Color(1.0, 1.0, 1.0, 0.05)
 const MOVING_COLOR := Color(0.35, 0.6, 1.0, 0.25)
 const ICON_SIZE := Vector2(40, 40)
+const NUMBER_WIDTH := 28
 
 ## The spell being moved (null: none).
 var moving: SpellData
@@ -79,12 +80,13 @@ func _row(slot: int, spell: SpellData) -> PanelContainer:
 	var line := HBoxContainer.new()
 	line.add_theme_constant_override("separation", 12)
 	row.add_child(line)
-	if slot >= 0:
-		var number := Label.new()
-		number.text = str(slot + 1)
-		number.theme_type_variation = &"HeaderLabel"
-		number.custom_minimum_size = Vector2(28, 0)
-		line.add_child(number)
+	# The slot number; an empty column for a spell outside the loadout, so every description
+	# starts at the same place.
+	var number := Label.new()
+	number.text = str(slot + 1) if slot >= 0 else ""
+	number.theme_type_variation = &"HeaderLabel"
+	number.custom_minimum_size = Vector2(NUMBER_WIDTH, 0)
+	line.add_child(number)
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = ICON_SIZE
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
