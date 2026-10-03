@@ -28,13 +28,16 @@ extends Resource
 @export_range(0.3, 4.0) var model_height := 1.1
 ## Replaces the model's "Skin" material color; alpha 0 keeps the pack's own.
 @export var skin_color := Color(0, 0, 0, 0)
-## A prop the model holds instead of one of its own parts (a bow instead of the Skeleton's
-## dagger): `held_item` takes the place, bone and orientation of the model's node named
-## `held_item_replaces` (hidden), at `held_item_scale`, turned by `held_item_rotation` degrees.
+## A prop the model holds (a hero's weapon, the Skeleton Archer's bow). It takes the place of
+## the model's node named `held_item_replaces` (hidden; same bone and orientation), or, with
+## that empty, hangs from the bone `held_item_bone` (e.g. "Fist.R"). Then `held_item_scale`,
+## `held_item_rotation` (degrees) and `held_item_offset` (in the bone's space) place it.
 @export var held_item: PackedScene
 @export var held_item_replaces := ""
+@export var held_item_bone := ""
 @export var held_item_scale := 1.0
 @export var held_item_rotation := Vector3.ZERO
+@export var held_item_offset := Vector3.ZERO
 
 
 func get_validation_errors() -> PackedStringArray:
@@ -51,6 +54,8 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("%s: %s" % [display_name, error])
 		if spell.ap_cost > ap:
 			errors.append("%s: %s costs %d AP but the unit has %d" % [display_name, spell.display_name, spell.ap_cost, ap])
+	if held_item != null and held_item_replaces.is_empty() and held_item_bone.is_empty():
+		errors.append("%s: held_item needs held_item_replaces or held_item_bone" % display_name)
 	for modifier in innate_modifiers:
 		if modifier == null:
 			errors.append("%s: empty innate modifier slot" % display_name)

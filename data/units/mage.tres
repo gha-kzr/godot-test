@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://dgs2h32llyj5h" path="res://data/spells/fireball.tres" id="4_qm8lk"]
 [ext_resource type="Resource" uid="uid://igvcnh0uv7e7" path="res://data/spells/mend.tres" id="5_1autv"]
 [ext_resource type="PackedScene" uid="uid://dxyyy8dtfx6fg" path="res://assets/quaternius/characters/Wizard.fbx" id="99_model"]
+[ext_resource type="PackedScene" uid="uid://1ei45blmqax1" path="res://assets/quaternius/props/Staff.glb" id="held_prop"]
 
 [resource]
 script = ExtResource("1_sglo2")
@@ -17,3 +18,7 @@ model_scene = ExtResource("99_model")
 model_scale = 0.5
 model_height = 1.45
 skin_color = Color(0.96, 0.8, 0.68, 1)
+held_item = ExtResource("held_prop")
+held_item_bone = "Fist.R"
+held_item_scale = 0.008
+held_item_rotation = Vector3(-6, -14, -178)
