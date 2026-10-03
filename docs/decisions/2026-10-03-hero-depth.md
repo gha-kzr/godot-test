@@ -31,6 +31,11 @@ Settled with the owner in three grill rounds. "Sound and animation leftovers" le
 - **Tuning:** Pinning Shot first applied Crippled (−1 AP, too strong: the slice's AI-vs-AI party won 8 of 20), then Pinned; Bone Rain went from 4 to 3 AP (the greedy AI took it over two Bone Arrows and wasted 2 AP). Slice AI-vs-AI: the party wins 18 of 20 (13 of 20 with the old Archer). Balance lab, 10 first climbs from floor 1 at level 1: 8 clear floor 10, losses only on the floor 10 boss (milestone 6c: 10 of 12).
 - **Along the way:** the party screen's hero row scrolls (the loadout made it taller than 720 px); the spell stage aims teleports at a free cell and always lets the caster act first (a slower caster used to fail its cast).
 
+## After the owner's first look
+- **Spells screen** instead of picking on the hub: the hub's two-click pick swapped spells by accident when the player only wanted to read them. A dedicated screen shows every description at once; changes need an explicit Move, then Put here. The hub keeps a read-only list of the active spells and a Change spells button.
+- **Next level** box under the stats, on a lighter background.
+- **Landing preview:** aiming a spell that moves units marks where they would land (DamagePreview.landings, a LANDING board highlight).
+
 ## Saves
 Beta: no backward compatibility. A save without loadouts gets the default one (the first known spells in learning order).
 

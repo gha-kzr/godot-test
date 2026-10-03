@@ -13,8 +13,8 @@ signal continue_pressed
 signal abandon_pressed
 signal equip_requested(hero_index: int, stash_index: int)
 signal unequip_requested(hero_index: int, slot: int)
-## A known spell is to go in a hero's loadout slot (swapping or replacing; see Profile.assign_spell).
-signal loadout_requested(hero_index: int, slot: int, spell: SpellData)
+## A hero's spells screen is wanted (to read them all and change the loadout).
+signal spells_pressed(hero_index: int)
 ## A rune of the stash is to be thrown away for good (after its inline Yes).
 signal drop_requested(stash_index: int)
 ## The player picked a hero's tab (the Game keeps it across screens).
@@ -53,8 +53,7 @@ func _ready() -> void:
 	add_child(_tutorial_overlay)
 	_tabs.hero_selected.connect(select_hero)
 	_panel.unequip_requested.connect(func(slot: int) -> void: unequip_requested.emit(selected_hero, slot))
-	_panel.spell_assign_requested.connect(func(slot: int, spell: SpellData) -> void:
-		loadout_requested.emit(selected_hero, slot, spell))
+	_panel.spells_requested.connect(func() -> void: spells_pressed.emit(selected_hero))
 	_stash.equip_requested.connect(func(index: int) -> void:
 		_on_equip_for_tutorial()
 		equip_requested.emit(selected_hero, index))

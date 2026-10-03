@@ -129,40 +129,92 @@ func test_a_save_without_a_loadout_gets_the_default_one() -> void:
 	assert_eq(loaded.heroes[0].spells(), loaded.heroes[0].known_spells())
 
 
-func _screen(profile: Profile) -> PartyScreen:
-	var screen := PARTY_SCENE.instantiate() as PartyScreen
+const SPELLS_SCENE := preload("res://scenes/game/spells_screen.tscn")
+
+
+func _spells_screen(record: HeroRecord) -> SpellsScreen:
+	var screen := SPELLS_SCENE.instantiate() as SpellsScreen
 	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
-	screen.show_profile(profile)
+	screen.show_spells(record)
 	return screen
 
 
-func test_the_party_screen_asks_for_a_swap_then_a_replacement() -> void:
+static func _button(row: Node, button_name: String) -> Button:
+	return row.find_child(button_name, true, false) as Button
+
+
+func test_the_spells_screen_shows_every_description_and_reading_moves_nothing() -> void:
 	var profile := _profile()
 	profile.heroes[0].level = 12
-	var screen := _screen(profile)
+	var screen := _spells_screen(profile.heroes[0])
 	var asks: Array = []
-	screen.loadout_requested.connect(func(hero: int, slot: int, spell: SpellData) -> void:
-		asks.append([hero, slot, spell.display_name]))
-	var slots := screen.find_child("Spells", true, false)
-	assert_eq(slots.get_child_count(), HeroRecord.LOADOUT_SLOTS)
-	assert_eq((slots.get_child(0) as Button).text, "1. A")
-	(slots.get_child(0) as Button).pressed.emit()
-	assert_true((screen.find_child("SpellInfo", true, false) as Label).text.contains("AP"), "the picked spell's description")
-	(slots.get_child(2) as Button).pressed.emit()
-	assert_eq(asks, [[0, 0, "C"]], "slot 1 takes C: a swap")
-	var inactive := screen.find_child("InactiveSpells", true, false)
-	assert_eq(inactive.get_child_count(), 2, "F and G")
-	(inactive.get_child(0) as Button).pressed.emit()
-	assert_eq(asks.size(), 1, "no slot picked: only the description")
-	(slots.get_child(4) as Button).pressed.emit()
-	(inactive.get_child(1) as Button).pressed.emit()
-	assert_eq(asks[1], [0, 4, "G"], "G into slot 5")
+	screen.assign_requested.connect(func(slot: int, spell: SpellData) -> void: asks.append([slot, spell.display_name]))
+	for slot in HeroRecord.LOADOUT_SLOTS:
+		var row := screen.find_child("Slot%d" % (slot + 1), true, false)
+		assert_true(row != null, "slot %d" % (slot + 1))
+		assert_true((row.find_child("Description", true, false) as Label).text.contains("Range"), "its description is shown")
+	assert_true(screen.find_child("Known_F", true, false) != null, "F is known, not active")
+	assert_true(screen.find_child("Known_G", true, false) != null)
+	assert_eq(asks, [], "nothing changes by reading")
 	screen.free()
 
 
-func test_empty_slots_are_disabled() -> void:
-	var screen := _screen(_profile())
-	var slots := screen.find_child("Spells", true, false)
-	assert_true((slots.get_child(2) as Button).disabled, "A and B only")
-	assert_false((screen.find_child("InactiveTitle", true, false) as Label).visible, "nothing inactive")
+func test_move_then_put_here_swaps_or_replaces() -> void:
+	var profile := _profile()
+	profile.heroes[0].level = 12
+	var screen := _spells_screen(profile.heroes[0])
+	var asks: Array = []
+	screen.assign_requested.connect(func(slot: int, spell: SpellData) -> void: asks.append([slot, spell.display_name]))
+	_button(screen.find_child("Slot3", true, false), "Move").pressed.emit()  # C.
+	assert_eq(screen.moving.display_name, "C")
+	assert_true(_button(screen.find_child("Slot3", true, false), "Cancel") != null, "its own row cancels")
+	assert_true(_button(screen.find_child("Known_F", true, false), "PutHere") == null, "an inactive spell isn't a destination")
+	_button(screen.find_child("Slot1", true, false), "PutHere").pressed.emit()
+	assert_eq(asks, [[0, "C"]], "C into slot 1: a swap with A")
+	screen.show_spells(profile.heroes[0])
+	_button(screen.find_child("Known_G", true, false), "Move").pressed.emit()
+	_button(screen.find_child("Slot5", true, false), "PutHere").pressed.emit()
+	assert_eq(asks[1], [4, "G"], "G replaces slot 5")
+	screen.free()
+
+
+func test_esc_cancels_a_move_before_going_back() -> void:
+	var profile := _profile()
+	profile.heroes[0].level = 12
+	var screen := _spells_screen(profile.heroes[0])
+	var backs := {"count": 0}
+	screen.back_pressed.connect(func() -> void: backs.count += 1)
+	_button(screen.find_child("Slot2", true, false), "Move").pressed.emit()
+	var esc := InputEventAction.new()
+	esc.action = &"ui_cancel"
+	esc.pressed = true
+	screen._unhandled_input(esc)
+	assert_eq(screen.moving, null, "the move is cancelled")
+	assert_eq(backs.count, 0)
+	screen._unhandled_input(esc)
+	assert_eq(backs.count, 1, "then Esc goes back")
+	screen.free()
+
+
+func test_empty_slots_show_as_empty() -> void:
+	var screen := _spells_screen(_profile().heroes[0])  # A and B only.
+	var empty := screen.find_child("Slot3", true, false)
+	assert_eq((empty.find_child("Name", true, false) as Label).text, "(empty)")
+	assert_true(_button(empty, "Move") == null)
+	screen.free()
+
+
+func test_the_hub_lists_the_active_spells_and_opens_the_spells_screen() -> void:
+	var profile := _profile()
+	profile.heroes[0].level = 12
+	var screen := PARTY_SCENE.instantiate() as PartyScreen
+	(Engine.get_main_loop() as SceneTree).root.add_child(screen)
+	screen.show_profile(profile)
+	assert_eq(screen.find_child("Spells", true, false).get_child_count(), HeroRecord.LOADOUT_SLOTS)
+	var change := screen.find_child("ChangeSpellsButton", true, false) as Button
+	assert_eq(change.text, "Change spells (2 more known)")
+	var asked: Array[int] = []
+	screen.spells_pressed.connect(func(hero: int) -> void: asked.append(hero))
+	change.pressed.emit()
+	assert_eq(asked, [0] as Array[int])
 	screen.free()

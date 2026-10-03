@@ -11,7 +11,7 @@ msgstr ""
 msgid "%d / %d unlocked"
 msgstr ""
 
-#: scripts/view/hud/spell_bar.gd
+#: scripts/game/spells_screen.gd scripts/view/hud/spell_bar.gd
 msgid "%d AP"
 msgstr ""
 
@@ -177,6 +177,10 @@ msgstr ""
 msgid "%s — level %d"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "%s — spells"
+msgstr ""
+
 #: scripts/data/stat_modifier.gd
 msgid "%s%% %s resistance"
 msgstr ""
@@ -201,7 +205,7 @@ msgstr ""
 msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
 msgstr ""
 
-#: scripts/game/hub/hero_panel.gd
+#: scripts/game/hub/hero_panel.gd scripts/game/spells_screen.gd
 msgid "(empty)"
 msgstr ""
 
@@ -223,6 +227,10 @@ msgstr ""
 
 #: scripts/progression/hints.gd
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "A spell learned later takes this slot."
 msgstr ""
 
 #: scripts/progression/hints.gd
@@ -285,7 +293,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
+#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn scenes/game/spells_screen.tscn
 msgid "Back"
 msgstr ""
 
@@ -353,6 +361,20 @@ msgstr ""
 msgid "Brute"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Cancel"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd scenes/game/hub/hero_panel.tscn
+msgid "Change spells"
+msgstr ""
+
+#: scripts/game/hub/hero_panel.gd
+msgid "Change spells (%d more known)"
+msgid_plural "Change spells (%d more known)"
+msgstr[0] ""
+msgstr[1] ""
+
 #: data/spells/charge.tres
 msgid "Charge"
 msgstr ""
@@ -387,10 +409,6 @@ msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
 msgid "Clear the previous stage first."
-msgstr ""
-
-#: scripts/game/hub/hero_panel.gd
-msgid "Click a spell below to put it in this slot, or another slot to swap them."
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -709,8 +727,8 @@ msgstr ""
 msgid "Knight"
 msgstr ""
 
-#: scenes/game/hub/hero_panel.tscn
-msgid "Known, not in the loadout:"
+#: scripts/game/spells_screen.gd
+msgid "Known, not in the loadout"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -759,6 +777,10 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
+msgstr ""
+
 #: data/units/mage.tres
 msgid "Mage"
 msgstr ""
@@ -777,6 +799,10 @@ msgstr ""
 
 #: scenes/battle/hud.tscn
 msgid "Menu"
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "Move"
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -875,10 +901,6 @@ msgstr ""
 msgid "Pick a boon, or heal the party instead."
 msgstr ""
 
-#: scripts/game/hub/hero_panel.gd
-msgid "Pick a slot first, then this spell to put it there."
-msgstr ""
-
 #: data/spells/piercing_thrust.tres
 msgid "Piercing Thrust"
 msgstr ""
@@ -931,6 +953,10 @@ msgstr ""
 msgid "Press a key..."
 msgstr ""
 
+#: scripts/game/spells_screen.gd
+msgid "Press Move on a spell to change the loadout."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "Progress couldn't be saved."
 msgstr ""
@@ -946,6 +972,10 @@ msgid "Pushes back %d cell"
 msgid_plural "Pushes back %d cells"
 msgstr[0] ""
 msgstr[1] ""
+
+#: scripts/game/spells_screen.gd
+msgid "Put here"
+msgstr ""
 
 #: scenes/game/title_screen.tscn
 msgid "Quit"
@@ -1187,7 +1217,7 @@ msgstr ""
 msgid "Spell 5"
 msgstr ""
 
-#: scenes/game/hub/hero_panel.tscn
+#: scenes/game/hub/hero_panel.tscn scenes/game/spells_screen.tscn
 msgid "Spells"
 msgstr ""
 
@@ -1369,6 +1399,10 @@ msgstr ""
 
 #: scripts/progression/tutorial.gd
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
+msgstr ""
+
+#: scripts/game/spells_screen.gd
+msgid "Where does %s go? Put here on a slot, or Cancel (Esc)."
 msgstr ""
 
 #: data/spells/whirlwind.tres

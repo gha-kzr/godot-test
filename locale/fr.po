@@ -140,6 +140,9 @@ msgstr "%s · Round %d"
 msgid "%s — level %d"
 msgstr "%s — niveau %d"
 
+msgid "%s — spells"
+msgstr "%s — sorts"
+
 msgid "%s%% %s resistance"
 msgstr "%s%% résistance (%s)"
 
@@ -175,6 +178,9 @@ msgstr "Un étage de boss ! Le boss est bien plus fort. Le vaincre offre un bien
 
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
 msgstr "Un héros a gagné un niveau : ses stats augmentent, et certains niveaux enseignent un nouveau sort."
+
+msgid "A spell learned later takes this slot."
+msgstr "Un sort appris plus tard prendra cet emplacement."
 
 msgid "A stage: one hard boss fight. Win it to raise the tower's top floor and start your climbs higher."
 msgstr "Une épreuve : un seul combat de boss difficile. Gagnez-le pour monter le sommet de la tour et commencer vos ascensions plus haut."
@@ -272,6 +278,17 @@ msgstr "Amenez un héros au niveau 30."
 msgid "Brute"
 msgstr "Brute"
 
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Change spells"
+msgstr "Changer les sorts"
+
+msgid "Change spells (%d more known)"
+msgid_plural "Change spells (%d more known)"
+msgstr[0] "Changer les sorts (%d autre connu)"
+msgstr[1] "Changer les sorts (%d autres connus)"
+
 msgid "Charge"
 msgstr "Charge"
 
@@ -298,9 +315,6 @@ msgstr "Terminez toutes les épreuves."
 
 msgid "Clear the previous stage first."
 msgstr "Terminez d'abord l'épreuve précédente."
-
-msgid "Click a spell below to put it in this slot, or another slot to swap them."
-msgstr "Cliquez sur un sort ci-dessous pour le mettre dans cet emplacement, ou sur un autre emplacement pour les échanger."
 
 msgid "Click a teal cell to place %s (Esc to deselect)"
 msgstr "Cliquez sur une case turquoise pour placer %s (Échap pour désélectionner)"
@@ -539,8 +553,8 @@ msgstr "Touches réinitialisées."
 msgid "Knight"
 msgstr "Chevalier"
 
-msgid "Known, not in the loadout:"
-msgstr "Connus, hors de la sélection :"
+msgid "Known, not in the loadout"
+msgstr "Connus, hors de la sélection"
 
 msgid "Language"
 msgstr "Langue"
@@ -577,6 +591,9 @@ msgstr "Niveau supérieur ! (+%d XP)"
 msgid "Line"
 msgstr "Ligne"
 
+msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
+msgstr "Sélection : les sorts emmenés au combat (l'emplacement 1 est la touche 1)"
+
 msgid "Mage"
 msgstr "Mage"
 
@@ -591,6 +608,9 @@ msgstr "Soin"
 
 msgid "Menu"
 msgstr "Menu"
+
+msgid "Move"
+msgstr "Déplacer"
 
 msgid "Move to a blue cell or pick a spell (%s)"
 msgstr "Déplacez-vous sur une case bleue ou choisissez un sort (%s)"
@@ -664,9 +684,6 @@ msgstr "Physique"
 msgid "Pick a boon, or heal the party instead."
 msgstr "Choisissez un bienfait, ou soignez l'équipe à la place."
 
-msgid "Pick a slot first, then this spell to put it there."
-msgstr "Choisissez d'abord un emplacement, puis ce sort pour l'y mettre."
-
 msgid "Piercing Thrust"
 msgstr "Estocade perçante"
 
@@ -706,6 +723,9 @@ msgstr "Appuyez sur une touche pour %s (Échap pour annuler)."
 msgid "Press a key..."
 msgstr "Appuyez sur une touche..."
 
+msgid "Press Move on a spell to change the loadout."
+msgstr "Appuyez sur Déplacer sur un sort pour changer la sélection."
+
 msgid "Progress couldn't be saved."
 msgstr "La progression n'a pas pu être sauvegardée."
 
@@ -718,6 +738,9 @@ msgid "Pushes back %d cell"
 msgid_plural "Pushes back %d cells"
 msgstr[0] "Repousse de %d case"
 msgstr[1] "Repousse de %d cases"
+
+msgid "Put here"
+msgstr "Mettre ici"
 
 msgid "Quit"
 msgstr "Quitter"
@@ -1036,6 +1059,9 @@ msgstr "Lamentation"
 
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
 msgstr "Quand vous avez fini, terminez votre tour ({end_turn}). Les ennemis jouent ensuite."
+
+msgid "Where does %s go? Put here on a slot, or Cancel (Esc)."
+msgstr "Où va %s ? Mettre ici sur un emplacement, ou Annuler (Échap)."
 
 msgid "Whirlwind"
 msgstr "Tourbillon"
