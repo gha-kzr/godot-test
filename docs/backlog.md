@@ -4,35 +4,9 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 ## Sound and animation leftovers
 
-*Milestone: 8 Hero depth (or any, it is small) · Category: Audio / animation · Pairs with: audio set, unit model*
+*Milestone: 14 Balance and release, or any (it is small; left out of milestone 8 because the owner couldn't test sound) · Category: Audio / animation · Pairs with: audio set, unit model*
 
 What milestones 6b to 7 left out on purpose: **turn start** stays silent (no candidate liked); a smoother blend between clips (walk to attack); the death sound is heavy, so its gain (`sfx_gain_db`) may need adjusting by ear. Hub and title share one track on purpose.
-
-## Choosing active spells (5-spell loadout)
-
-*Milestone: 8 Hero depth · Category: Gameplay · Pairs with: level cap, hub, spell bar*
-
-heroes will know more spells than they can bring: the player picks up to **5 active spells** per hero (a loadout, e.g. on the hub), the rest stay inactive. Touches `HeroRecord` (saved loadout), level rewards (a new spell goes to the loadout if there's room), the party screen and the HUD's spell bar (5 slots).
-
-## Increase the level cap
-
-*Milestone: 8 Hero depth · Category: Gameplay / balance · Pairs with: loadout, rewards content, balance*
-
-heroes cap at level 10 (the XP table has 10 thresholds and the first tower reaches floor 10 at first, then 20, 30…). Raise it (20? 30?) with the XP curve, per-level rewards (stats, spells, the 4th spell at level 3 and +1 MP at level 6 today), enemy scaling per floor and the hub / run-screen displays; needs a balance pass and more `LevelReward` content per hero (so it pairs with the active-spell loadout item, which is how new spells would be handled).
-
-**Done in milestone 6c** (cap 100, generated XP curve, growth rule for stats; new spells still wait for the loadout). Original note: this one was wanted soon, not only at milestone 8: the cap is reached quickly and the fun stops, so raising it and re-tuning enemy levels per floor should come early (see the balance observations below).
-
-## Movement spells: teleport, jump and more
-
-*Milestone: 8 Hero depth · Category: Gameplay · Pairs with: height rules, enemy AI, enemy roles*
-
-spells that move the caster (and later others): **teleport** (to a targeted free cell in range, ignoring obstacles, no path), **jump** (over obstacles or up high ground), charge / dash, swap places, push and pull. Rules in the battle layer (a new `MoveEffect` `EffectData`: the caster or the target moves, with its own events so the view animates it: a blink effect, a leap arc), range and line-of-sight rules for the destination, height rules (a jump can clear a drop or a climb the normal move can't), interplay with blockers and the AI's evaluation (`EnemyAI` must value positions). Pairs with the height system and the enemy roles (a charger, a blinker).
-
-## Undo a move
-
-*Milestone: 8 Hero depth · Category: Gameplay · Pairs with: command actions*
-
-a hero can take back its move(s) as long as it hasn't cast anything this turn (Disgaea-style). The slice already kept actions as commands and views re-syncing from state so undo stays cheap (`decisions/2026-09-27-tactical-rpg-slice.md`, "Undo"); needs a snapshot of the unit before its first move, an Undo button / key, and the AI never using it.
 
 ## Enemy roles and team compositions
 
@@ -114,7 +88,7 @@ Notes from the owner's playtests, to turn into one balance pass (with the balanc
 - **Enemy levels vs hero levels:** on floor 20, a level 4 Brute (57 HP) has about the stats of the owner's level 10 hero, and a level 4 elite Brute (171 HP) more than that. It is not too hard (the fight was easy by kiting with the ranged hero), but a level that doesn't match the power it stands for feels wrong: a level 4 enemy should be clearly weaker than a level 10 hero, or levels should be shown differently. Related: the Knight died very quickly, so melee heroes seem too fragile next to ranged ones (enemy damage, HP growth, how enemies pick targets). Look at `hp_per_level` / `power_per_level`, the elite and boss presets and the band's `enemy_level` curve against hero growth, and how a level is displayed.
 - **Area spells are not worth it:** a spell can be cast only once per turn, so two casts of a single-target spell out-damage one area spell unless three enemies stand in a cross, which is rare with so few enemies. Options to weigh: cheaper area spells (lower AP), higher damage per target, more enemies per floor, or bigger / better-shaped areas; the balance lab's damage-per-AP view (Inspector preview) helps compare.
 - **Stage difficulty:** a stage should be much harder than the floors below it (the ones the player starts from once it is cleared) but simpler than the floors it unlocks above it. Today a stage plays like that floor's boss fight (`difficulty_floor`), which may not sit between the two; re-tune each stage's `difficulty_floor` / seed against the floors on both sides with the balance lab (Run tower from the unlocked start floor).
-- **Level cap:** see "Increase the level cap"; the owner wants it raised early, with enemy levels re-tuned to match.
+- **Level cap:** raised to 100 in milestone 6c, with enemy levels re-tuned; new spells at levels 3, 5, 9 and 14 came with the loadout in milestone 8.
 
 ## Balance pass and release checks
 

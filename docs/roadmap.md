@@ -26,23 +26,12 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 6b | Feel and language | French translation (gettext, extraction tool, tests), audio (sound effects, hub / battle / boss music, volume settings), camera follows walking units, screen shake and status auras, per-spell projectiles, timing and effects, the spell stage | [decisions](decisions/2026-10-02-feel-and-language.md) · [plan](plans/2026-10-02-feel-and-language.md) |
 | 6c | Progression and balance | Level cap 100 with a generated XP curve and growth rule, enemy levels that follow the party's pace, a sturdier Knight, area spells worth casting, stages between the floors around them, pin-on-attack fix, cast / death / victory sounds | [decisions](decisions/2026-10-02-progression-and-balance.md) · [plan](plans/2026-10-02-progression-and-balance.md) |
 | 7 | First impressions | Battle speed and auto end turn, the web Click to start screen, a spotlight tutorial that waits for the player's actions (with a starter rune to learn equipping), one-time tips and glossary tooltips, best floor and achievements, victory cheers, the rename to Rune Ascent and branding slots | [decisions](decisions/2026-10-02-first-impressions.md) · [plan](plans/2026-10-02-first-impressions.md) |
+| 8 | Hero depth | A 5-spell loadout chosen on the party screen, three new spells per hero (levels 5, 9, 14), movement spells (teleport, charge, push, pull, Backslash's leap back), spell cooldowns, free repositioning until a cast (instead of undo), Holy and Frost, resistance caps 75 % / 100 %, the Skeleton Archer, Ghoul and Ghost replacing the Archer | [decisions](decisions/2026-10-03-hero-depth.md) · [plan](plans/2026-10-03-hero-depth.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)
 
 The backlog grouped into milestones, in the order I would build them: each follows the ones whose systems it needs and ends in something playable on its own. The order can change if priorities do. Full descriptions and open questions are in [`backlog.md`](backlog.md); each milestone starts with a grill and a plan, like the finished ones.
-
-### 8. Hero depth
-
-Deepens the tactics before content scales up: the spell loadout, a higher level cap (which needs the loadout for its new spells), movement spells and undo. Enemy AI must learn to value positions for the movement spells, which later milestones rely on.
-
-| Feature | Category | Pairs with |
-|---|---|---|
-| [Sound and animation leftovers](backlog.md#sound-and-animation-leftovers) | Audio / animation | audio set, unit model |
-| [Choosing active spells (5-spell loadout)](backlog.md#choosing-active-spells-5-spell-loadout) | Gameplay | level cap, hub, spell bar |
-| [Increase the level cap](backlog.md#increase-the-level-cap) | Gameplay / balance | loadout, rewards content, balance |
-| [Movement spells: teleport, jump and more](backlog.md#movement-spells-teleport-jump-and-more) | Gameplay | height rules, enemy AI, enemy roles |
-| [Undo a move](backlog.md#undo-a-move) | Gameplay | command actions |
 
 ### 9. Encounters
 
@@ -99,4 +88,5 @@ The final pass when content stops moving: a balance pass with the balance lab, a
 |---|---|---|
 | [Balance observations from playtests](backlog.md#balance-observations-from-playtests) | Balance | level cap, area spells, tower bands |
 | [Balance pass and release checks](backlog.md#balance-pass-and-release-checks) | Balance / release | content stable |
+| [Sound and animation leftovers](backlog.md#sound-and-animation-leftovers) (or any milestone: it is small) | Audio / animation | audio set, unit model |
 
