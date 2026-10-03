@@ -22,5 +22,4 @@ skin_color = Color(0.98, 0.86, 0.72, 1)
 held_item = ExtResource("held_prop")
 held_item_bone = "Fist.R"
 held_item_scale = 0.0095
-held_item_rotation = Vector3(-2, 77, 174)
-held_item_offset = Vector3(0.00002, -0.002, 0.00024)
+held_item_rotation = Vector3(-2, 76, 149)
