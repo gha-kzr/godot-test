@@ -517,10 +517,7 @@ func test_a_web_build_asks_for_a_click_before_the_title_and_the_music_waits_for_
 	_tree().root.add_child(game)
 	assert_true(game.screen is StartScreen, "the start screen first, on every platform")
 	assert_eq(game.audio.current_music, &"", "no music before the click")
-	var click := InputEventMouseButton.new()
-	click.button_index = MOUSE_BUTTON_LEFT
-	click.pressed = true
-	game.screen._gui_input(click)
+	(game.screen.get_node("%StartButton") as Button).pressed.emit()
 	assert_true(game.screen is TitleScreen, "the click goes on to the title")
 	assert_eq(game.audio.current_music, &"hub", "and the title's music starts from the beginning")
 	game.free()
@@ -532,29 +529,24 @@ func test_the_start_screen_is_on_by_default_everywhere() -> void:
 	game.free()
 
 
-func test_the_start_screen_goes_on_with_a_key_or_a_tap_but_not_with_a_release_or_a_held_key() -> void:
+func test_the_start_screen_goes_on_with_a_key_but_not_a_held_one_and_only_once() -> void:
 	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
 	_tree().root.add_child(screen)
 	var starts := [0]
 	screen.started.connect(func() -> void: starts[0] += 1)
-	var release := InputEventMouseButton.new()
-	release.button_index = MOUSE_BUTTON_LEFT
-	release.pressed = false
-	screen._gui_input(release)
 	var held := InputEventKey.new()
 	held.keycode = KEY_A
 	held.pressed = true
 	held.echo = true
 	screen._unhandled_input(held)
-	assert_eq(starts[0], 0, "a release and an auto-repeat don't start")
+	assert_eq(starts[0], 0, "an auto-repeat doesn't start")
 	var key := InputEventKey.new()
 	key.keycode = KEY_A
 	key.pressed = true
 	screen._unhandled_input(key)
-	var tap := InputEventScreenTouch.new()
-	tap.pressed = true
-	screen._gui_input(tap)
-	assert_eq(starts[0], 2, "a key press and a tap do")
+	assert_eq(starts[0], 1, "a key press does")
+	(screen.get_node("%StartButton") as Button).pressed.emit()
+	assert_eq(starts[0], 1, "once only")
 	screen.free()
 
 
@@ -612,27 +604,34 @@ func test_the_spells_screen_changes_the_loadout_and_saves_it() -> void:
 	game.free()
 
 
-func test_a_real_click_anywhere_on_the_start_screen_goes_on() -> void:
+func test_a_real_click_on_the_button_starts_but_not_elsewhere() -> void:
 	# Through the viewport, as a player's click arrives (GUI routing first), not by calling a handler.
 	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
 	_tree().root.add_child(screen)
 	var starts := [0]
 	screen.started.connect(func() -> void: starts[0] += 1)
 	await _tree().process_frame
-	var click := InputEventMouseButton.new()
-	click.button_index = MOUSE_BUTTON_LEFT
-	click.pressed = true
-	click.position = screen.get_viewport_rect().size / 2.0
-	click.global_position = click.position
-	screen.get_viewport().push_input(click)
-	assert_eq(starts[0], 1, "a left click starts")
+	var button := screen.get_node("%StartButton") as Button
+	var away := button.get_global_rect().position - Vector2(12, 12)  # Just above and left of it.
+	assert_false(button.get_global_rect().has_point(away))
+	for spot: Vector2 in [away, button.get_global_rect().get_center()]:
+		for pressed in [true, false]:
+			var click := InputEventMouseButton.new()
+			click.button_index = MOUSE_BUTTON_LEFT
+			click.pressed = pressed
+			click.position = spot
+			click.global_position = spot
+			screen.get_viewport().push_input(click)
+		if spot == away:
+			assert_eq(starts[0], 0, "a click away from the button does nothing")
+	assert_eq(starts[0], 1, "a click on the button starts")
 	screen.free()
 
 
 func test_click_to_start_pulses() -> void:
 	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
 	_tree().root.add_child(screen)
-	var pill := screen.get_node("%PromptBox") as PanelContainer
+	var pill := screen.get_node("%StartButton") as Button
 	await _tree().create_timer(StartScreen.PULSE_TIME * 0.5).timeout
 	assert_true(pill.scale.x > 1.0, "it grows (%s)" % pill.scale)
 	assert_eq(pill.pivot_offset_ratio, Vector2(0.5, 0.5), "from its center")

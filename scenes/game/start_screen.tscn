@@ -20,6 +20,44 @@ corner_radius_bottom_left = 24
 shadow_color = Color(0.3, 0.85, 1, 0.25)
 shadow_size = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBox_pill_hover"]
+content_margin_left = 32.0
+content_margin_top = 10.0
+content_margin_right = 32.0
+content_margin_bottom = 12.0
+bg_color = Color(0.08, 0.16, 0.22, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.97, 1, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.3, 0.85, 1, 0.45)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_pill_pressed"]
+content_margin_left = 32.0
+content_margin_top = 10.0
+content_margin_right = 32.0
+content_margin_bottom = 12.0
+bg_color = Color(0.12, 0.3, 0.38, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.97, 1, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.3, 0.85, 1, 0.25)
+shadow_size = 8
+
+[sub_resource type="StyleBoxEmpty" id="StyleBox_focus"]
+
 [node name="StartScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -74,15 +112,17 @@ theme_override_font_sizes/font_size = 64
 text = "Title"
 horizontal_alignment = 1
 
-[node name="PromptBox" type="PanelContainer" parent="Center/Rows"]
+[node name="StartButton" type="Button" parent="Center/Rows"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBox_pill")
-
-[node name="Prompt" type="Label" parent="Center/Rows/PromptBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"PromptLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.8, 0.95, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBox_pill")
+theme_override_styles/hover = SubResource("StyleBox_pill_hover")
+theme_override_styles/pressed = SubResource("StyleBox_pill_pressed")
+theme_override_styles/focus = SubResource("StyleBox_focus")
 text = "Click to start"
-horizontal_alignment = 1
