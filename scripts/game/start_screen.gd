@@ -8,14 +8,23 @@ extends Screen
 
 signal started
 
+## "Click to start" breathes: it grows to this scale and back, each way in PULSE_TIME seconds.
+const PULSE_SCALE := 1.08
+const PULSE_TIME := 0.8
+
 @onready var _title: Label = %TitleLabel
 @onready var _picture: TextureRect = %Picture
 @onready var _center: CenterContainer = %Center
+@onready var _prompt: Label = %Prompt
 
 
 func _ready() -> void:
 	back_enabled = false
 	_title.text = Game.TITLE
+	_prompt.resized.connect(func() -> void: _prompt.pivot_offset = _prompt.size / 2.0)  # Grows from its center.
+	var pulse := _prompt.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse.tween_property(_prompt, "scale", Vector2.ONE * PULSE_SCALE, PULSE_TIME)
+	pulse.tween_property(_prompt, "scale", Vector2.ONE, PULSE_TIME)
 
 
 func show_title(title: String) -> void:

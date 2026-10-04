@@ -627,3 +627,13 @@ func test_a_real_click_anywhere_on_the_start_screen_goes_on() -> void:
 	screen.get_viewport().push_input(click)
 	assert_eq(starts[0], 1, "a left click starts")
 	screen.free()
+
+
+func test_click_to_start_pulses() -> void:
+	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
+	_tree().root.add_child(screen)
+	var prompt := screen.get_node("%Prompt") as Label
+	await _tree().create_timer(StartScreen.PULSE_TIME * 0.5).timeout
+	assert_true(prompt.scale.x > 1.0, "it grows (%s)" % prompt.scale)
+	assert_true(prompt.pivot_offset.is_equal_approx(prompt.size / 2.0), "from its center")
+	screen.free()

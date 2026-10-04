@@ -95,6 +95,22 @@ func test_instant_skips_the_animations_but_the_state_and_views_end_up_right() ->
 	var enemy := controller.battle.state.units[1]
 	assert_true(enemy.hp < enemy.max_hp(), "the hit landed")
 	assert_eq(controller.units_view.view(1).hp_text(), "%d/%d" % [enemy.hp, enemy.max_hp()], "and the view shows it")
+	var floating := controller.units_view.view(1).find_children("FloatingNumber*", "Label3D", false, false)
+	assert_true(floating.any(func(label: Node) -> bool: return (label as Label3D).text == "-%d" % (enemy.max_hp() - enemy.hp)),
+			"the damage number still floats over the target")
+	controller.free()
+
+
+func test_floating_texts_of_one_action_are_stacked() -> void:
+	var settings := Settings.new()
+	settings.battle_speed = Settings.BattleSpeed.INSTANT
+	var controller := _controller(settings)
+	var view := controller.units_view.view(1)
+	var events: Array[BattleEvents.Event] = [BattleEvents.DamageDealt.new(1, 3, 10), BattleEvents.DamageDealt.new(1, 4, 6)]
+	await controller.event_player.play(events)
+	var labels := view.find_children("FloatingNumber*", "Label3D", false, false)
+	assert_eq(labels.size(), 2, "both numbers")
+	assert_true(absf((labels[1] as Label3D).position.y - (labels[0] as Label3D).position.y) >= UnitView.FLOAT_STACK_STEP * 0.5, "one above the other")
 	controller.free()
 
 

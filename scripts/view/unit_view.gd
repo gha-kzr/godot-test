@@ -22,6 +22,8 @@ const CAST_DURATION := 0.3
 const HIT_DURATION := 0.3
 const DEATH_DURATION := 0.45
 const FLOAT_DURATION := 0.8
+## How much higher each extra floating text of one action starts (instant speed).
+const FLOAT_STACK_STEP := 0.3
 ## How far toward its target a caster lunges.
 const LUNGE_DISTANCE := 0.3
 ## How far above a cell's top a projectile aims (about a unit's chest).
@@ -434,13 +436,20 @@ func _play_hp_change(text: String, color: Color, hp_after: int) -> void:
 	await tween.finished
 
 
-func _spawn_floating_number(text: String, color: Color) -> void:
+## A text floating up from the unit without any other animation (the instant battle speed);
+## `stack` > 0 starts it higher, above the ones already floating from the same action.
+func float_text(text: String, color: Color, stack := 0) -> void:
+	_spawn_floating_number(text, color, stack * FLOAT_STACK_STEP)
+
+
+func _spawn_floating_number(text: String, color: Color, lift := 0.0) -> void:
 	var label := _hp_label.duplicate() as Label3D
 	label.name = "FloatingNumber"
 	label.text = text
 	label.modulate = color
+	label.position.y += lift
 	label.show()
-	add_child(label)
+	add_child(label, true)  # Readable names (FloatingNumber2…) when several float at once.
 	var tween := label.create_tween().set_parallel()
 	tween.tween_property(label, "position:y", label.position.y + 0.8, FLOAT_DURATION)
 	tween.tween_property(label, "modulate:a", 0.0, FLOAT_DURATION).set_delay(FLOAT_DURATION * 0.4)

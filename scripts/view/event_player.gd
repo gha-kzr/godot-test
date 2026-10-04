@@ -61,6 +61,7 @@ func play(events: Array[BattleEvents.Event]) -> void:
 	is_playing = true
 	_spell = null
 	var generation := _generation
+	var floated: Dictionary[int, int] = {}  # Instant: texts already floated per unit, to stack them.
 	for event in events:
 		if not instant:
 			await _play_event(event)
@@ -68,8 +69,39 @@ func play(events: Array[BattleEvents.Event]) -> void:
 				return  # stop() was called; it already reset the player.
 		else:
 			_track_spell(event)
+			_float_feedback(event, floated)
 		event_played.emit(event)
 	is_playing = false
+
+
+## Instant speed skips the animations but keeps what the player must read: damage and heal
+## numbers and applied statuses float over their units at once, without waiting (several on
+## one unit are stacked so they stay readable).
+func _float_feedback(event: BattleEvents.Event, floated: Dictionary[int, int]) -> void:
+	var text := ""
+	var color := Color.WHITE
+	if event is BattleEvents.DamageDealt:
+		var hit := event as BattleEvents.DamageDealt
+		if hit.amount > 0:
+			text = "-%d" % hit.amount
+			color = UnitView.DAMAGE_COLOR
+	elif event is BattleEvents.Healed:
+		var heal := event as BattleEvents.Healed
+		if heal.amount > 0:
+			text = "+%d" % heal.amount
+			color = UnitView.HEAL_COLOR
+	elif event is BattleEvents.StatusApplied:
+		var applied := event as BattleEvents.StatusApplied
+		text = applied.status.display_name  # The label translates it, as in normal playback.
+		color = applied.status.color
+	if text.is_empty():
+		return
+	var view := _units.find_view(event.subject_id())
+	if view == null or not is_instance_valid(view):
+		return
+	var stack: int = floated.get(event.subject_id(), 0)
+	floated[event.subject_id()] = stack + 1
+	view.float_text(text, color, stack)
 
 
 ## A spell's effect on each cell of its area with no unit on it: casting at the ground still
