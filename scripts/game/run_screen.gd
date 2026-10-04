@@ -43,7 +43,8 @@ func show_report(report: RunDirector.Report, profile: Profile, title: String) ->
 	_strip.visible = run != null and run.mode == RunState.Mode.TOWER
 	if _strip.visible:
 		_strip.show_floors(run.floor_number)
-	_party_row.visible = run != null
+	# After a fight the heroes' XP shows even when it ended the run (a stage, a lost or finished climb).
+	_party_row.visible = run != null or report.rewards != null
 	_party_row.show_party(_party_infos(profile, report))
 	_boons.visible = run != null and not run.boons.is_empty()
 	_boons.text = tr("Boons: %s") % ", ".join(run.boons.map(func(b: BoonData) -> String: return tr(b.display_name))) if _boons.visible else ""
@@ -113,8 +114,6 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 ## One UnitInfo per hero of the run's party, for the HP chips.
 func _party_infos(profile: Profile, report: RunDirector.Report) -> Array[UnitInfo]:
 	var infos: Array[UnitInfo] = []
-	if profile.run == null:
-		return infos
 	var records := profile.party_records()
 	for slot in records.size():
 		var info := UnitInfo.new()
@@ -122,7 +121,8 @@ func _party_infos(profile: Profile, report: RunDirector.Report) -> Array[UnitInf
 		info.level = records[slot].level
 		_fill_xp(info, profile, profile.party[slot], report)
 		info.max_hp = RunDirector.max_hp(profile, slot)
-		var hp: int = profile.run.hero_hp[slot] if slot < profile.run.hero_hp.size() else -1
+		# Outside a run (it just ended) heroes are back to full, as the hub shows them.
+		var hp: int = profile.run.hero_hp[slot] if profile.run != null and slot < profile.run.hero_hp.size() else -1
 		info.hp = info.max_hp if hp < 0 else mini(hp, info.max_hp)
 		infos.append(info)
 	return infos

@@ -70,17 +70,27 @@ func test_a_level_up_lists_the_spells_it_unlocks() -> void:
 	screen.free()
 
 
-func test_a_stage_run_has_no_floor_strip_and_the_run_end_no_party() -> void:
+func test_a_stage_run_has_no_floor_strip_and_its_win_still_shows_the_heroes_xp() -> void:
 	var profile := _profile_on_floor(1)
 	profile.run.mode = RunState.Mode.STAGE
 	profile.run.stage = _tower().stages[0]
 	var screen := _screen(profile)
 	assert_false((screen.get_node("%FloorStrip") as Control).visible)
 	screen.free()
-	profile.run = null
-	screen = _screen(profile)
-	assert_false((screen.get_node("%PartyHpRow") as Control).visible)
+	profile.run = null  # A won stage ends its run.
+	var report := RunDirector.Report.new()
+	report.won = true
+	report.run_over = true
+	report.rewards = BattleRewards.new()
+	report.rewards.xp = 30
+	screen = _screen(profile, report)
+	var row := screen.get_node("%PartyHpRow") as Control
+	assert_true(row.visible, "the heroes and their XP, though the run is over")
+	assert_eq(row.get_child_count(), profile.party.size())
 	assert_false((screen.get_node("%Boons") as Control).visible)
+	screen.free()
+	screen = _screen(profile)  # No fight behind it (e.g. the end of a run after a boss choice).
+	assert_false((screen.get_node("%PartyHpRow") as Control).visible)
 	screen.free()
 
 
