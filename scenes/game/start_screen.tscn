@@ -2,6 +2,24 @@
 
 [ext_resource type="Script" uid="uid://duvrdp5r54685" path="res://scripts/game/start_screen.gd" id="1_start"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBox_pill"]
+content_margin_left = 32.0
+content_margin_top = 10.0
+content_margin_right = 32.0
+content_margin_bottom = 12.0
+bg_color = Color(0.05, 0.07, 0.11, 0.78)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.9, 1, 0.9)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.3, 0.85, 1, 0.25)
+shadow_size = 8
+
 [node name="StartScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -56,7 +74,13 @@ theme_override_font_sizes/font_size = 64
 text = "Title"
 horizontal_alignment = 1
 
-[node name="Prompt" type="Label" parent="Center/Rows"]
+[node name="PromptBox" type="PanelContainer" parent="Center/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBox_pill")
+
+[node name="Prompt" type="Label" parent="Center/Rows/PromptBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"PromptLabel"

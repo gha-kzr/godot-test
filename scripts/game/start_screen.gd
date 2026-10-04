@@ -8,35 +8,42 @@ extends Screen
 
 signal started
 
-## "Click to start" breathes: it grows to this scale and back, each way in PULSE_TIME seconds.
+## The "Click to start" pill breathes: it grows to this scale and back (from its center), each
+## way in PULSE_TIME seconds.
 const PULSE_SCALE := 1.08
 const PULSE_TIME := 0.8
+## With the title picture, the prompt sits in this band of the screen's height, just under the
+## name painted on the picture.
+const PROMPT_TOP := 0.7
+const PROMPT_BOTTOM := 0.84
 
 @onready var _title: Label = %TitleLabel
 @onready var _picture: TextureRect = %Picture
 @onready var _center: CenterContainer = %Center
-@onready var _prompt: Label = %Prompt
+@onready var _prompt_box: PanelContainer = %PromptBox
 
 
 func _ready() -> void:
 	back_enabled = false
 	_title.text = Game.TITLE
-	_prompt.resized.connect(func() -> void: _prompt.pivot_offset = _prompt.size / 2.0)  # Grows from its center.
-	var pulse := _prompt.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	pulse.tween_property(_prompt, "scale", Vector2.ONE * PULSE_SCALE, PULSE_TIME)
-	pulse.tween_property(_prompt, "scale", Vector2.ONE, PULSE_TIME)
+	_prompt_box.pivot_offset_ratio = Vector2(0.5, 0.5)  # Grows from its center, whatever its size.
+	var pulse := _prompt_box.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse.tween_property(_prompt_box, "scale", Vector2.ONE * PULSE_SCALE, PULSE_TIME)
+	pulse.tween_property(_prompt_box, "scale", Vector2.ONE, PULSE_TIME)
 
 
 func show_title(title: String) -> void:
 	_title.text = title
 
 
-## The title picture (it carries the name) behind a prompt near the bottom; the text title otherwise.
+## The title picture (it carries the name) with the prompt just under the name; the text title
+## and the prompt in the middle otherwise.
 func apply_branding(picture: Texture2D) -> void:
 	_picture.texture = picture
 	_picture.visible = picture != null
 	_title.visible = picture == null
-	_center.anchor_top = 0.82 if picture != null else 0.0
+	_center.anchor_top = PROMPT_TOP if picture != null else 0.0
+	_center.anchor_bottom = PROMPT_BOTTOM if picture != null else 1.0
 
 
 func _gui_input(event: InputEvent) -> void:

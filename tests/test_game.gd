@@ -632,8 +632,10 @@ func test_a_real_click_anywhere_on_the_start_screen_goes_on() -> void:
 func test_click_to_start_pulses() -> void:
 	var screen := (load("res://scenes/game/start_screen.tscn") as PackedScene).instantiate() as StartScreen
 	_tree().root.add_child(screen)
-	var prompt := screen.get_node("%Prompt") as Label
+	var pill := screen.get_node("%PromptBox") as PanelContainer
 	await _tree().create_timer(StartScreen.PULSE_TIME * 0.5).timeout
-	assert_true(prompt.scale.x > 1.0, "it grows (%s)" % prompt.scale)
-	assert_true(prompt.pivot_offset.is_equal_approx(prompt.size / 2.0), "from its center")
+	assert_true(pill.scale.x > 1.0, "it grows (%s)" % pill.scale)
+	assert_eq(pill.pivot_offset_ratio, Vector2(0.5, 0.5), "from its center")
+	var center := pill.get_global_rect().get_center()
+	assert_true(absf(center.x - screen.size.x / 2.0) < 2.0, "the pill is centered on the screen")
 	screen.free()
