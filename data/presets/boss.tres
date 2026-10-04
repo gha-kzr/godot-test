@@ -16,3 +16,4 @@ extra_loot_rolls = 2
 rarity_floor = 1
 ai_profile = ExtResource("1_de8n8")
 visual_scale = 1.3
+grants_boss_spells = true

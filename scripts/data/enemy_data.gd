@@ -24,6 +24,8 @@ class Build:
 ## How many a generated floor may have at most (0: no limit), e.g. one Ghost, so a party
 ## that can't hurt it is never walled.
 @export_range(0, 10) var max_per_floor := 0
+## Spells it gets only with a preset that grants them (the boss): e.g. the boss Ghoul's Feast.
+@export var boss_spells: Array[SpellData] = []
 
 
 func display_name() -> String:
@@ -55,6 +57,12 @@ func build(level: int, preset: DifficultyPreset = null) -> Build:
 		result.ai_profile = preset.ai_profile
 		result.visual_scale = preset.visual_scale
 		result.modifiers.append_array(preset.extra_modifiers)
+		if preset.grants_boss_spells and not boss_spells.is_empty():
+			# A copy with the extra spells; the shared template is never changed.
+			result.unit = unit.duplicate() as UnitData
+			var spells := unit.spells.duplicate()
+			spells.append_array(boss_spells)
+			result.unit.spells = spells
 		if not preset.tag.is_empty():
 			result.label += " · %s" % tr(preset.tag)
 	if hp_bonus != 0:
@@ -69,6 +77,14 @@ func get_validation_errors() -> PackedStringArray:
 	if unit == null:
 		return PackedStringArray(["enemy has no unit"])
 	var errors := unit.get_validation_errors()
+	for spell in boss_spells:
+		if spell == null:
+			errors.append("%s: empty boss spell slot" % display_name())
+			continue
+		for error in spell.get_validation_errors():
+			errors.append("%s boss spell: %s" % [display_name(), error])
+		if spell.ap_cost > unit.ap:
+			errors.append("%s: boss spell %s costs %d AP but the unit has %d" % [display_name(), spell.display_name, spell.ap_cost, unit.ap])
 	if loot_table != null:
 		for error in loot_table.get_validation_errors():
 			errors.append("%s: %s" % [display_name(), error])

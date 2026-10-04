@@ -9,13 +9,22 @@ extends EffectData
 ## How much of the caster's Power applies, in percent (100: all of it; 150: a heavy hit
 ## that gains more from Power; 50: a light one).
 @export_range(0, 500) var power_scaling := 100
+## Life steal: the caster heals this percent of the damage actually dealt (after resistances
+## and the target's remaining HP; so nothing from an immune target or an ally a filter spares).
+@export_range(0, 1000) var lifesteal_percent := 0
 
 
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
 	var target := state.units[target_id]
 	var amount := mini(roundi(scaled(state, caster_id, target_id, state.roll(min_amount, max_amount))), target.hp)
 	target.hp -= amount
-	return [BattleEvents.DamageDealt.new(target_id, amount, target.hp, damage_type)]
+	var events: Array[BattleEvents.Event] = [BattleEvents.DamageDealt.new(target_id, amount, target.hp, damage_type)]
+	if lifesteal_percent > 0 and caster_id >= 0 and state.units[caster_id].is_alive():
+		var caster := state.units[caster_id]
+		var healed := mini(roundi(amount * lifesteal_percent / 100.0), caster.max_hp() - caster.hp)
+		caster.hp += healed
+		events.append(BattleEvents.Healed.new(caster_id, healed, caster.hp))
+	return events
 
 
 ## A roll after the caster's power and the target's damage taken and resistance:
@@ -37,6 +46,13 @@ func average_roll() -> float:
 
 
 func describe() -> String:
+	var text := _damage_text()
+	if lifesteal_percent > 0:
+		return tr("%s, the caster heals %d%% of it") % [text, lifesteal_percent]
+	return text
+
+
+func _damage_text() -> String:
 	var amount := amount_text(min_amount, max_amount)
 	if damage_type == null:
 		if power_scaling == 100:

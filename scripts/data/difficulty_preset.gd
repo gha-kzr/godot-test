@@ -18,6 +18,8 @@ extends Resource
 @export var rarity_floor := RuneData.Rarity.COMMON
 ## Replaces the encounter's AI profile for enemies with this preset (null: keep it).
 @export var ai_profile: AIProfile
+## Enemies built with this preset also get their `boss_spells` (EnemyData).
+@export var grants_boss_spells := false
 @export_range(0.5, 3.0) var visual_scale := 1.0
 
 

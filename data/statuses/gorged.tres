@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://bqp3j86fuhfu4"]
+
+[ext_resource type="PackedScene" uid="uid://bw7w3vcte8hhb" path="res://scenes/fx/aura_marked.tscn" id="1_iwjn1"]
+[ext_resource type="Texture2D" uid="uid://bglad4kysfktr" path="res://ui/icons/feast.svg" id="2_whndf"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="3_jtf26"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="4_s5ro2"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="5_pgs4s"]
+
+[sub_resource type="Resource" id="Resource_i5g2k"]
+script = ExtResource("3_jtf26")
+stat = 0
+amount = 2
+
+[resource]
+script = ExtResource("4_s5ro2")
+display_name = "Gorged"
+icon = ExtResource("2_whndf")
+aura_effect = ExtResource("1_iwjn1")
+short_label = "G"
+color = Color(0.95, 0.55, 0.35, 1)
+is_positive = true
+duration = 1
+modifiers = Array[ExtResource("3_jtf26")]([SubResource("Resource_i5g2k")])

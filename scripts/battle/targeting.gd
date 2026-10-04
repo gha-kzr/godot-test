@@ -34,6 +34,13 @@ static func can_target(state: BattleState, caster_id: int, spell: SpellData, cel
 		return false
 	if spell.needs_line_of_sight and not has_line_of_sight(state, from, cell):
 		return false
+	if spell.target_unit != SpellData.TargetUnit.ANY:
+		var unit := state.unit_at(cell)
+		var caster := state.units[caster_id]
+		if unit == null or unit.id == caster_id:
+			return false
+		if (unit.team == caster.team) != (spell.target_unit == SpellData.TargetUnit.ALLY):
+			return false
 	for effect in spell.effects:
 		if effect != null and not effect.allows_target(state, caster_id, cell):
 			return false

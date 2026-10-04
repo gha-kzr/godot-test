@@ -38,6 +38,9 @@ Settled with the owner in three grill rounds. "Sound and animation leftovers" le
 - **Weapons:** the heroes hold Quaternius props (CC0) in their right fist, placed after the owner's sketch: the Knight's sword forward and down, the Mage's staff diagonal through the fist with its hook forward (about 42° above level), the Ranger's bow level, its limbs along the facing and its curve bulging out to its right. Rotations computed from the fist bone in the idle pose, checked through the battle camera from every side.
 - **Second look:** the Skeleton Archer holds a bow (Quaternius's Wooden Bow, CC0) instead of its dagger (`UnitData.held_item`); every stat shows, zeros included (initiative and damage taken on unit cards, every resistance on the hub); the next level sits beside the hero's title; descriptions line up on the spells screen; a spell with no target from where the hero stands shades its reach and says so (blocked cells now include the ones its effects refuse).
 
+## Ghouls and the boss's Feast (after a playtest)
+Ghouls were healing by "devouring" their fellow Ghoul: Devour hit enemies only but healed its caster anyway, so a bite on an ally was a free heal. Now **Devour** steals life (heals 50 % of the damage dealt, so nothing on an ally) and can only target a hero. The **boss Ghoul** alone (spells granted by the boss preset) has **Feast**: bites an adjacent ally (6–8), heals 4× the damage dealt and is **Gorged** (+2 AP on its next turn), every 3 turns. With the boss AI's weights it never feasts while healthy and does once it misses about a quarter of its HP, even with a hero in reach: killing its escort first is the counter.
+
 ## Saves
 Beta: no backward compatibility. A save without loadouts gets the default one (the first known spells in learning order).
 

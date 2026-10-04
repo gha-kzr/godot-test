@@ -197,6 +197,10 @@ msgstr ""
 msgid "%s's turn"
 msgstr ""
 
+#: scripts/data/damage_effect.gd
+msgid "%s, the caster heals %d%% of it"
+msgstr ""
+
 #: scripts/run/run_director.gd
 msgid "%s: %s for the rest of the run."
 msgstr ""
@@ -535,6 +539,10 @@ msgstr ""
 msgid "Fast (x2)"
 msgstr ""
 
+#: data/spells/feast.tres
+msgid "Feast"
+msgstr ""
+
 #: data/achievements/full_runes.tres
 msgid "Fill all six rune slots of one hero."
 msgstr ""
@@ -645,6 +653,10 @@ msgstr ""
 
 #: data/units/ghoul.tres
 msgid "Ghoul"
+msgstr ""
+
+#: data/statuses/gorged.tres
+msgid "Gorged"
 msgstr ""
 
 #: scenes/game/hint_card.tscn
@@ -1271,6 +1283,14 @@ msgstr ""
 
 #: data/boons/swift_stride.tres
 msgid "Swift Stride"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Targets an ally"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Targets an enemy"
 msgstr ""
 
 #: scripts/data/move_effect.gd

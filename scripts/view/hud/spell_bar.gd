@@ -116,6 +116,10 @@ static func detail_lines(spell: SpellData) -> Array[String]:
 		range_text = TranslationServer.translate("Range %s")
 	range_text = range_text % range_amount
 	lines.append(range_text)
+	if spell.target_unit == SpellData.TargetUnit.ENEMY:
+		lines.append(TranslationServer.translate("Targets an enemy"))
+	elif spell.target_unit == SpellData.TargetUnit.ALLY:
+		lines.append(TranslationServer.translate("Targets an ally"))
 	if spell.cooldown == 1:
 		lines.append(TranslationServer.translate("Once per turn"))
 	elif spell.cooldown > 1:

@@ -59,6 +59,10 @@ extends Resource
 @export var needs_line_of_sight := true
 ## Whether standing higher than the target extends max_range (formula in the targeting rules).
 @export var height_extends_range := false
+## Who must stand on the target cell: anyone or nothing (ANY), an enemy of the caster, or an
+## ally (not the caster itself). Checked with range and sight, so highlights and the AI follow.
+enum TargetUnit { ANY, ENEMY, ALLY }
+@export var target_unit := TargetUnit.ANY
 @export var area: AreaShape
 @export var effects: Array[EffectData] = []
 

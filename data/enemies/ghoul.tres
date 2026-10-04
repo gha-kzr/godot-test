@@ -3,6 +3,8 @@
 [ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="1_oeyn6"]
 [ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="2_rvj5m"]
 [ext_resource type="Resource" uid="uid://dlob7c217iah0" path="res://data/units/ghoul.tres" id="3_8epti"]
+[ext_resource type="Resource" uid="uid://b7vmvytr4ede0" path="res://data/spells/feast.tres" id="boss_feast"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="spell_script"]
 
 [resource]
 script = ExtResource("2_rvj5m")
@@ -11,3 +13,4 @@ power_per_level = 2
 xp_base = 16
 xp_per_level = 5
 loot_table = ExtResource("1_oeyn6")
+boss_spells = Array[ExtResource("spell_script")]([ExtResource("boss_feast")])
