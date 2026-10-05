@@ -1,6 +1,6 @@
 # Rune Ascent
 
-A turn-based tactical roguelite made with a Godot 4.7 project and an AI agent (the repository and the save folder are still named `godot-test`: `application/config/custom_user_dir_name` keeps the saves where they were).
+A turn-based tactical roguelite made with a Godot 4.7 project and an AI agent (the repository is `rune-ascent`; the save folder is still named `godot-test`: `application/config/custom_user_dir_name` keeps the saves where they were).
 
 This is a **Godot 4.7** project (GDScript), developed from the command line — the editor UI is optional.
 
