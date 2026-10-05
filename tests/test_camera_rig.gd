@@ -174,3 +174,12 @@ func test_arrow_keys_pan_only_while_enabled() -> void:
 	Input.action_release(&"camera_pan_right")
 	assert_eq(rig.position, moved, "a panel is open: the arrows belong to the menus")
 	rig.free()
+
+
+func test_a_big_board_starts_zoomed_out_and_a_small_one_as_before() -> void:
+	var rig := _rig()
+	rig.fit_board(Vector2i(10, 9))
+	assert_eq(rig.target_size, rig.default_size, "a small board: the usual view")
+	rig.fit_board(Vector2i(18, 16))
+	assert_true(rig.target_size > rig.default_size and rig.target_size <= rig.max_size, "a big one: wider (%.1f)" % rig.target_size)
+	rig.free()

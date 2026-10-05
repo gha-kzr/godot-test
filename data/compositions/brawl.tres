@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://bn0fdi5l5l6pv"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_jo3gh"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_d0vtg"]
+
+[sub_resource type="Resource" id="Resource_dg15l"]
+script = ExtResource("2_d0vtg")
+
+[sub_resource type="Resource" id="Resource_2y8qq"]
+script = ExtResource("2_d0vtg")
+
+[resource]
+script = ExtResource("1_jo3gh")
+label = "Brawl"
+slots = Array[ExtResource("2_d0vtg")]([SubResource("Resource_dg15l"), SubResource("Resource_2y8qq")])
+weight = 2

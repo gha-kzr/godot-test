@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://c454wx5g8ou53"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_3pk37"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_i412q"]
+
+[sub_resource type="Resource" id="Resource_p2285"]
+script = ExtResource("2_i412q")
+role = 5
+
+[sub_resource type="Resource" id="Resource_mga7b"]
+script = ExtResource("2_i412q")
+role = 1
+
+[sub_resource type="Resource" id="Resource_5dgen"]
+script = ExtResource("2_i412q")
+
+[sub_resource type="Resource" id="Resource_ab2mb"]
+script = ExtResource("2_i412q")
+role = 3
+
+[resource]
+script = ExtResource("1_3pk37")
+label = "Haunted band"
+slots = Array[ExtResource("2_i412q")]([SubResource("Resource_p2285"), SubResource("Resource_mga7b"), SubResource("Resource_5dgen"), SubResource("Resource_ab2mb")])
+weight = 2

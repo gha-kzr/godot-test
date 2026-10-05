@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://df0v1qybf5ius"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_dqs33"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_0x5pl"]
+[ext_resource type="Resource" uid="uid://cy6nvmirve4ow" path="res://data/enemies/warg.tres" id="3_0liy1"]
+
+[sub_resource type="Resource" id="Resource_0lqwn"]
+script = ExtResource("2_0x5pl")
+enemy = ExtResource("3_0liy1")
+
+[sub_resource type="Resource" id="Resource_5q4lh"]
+script = ExtResource("2_0x5pl")
+enemy = ExtResource("3_0liy1")
+
+[sub_resource type="Resource" id="Resource_gxhc2"]
+script = ExtResource("2_0x5pl")
+role = 3
+
+[resource]
+script = ExtResource("1_dqs33")
+label = "Wolf pack"
+slots = Array[ExtResource("2_0x5pl")]([SubResource("Resource_0lqwn"), SubResource("Resource_5q4lh"), SubResource("Resource_gxhc2")])

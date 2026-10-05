@@ -36,6 +36,8 @@ var muted := false
 var battle_speed := BattleSpeed.NORMAL
 ## Ends the turn by itself once the acting hero can neither move nor afford a spell.
 var auto_end_turn := false
+## Developer tools: the title's QA screen, Auto in battle, cheats in QA battles.
+var qa_tools := false
 var window_mode := WindowMode.WINDOWED
 var ui_scale := 1.0
 ## Action → physical keycode, only for actions the player changed.

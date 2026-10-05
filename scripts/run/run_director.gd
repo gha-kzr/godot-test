@@ -55,7 +55,7 @@ static func start_stage(profile: Profile, config: TowerConfig, stage: StageData)
 	if stage not in config.stages:
 		return TranslationServer.translate("Unknown stage.")
 	if not profile.is_stage_available(config, stage):
-		return "Clear the previous stage first."
+		return profile.stage_lock_reason(config, stage)
 	var run := RunState.new()
 	run.mode = RunState.Mode.STAGE
 	run.stage = stage

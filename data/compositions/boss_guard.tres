@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://b0ynoiejnh56"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_xxkgl"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_y1qdf"]
+
+[sub_resource type="Resource" id="Resource_d4n3i"]
+script = ExtResource("2_y1qdf")
+
+[sub_resource type="Resource" id="Resource_rw2xx"]
+script = ExtResource("2_y1qdf")
+role = 1
+
+[sub_resource type="Resource" id="Resource_qrib0"]
+script = ExtResource("2_y1qdf")
+role = 3
+
+[resource]
+script = ExtResource("1_xxkgl")
+label = "Boss with a guard"
+slots = Array[ExtResource("2_y1qdf")]([SubResource("Resource_d4n3i"), SubResource("Resource_rw2xx"), SubResource("Resource_qrib0")])

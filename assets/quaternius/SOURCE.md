@@ -6,6 +6,7 @@ Models by **Quaternius** (https://quaternius.com), license **CC0 1.0** (public d
 |---|---|---|---|
 | Ultimate Animated Character Pack (Nov 2019) | https://quaternius.com/packs/ultimatedanimatedcharacter.html | `characters/*.fbx` (Knight_Male, Wizard, Elf, Goblin_Male, Viking_Male) | `66c7686f443bc2dbcf4f278aa725a3562ee6d2e592c28798c9061c74ed3ad827` |
 | Skeleton, Zombie, Ghost (single models, CC0 1.0 on their pages) | [Skeleton](https://poly.pizza/m/yq5ATpujSt), [Zombie](https://poly.pizza/m/VlXjG0N8Eg), [Ghost](https://poly.pizza/m/Iip30bDHmu) on Poly Pizza | `monsters/Skeleton.glb`, `monsters/Zombie.glb`, `monsters/Ghost.glb` | — (downloaded one by one, see the file hashes) |
+| Orc, Mushroom King, Husky, Yeti (single models, CC0 1.0 on their pages; milestone 9a) | [Orc](https://poly.pizza/m/5vO2YJsPEf), [Mushroom King](https://poly.pizza/m/grnFTziU8u), [Husky](https://poly.pizza/m/wcWiuEqwzq), [Yeti](https://poly.pizza/m/ceRHrn8HHE) on Poly Pizza | `monsters/Orc.glb` (Orc Guard), `monsters/MushroomKing.glb` (Mushroom Sage), `monsters/Husky.glb` (Warg), `monsters/Yeti.glb` (Yeti) | — (see the file hashes) |
 | Wooden Bow, Sword, Staff (single models, CC0 1.0 on their pages) | [Wooden Bow](https://poly.pizza/m/QnpqjLSKFU), [Sword](https://poly.pizza/m/9lLmH8Et4K), [Staff](https://poly.pizza/m/PnGRvO4Lwd) on Poly Pizza | `props/WoodenBow.glb` (the Ranger's and the Skeleton Archer's), `props/Sword.glb` (the Knight's), `props/Staff.glb` (the Mage's) | — (see the file hashes) |
 | Modular Dungeon Pack (Jan 2018) | https://quaternius.com/packs/medievaldungeon.html | `dungeon/*.fbx` (Barrel, Chest, Rock1, Rock2, Rock3) | `6933ae4b51a256a6fbc08d9c2d1c3a80dbeca04c12385ffbbb365c26848130bd` |
 
@@ -32,4 +33,8 @@ e2e77586004510a9a9302f7120e08339b9467da782b4bc47d350e0766da9a468  dungeon/Rock2.
 8c0dbd0bc20dc586163124c745b10852a6f215b646084dc74955e92f77824401  props/Staff.glb
 ebf6a37a1570d3c01822f3e65ae3dca76a76fcc1943ed33bdcd90dc75329218a  props/Sword.glb
 0aca54204443e70af43a9cc7e98c5c9ae42c938595078c801f2303fedd2f6d8f  props/WoodenBow.glb
+a1e107ec4c2c62ce8cad86f750a7f6f9f2065c691dc6f88fce39667d3f4877eb  monsters/Husky.glb
+45bbb9d659697d0127be159af0a58fae3fe8eef430adacaf994efcf0769b2e09  monsters/MushroomKing.glb
+fb5d9da18e16fd3bd6f066692576845d411acf19536d46c7598f5d701b6db19f  monsters/Orc.glb
+789fcdd3d32a1bf6ceaa0e30f9ac5d8d2c52d15fa0181d4d1d980a1b2a2ac869  monsters/Yeti.glb
 ```

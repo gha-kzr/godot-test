@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MapTypology" format=3 uid="uid://bnuqi1l6qll5d"]
+
+[ext_resource type="Script" uid="uid://blqo7c6bl7wul" path="res://scripts/data/map_typology.gd" id="1_8sx2f"]
+
+[resource]
+script = ExtResource("1_8sx2f")
+kind = 1
+label = "Mountain"
+max_height = 4
+noise_frequency = 0.18
+obstacle_density = 0.04
+hole_density = 0.0

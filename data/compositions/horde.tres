@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://ddiwnuxwfqqno"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_b5n2h"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_hpxlx"]
+
+[sub_resource type="Resource" id="Resource_s8wfw"]
+script = ExtResource("2_hpxlx")
+
+[sub_resource type="Resource" id="Resource_bh1ei"]
+script = ExtResource("2_hpxlx")
+
+[sub_resource type="Resource" id="Resource_oiobb"]
+script = ExtResource("2_hpxlx")
+
+[sub_resource type="Resource" id="Resource_wq3ca"]
+script = ExtResource("2_hpxlx")
+role = 3
+
+[sub_resource type="Resource" id="Resource_py4gq"]
+script = ExtResource("2_hpxlx")
+role = 4
+
+[resource]
+script = ExtResource("1_b5n2h")
+label = "Horde"
+slots = Array[ExtResource("2_hpxlx")]([SubResource("Resource_s8wfw"), SubResource("Resource_bh1ei"), SubResource("Resource_oiobb"), SubResource("Resource_wq3ca"), SubResource("Resource_py4gq")])
+weight = 2

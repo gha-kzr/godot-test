@@ -12,6 +12,8 @@ extends Resource
 @export_range(1, 9999) var difficulty_floor := 10
 @export_range(1, 9999) var unlocks_cap := 20
 @export_range(1, 9999) var unlocks_start_floor := 11
+## Its map's shape (null: one drawn from its difficulty floor's band, like a boss floor).
+@export var map_typology: MapTypology
 
 
 func get_validation_errors() -> PackedStringArray:

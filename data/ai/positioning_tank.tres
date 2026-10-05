@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Positioning" format=3 uid="uid://cvoe3dov5nsoi"]
+
+[ext_resource type="Script" uid="uid://dl43trwouoccu" path="res://scripts/data/positioning.gd" id="1_4we6a"]
+
+[resource]
+script = ExtResource("1_4we6a")
+max_distance = 2
+ally_weight = 3.0

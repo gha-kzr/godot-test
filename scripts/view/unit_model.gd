@@ -13,9 +13,9 @@ extends Node3D
 const ANIMATIONS := {
 	&"Idle": ["Idle", "Flying_Idle"],
 	&"Walk": ["Walk", "Run", "Fast_Flying"],
-	&"Attack": ["SwordSlash", "Sword", "Punch", "Attack"],
-	&"Cast": ["Shoot_OneHanded", "SwordSlash", "Sword", "Punch", "Attack"],
-	&"Hit": ["RecieveHit", "HitRecieve", "HitReact", "Hit"],
+	&"Attack": ["SwordSlash", "Sword", "Weapon", "Punch", "Attack"],
+	&"Cast": ["Shoot_OneHanded", "SwordSlash", "Sword", "Weapon", "Punch", "Attack"],
+	&"Hit": ["RecieveHit", "HitRecieve", "HitReact", "Idle_HitReact_Left", "Hit"],
 	&"Death": ["Death"],
 	&"Victory": ["Victory"],
 	&"Defeat": ["Defeat"],

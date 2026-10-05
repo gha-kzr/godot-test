@@ -178,10 +178,20 @@ func start_floors(config: TowerConfig) -> Array[int]:
 	return floors
 
 
-## A stage can be played once the one before it (in the tower's list) is cleared.
+## A stage can be played once the one before it (in the tower's list) is cleared; the first
+## one once the tower's first stretch (up to its initial cap, floor 10) has been cleared.
 func is_stage_available(config: TowerConfig, stage: StageData) -> bool:
+	return stage_lock_reason(config, stage).is_empty()
+
+
+## Why a stage can't be played yet, or "" if it can.
+func stage_lock_reason(config: TowerConfig, stage: StageData) -> String:
 	var index := config.stages.find(stage)
-	return index == 0 or (index > 0 and config.stages[index - 1] in cleared_stages)
+	if index < 0:
+		return tr("Unknown stage.")
+	if index == 0:
+		return "" if best_depth >= config.initial_cap else tr("Clear tower floor %d first.") % config.initial_cap
+	return "" if config.stages[index - 1] in cleared_stages else tr("Clear the previous stage first.")
 
 
 ## Plain data for saving: resources (heroes, runes) are referenced as {"uid", "path"}, so

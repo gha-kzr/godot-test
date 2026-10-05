@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://tpx6htwdirvy"]
+
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="1_mqyu6"]
+[ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="2_rwjvb"]
+[ext_resource type="Resource" uid="uid://chxf7dscbytpg" path="res://data/ai/positioning_support.tres" id="3_yekse"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="4_droxt"]
+[ext_resource type="Resource" uid="uid://chubj743gawwt" path="res://data/units/mushroom_sage.tres" id="5_njcmq"]
+
+[resource]
+script = ExtResource("4_droxt")
+unit = ExtResource("5_njcmq")
+role = 4
+positioning = ExtResource("3_yekse")
+hp_per_level = 2
+xp_base = 14
+xp_per_level = 4
+loot_table = ExtResource("2_rwjvb")

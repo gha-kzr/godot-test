@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MapTypology" format=3 uid="uid://ok2aprovs3hi"]
+
+[ext_resource type="Script" uid="uid://blqo7c6bl7wul" path="res://scripts/data/map_typology.gd" id="1_1uam4"]
+
+[resource]
+script = ExtResource("1_1uam4")
+label = "Open field"
+obstacle_density = 0.06
+hole_density = 0.03

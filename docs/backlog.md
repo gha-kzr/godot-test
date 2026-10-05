@@ -8,29 +8,23 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 What milestones 6b to 7 left out on purpose: **turn start** stays silent (no candidate liked); a smoother blend between clips (walk to attack); the death sound is heavy, so its gain (`sfx_gain_db`) may need adjusting by ear. Hub and title share one track on purpose.
 
-## Enemy roles and team compositions
-
-*Milestone: 9 Encounters · Category: Content / gameplay · Pairs with: new enemies, AI profiles, biomes*
-
-the tower picks enemies from a pool at random. Give enemies **roles** (warrior / tank, healer, ranged, summoner, charger…) and build encounters from **compositions**: predefined teams that make tactical sense (for instance a healer always comes with a warrior to protect it, a ranged unit with a blocker), chosen per floor band, with elites and bosses having their own. Data: a role field on `EnemyData`, composition resources (`data/compositions/*.tres`: slots with role, level offsets, optional fixed enemy) referenced by the tower bands, and AI profiles per role (a healer prioritizes healing and keeps its distance); the generator fills the map from a composition. Not intent previews (those stay out of scope); questions for the grill: how many roles and enemy types at first, composition weights per band, how roles show in the UI (an icon on the card).
-
-## Bigger maps
-
-*Milestone: 9 Encounters · Category: Gameplay / content · Pairs with: props, map types, balance, AI speed*
-
-generated floors are 8 to 11 cells wide (boss floors 12, ambush layouts 13) and the slice map is 10 × 9: small for a tactics game with 3 heroes against 2 to 3 enemies. Make them bigger where it helps (`MapGenSettings.min_size` / `max_size` / `boss_size` allow up to 30), with more enemies to fill them, longer approaches, more terrain and cover; check the camera (zoom limits, panning bounds already follow the board), the pathfinding and line-of-sight cost on larger boards, the AI's per-turn time, and balance (a bigger board slows fights). Best together with the props item above.
-
 ## More props and floor types
 
 *Milestone: 10 World · Category: Art / content · Pairs with: biomes, bigger maps*
 
 the maps feel empty: a single green terrain and a few rocks. Add floor variety (grass, dirt, stone, water-like or hazard tiles by theme, per-region or per-band looks) and props (barrels, chests, columns, bones, torches, trees; the Quaternius dungeon pack already has many, only five files are imported), placed by the map generator on cells that don't change the rules (decoration only), or with rules later (cover, hazards, slowing floors). Questions for the grill: purely visual first, or floor types with effects (a gameplay milestone); themes per tower band; how props avoid hiding units and the click targets. Touches `BoardTheme` / `BoardView` (floor variants, prop scenes), `MapGenerator` (decoration pass, a map-token or a separate layer), and credits.
 
-## Map typologies from noise
+## See-through props and walls
 
-*Milestone: 10 World · Category: Content / procedural · Pairs with: bigger maps, biomes*
+*Milestone: 10 World · Category: Art / camera · Pairs with: props, ruins, camera*
 
-generated floors are plateaus on flat ground. Add **map types** built from noise and shaped height fields, each a generator mode with its own settings: **mountain** (height rises to a peak at the centre, spawns on the foothills, ridges and slopes to fight over), **crater** (the opposite: a rim high around a low centre, fights down in or along the rim), **islands joined by bridges** (several raised islands over holes, narrow bridge cells as chokepoints), plus more to vary the board: **canyon / river** (a hole or low corridor splitting the map with a few crossings), **ruins** (many obstacle blocks forming rooms), **stairs / terraces** (concentric or linear steps), **maze-like corridors**, **open field**, **ridge line** (a long high wall of cells with gaps). Rules to keep: every floor cell reachable from the spawns (the connectivity check exists), climbs and drops within the limits (`Movement.MAX_CLIMB`, `MAX_DROP`), line-of-sight stays fair, and the start zone and enemy placement adapt to the shape. Touches `MapGenerator` (typology functions, `FastNoiseLite` seeded from the floor so floors stay deterministic), `MapGenSettings` (per-type settings, weights per tower band), the editor preview and the map tests. Pairs with bigger maps and props and floor types.
+today obstacles are low rocks, so the board stays readable from every camera angle; once the ruins' blocks (and props such as columns or trees) become real walls, they will hide the units, the cells and the hover behind them. When something stands between the camera and a unit or the hovered cell, fade it (dithered or alpha transparency, or a cut-out circle around the units: the usual x-ray / occlusion fade of isometric tactics games), and maybe show hidden units as outlines. Questions for the grill: which objects fade (every prop and obstacle, or only tall ones), fade by camera ray to each unit and the cursor or by a screen-space circle, outlines for hidden units, the cost on the web build's Compatibility renderer. Touches `BoardView` (obstacle materials), `UnitView` (outlines), the camera rig (rays), and the shaders.
+
+## More map typologies
+
+*Milestone: 10 World · Category: Content / procedural · Pairs with: biomes*
+
+milestone 9b brought six typologies from seeded noise (open field, mountain, crater, islands and bridges, canyon, ruins: `data/maps/typologies/`, `MapShapes`). Add more (owner's note): **stairs / terraces** (concentric or linear steps), **maze-like corridors**, **ridge line** (a long high wall of cells with gaps), and let biomes pick their own. The same rules hold (every map checked for two-way reachability and the enemies' walk, redrawn from the same seed), and the floor fingerprints test changes on purpose when bands' weights change.
 
 ## Biomes that change every X floors
 

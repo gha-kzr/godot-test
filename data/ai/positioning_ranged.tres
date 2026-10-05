@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Positioning" format=3 uid="uid://ckwf0g3qsolwc"]
+
+[ext_resource type="Script" uid="uid://dl43trwouoccu" path="res://scripts/data/positioning.gd" id="1_pcocr"]
+
+[resource]
+script = ExtResource("1_pcocr")
+min_distance = 3
+max_distance = 4
+distance_weight = 1.5

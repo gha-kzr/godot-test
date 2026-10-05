@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cy6nvmirve4ow"]
+
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="1_n8w88"]
+[ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="2_1eyc5"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="3_6gyi3"]
+[ext_resource type="Resource" uid="uid://cq2is62u2aswd" path="res://data/units/warg.tres" id="4_jcftb"]
+
+[resource]
+script = ExtResource("3_6gyi3")
+unit = ExtResource("4_jcftb")
+role = 2
+hp_per_level = 3
+xp_base = 13
+xp_per_level = 4
+loot_table = ExtResource("2_1eyc5")

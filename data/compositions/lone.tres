@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://cajnr5kergv7r"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_13ulv"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_iw0ed"]
+
+[sub_resource type="Resource" id="Resource_e53f7"]
+script = ExtResource("2_iw0ed")
+
+[resource]
+script = ExtResource("1_13ulv")
+label = "Lone brute"
+slots = Array[ExtResource("2_iw0ed")]([SubResource("Resource_e53f7")])

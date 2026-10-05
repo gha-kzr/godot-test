@@ -23,12 +23,17 @@ extends Resource
 @export_range(9, 30) var ambush_size := 13
 ## Every start-zone cell is at least this many MP from every enemy spawn.
 @export_range(0, 20) var min_enemy_distance := 5
+## Enemies spawn at most this many MP from the start zone, whatever the map's size: a big
+## board leaves room to manoeuvre, not a longer walk.
+@export_range(1, 30) var max_enemy_distance := 9
 
 
 func get_validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	if min_size > max_size:
 		errors.append("map settings: min_size > max_size")
+	if min_enemy_distance > max_enemy_distance:
+		errors.append("map settings: min_enemy_distance > max_enemy_distance")
 	if edge_weight + corner_weight + ambush_weight <= 0:
 		errors.append("map settings: every layout weight is 0")
 	return errors

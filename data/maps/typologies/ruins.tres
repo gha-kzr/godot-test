@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapTypology" format=3 uid="uid://btldnt03ih4w1"]
+
+[ext_resource type="Script" uid="uid://blqo7c6bl7wul" path="res://scripts/data/map_typology.gd" id="1_7thb3"]
+
+[resource]
+script = ExtResource("1_7thb3")
+kind = 5
+label = "Ruins"
+max_height = 1
+obstacle_density = 0.03
+hole_density = 0.0

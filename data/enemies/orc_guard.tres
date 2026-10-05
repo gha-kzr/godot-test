@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://wmeocw537m4y"]
+
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="1_xxqvc"]
+[ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="2_2v2c4"]
+[ext_resource type="Resource" uid="uid://cvoe3dov5nsoi" path="res://data/ai/positioning_tank.tres" id="3_1cf6t"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="4_etvh8"]
+[ext_resource type="Resource" uid="uid://cxe7arsoqbd1n" path="res://data/units/orc_guard.tres" id="5_rjqr8"]
+
+[resource]
+script = ExtResource("4_etvh8")
+unit = ExtResource("5_rjqr8")
+role = 1
+positioning = ExtResource("3_1cf6t")
+power_per_level = 1
+xp_base = 16
+xp_per_level = 5
+loot_table = ExtResource("2_2v2c4")

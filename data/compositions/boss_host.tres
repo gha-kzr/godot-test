@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://dw757nuwh1u20"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_km5uy"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_5q1ta"]
+
+[sub_resource type="Resource" id="Resource_n2jkh"]
+script = ExtResource("2_5q1ta")
+
+[sub_resource type="Resource" id="Resource_dhaix"]
+script = ExtResource("2_5q1ta")
+role = 1
+
+[sub_resource type="Resource" id="Resource_orb7i"]
+script = ExtResource("2_5q1ta")
+role = 3
+
+[sub_resource type="Resource" id="Resource_mi2bc"]
+script = ExtResource("2_5q1ta")
+role = 4
+
+[sub_resource type="Resource" id="Resource_k4prq"]
+script = ExtResource("2_5q1ta")
+
+[resource]
+script = ExtResource("1_km5uy")
+label = "Boss and its host"
+slots = Array[ExtResource("2_5q1ta")]([SubResource("Resource_n2jkh"), SubResource("Resource_dhaix"), SubResource("Resource_orb7i"), SubResource("Resource_mi2bc"), SubResource("Resource_k4prq")])

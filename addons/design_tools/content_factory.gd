@@ -177,6 +177,7 @@ func _template_unit(display_name: String) -> UnitData:
 func _template_enemy(unit: UnitData) -> EnemyData:
 	var enemy := EnemyData.new()
 	enemy.unit = unit
+	enemy.role = EnemyData.Role.BRUISER  # The template fights up close (Slash); compositions need a role.
 	var pool := "res://data/loot/common_pool.tres"
 	if ResourceLoader.exists(pool):
 		enemy.loot_table = load(pool)

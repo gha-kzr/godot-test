@@ -14,6 +14,7 @@ const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
 const START_SCENE := preload("res://scenes/game/start_screen.tscn")
 const ACHIEVEMENTS_SCENE := preload("res://scenes/game/achievements_screen.tscn")
 const SPELLS_SCENE := preload("res://scenes/game/spells_screen.tscn")
+const QA_SCENE := preload("res://scenes/game/qa_screen.tscn")
 const CREDITS_SCENE := preload("res://scenes/game/credits_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
@@ -59,6 +60,8 @@ var _battle_title := ""
 var _battle_music: StringName = &"battle"
 ## The hero whose tab the player picked last (kept when the hub is rebuilt).
 var _selected_hero := 0
+## The QA screen's choices, kept between its visits.
+var _qa_state := QaScreen.State.new()
 
 
 func _ready() -> void:
@@ -100,6 +103,67 @@ func show_title() -> void:
 	title.play_pressed.connect(show_party)
 	title.settings_pressed.connect(show_settings)
 	title.quit_pressed.connect(get_tree().quit)
+	title.show_qa(settings.qa_tools)
+	title.qa_pressed.connect(show_qa)
+
+
+## The QA tools (with the setting on): floors, playground, profile tools. Its choices are kept
+## between visits.
+func show_qa(message := "") -> void:
+	var qa := QA_SCENE.instantiate() as QaScreen
+	_replace_screen(qa)
+	qa.show_qa(_qa_state, profile, tower, message)
+	qa.back_pressed.connect(show_title)
+	qa.fight_requested.connect(start_qa_battle)
+	qa.profile_action.connect(_on_qa_profile_action)
+
+
+## A QA battle: the usual battle screen with cheats, whose end (or Menu) returns to the QA
+## screen. Nothing of it is applied or saved: no XP, runes, achievements or run progress.
+func start_qa_battle(encounter: Encounter, team: QaTools.Team, title: String) -> void:
+	if team.units.is_empty():
+		show_qa(tr("The quick team has no hero (every level is 0)."))
+		return
+	var spawns := encounter.map.parse().player_spawns.size()
+	if team.units.size() > spawns:
+		show_qa(tr("The party needs 1 to %d heroes to fight on this map.") % spawns)
+		return
+	var battle := BATTLE_SCENE.instantiate() as BattleController
+	battle.setup(encounter, team.units, team.modifiers, rng_seed, [], tower.sudden_death_round, tower.sudden_death_percent,
+			title, team.levels)
+	battle.settings = settings
+	battle.qa_battle = true
+	battle.sound.connect(audio.play_sfx)
+	battle.speed_changed.connect(_on_settings_changed)
+	battle.left_battle.connect(show_qa.bind(tr("You left the QA battle.")))
+	battle.battle_finished.connect(func(_state: BattleState) -> void: show_qa(tr("QA battle over: nothing was saved.")))
+	_battle_music = &"battle"
+	_replace_screen(battle)
+	if battle.battle == null:
+		show_qa(tr("The battle couldn't start (see the log)."))
+
+
+func _on_qa_profile_action(action: StringName, value: int) -> void:
+	var message := ""
+	match action:
+		&"set_levels":
+			QaTools.set_levels(profile, value)
+			message = tr("Every hero is now level %d.") % profile.heroes[0].level
+		&"give_runes":
+			QaTools.give_every_rune(profile)
+			message = tr("One of every rune is in the stash.")
+		&"best_floor":
+			QaTools.set_best_floor(profile, value)
+			message = tr("The best floor is now %d.") % profile.best_depth
+		&"clear_stages":
+			QaTools.clear_every_stage(profile, tower)
+			message = tr("Every stage is cleared.")
+		&"start_run":
+			var error := QaTools.start_run_at(profile, tower, value)
+			message = error if not error.is_empty() else tr("A run waits at floor %d: Continue run on the hub.") % value
+	if not _save():
+		message = tr("Progress couldn't be saved.")
+	show_qa(message)
 
 
 func show_settings() -> void:

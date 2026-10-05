@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://b7ajl6e71ahnd"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_b368i"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_5nrei"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_nw85m"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_5m32o"]
+[ext_resource type="Texture2D" uid="uid://dpx3e2kq5442h" path="res://ui/icons/spore_bolt.svg" id="5_p6rhl"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_s5kpy"]
+
+[sub_resource type="Resource" id="Resource_sic2i"]
+script = ExtResource("1_b368i")
+
+[sub_resource type="Resource" id="Resource_p6be3"]
+script = ExtResource("4_5m32o")
+min_amount = 4
+max_amount = 6
+damage_type = ExtResource("3_nw85m")
+
+[resource]
+script = ExtResource("6_s5kpy")
+display_name = "Spore Bolt"
+icon = ExtResource("5_p6rhl")
+min_range = 2
+max_range = 5
+area = SubResource("Resource_sic2i")
+effects = Array[ExtResource("2_5nrei")]([SubResource("Resource_p6be3")])

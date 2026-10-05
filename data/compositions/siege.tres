@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://bofvc645ug30w"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_cts4i"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_1iyse"]
+
+[sub_resource type="Resource" id="Resource_sanon"]
+script = ExtResource("2_1iyse")
+role = 1
+
+[sub_resource type="Resource" id="Resource_vtegy"]
+script = ExtResource("2_1iyse")
+role = 3
+
+[sub_resource type="Resource" id="Resource_aue7r"]
+script = ExtResource("2_1iyse")
+role = 3
+
+[sub_resource type="Resource" id="Resource_cx5bt"]
+script = ExtResource("2_1iyse")
+role = 4
+
+[sub_resource type="Resource" id="Resource_3u1la"]
+script = ExtResource("2_1iyse")
+role = 5
+
+[resource]
+script = ExtResource("1_cts4i")
+label = "Siege"
+slots = Array[ExtResource("2_1iyse")]([SubResource("Resource_sanon"), SubResource("Resource_vtegy"), SubResource("Resource_aue7r"), SubResource("Resource_cx5bt"), SubResource("Resource_3u1la")])
+weight = 2

@@ -28,7 +28,10 @@ signal overhead_changed(enabled: bool)
 @export var distance := 30.0
 @export var default_size := 12.0
 @export var min_size := 6.0
-@export var max_size := 24.0
+@export var max_size := 28.0
+## fit_board(): the view's size per cell of the board's longest side (a big board starts
+## zoomed out to show it), never below default_size.
+@export var fit_ratio := 0.85
 @export var zoom_step := 1.5
 @export var tween_duration := 0.25
 ## Shifts the view up (in world units at the screen) so the board clears the turn-order
@@ -291,6 +294,12 @@ func set_overhead(enabled: bool, animate := true) -> void:
 	_pitch_tween = create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_pitch_tween.tween_method(_apply_pitch, _current_pitch, target_pitch(), tween_duration)
 	_pitch_tween.tween_property(camera, "size", _view_size(), tween_duration)
+
+
+## Starts the view zoomed to fit a board of `cells` (small boards keep default_size).
+func fit_board(cells: Vector2i) -> void:
+	target_size = clampf(maxi(cells.x, cells.y) * fit_ratio, default_size, max_size)
+	camera.size = _view_size()
 
 
 ## Negative zooms in. Clamped to [min_size, max_size].

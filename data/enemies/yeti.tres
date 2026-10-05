@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://d2tstuhso1k8g"]
+
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="1_y2qaf"]
+[ext_resource type="Resource" uid="uid://bxe0fj01ic8ox" path="res://data/loot/common_pool.tres" id="2_bff0g"]
+[ext_resource type="Script" uid="uid://ch2od245t7fml" path="res://scripts/data/enemy_data.gd" id="3_4au03"]
+[ext_resource type="Resource" uid="uid://dl55de1ou8tl3" path="res://data/units/yeti.tres" id="4_1l371"]
+
+[resource]
+script = ExtResource("3_4au03")
+unit = ExtResource("4_1l371")
+role = 2
+power_per_level = 2
+xp_base = 18
+xp_per_level = 5
+loot_table = ExtResource("2_bff0g")

@@ -17,6 +17,7 @@ const DEBUFFED_COLOR := Color(1.0, 0.5, 0.45)
 @onready var _swatch: ColorRect = %Swatch
 @onready var _name_label: Label = %NameLabel
 @onready var _close_button: Button = %CloseButton
+@onready var _role_label: Label = %RoleLabel
 @onready var _hp_bar: ProgressBar = %HpBar
 @onready var _hp_label: Label = %HpLabel
 @onready var _ap_label: Label = %ApLabel
@@ -34,6 +35,9 @@ func _ready() -> void:
 func show_unit(info: UnitInfo) -> void:
 	_swatch.color = info.color
 	_name_label.text = info.title_text()
+	_role_label.visible = info.role != EnemyData.Role.NONE
+	_role_label.text = tr("Role: %s") % EnemyData.role_name(info.role) if _role_label.visible else ""
+	_role_label.tooltip_text = EnemyData.role_description(info.role)
 	_hp_bar.max_value = info.max_hp
 	_hp_bar.value = info.hp
 	_hp_label.text = tr("%d / %d HP") % [info.hp, info.max_hp]

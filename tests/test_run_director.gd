@@ -120,6 +120,8 @@ func test_clearing_the_cap_ends_the_run_as_a_success() -> void:
 func test_a_cleared_stage_raises_the_cap_and_adds_a_starting_floor() -> void:
 	var profile := _profile()
 	var config := _config()
+	assert_eq(RunDirector.start_stage(profile, config, config.stages[0]), "Clear tower floor 10 first.", "the first stage waits for floor 10")
+	profile.best_depth = 10
 	assert_false(profile.is_stage_available(config, config.stages[1]), "stages in order")
 	assert_eq(RunDirector.start_stage(profile, config, config.stages[1]), "Clear the previous stage first.")
 	assert_eq(RunDirector.start_stage(profile, config, config.stages[0]), "")

@@ -65,6 +65,8 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 			unit.reward = build.reward
 			unit.ai_profile = build.ai_profile
 			unit.label = build.label
+			unit.role = build.role
+			unit.positioning = build.positioning
 			unit.visual_scale = build.visual_scale
 			unit.hp = unit.max_hp()
 			unit.start_turn()

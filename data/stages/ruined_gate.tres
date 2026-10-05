@@ -1,9 +1,11 @@
 [gd_resource type="Resource" script_class="StageData" format=3 uid="uid://dckqa3gpfnl3e"]
 
 [ext_resource type="Script" uid="uid://c8wwtfep5bqe1" path="res://scripts/data/stage_data.gd" id="1_pdsmq"]
+[ext_resource type="Resource" uid="uid://btldnt03ih4w1" path="res://data/maps/typologies/ruins.tres" id="typ"]
 
 [resource]
 script = ExtResource("1_pdsmq")
 display_name = "Ruined Gate"
 seed = 101
 difficulty_floor = 15
+map_typology = ExtResource("typ")

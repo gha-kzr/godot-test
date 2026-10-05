@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapTypology" format=3 uid="uid://c0oogyhvsrytu"]
+
+[ext_resource type="Script" uid="uid://blqo7c6bl7wul" path="res://scripts/data/map_typology.gd" id="1_a73ob"]
+
+[resource]
+script = ExtResource("1_a73ob")
+kind = 4
+label = "Canyon"
+noise_frequency = 0.12
+obstacle_density = 0.04
+hole_density = 0.01

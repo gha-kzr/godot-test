@@ -217,6 +217,10 @@ msgstr ""
 msgid "(empty)"
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "(none)"
+msgstr ""
+
 #: scripts/game/run_screen.gd
 msgid "+%d XP for each hero."
 msgstr ""
@@ -235,6 +239,10 @@ msgstr ""
 
 #: scripts/progression/hints.gd
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "A run waits at floor %d: Continue run on the hub."
 msgstr ""
 
 #: scripts/game/spells_screen.gd
@@ -269,6 +277,10 @@ msgstr ""
 msgid "All (%s)"
 msgstr ""
 
+#: scripts/progression/qa_tools.gd
+msgid "ambush in the middle"
+msgstr ""
+
 #: scripts/progression/hints.gd
 msgid "An elite floor: its enemies are stronger and drop better runes. Take your time."
 msgstr ""
@@ -293,6 +305,10 @@ msgstr ""
 msgid "Audio"
 msgstr ""
 
+#: scripts/view/hud.gd
+msgid "Auto"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Auto end turn"
 msgstr ""
@@ -301,7 +317,7 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn scenes/game/spells_screen.tscn
+#: scenes/game/achievements_screen.tscn scenes/game/credits_screen.tscn scenes/game/qa_screen.tscn scenes/game/settings_screen.tscn scenes/game/spells_screen.tscn
 msgid "Back"
 msgstr ""
 
@@ -333,8 +349,16 @@ msgstr ""
 msgid "Best floor: %d"
 msgstr ""
 
+#: data/spells/bite.tres
+msgid "Bite"
+msgstr ""
+
 #: data/spells/blink.tres
 msgid "Blink"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Board"
 msgstr ""
 
 #: data/spells/bone_arrow.tres
@@ -365,12 +389,24 @@ msgstr ""
 msgid "Bring a hero to level 30."
 msgstr ""
 
+#: scripts/data/enemy_data.gd
+msgid "Bruiser"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Bruiser: hits hard up close and goes for the heroes."
+msgstr ""
+
 #: data/units/brute.tres
 msgid "Brute"
 msgstr ""
 
 #: scripts/game/spells_screen.gd
 msgid "Cancel"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Canyon"
 msgstr ""
 
 #: scripts/game/hub/hero_panel.gd scenes/game/hub/hero_panel.tscn
@@ -411,12 +447,20 @@ msgstr ""
 msgid "Clear a stage."
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Clear every stage"
+msgstr ""
+
 #: data/achievements/all_stages.tres
 msgid "Clear every stage."
 msgstr ""
 
-#: scripts/game/hub/destination_bar.gd
+#: scripts/progression/profile.gd
 msgid "Clear the previous stage first."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "Clear tower floor %d first."
 msgstr ""
 
 #: scripts/view/battle_controller.gd
@@ -443,6 +487,10 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: data/spells/club.tres
+msgid "Club"
+msgstr ""
+
 #: scripts/data/rune_data.gd
 msgid "Common"
 msgstr ""
@@ -457,6 +505,10 @@ msgstr ""
 
 #: scenes/game/settings_screen.tscn
 msgid "Controls"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Crater"
 msgstr ""
 
 #: scenes/game/credits_screen.tscn scenes/game/settings_screen.tscn
@@ -483,6 +535,10 @@ msgstr ""
 msgid "Defeat. The run ends; heroes keep their levels and runes."
 msgstr ""
 
+#: scenes/game/settings_screen.tscn
+msgid "Developer tools: a QA screen on the title (any floor, a playground, profile tools), Auto in battle, cheats in QA battles."
+msgstr ""
+
 #: data/spells/devour.tres
 msgid "Devour"
 msgstr ""
@@ -501,6 +557,10 @@ msgstr ""
 
 #: scripts/game/hub/rune_stash.gd
 msgid "Drop %s?"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "edge layout"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -527,6 +587,10 @@ msgstr ""
 msgid "Ends your turn by itself when a hero can neither move nor cast."
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Enemies (they take the board's spawns)"
+msgstr ""
+
 #: scripts/data/rune_data.gd
 msgid "Epic"
 msgstr ""
@@ -535,12 +599,32 @@ msgstr ""
 msgid "Every %d turns"
 msgstr ""
 
+#: scripts/game/game.gd
+msgid "Every hero is now level %d."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Every stage is cleared."
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "facing edges"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Fast (x2)"
 msgstr ""
 
 #: data/spells/feast.tres
 msgid "Feast"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Fight"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Fight it"
 msgstr ""
 
 #: data/achievements/full_runes.tres
@@ -575,7 +659,11 @@ msgstr ""
 msgid "Flawless"
 msgstr ""
 
-#: scripts/game/run_screen.gd scripts/run/run_director.gd
+#: scripts/game/qa_screen.gd
+msgid "Floor"
+msgstr ""
+
+#: scripts/game/qa_screen.gd scripts/game/run_screen.gd scripts/run/run_director.gd
 msgid "Floor %d"
 msgstr ""
 
@@ -595,6 +683,14 @@ msgstr ""
 msgid "Floor %d isn't unlocked as a starting floor."
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Floor %d: a boss"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Floor %d: an elite"
+msgstr ""
+
 #: data/achievements/floor_10.tres
 msgid "Floor 10"
 msgstr ""
@@ -609,6 +705,14 @@ msgstr ""
 
 #: data/achievements/floor_40.tres
 msgid "Floor 40"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Floor or seed"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Floors"
 msgstr ""
 
 #: data/boons/focus_crown.tres
@@ -655,6 +759,10 @@ msgstr ""
 msgid "Ghoul"
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Give one of every rune"
+msgstr ""
+
 #: data/statuses/gorged.tres
 msgid "Gorged"
 msgstr ""
@@ -681,6 +789,10 @@ msgstr ""
 
 #: data/spells/hamstring.tres
 msgid "Hamstring"
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Heal the heroes"
 msgstr ""
 
 #: scripts/data/heal_effect.gd
@@ -719,6 +831,10 @@ msgstr ""
 msgid "Hunter's Mark"
 msgstr ""
 
+#: data/spells/icy_grasp.tres
+msgid "Icy Grasp"
+msgstr ""
+
 #: scripts/view/hud/unit_info.gd
 msgid "Initiative %d, damage taken %+d%%"
 msgstr ""
@@ -735,6 +851,10 @@ msgstr ""
 msgid "Iron Ward"
 msgstr ""
 
+#: scripts/progression/qa_tools.gd
+msgid "Islands and bridges"
+msgstr ""
+
 #: scripts/progression/tutorial.gd
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr ""
@@ -745,6 +865,10 @@ msgstr ""
 
 #: scripts/game/settings_screen.gd
 msgid "Keys reset."
+msgstr ""
+
+#: scripts/view/hud.gd
+msgid "Kill pinned unit"
 msgstr ""
 
 #: data/units/knight.tres
@@ -805,6 +929,10 @@ msgstr ""
 msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
 msgstr ""
 
+#: scripts/view/hud.gd
+msgid "Lose now"
+msgstr ""
+
 #: data/units/mage.tres
 msgid "Mage"
 msgstr ""
@@ -823,6 +951,10 @@ msgstr ""
 
 #: scenes/battle/hud.tscn
 msgid "Menu"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Mountain"
 msgstr ""
 
 #: scripts/game/spells_screen.gd
@@ -845,6 +977,10 @@ msgstr ""
 msgid "MP: movement points. Walking costs 1 per cell (and 1 more per step up); they refill every turn."
 msgstr ""
 
+#: data/units/mushroom_sage.tres
+msgid "Mushroom Sage"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Music"
 msgstr ""
@@ -855,6 +991,10 @@ msgstr ""
 
 #: scripts/game/mute_button.gd
 msgid "Mute or unmute all sound"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Next"
 msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
@@ -885,6 +1025,10 @@ msgstr ""
 msgid "No such rune in the stash."
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "None"
+msgstr ""
+
 #: scripts/view/hud/unit_info.gd
 msgid "none"
 msgstr ""
@@ -909,8 +1053,24 @@ msgstr ""
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
 msgstr ""
 
+#: scripts/game/game.gd
+msgid "One of every rune is in the stash."
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Open field"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "opposite corners"
+msgstr ""
+
 #: scripts/progression/tutorial.gd
 msgid "Orange cells can be targeted. Click an enemy to cast the spell on it."
+msgstr ""
+
+#: data/units/orc_guard.tres
+msgid "Orc Guard"
 msgstr ""
 
 #: scripts/game/run_screen.gd scenes/game/party_screen.tscn
@@ -923,6 +1083,10 @@ msgstr ""
 
 #: scripts/game/game.gd
 msgid "Pick a boon, or heal the party instead."
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Pick at least one enemy."
 msgstr ""
 
 #: data/spells/piercing_thrust.tres
@@ -949,12 +1113,20 @@ msgstr ""
 msgid "Play again"
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Playground"
+msgstr ""
+
 #: data/damage_types/poison.tres data/statuses/poison.tres
 msgid "Poison"
 msgstr ""
 
 #: data/spells/poison_arrow.tres
 msgid "Poison Arrow"
+msgstr ""
+
+#: data/spells/pounce.tres
+msgid "Pounce"
 msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
@@ -981,6 +1153,14 @@ msgstr ""
 msgid "Press Move on a spell to change the loadout."
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Previous"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Profile"
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "Progress couldn't be saved."
 msgstr ""
@@ -1002,6 +1182,30 @@ msgid "Put here"
 msgstr ""
 
 #: scenes/game/title_screen.tscn
+msgid "QA"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "QA battle over: nothing was saved."
+msgstr ""
+
+#: scenes/game/qa_screen.tscn scenes/game/settings_screen.tscn
+msgid "QA tools"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "QA: floor %d"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "QA: playground"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Quick team (level 0: left out)"
+msgstr ""
+
+#: scenes/game/title_screen.tscn
 msgid "Quit"
 msgstr ""
 
@@ -1019,6 +1223,14 @@ msgstr ""
 
 #: scripts/view/hud/spell_bar.gd
 msgid "Range %s, line of sight, +range from high ground"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Ranged"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Ranged: attacks from afar and keeps its distance."
 msgstr ""
 
 #: data/units/ranger.tres
@@ -1065,6 +1277,10 @@ msgstr ""
 msgid "Recenter camera"
 msgstr ""
 
+#: scripts/view/hud.gd
+msgid "Refill AP and MP"
+msgstr ""
+
 #: data/spells/regeneration.tres data/statuses/regeneration.tres
 msgid "Regeneration"
 msgstr ""
@@ -1093,6 +1309,10 @@ msgstr ""
 msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
 msgstr ""
 
+#: scripts/view/hud/unit_card.gd
+msgid "Role: %s"
+msgstr ""
+
 #: scripts/view/hud.gd
 msgid "Round %d"
 msgstr ""
@@ -1107,6 +1327,10 @@ msgstr ""
 
 #: data/stages/ruined_gate.tres
 msgid "Ruined Gate"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Ruins"
 msgstr ""
 
 #: scripts/game/game.gd
@@ -1145,12 +1369,20 @@ msgstr ""
 msgid "Rune stash"
 msgstr ""
 
-#: scenes/game/hub/hero_panel.tscn
+#: scripts/game/qa_screen.gd scenes/game/hub/hero_panel.tscn
 msgid "Runes"
 msgstr ""
 
 #: scripts/game/game.gd
 msgid "Save reset."
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Set every hero to this level"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Set the best floor to this value"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
@@ -1161,8 +1393,16 @@ msgstr ""
 msgid "Settings couldn't be saved."
 msgstr ""
 
-#: data/spells/shield_bash.tres
+#: data/spells/orc_shield_bash.tres data/spells/shield_bash.tres
 msgid "Shield Bash"
+msgstr ""
+
+#: data/spells/shield_wall.tres
+msgid "Shield Wall"
+msgstr ""
+
+#: data/statuses/shielded.tres
+msgid "Shielded"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -1177,12 +1417,24 @@ msgstr ""
 msgid "Single"
 msgstr ""
 
+#: scripts/game/qa_screen.gd
+msgid "Size (0: the floor's)"
+msgstr ""
+
 #: data/units/skeleton_archer.tres
 msgid "Skeleton Archer"
 msgstr ""
 
 #: scripts/game/tutorial_overlay.gd
 msgid "Skip tutorial"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Skirmisher"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Skirmisher: fast and slippery; harasses the heroes."
 msgstr ""
 
 #: data/stages/sky_bastion.tres
@@ -1249,6 +1501,18 @@ msgstr ""
 msgid "Spells cost AP. Pick one (or press its number) to see where it can reach."
 msgstr ""
 
+#: data/spells/spore_bolt.tres
+msgid "Spore Bolt"
+msgstr ""
+
+#: data/spells/spore_hex.tres
+msgid "Spore Hex"
+msgstr ""
+
+#: data/spells/spore_mend.tres
+msgid "Spore Mend"
+msgstr ""
+
 #: data/achievements/first_stage.tres
 msgid "Stage cleared"
 msgstr ""
@@ -1259,6 +1523,10 @@ msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
 msgid "Stages"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Start a tower run at this floor"
 msgstr ""
 
 #: scenes/battle/hud.tscn
@@ -1277,6 +1545,18 @@ msgstr ""
 msgid "Sunken Crypt"
 msgstr ""
 
+#: scripts/data/enemy_data.gd
+msgid "Support"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Support: heals and strengthens its allies from behind the front."
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Sure? Press again"
+msgstr ""
+
 #: data/boons/surge.tres
 msgid "Surge"
 msgstr ""
@@ -1285,12 +1565,24 @@ msgstr ""
 msgid "Swift Stride"
 msgstr ""
 
+#: scripts/data/enemy_data.gd
+msgid "Tank"
+msgstr ""
+
+#: scripts/data/enemy_data.gd
+msgid "Tank: tough; stays next to its allies and shields them."
+msgstr ""
+
 #: scripts/view/hud/spell_bar.gd
 msgid "Targets an ally"
 msgstr ""
 
 #: scripts/view/hud/spell_bar.gd
 msgid "Targets an enemy"
+msgstr ""
+
+#: scripts/progression/qa_tools.gd
+msgid "Team: %s"
 msgstr ""
 
 #: scripts/data/move_effect.gd
@@ -1317,12 +1609,24 @@ msgstr ""
 msgid "That spell can't go there."
 msgstr ""
 
+#: scripts/view/hud.gd
+msgid "The AI plays your heroes until you turn it off."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "The battle couldn't start (see the log)."
 msgstr ""
 
 #: scripts/game/game.gd
+msgid "The best floor is now %d."
+msgstr ""
+
+#: scripts/game/game.gd
 msgid "The floor's encounter is invalid: %s"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "The floor's own"
 msgstr ""
 
 #: scripts/run/run_director.gd
@@ -1334,7 +1638,15 @@ msgid "The party needs 1 to %d heroes to fight on this map."
 msgstr ""
 
 #: scripts/game/game.gd
+msgid "The quick team has no hero (every level is 0)."
+msgstr ""
+
+#: scripts/game/game.gd
 msgid "The tower is invalid: %s"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "These change your save (press twice to confirm)."
 msgstr ""
 
 #: scripts/game/hub/rune_stash.gd
@@ -1405,8 +1717,12 @@ msgstr ""
 msgid "Unit"
 msgstr ""
 
-#: scripts/run/run_director.gd
+#: scripts/progression/profile.gd scripts/run/run_director.gd
 msgid "Unknown stage."
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Value (a level or a floor)"
 msgstr ""
 
 #: data/runes/venom_ward.tres
@@ -1427,6 +1743,10 @@ msgstr ""
 
 #: data/spells/wail.tres
 msgid "Wail"
+msgstr ""
+
+#: data/units/warg.tres
+msgid "Warg"
 msgstr ""
 
 #: scripts/progression/tutorial.gd
@@ -1453,6 +1773,10 @@ msgstr ""
 msgid "Win a floor without a single hero falling."
 msgstr ""
 
+#: scripts/view/hud.gd
+msgid "Win now"
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Window"
 msgstr ""
@@ -1477,6 +1801,10 @@ msgstr ""
 msgid "Yes, reset"
 msgstr ""
 
+#: data/units/yeti.tres
+msgid "Yeti"
+msgstr ""
+
 #: scripts/progression/tutorial.gd
 msgid "You found a rune! Click it in the stash to equip it on the selected hero."
 msgstr ""
@@ -1487,6 +1815,10 @@ msgstr ""
 
 #: scripts/game/game.gd
 msgid "You left the fight. It starts over when you continue the run."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "You left the QA battle."
 msgstr ""
 
 #: scripts/progression/tutorial.gd

@@ -67,7 +67,9 @@ func test_the_game_opens_on_the_hub_with_the_three_heroes() -> void:
 	assert_true(game.screen is PartyScreen)
 	assert_eq(game.profile.party, [0, 1, 2] as Array[int])
 	assert_true(game.screen.find_child("TowerButton", true, false) != null)
-	assert_false((game.screen.find_child("Stage0", true, false) as Button).disabled)
+	var first := game.screen.find_child("Stage0", true, false) as Button
+	assert_true(first.disabled, "the first stage waits for tower floor 10")
+	assert_eq(first.tooltip_text, "Clear tower floor 10 first.")
 	assert_true((game.screen.find_child("Stage1", true, false) as Button).disabled, "locked until stage 1 is cleared")
 	assert_eq(game.screen.find_child("ContinueButton", true, false), null, "no run to continue")
 	after_each_clean()
@@ -186,6 +188,8 @@ func test_a_pending_boss_choice_survives_a_restart_and_leaving_ends_the_run() ->
 
 func test_a_cleared_stage_unlocks_the_next_one() -> void:
 	var game := _game()
+	game.profile.best_depth = 10  # The first ten floors cleared.
+	game.show_party()
 	_press(game.screen, "Stage0")
 	assert_eq(_battle(game).battle_title, game.tower.stages[0].display_name)
 	_finish(game, true)

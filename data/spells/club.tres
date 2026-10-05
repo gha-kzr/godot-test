@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://by6km62redrcd"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_1di7t"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_uqmj2"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_xov2r"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_6si1j"]
+[ext_resource type="Texture2D" uid="uid://m0e005r540hf" path="res://ui/icons/club.svg" id="5_doyjm"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_b0iv8"]
+
+[sub_resource type="Resource" id="Resource_prtpk"]
+script = ExtResource("1_1di7t")
+
+[sub_resource type="Resource" id="Resource_yrs1f"]
+script = ExtResource("4_6si1j")
+min_amount = 5
+max_amount = 7
+damage_type = ExtResource("3_xov2r")
+
+[resource]
+script = ExtResource("6_b0iv8")
+display_name = "Club"
+icon = ExtResource("5_doyjm")
+needs_line_of_sight = false
+area = SubResource("Resource_prtpk")
+effects = Array[ExtResource("2_uqmj2")]([SubResource("Resource_yrs1f")])

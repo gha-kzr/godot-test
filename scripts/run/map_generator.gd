@@ -1,35 +1,42 @@
 @tool
 class_name MapGenerator
 extends RefCounted
-## Generates a battle map from a seeded RNG: raised plateaus smoothed so every step
-## climbs at most one level, a sprinkle of obstacles and holes, a 3 x 3 player start zone
-## and the enemy spawns, placed by layout: facing edges, opposite corners, or an ambush
-## (the zone in the centre, enemies on 2-3 sides). Every attempt is checked for two-way
-## connectivity and for the enemies' distance to the zone; failed attempts draw the next
-## one from the same RNG, so the result is still fully determined by the seed.
+## Generates a battle map from a seeded RNG: the typology's shape (MapShapes: open field,
+## mountain, crater, islands, canyon, ruins), a 3 x 3 player start zone placed by layout (near
+## the bottom edge, a bottom corner, or the centre for an ambush) with every piece of ground
+## bridged to it, and the enemy spawns a bounded walk away (`min_enemy_distance` to
+## `max_enemy_distance` MP) in the layout's direction. Every attempt is checked for two-way
+## connectivity and the enemies' distance; failed attempts draw the next one from the same RNG,
+## so the result is still fully determined by the seed.
 
 enum Layout { EDGE, CORNER, AMBUSH }
 
 ## The start zone is a 3 x 3 square.
 const ZONE_SIZE := 9
 const ATTEMPTS := 20
-const SIDES: Array[Vector2i] = [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]
 
 
 ## At most this many enemies can be placed by every layout (CORNER has 6 candidate cells).
 const MAX_ENEMIES := 6
 
 
+## `typology` shapes the board (null: an open field from the settings); `size_range` is the
+## width and height range (x to y; zero: the settings', boss floors their `boss_size`).
 static func generate(rng: RandomNumberGenerator, settings: MapGenSettings, enemy_count: int, is_boss := false,
-		layout := Layout.EDGE) -> MapData:
+		layout := Layout.EDGE, typology: MapTypology = null, size_range := Vector2i.ZERO) -> MapData:
 	if enemy_count < 1 or enemy_count > MAX_ENEMIES:
 		push_error("MapGenerator: %d enemies (1 to %d supported)" % [enemy_count, MAX_ENEMIES])
 		enemy_count = clampi(enemy_count, 1, MAX_ENEMIES)
+	if typology == null:
+		typology = _settings_typology(settings, is_boss)
+	if size_range == Vector2i.ZERO:
+		size_range = Vector2i(settings.boss_size, settings.boss_size) if is_boss else Vector2i(settings.min_size, settings.max_size)
 	for attempt in ATTEMPTS:
-		var map := _attempt(rng, settings, enemy_count, is_boss, layout)
-		if is_playable(map, enemy_count, settings.min_enemy_distance):
+		var map := _attempt(rng, settings, enemy_count, layout, typology, size_range)
+		if map != null and is_playable(map, enemy_count, settings.min_enemy_distance):
 			return map
-	push_warning("MapGenerator: no valid %s map in %d attempts; using an open map" % [Layout.keys()[layout], ATTEMPTS])
+	push_warning("MapGenerator: no valid %s %s map in %d attempts; using an open map" % [
+			MapTypology.Kind.keys()[typology.kind], Layout.keys()[layout], ATTEMPTS])
 	return _open_map(maxi(settings.min_size, settings.min_enemy_distance + 4), enemy_count)  # Always valid.
 
 
@@ -51,6 +58,9 @@ static func is_playable(map: MapData, enemy_count: int, min_enemy_distance := 0)
 	for cell in parsed.player_spawns:
 		if to_enemies.get(cell, 0) < min_enemy_distance:
 			return false
+	for cell in parsed.enemy_spawns:
+		if to_zone.get(cell, 0) < min_enemy_distance:
+			return false
 	return true
 
 
@@ -71,58 +81,53 @@ static func pick_layout(rng: RandomNumberGenerator, settings: MapGenSettings, fl
 	return Layout.EDGE
 
 
-static func _attempt(rng: RandomNumberGenerator, settings: MapGenSettings, enemy_count: int, is_boss: bool,
-		layout: Layout) -> MapData:
-	var width := settings.boss_size if is_boss else rng.randi_range(settings.min_size, settings.max_size)
-	var height := settings.boss_size if is_boss else rng.randi_range(settings.min_size, settings.max_size)
+## An open field with the settings' own plateaus and densities (no band typology).
+static func _settings_typology(settings: MapGenSettings, is_boss: bool) -> MapTypology:
+	var typology := MapTypology.new()
+	typology.max_height = settings.max_height
+	var area := float(settings.boss_size * settings.boss_size) if is_boss else pow((settings.min_size + settings.max_size) / 2.0, 2.0)
+	typology.plateaus_per_100_cells = settings.plateaus * 100.0 / area
+	typology.obstacle_density = settings.boss_obstacle_density if is_boss else settings.obstacle_density
+	typology.hole_density = settings.hole_density
+	return typology
+
+
+## One try: the typology's shape, the zone cleared on it, every piece of ground joined to the
+## zone by a bridge, then the enemies a bounded walk away. Null when the enemies don't fit.
+static func _attempt(rng: RandomNumberGenerator, settings: MapGenSettings, enemy_count: int, layout: Layout,
+		typology: MapTypology, size_range: Vector2i) -> MapData:
+	var width := rng.randi_range(size_range.x, size_range.y)
+	var height := rng.randi_range(size_range.x, size_range.y)
 	if layout == Layout.AMBUSH:
 		width = maxi(width, settings.ambush_size)
 		height = maxi(height, settings.ambush_size)
-	var heights: Array[PackedInt32Array] = []
-	for y in height:
-		var row := PackedInt32Array()
-		row.resize(width)
-		heights.append(row)
-	for i in settings.plateaus:
-		var w := rng.randi_range(2, 4)
-		var h := rng.randi_range(2, 4)
-		var x0 := rng.randi_range(0, width - w)
-		var y0 := rng.randi_range(0, height - h)
-		var level := rng.randi_range(1, settings.max_height)
-		for y in range(y0, mini(height, y0 + h)):
-			for x in range(x0, x0 + w):
-				heights[y][x] = maxi(heights[y][x], level)
-	_smooth(heights)
-	# Tokens: "" floor, "#" obstacle, "." hole.
-	var marks: Array[PackedStringArray] = []
-	var density := settings.boss_obstacle_density if is_boss else settings.obstacle_density
-	for y in height:
-		var row := PackedStringArray()
-		row.resize(width)
-		for x in width:
-			var roll := rng.randf()
-			if roll < density:
-				row[x] = "#"
-			elif roll < density + settings.hole_density:
-				row[x] = "."
-		marks.append(row)
 	var size := Vector2i(width, height)
+	var field := MapShapes.build(rng, typology, size)
 	var center := _zone_center(rng, size, layout)
 	var zone: Array[Vector2i] = []
 	for dy in range(-1, 2):
 		for dx in range(-1, 2):
 			zone.append(center + Vector2i(dx, dy))
-	var enemies := _enemy_cells(rng, size, layout, center, enemy_count)
+	for cell in zone:
+		field.marks[cell.y][cell.x] = ""
+	MapShapes.connect_ground(field, center)
+	var enemies := _enemy_cells(rng, settings, field, layout, center, zone, enemy_count)
+	if enemies.size() < enemy_count:
+		return null
+	return _to_map(field, zone, enemies)
+
+
+static func _to_map(field: MapShapes.Field, zone: Array[Vector2i], enemies: Array[Vector2i]) -> MapData:
 	var lines: Array[String] = []
-	for y in height:
+	for y in field.size.y:
 		var tokens: Array[String] = []
-		for x in width:
+		for x in field.size.x:
 			var cell := Vector2i(x, y)
-			var token := marks[y][x]
-			if token == "#" and heights[y][x] > 0:
-				token = "%d#" % heights[y][x]  # A block stands on its plateau, not sunk to level 0.
+			var token := field.marks[y][x]
+			if token == "#" and field.heights[y][x] > 0:
+				token = "%d#" % field.heights[y][x]  # A block stands on its plateau, not sunk to level 0.
 			if token.is_empty() or cell in zone or cell in enemies:
-				token = str(heights[y][x])
+				token = str(field.heights[y][x])
 				if cell in zone:
 					token += MapData.PLAYER_SPAWN
 				elif cell in enemies:
@@ -146,80 +151,56 @@ static func _zone_center(rng: RandomNumberGenerator, size: Vector2i, layout: Lay
 			return Vector2i(size.x / 2 + rng.randi_range(-2, 1), size.y - 2)
 
 
-## Enemy spawns: spread along the top edge (EDGE), around the corner opposite the zone
-## (CORNER), or on 2-3 sides of the map around the zone (AMBUSH).
-static func _enemy_cells(rng: RandomNumberGenerator, size: Vector2i, layout: Layout, center: Vector2i,
-		count: int) -> Array[Vector2i]:
+## Enemy spawns: floor cells a bounded walk from the zone (`min_enemy_distance` to
+## `max_enemy_distance` MP both ways: climbing costs more than dropping), in the layout's direction
+## (in front of the zone for EDGE, along the diagonal toward the far corner for CORNER, anywhere
+## for AMBUSH), spread apart: the first at random, then each
+## the farthest from those already chosen. Fewer than `count` when the map lacks room.
+static func _enemy_cells(rng: RandomNumberGenerator, settings: MapGenSettings, field: MapShapes.Field, layout: Layout,
+		center: Vector2i, zone: Array[Vector2i], count: int) -> Array[Vector2i]:
+	var grid := field.to_grid()
+	var to_zone := Movement.distances_to(grid, zone)
+	var from_zone := Movement.distances_from(grid, zone)
+	var far_side := -1 if center.x >= field.size.x / 2 else 1
+	var candidates: Array[Vector2i] = []
+	for y in field.size.y:
+		for x in field.size.x:
+			var cell := Vector2i(x, y)
+			if not grid.is_walkable(cell) or cell in zone:
+				continue
+			var nearest: int = mini(to_zone.get(cell, -1), from_zone.get(cell, -1))
+			var farthest: int = maxi(to_zone.get(cell, -1), from_zone.get(cell, -1))
+			if nearest < settings.min_enemy_distance or farthest > settings.max_enemy_distance:
+				continue
+			match layout:
+				Layout.EDGE:
+					if cell.y >= center.y - 1:
+						continue
+				Layout.CORNER:
+					# At least half as far across as up: toward the far corner, not above the zone.
+					if 2 * (cell.x - center.x) * far_side < center.y - cell.y or cell.y >= center.y - 1:
+						continue
+			candidates.append(cell)
 	var cells: Array[Vector2i] = []
-	match layout:
-		Layout.CORNER:
-			var corner := Vector2i(size.x - 1 if center.x < size.x / 2 else 0, 0)
-			var step := Vector2i(-1 if corner.x > 0 else 1, 1)
-			var candidates: Array[Vector2i] = [corner, corner + Vector2i(step.x * 2, 0), corner + Vector2i(0, 2),
-					corner + Vector2i(step.x, step.y), corner + Vector2i(step.x * 3, 1), corner + Vector2i(1 * step.x, 3)]
-			var offset := rng.randi_range(0, 2)
-			for i in count:
-				cells.append(candidates[(offset + i) % candidates.size()])
-		Layout.AMBUSH:
-			var sides := SIDES.duplicate()
-			_shuffle(rng, sides)
-			sides.resize(clampi(count, 1, rng.randi_range(2, 3)))
-			for i in count:
-				var side: Vector2i = sides[i % sides.size()]
-				var along := rng.randi_range(-2, 2) + (i / sides.size()) * 3
-				var cell := center
-				if side.x == 0:
-					cell = Vector2i(clampi(center.x + along, 0, size.x - 1), 0 if side.y < 0 else size.y - 1)
-				else:
-					cell = Vector2i(0 if side.x < 0 else size.x - 1, clampi(center.y + along, 0, size.y - 1))
-				# Slide along the side (wrapping) to a free cell; give up if the side is full.
-				var tries := 0
-				while cell in cells and tries < size.x + size.y:
-					cell = Vector2i((cell.x + absi(side.y)) % size.x, (cell.y + absi(side.x)) % size.y)
-					tries += 1
-				cells.append(cell)
-		_:
-			for column in _spread_columns(rng, size.x, count):
-				cells.append(Vector2i(column, 0))
+	if candidates.is_empty():
+		return cells
+	cells.append(candidates[rng.randi_range(0, candidates.size() - 1)])
+	while cells.size() < count:
+		var best := Vector2i(-1, -1)
+		var best_gap := 0
+		for cell in candidates:
+			if cell in cells:
+				continue
+			var gap := 1 << 20
+			for chosen in cells:
+				gap = mini(gap, Targeting.distance(cell, chosen))
+			if gap > best_gap:
+				best = cell
+				best_gap = gap
+		if best_gap == 0:
+			break  # No candidate left.
+		cells.append(best)
 	return cells
-
-
-static func _shuffle(rng: RandomNumberGenerator, list: Array) -> void:
-	for i in range(list.size() - 1, 0, -1):
-		var j := rng.randi_range(0, i)
-		var swap: Variant = list[i]
-		list[i] = list[j]
-		list[j] = swap
-
-
-## Lowers cells until no two neighbours differ by more than one level (every step climbable).
-static func _smooth(heights: Array[PackedInt32Array]) -> void:
-	var changed := true
-	while changed:
-		changed = false
-		for y in heights.size():
-			for x in heights[y].size():
-				var lowest := heights[y][x]
-				for offset in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
-					var nx: int = x + offset.x
-					var ny: int = y + offset.y
-					if ny >= 0 and ny < heights.size() and nx >= 0 and nx < heights[y].size():
-						lowest = mini(lowest, heights[ny][nx])
-				if heights[y][x] > lowest + 1:
-					heights[y][x] = lowest + 1
-					changed = true
-
-
-## `count` distinct columns spread over the width, with a little jitter.
-static func _spread_columns(rng: RandomNumberGenerator, width: int, count: int) -> Array[int]:
-	var columns: Array[int] = []
-	for i in count:
-		var center := int((i + 0.5) * width / float(count))
-		var column := clampi(center + rng.randi_range(-1, 1), 0, width - 1)
-		while column in columns:
-			column = (column + 1) % width
-		columns.append(column)
-	return columns
 
 
 static func _walkable_from(grid: Grid, start: Vector2i) -> Dictionary[Vector2i, bool]:

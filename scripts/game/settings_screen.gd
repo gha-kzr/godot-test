@@ -25,6 +25,7 @@ var _key_buttons: Dictionary[StringName, Button] = {}
 @onready var _muted: CheckButton = %Muted
 @onready var _battle_speed: OptionButton = %BattleSpeed
 @onready var _auto_end_turn: CheckButton = %AutoEndTurn
+@onready var _qa_tools: CheckButton = %QaTools
 @onready var _window_row: HBoxContainer = %WindowRow
 @onready var _window_mode: OptionButton = %WindowMode
 @onready var _ui_scale: OptionButton = %UiScale
@@ -71,6 +72,9 @@ func _ready() -> void:
 	_auto_end_turn.toggled.connect(func(pressed: bool) -> void:
 		_settings.auto_end_turn = pressed
 		changed.emit())
+	_qa_tools.toggled.connect(func(pressed: bool) -> void:
+		_settings.qa_tools = pressed
+		changed.emit())
 	_window_mode.item_selected.connect(_on_window_mode_selected)
 	_ui_scale.item_selected.connect(_on_ui_scale_selected)
 	_reset_keys.pressed.connect(_on_reset_keys)
@@ -103,6 +107,7 @@ func show_settings(settings: Settings) -> void:
 	_muted.set_pressed_no_signal(settings.muted)
 	_battle_speed.select(_battle_speed.get_item_index(settings.battle_speed))
 	_auto_end_turn.set_pressed_no_signal(settings.auto_end_turn)
+	_qa_tools.set_pressed_no_signal(settings.qa_tools)
 	_window_mode.select(_window_mode.get_item_index(settings.window_mode))
 	_ui_scale.select(Settings.UI_SCALES.find(settings.ui_scale))
 	_build_bindings()
@@ -163,7 +168,7 @@ func _link_focus() -> void:
 	if _window_row.visible:
 		chain.append(_window_mode)
 	chain.append(_ui_scale)
-	chain.append_array([_master, _music, _effects, _muted, _battle_speed, _auto_end_turn])
+	chain.append_array([_master, _music, _effects, _muted, _battle_speed, _auto_end_turn, _qa_tools])
 	for action in Settings.REBINDABLE:
 		chain.append(_key_buttons[action])
 	chain.append_array([_reset_keys, _show_hints, _reset_save, _credits_button])

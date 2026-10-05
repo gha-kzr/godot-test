@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://dury58lh3txwj"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_6yqn7"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_t8yl4"]
+
+[sub_resource type="Resource" id="Resource_1vepd"]
+script = ExtResource("2_t8yl4")
+
+[sub_resource type="Resource" id="Resource_vncho"]
+script = ExtResource("2_t8yl4")
+role = 3
+
+[resource]
+script = ExtResource("1_6yqn7")
+label = "Raiders"
+slots = Array[ExtResource("2_t8yl4")]([SubResource("Resource_1vepd"), SubResource("Resource_vncho")])
+weight = 3

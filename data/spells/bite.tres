@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dpsvb1nwym5qm"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_83c0t"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_tu73p"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_mttc3"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_pttro"]
+[ext_resource type="Texture2D" uid="uid://duql0byr5jrwv" path="res://ui/icons/bite.svg" id="5_ksnmo"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_1qgy4"]
+
+[sub_resource type="Resource" id="Resource_lwlk7"]
+script = ExtResource("1_83c0t")
+
+[sub_resource type="Resource" id="Resource_xcnyt"]
+script = ExtResource("4_pttro")
+min_amount = 6
+max_amount = 8
+damage_type = ExtResource("3_mttc3")
+
+[resource]
+script = ExtResource("6_1qgy4")
+display_name = "Bite"
+icon = ExtResource("5_ksnmo")
+needs_line_of_sight = false
+area = SubResource("Resource_lwlk7")
+effects = Array[ExtResource("2_tu73p")]([SubResource("Resource_xcnyt")])

@@ -36,6 +36,9 @@ func load_or_default() -> Settings:
 	var auto_end: Variant = config.get_value("gameplay", "auto_end_turn", false)
 	if auto_end is bool:
 		settings.auto_end_turn = auto_end
+	var qa: Variant = config.get_value("gameplay", "qa_tools", false)
+	if qa is bool:
+		settings.qa_tools = qa
 	var muted: Variant = config.get_value("audio", "muted", false)
 	if muted is bool:
 		settings.muted = muted
@@ -68,6 +71,7 @@ func save(settings: Settings) -> bool:
 	var config := ConfigFile.new()
 	config.set_value("gameplay", "battle_speed", settings.battle_speed)
 	config.set_value("gameplay", "auto_end_turn", settings.auto_end_turn)
+	config.set_value("gameplay", "qa_tools", settings.qa_tools)
 	config.set_value("audio", "master_volume", settings.master_volume)
 	config.set_value("audio", "music_volume", settings.music_volume)
 	config.set_value("audio", "effects_volume", settings.effects_volume)

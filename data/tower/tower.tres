@@ -26,19 +26,63 @@
 [ext_resource type="Resource" uid="uid://dckqa3gpfnl3e" path="res://data/stages/ruined_gate.tres" id="21_h0g44"]
 [ext_resource type="Resource" uid="uid://o34jlgmg6x4o" path="res://data/stages/sunken_crypt.tres" id="22_4pmag"]
 [ext_resource type="Resource" uid="uid://baxm0tw8w7yfk" path="res://data/stages/sky_bastion.tres" id="23_dnkor"]
+[ext_resource type="Resource" uid="uid://wmeocw537m4y" path="res://data/enemies/orc_guard.tres" id="m9_orc_guard"]
+[ext_resource type="Resource" uid="uid://tpx6htwdirvy" path="res://data/enemies/mushroom_sage.tres" id="m9_mushroom_sage"]
+[ext_resource type="Resource" uid="uid://cy6nvmirve4ow" path="res://data/enemies/warg.tres" id="m9_warg"]
+[ext_resource type="Resource" uid="uid://d2tstuhso1k8g" path="res://data/enemies/yeti.tres" id="m9_yeti"]
+[ext_resource type="Resource" uid="uid://cajnr5kergv7r" path="res://data/compositions/lone.tres" id="comp_lone"]
+[ext_resource type="Resource" uid="uid://dury58lh3txwj" path="res://data/compositions/raiders.tres" id="comp_raiders"]
+[ext_resource type="Resource" uid="uid://bn0fdi5l5l6pv" path="res://data/compositions/brawl.tres" id="comp_brawl"]
+[ext_resource type="Resource" uid="uid://b17tbiec8qtxe" path="res://data/compositions/shield_line.tres" id="comp_shield_line"]
+[ext_resource type="Resource" uid="uid://df0v1qybf5ius" path="res://data/compositions/wolf_pack.tres" id="comp_wolf_pack"]
+[ext_resource type="Resource" uid="uid://oleivx3mltuv" path="res://data/compositions/skirmish.tres" id="comp_skirmish"]
+[ext_resource type="Resource" uid="uid://cxq7khmqnth6e" path="res://data/compositions/haunt.tres" id="comp_haunt"]
+[ext_resource type="Resource" uid="uid://cj8lc8ww2jlck" path="res://data/compositions/warband.tres" id="comp_warband"]
+[ext_resource type="Resource" uid="uid://b5s0dy66l1k7h" path="res://data/compositions/fortress.tres" id="comp_fortress"]
+[ext_resource type="Resource" uid="uid://c454wx5g8ou53" path="res://data/compositions/haunted_band.tres" id="comp_haunted_band"]
+[ext_resource type="Resource" uid="uid://ddiwnuxwfqqno" path="res://data/compositions/horde.tres" id="comp_horde"]
+[ext_resource type="Resource" uid="uid://bofvc645ug30w" path="res://data/compositions/siege.tres" id="comp_siege"]
+[ext_resource type="Resource" uid="uid://dm802jgty7xqs" path="res://data/compositions/boss_duo.tres" id="comp_boss_duo"]
+[ext_resource type="Resource" uid="uid://b0ynoiejnh56" path="res://data/compositions/boss_guard.tres" id="comp_boss_guard"]
+[ext_resource type="Resource" uid="uid://dsaia8qk4qiaa" path="res://data/compositions/boss_court.tres" id="comp_boss_court"]
+[ext_resource type="Resource" uid="uid://dw757nuwh1u20" path="res://data/compositions/boss_host.tres" id="comp_boss_host"]
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="comp_script"]
+[ext_resource type="Resource" uid="uid://ok2aprovs3hi" path="res://data/maps/typologies/open_field.tres" id="typ_open_field"]
+[ext_resource type="Resource" uid="uid://bnuqi1l6qll5d" path="res://data/maps/typologies/mountain.tres" id="typ_mountain"]
+[ext_resource type="Resource" uid="uid://rhvfe61eg13s" path="res://data/maps/typologies/crater.tres" id="typ_crater"]
+[ext_resource type="Resource" uid="uid://dwc2kjrmovlf" path="res://data/maps/typologies/islands.tres" id="typ_islands"]
+[ext_resource type="Resource" uid="uid://c0oogyhvsrytu" path="res://data/maps/typologies/canyon.tres" id="typ_canyon"]
+[ext_resource type="Resource" uid="uid://btldnt03ih4w1" path="res://data/maps/typologies/ruins.tres" id="typ_ruins"]
+[ext_resource type="Script" uid="uid://blqo7c6bl7wul" path="res://scripts/data/map_typology.gd" id="typ_script"]
 
 [sub_resource type="Resource" id="Resource_hfmpi"]
 script = ExtResource("1_2021b")
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_lone"), ExtResource("comp_raiders"), ExtResource("comp_brawl")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_duo")])
+map_min_size = 9
+map_max_size = 11
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 5,
+ExtResource("typ_ruins"): 2
+})
 
 [sub_resource type="Resource" id="Resource_6mk45"]
 script = ExtResource("1_2021b")
 from_floor = 5
 levels_per_floor = 0.3
 min_enemies = 2
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_raiders"), ExtResource("comp_brawl")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_duo")])
+map_min_size = 9
+map_max_size = 11
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 5,
+ExtResource("typ_ruins"): 2
+})
 
 [sub_resource type="Resource" id="Resource_7d522"]
 script = ExtResource("1_2021b")
@@ -47,8 +91,24 @@ enemy_level = 2
 levels_per_floor = 0.4
 min_enemies = 3
 max_enemies = 3
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
 boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_shield_line"), ExtResource("comp_wolf_pack"), ExtResource("comp_skirmish")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_guard")])
+map_min_size = 12
+map_max_size = 15
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 3,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 1,
+ExtResource("typ_islands"): 1,
+ExtResource("typ_canyon"): 1
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2
+})
 
 [sub_resource type="Resource" id="Resource_1pmip"]
 script = ExtResource("1_2021b")
@@ -57,8 +117,25 @@ enemy_level = 8
 levels_per_floor = 0.31
 min_enemies = 3
 max_enemies = 3
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_shield_line"), ExtResource("comp_wolf_pack"), ExtResource("comp_skirmish"), ExtResource("comp_haunt")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_guard")])
+map_min_size = 12
+map_max_size = 15
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 2,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 2,
+ExtResource("typ_islands"): 2,
+ExtResource("typ_canyon"): 2
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_islands"): 1
+})
 
 [sub_resource type="Resource" id="Resource_da6r2"]
 script = ExtResource("1_2021b")
@@ -67,8 +144,25 @@ enemy_level = 12
 levels_per_floor = 0.3
 min_enemies = 4
 max_enemies = 4
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_warband"), ExtResource("comp_fortress"), ExtResource("comp_haunted_band")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_court")])
+map_min_size = 15
+map_max_size = 18
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 1,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 2,
+ExtResource("typ_islands"): 3,
+ExtResource("typ_canyon"): 3
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_islands"): 1
+})
 
 [sub_resource type="Resource" id="Resource_mqrmq"]
 script = ExtResource("1_2021b")
@@ -77,8 +171,25 @@ enemy_level = 18
 levels_per_floor = 0.28
 min_enemies = 4
 max_enemies = 4
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_warband"), ExtResource("comp_fortress"), ExtResource("comp_haunted_band")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_court")])
+map_min_size = 15
+map_max_size = 18
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 1,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 2,
+ExtResource("typ_islands"): 3,
+ExtResource("typ_canyon"): 3
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_islands"): 1
+})
 
 [sub_resource type="Resource" id="Resource_m824n"]
 script = ExtResource("1_2021b")
@@ -87,8 +198,25 @@ enemy_level = 23
 levels_per_floor = 0.28
 min_enemies = 5
 max_enemies = 5
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_horde"), ExtResource("comp_siege")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_host")])
+map_min_size = 15
+map_max_size = 18
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 1,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 2,
+ExtResource("typ_islands"): 3,
+ExtResource("typ_canyon"): 3
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_islands"): 1
+})
 
 [sub_resource type="Resource" id="Resource_elsql"]
 script = ExtResource("1_2021b")
@@ -97,8 +225,25 @@ enemy_level = 29
 levels_per_floor = 0.25
 min_enemies = 5
 max_enemies = 5
-enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m8_ghoul"), ExtResource("m8_ghost")])
-boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("4_7d522")])
+enemy_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("4_7d522"), ExtResource("m9_warg"), ExtResource("m9_orc_guard"), ExtResource("m9_mushroom_sage"), ExtResource("m8_ghoul"), ExtResource("m9_yeti"), ExtResource("m8_ghost")])
+boss_pool = Array[ExtResource("2_hfmpi")]([ExtResource("3_6mk45"), ExtResource("m8_ghoul"), ExtResource("m9_yeti")])
+compositions = Array[ExtResource("comp_script")]([ExtResource("comp_horde"), ExtResource("comp_siege")])
+boss_compositions = Array[ExtResource("comp_script")]([ExtResource("comp_boss_host")])
+map_min_size = 15
+map_max_size = 18
+map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_open_field"): 1,
+ExtResource("typ_ruins"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_crater"): 2,
+ExtResource("typ_islands"): 3,
+ExtResource("typ_canyon"): 3
+})
+boss_map_typologies = Dictionary[ExtResource("typ_script"), int]({
+ExtResource("typ_crater"): 2,
+ExtResource("typ_mountain"): 2,
+ExtResource("typ_islands"): 1
+})
 
 [sub_resource type="Resource" id="Resource_mdxgi"]
 script = ExtResource("17_dasot")

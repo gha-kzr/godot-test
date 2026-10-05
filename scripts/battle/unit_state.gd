@@ -36,6 +36,10 @@ var moved_from: Vector2i
 var moved_cost := 0
 ## Spells waiting to be cast again: spell → turns left (counted down at turn start).
 var cooldowns: Dictionary[SpellData, int] = {}
+## What it does in its team (enemies; NONE for heroes).
+var role := EnemyData.Role.NONE
+## Where the AI likes this unit to stand (null: straight at its opponents). Shared, read-only.
+var positioning: Positioning
 ## Name shown in the HUD, e.g. "Brute Lv 5 · Elite".
 var label := ""
 var visual_scale := 1.0
@@ -195,5 +199,7 @@ func clone() -> UnitState:
 	copy.reward = reward
 	copy.ai_profile = ai_profile
 	copy.label = label
+	copy.role = role
+	copy.positioning = positioning
 	copy.visual_scale = visual_scale
 	return copy

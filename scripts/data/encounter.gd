@@ -10,6 +10,11 @@ extends Resource
 ## For enemies whose preset doesn't set one.
 @export var ai_profile: AIProfile
 
+## How a generated floor was made (set by the floor generator, for the QA screen; not saved).
+var map_typology: MapTypology
+var layout_name := ""
+var composition: CompositionData
+
 
 ## The enemies to field; empty or broken spawns are skipped (with an error).
 func builds() -> Array[EnemyData.Build]:

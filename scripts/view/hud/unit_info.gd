@@ -23,6 +23,7 @@ var spells: Array[SpellData] = []
 ## Per spell slot: turns before it can be cast again (0: ready).
 var cooldowns: Array[int] = []
 var power := 0
+var role := EnemyData.Role.NONE
 var initiative := 0
 ## Percent added to the damage the unit takes (0: normal; a Guard's -30, a Mark's +20).
 var damage_taken := 0
@@ -57,6 +58,7 @@ static func from_unit(unit: UnitState, hero_level := 0) -> UnitInfo:
 	for spell in unit.data.spells:
 		info.cooldowns.append(unit.cooldown_left(spell))
 	info.power = unit.power()
+	info.role = unit.role
 	info.initiative = unit.initiative()
 	info.damage_taken = unit.damage_taken_percent() - 100
 	var types := DamageType.all().duplicate()

@@ -87,6 +87,7 @@ func _tower() -> TowerConfig:
 
 func test_the_hub_asks_for_a_tower_run_or_a_stage() -> void:
 	var profile := _profile()
+	profile.best_depth = 10
 	profile.cleared_stages.append(_tower().stages[0])
 	var screen := PARTY_SCENE.instantiate() as PartyScreen
 	(Engine.get_main_loop() as SceneTree).root.add_child(screen)

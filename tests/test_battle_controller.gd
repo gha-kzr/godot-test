@@ -859,3 +859,83 @@ func test_a_spell_with_no_target_says_so_and_shades_its_reach() -> void:
 	assert_eq(controller.input_state, BattleController.State.TARGETING, "still aiming")
 	assert_true(controller._prompt_text().contains("no target"), controller._prompt_text())
 	assert_true(controller.board_view.highlighted_count(BoardView.Highlight.RANGE_BLOCKED) > 0, "its reach is shaded")
+
+
+func test_auto_lets_the_ai_play_the_heroes_until_switched_off() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100, 60, 1)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_false((controller.hud.get_node("Root/Actions/AutoButton") as Button).visible, "no Auto without QA tools")
+	controller.settings.qa_tools = true
+	controller._set_state(BattleController.State.IDLE)
+	assert_true((controller.hud.get_node("Root/Actions/AutoButton") as Button).visible, "Auto with QA tools")
+	controller.set_auto_play(true)
+	assert_eq(controller.input_state, BattleController.State.ENEMY_TURN, "the AI takes the hero's turn")
+	var hero := controller.battle.state.units[0]
+	for i in MAX_WAIT_FRAMES:
+		if hero.cell != Vector2i(0, 0):
+			break
+		await _tree().process_frame
+	assert_ne(hero.cell, Vector2i(0, 0), "the AI walked the hero")
+	controller.set_auto_play(false)
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE, BattleController.State.ENDED]), "the player takes over")
+
+
+func test_qa_cheats_heal_refill_and_win() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.qa_cheat(&"win")
+	assert_eq(controller.input_state, BattleController.State.IDLE, "no cheats outside QA battles")
+	controller.qa_battle = true
+	controller._set_state(BattleController.State.IDLE)
+	assert_true((controller.hud.get_node("Root/QaBar") as Control).visible, "the cheat bar")
+	var hero := controller.battle.state.units[0]
+	controller.click_cell(Vector2i(3, 0))
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.qa_cheat(&"refill")
+	assert_eq(hero.mp, hero.max_mp(), "MP refilled")
+	hero.hp = 3
+	controller.qa_cheat(&"heal")
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_eq(hero.hp, hero.max_hp(), "healed")
+	controller.qa_cheat(&"win")
+	assert_true(await _wait_for(controller, [BattleController.State.ENDED]))
+	assert_eq((controller.hud.get_node("%ResultLabel") as Label).text, "Victory!")
+	_assert_views_in_sync(controller)
+
+
+
+func test_auto_switched_on_while_placing_or_aiming_waits_its_turn() -> void:
+	var controller := _controller("0p 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100, 60, 1)], false)
+	controller.settings.qa_tools = true
+	controller.set_auto_play(true)
+	assert_eq(controller.input_state, BattleController.State.PLACING, "placement stays the player's")
+	controller.set_auto_play(false)
+	controller.end_turn()  # Ready.
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.select_spell(0)
+	assert_eq(controller.input_state, BattleController.State.TARGETING)
+	controller.set_auto_play(true)
+	assert_eq(controller.input_state, BattleController.State.ENEMY_TURN, "the AI takes over from aiming")
+	assert_eq(controller.selected_spell, -1)
+	controller.set_auto_play(false)
+	controller.set_auto_play(true)  # Off and on again mid-turn: still one AI at the wheel.
+	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN, BattleController.State.ANIMATING]))
+	controller.set_auto_play(false)
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE, BattleController.State.ENDED]))
+
+
+func test_qa_cheats_kill_the_pinned_unit_and_lose() -> void:
+	var controller := _controller("0p 0 0 0 0 0e\n0 0 0 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100), _fighter("E1", 90)])
+	controller.qa_battle = true
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	controller.qa_cheat(&"kill")
+	assert_eq(controller.input_state, BattleController.State.IDLE, "nothing pinned: nothing killed")
+	controller.pin(1)
+	controller.qa_cheat(&"kill")
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_false(controller.battle.state.units[1].is_alive(), "the pinned enemy fell")
+	assert_true(controller.battle.state.units[2].is_alive())
+	controller.qa_cheat(&"lose")
+	assert_true(await _wait_for(controller, [BattleController.State.ENDED]))
+	assert_eq((controller.hud.get_node("%ResultLabel") as Label).text, "Defeat")
+	_assert_views_in_sync(controller)

@@ -154,23 +154,34 @@ static func _pop_cheapest(frontier: Array[Vector2i], costs: Dictionary[Vector2i,
 ## Cells that can't reach any goal are absent. Runs backwards from the goals, using
 ## the cost of the step *into* each cell, because climbing and dropping cost differently.
 static func distances_to(grid: Grid, goals: Array[Vector2i]) -> Dictionary[Vector2i, int]:
+	return _dijkstra_map(grid, goals, false)
+
+
+## MP cost of walking to every cell from the nearest of `sources` (e.g. how far a hero must
+## walk to reach a cell), the other way round from distances_to: on slopes the two differ.
+static func distances_from(grid: Grid, sources: Array[Vector2i]) -> Dictionary[Vector2i, int]:
+	return _dijkstra_map(grid, sources, true)
+
+
+## `forward`: costs of walking out of `origins`; otherwise of walking into them.
+static func _dijkstra_map(grid: Grid, origins: Array[Vector2i], forward: bool) -> Dictionary[Vector2i, int]:
 	var costs: Dictionary[Vector2i, int] = {}
 	var frontier: Array[Vector2i] = []
-	for goal in goals:
-		costs[goal] = 0
-		frontier.append(goal)
+	for origin in origins:
+		costs[origin] = 0
+		frontier.append(origin)
 
 	while not frontier.is_empty():
 		var current := _pop_cheapest(frontier, costs)
-		for previous in grid.neighbors(current):
-			if not grid.is_walkable(previous):
+		for other in grid.neighbors(current):
+			if not grid.is_walkable(other):
 				continue
-			var step := step_cost(grid, previous, current)
+			var step := step_cost(grid, current, other) if forward else step_cost(grid, other, current)
 			if step < 0:
 				continue
 			var cost := costs[current] + step
-			if not costs.has(previous) or cost < costs[previous]:
-				costs[previous] = cost
-				if previous not in frontier:
-					frontier.append(previous)
+			if not costs.has(other) or cost < costs[other]:
+				costs[other] = cost
+				if other not in frontier:
+					frontier.append(other)
 	return costs

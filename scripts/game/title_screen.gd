@@ -9,6 +9,8 @@ const PICTURE_MENU_TOP := 0.68
 signal play_pressed
 signal settings_pressed
 signal quit_pressed
+## The QA screen (shown with the QA tools setting).
+signal qa_pressed
 
 @onready var _title: Label = %TitleLabel
 @onready var _best: Label = %BestLabel
@@ -19,6 +21,7 @@ signal quit_pressed
 @onready var _play: Button = %PlayButton
 @onready var _settings: Button = %SettingsButton
 @onready var _quit: Button = %QuitButton
+@onready var _qa: Button = %QaButton
 
 
 func _ready() -> void:
@@ -26,6 +29,7 @@ func _ready() -> void:
 	_play.pressed.connect(play_pressed.emit)
 	_settings.pressed.connect(settings_pressed.emit)
 	_quit.pressed.connect(quit_pressed.emit)
+	_qa.pressed.connect(qa_pressed.emit)
 	_quit.visible = not OS.has_feature("web")
 
 
@@ -44,6 +48,11 @@ func apply_branding(logo: Texture2D, picture: Texture2D) -> void:
 	_picture.visible = picture != null
 	_center.anchor_top = PICTURE_MENU_TOP if picture != null else 0.0
 	_spacer.visible = picture == null
+
+
+## The QA button, with the QA tools setting on.
+func show_qa(shown: bool) -> void:
+	_qa.visible = shown
 
 
 ## The best floor reached, under the title (nothing before the first floor is won).

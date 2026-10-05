@@ -423,6 +423,7 @@ func test_a_stage_opens_with_its_own_tip_not_the_boss_floor_one() -> void:
 	game.settings_path = "user://test_tutorial/settings.cfg"
 	DirAccess.make_dir_recursive_absolute("user://test_tutorial")
 	_tree().root.add_child(game)
+	game.profile.best_depth = 10
 	RunDirector.start_stage(game.profile, game.tower, game.tower.stages[0])
 	assert_eq(game._opening_tip(), "first_stage")
 	assert_false(Hints.TEXTS["first_stage"].contains("boon"), "no word of boons: a stage offers none")

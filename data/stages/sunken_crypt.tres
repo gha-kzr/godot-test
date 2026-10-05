@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="StageData" format=3 uid="uid://o34jlgmg6x4o"]
 
 [ext_resource type="Script" uid="uid://c8wwtfep5bqe1" path="res://scripts/data/stage_data.gd" id="1_vo5km"]
+[ext_resource type="Resource" uid="uid://rhvfe61eg13s" path="res://data/maps/typologies/crater.tres" id="typ"]
 
 [resource]
 script = ExtResource("1_vo5km")
@@ -9,3 +10,4 @@ seed = 202
 difficulty_floor = 25
 unlocks_cap = 30
 unlocks_start_floor = 21
+map_typology = ExtResource("typ")

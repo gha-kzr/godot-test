@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://b5s0dy66l1k7h"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_ityvq"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_inm3x"]
+
+[sub_resource type="Resource" id="Resource_kd1tq"]
+script = ExtResource("2_inm3x")
+role = 1
+
+[sub_resource type="Resource" id="Resource_a8dcc"]
+script = ExtResource("2_inm3x")
+role = 4
+
+[sub_resource type="Resource" id="Resource_p6vuk"]
+script = ExtResource("2_inm3x")
+role = 3
+
+[sub_resource type="Resource" id="Resource_tqkdm"]
+script = ExtResource("2_inm3x")
+role = 3
+
+[resource]
+script = ExtResource("1_ityvq")
+label = "Fortress"
+slots = Array[ExtResource("2_inm3x")]([SubResource("Resource_kd1tq"), SubResource("Resource_a8dcc"), SubResource("Resource_p6vuk"), SubResource("Resource_tqkdm")])
+weight = 2

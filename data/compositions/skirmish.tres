@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://oleivx3mltuv"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_50lci"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_hvdbr"]
+
+[sub_resource type="Resource" id="Resource_y1ogq"]
+script = ExtResource("2_hvdbr")
+
+[sub_resource type="Resource" id="Resource_wq6eh"]
+script = ExtResource("2_hvdbr")
+role = 3
+
+[sub_resource type="Resource" id="Resource_ao0vh"]
+script = ExtResource("2_hvdbr")
+role = 3
+
+[resource]
+script = ExtResource("1_50lci")
+label = "Skirmish"
+slots = Array[ExtResource("2_hvdbr")]([SubResource("Resource_y1ogq"), SubResource("Resource_wq6eh"), SubResource("Resource_ao0vh")])
+weight = 2

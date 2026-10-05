@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cxlsv6bj4dfa2"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_t6e3k"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_aie6p"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="3_q8xov"]
+[ext_resource type="Resource" uid="uid://bcwhoqni8dhld" path="res://data/statuses/shielded.tres" id="4_f80fm"]
+[ext_resource type="Texture2D" uid="uid://bm4vvkqcw6uro" path="res://ui/icons/shield_wall.svg" id="5_mwfc6"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_7pqwb"]
+
+[sub_resource type="Resource" id="Resource_12q0w"]
+script = ExtResource("1_t6e3k")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_clq7j"]
+script = ExtResource("3_q8xov")
+status = ExtResource("4_f80fm")
+target_filter = 1
+
+[resource]
+script = ExtResource("6_7pqwb")
+display_name = "Shield Wall"
+icon = ExtResource("5_mwfc6")
+cooldown = 2
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_12q0w")
+effects = Array[ExtResource("2_aie6p")]([SubResource("Resource_clq7j")])

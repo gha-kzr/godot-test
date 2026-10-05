@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("2_rvj5m")
 unit = ExtResource("3_8epti")
+role = 2
 power_per_level = 2
 xp_base = 16
 xp_per_level = 5

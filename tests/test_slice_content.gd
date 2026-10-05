@@ -195,3 +195,42 @@ func test_the_ghoul_and_the_ghost_use_their_kits() -> void:
 	print("  ghoul and ghost casts: %s" % casts)
 	for spell_name in ["Rend", "Devour", "Chill Touch", "Wail"]:
 		assert_true(casts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
+
+
+func _casts_against(enemy_names: Array, seeds: int) -> Dictionary:
+	var casts := {}
+	for rng_seed in range(1, seeds + 1):
+		var map := load(MAP) as MapData
+		var builds: Array = []
+		var units: Array[UnitData] = []
+		for enemy_name: String in enemy_names:
+			var build := (load("res://data/enemies/%s.tres" % enemy_name) as EnemyData).build(3)
+			builds.append(build)
+			units.append(build.unit)
+		var battle := Battle.new(BattleState.create(map.parse(), _team(["res://data/units/knight.tres", "res://data/units/ranger.tres"]),
+				units, rng_seed, [], builds))
+		battle.start()
+		var actions := 0
+		while not battle.state.is_over() and actions < 1000:
+			var actor := battle.state.turn_order.current_unit_id()
+			var result := battle.perform(EnemyAI.choose_next(battle.state, actor, battle.state.units[actor].ai_profile))
+			assert_true(result.ok(), result.error)
+			for event in result.events:
+				if event is BattleEvents.SpellCast:
+					var spell_name := (event as BattleEvents.SpellCast).spell.display_name
+					casts[spell_name] = casts.get(spell_name, 0) + 1
+			actions += 1
+		assert_true(battle.state.is_over(), "seed %d ends" % rng_seed)
+	return casts
+
+
+func test_the_new_enemies_use_their_kits() -> void:
+	var front := _casts_against(["orc_guard", "mushroom_sage"], 6)
+	var beasts := _casts_against(["warg", "yeti"], 6)
+	print("  orc guard and mushroom sage casts: %s" % front)
+	print("  warg and yeti casts: %s" % beasts)
+	# The opportunistic spells (Pounce, Icy Grasp, Spore Mend) have their own situations in test_roles.
+	for spell_name in ["Club", "Shield Bash", "Spore Bolt"]:
+		assert_true(front.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)
+	for spell_name in ["Bite", "Smash"]:
+		assert_true(beasts.get(spell_name, 0) > 0, "%s gets cast by the AI" % spell_name)

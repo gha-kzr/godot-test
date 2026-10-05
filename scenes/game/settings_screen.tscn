@@ -208,6 +208,13 @@ size_flags_horizontal = 0
 text = "Auto end turn"
 tooltip_text = "Ends your turn by itself when a hero can neither move nor cast."
 
+[node name="QaTools" type="CheckButton" parent="Rows/Scroll/Margin/Sections"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "QA tools"
+tooltip_text = "Developer tools: a QA screen on the title (any floor, a playground, profile tools), Auto in battle, cheats in QA battles."
+
 [node name="ControlsTitle" type="Label" parent="Rows/Scroll/Margin/Sections"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"

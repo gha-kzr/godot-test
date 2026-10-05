@@ -262,3 +262,20 @@ func test_performing_on_a_clone_leaves_the_real_battle_untouched() -> void:
 	assert_eq(battle.state.units[0].ap, 6)
 	assert_true(battle.perform(action).ok(), "the same action object then applies to the real battle")
 	assert_eq(battle.state.units[1].hp, 15)
+
+
+func test_qa_set_hp_reports_damage_heal_deaths_and_the_next_turn() -> void:
+	var battle := Battle.new(BattleFixtures.state_with("0p 0p 0e", [_fighter("P0", 200), _fighter("P1", 150)], [_fighter("E0", 100)]))
+	battle.start()
+	var hurt := battle.qa_set_hp(2, 5)
+	assert_true(hurt[0] is BattleEvents.DamageDealt and (hurt[0] as BattleEvents.DamageDealt).amount == 15)
+	var healed := battle.qa_set_hp(2, 99)
+	assert_true(healed[0] is BattleEvents.Healed, "clamped to the max")
+	assert_eq(battle.state.units[2].hp, 20)
+	var killed := battle.qa_set_hp(0, 0)  # The acting hero falls: the next unit's turn starts.
+	assert_true(killed[1] is BattleEvents.UnitDied)
+	assert_true(killed.any(func(e: BattleEvents.Event) -> bool: return e is BattleEvents.TurnStarted))
+	assert_eq(battle.state.current_unit().id, 1)
+	var won := battle.qa_set_hp(2, 0)
+	assert_true(won.back() is BattleEvents.BattleEnded)
+	assert_true(battle.qa_set_hp(1, 0).is_empty(), "nothing once the battle is over")

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://b17tbiec8qtxe"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_xvast"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_20uu0"]
+
+[sub_resource type="Resource" id="Resource_nrw22"]
+script = ExtResource("2_20uu0")
+role = 1
+
+[sub_resource type="Resource" id="Resource_gd8m2"]
+script = ExtResource("2_20uu0")
+role = 3
+
+[sub_resource type="Resource" id="Resource_vaayb"]
+script = ExtResource("2_20uu0")
+role = 4
+
+[resource]
+script = ExtResource("1_xvast")
+label = "Shield line"
+slots = Array[ExtResource("2_20uu0")]([SubResource("Resource_nrw22"), SubResource("Resource_gd8m2"), SubResource("Resource_vaayb")])
+weight = 2

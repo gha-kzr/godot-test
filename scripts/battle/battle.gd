@@ -101,6 +101,27 @@ func _start_turns(advance_first: bool) -> Array[BattleEvents.Event]:
 	return events
 
 
+## QA cheat: sets a living unit's HP (clamped to its max) and reports it like any change:
+## the damage or heal, the deaths, the battle's end, and the next turn if the acting unit fell.
+func qa_set_hp(unit_id: int, hp: int) -> Array[BattleEvents.Event]:
+	var events: Array[BattleEvents.Event] = []
+	var unit := state.units[unit_id]
+	if not unit.is_alive() or state.is_over():
+		return events
+	var alive_before := _alive_ids()
+	var target := clampi(hp, 0, unit.max_hp())
+	if target < unit.hp:
+		events.append(BattleEvents.DamageDealt.new(unit_id, unit.hp - target, target))
+	elif target > unit.hp:
+		events.append(BattleEvents.Healed.new(unit_id, target - unit.hp, target))
+	unit.hp = target
+	var acting := state.started and state.turn_order.current_unit_id() == unit_id
+	events.append_array(_report_deaths(alive_before))
+	if acting and not unit.is_alive() and not state.is_over():
+		events.append_array(_start_turns(true))
+	return events
+
+
 func is_sudden_death() -> bool:
 	return sudden_death_round > 0 and state.turn_order.round_number >= sudden_death_round
 

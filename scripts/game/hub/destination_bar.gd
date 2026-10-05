@@ -43,7 +43,7 @@ func show_destinations(profile: Profile, tower: TowerConfig) -> void:
 		if not profile.is_stage_available(tower, stage):
 			button.text = tr("%s (locked)") % tr(stage.display_name)
 			button.disabled = true
-			button.tooltip_text = "Clear the previous stage first."
+			button.tooltip_text = profile.stage_lock_reason(tower, stage)
 		else:
 			button.tooltip_text = tr("One battle. Clearing it lets the tower go up to floor %d and start at floor %d.") % [
 					stage.unlocks_cap, stage.unlocks_start_floor]

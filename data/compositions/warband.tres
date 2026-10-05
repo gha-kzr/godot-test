@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CompositionData" format=3 uid="uid://cj8lc8ww2jlck"]
+
+[ext_resource type="Script" uid="uid://buswcordh31hq" path="res://scripts/data/composition_data.gd" id="1_x1uda"]
+[ext_resource type="Script" uid="uid://b38yjbfu64mug" path="res://scripts/data/composition_slot.gd" id="2_u7xdk"]
+
+[sub_resource type="Resource" id="Resource_n6hbf"]
+script = ExtResource("2_u7xdk")
+
+[sub_resource type="Resource" id="Resource_jo5yj"]
+script = ExtResource("2_u7xdk")
+role = 1
+
+[sub_resource type="Resource" id="Resource_umwqr"]
+script = ExtResource("2_u7xdk")
+role = 3
+
+[sub_resource type="Resource" id="Resource_r5ecx"]
+script = ExtResource("2_u7xdk")
+role = 4
+
+[resource]
+script = ExtResource("1_x1uda")
+label = "Warband"
+slots = Array[ExtResource("2_u7xdk")]([SubResource("Resource_n6hbf"), SubResource("Resource_jo5yj"), SubResource("Resource_umwqr"), SubResource("Resource_r5ecx")])
+weight = 3

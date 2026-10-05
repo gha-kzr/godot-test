@@ -53,21 +53,31 @@ static func can_target(state: BattleState, caster_id: int, spell: SpellData, cel
 static func blocked_cells(state: BattleState, caster_id: int, spell: SpellData) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
 	var from := state.units[caster_id].cell
-	for y in state.grid.size.y:
-		for x in state.grid.size.x:
-			var cell := Vector2i(x, y)
-			if _in_range(state, from, spell, cell) and not can_target(state, caster_id, spell, cell):
-				result.append(cell)
+	for cell in _cells_in_reach(state, caster_id, spell):
+		if _in_range(state, from, spell, cell) and not can_target(state, caster_id, spell, cell):
+			result.append(cell)
 	return result
 
 
 static func targetable_cells(state: BattleState, caster_id: int, spell: SpellData) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
-	for y in state.grid.size.y:
-		for x in state.grid.size.x:
-			if can_target(state, caster_id, spell, Vector2i(x, y)):
-				result.append(Vector2i(x, y))
+	for cell in _cells_in_reach(state, caster_id, spell):
+		if can_target(state, caster_id, spell, cell):
+			result.append(cell)
 	return result
+
+
+## The board cells within the spell's longest possible range of the caster (high ground
+## included), row by row: only these can be in range, so big boards stay cheap to scan.
+static func _cells_in_reach(state: BattleState, caster_id: int, spell: SpellData) -> Array[Vector2i]:
+	var from := state.units[caster_id].cell
+	var reach := spell.max_range + (MAX_RANGE_BONUS if spell.height_extends_range else 0)
+	var cells: Array[Vector2i] = []
+	for y in range(maxi(0, from.y - reach), mini(state.grid.size.y, from.y + reach + 1)):
+		var span := reach - absi(y - from.y)
+		for x in range(maxi(0, from.x - span), mini(state.grid.size.x, from.x + span + 1)):
+			cells.append(Vector2i(x, y))
+	return cells
 
 
 ## Traces the sight line cell by cell (Amanatides–Woo grid traversal) and checks each

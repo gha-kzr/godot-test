@@ -27,29 +27,24 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 6c | Progression and balance | Level cap 100 with a generated XP curve and growth rule, enemy levels that follow the party's pace, a sturdier Knight, area spells worth casting, stages between the floors around them, pin-on-attack fix, cast / death / victory sounds | [decisions](decisions/2026-10-02-progression-and-balance.md) · [plan](plans/2026-10-02-progression-and-balance.md) |
 | 7 | First impressions | Battle speed and auto end turn, the web Click to start screen, a spotlight tutorial that waits for the player's actions (with a starter rune to learn equipping), one-time tips and glossary tooltips, best floor and achievements, victory cheers, the rename to Rune Ascent and branding slots | [decisions](decisions/2026-10-02-first-impressions.md) · [plan](plans/2026-10-02-first-impressions.md) |
 | 8 | Hero depth | A 5-spell loadout chosen on the party screen, three new spells per hero (levels 5, 9, 14), movement spells (teleport, charge, push, pull, Backslash's leap back), spell cooldowns, free repositioning until a cast (instead of undo), Holy and Frost, resistance caps 75 % / 100 %, the Skeleton Archer, Ghoul and Ghost replacing the Archer | [decisions](decisions/2026-10-03-hero-depth.md) · [plan](plans/2026-10-03-hero-depth.md) |
+| 9a | Encounters | Enemy roles (tank, bruiser, ranged, support, skirmisher) with a positioning AI that can't kite for ever, four new enemies (Orc Guard, Mushroom Sage, Warg, Yeti), sixteen team compositions, the first stage after tower floor 10 | [decisions](decisions/2026-10-04-encounters.md) · [plan](plans/2026-10-04-encounters.md) |
+| 9b | Bigger maps | Map sizes per band (9–11 up to 15–18, never bigger), six map typologies from seeded noise (open field, mountain, crater, islands, canyon, ruins), enemies a bounded walk away, a camera that fits the board | [decisions](decisions/2026-10-04-maps.md) · [plan](plans/2026-10-04-maps.md) |
+| 9c | QA tools | A QA switch: a floor browser with map previews, a playground, a quick team, profile tools, Auto (the AI plays the heroes) and cheats in QA battles that never touch the save | [decisions](decisions/2026-10-05-qa-tools.md) · [plan](plans/2026-10-05-qa-tools.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)
 
 The backlog grouped into milestones, in the order I would build them: each follows the ones whose systems it needs and ends in something playable on its own. The order can change if priorities do. Full descriptions and open questions are in [`backlog.md`](backlog.md); each milestone starts with a grill and a plan, like the finished ones.
 
-### 9. Encounters
-
-Smarter, more varied fights: enemy roles with predefined team compositions (needs new enemy content and AI that handles movement spells) and bigger maps with enough enemies to fill them.
-
-| Feature | Category | Pairs with |
-|---|---|---|
-| [Enemy roles and team compositions](backlog.md#enemy-roles-and-team-compositions) | Content / gameplay | new enemies, AI profiles, biomes |
-| [Bigger maps](backlog.md#bigger-maps) | Gameplay / content | props, map types, balance, AI speed |
-
 ### 10. World
 
-Makes levels look and play differently: props and floor types, map typologies from noise, and biomes that change every few floors (a biome picks a look, map types and enemy pools from the previous milestones).
+Makes levels look and play differently: props and floor types (with see-through props and walls, so units stay visible), more map typologies (terraces, mazes, ridge lines; six exist since 9b), and biomes that change every few floors (a biome picks a look, map types and enemy pools from the previous milestones).
 
 | Feature | Category | Pairs with |
 |---|---|---|
 | [More props and floor types](backlog.md#more-props-and-floor-types) | Art / content | biomes, bigger maps |
-| [Map typologies from noise](backlog.md#map-typologies-from-noise) | Content / procedural | bigger maps, biomes |
+| [See-through props and walls](backlog.md#see-through-props-and-walls) | Art / camera | props, ruins, camera |
+| [More map typologies](backlog.md#more-map-typologies) | Content / procedural | bigger maps, biomes |
 | [Biomes that change every X floors](backlog.md#biomes-that-change-every-x-floors) | Content | props, map types, enemy roles |
 
 ### 11. Loot depth

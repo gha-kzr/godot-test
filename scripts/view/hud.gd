@@ -13,6 +13,10 @@ signal end_turn_pressed
 signal view_toggle_pressed
 ## The speed button was pressed: the controller cycles the battle speed.
 signal speed_pressed
+## QA tools: Auto (the AI plays the heroes) was switched.
+signal auto_toggled(on: bool)
+## QA battles: a cheat was pressed (&"win", &"lose", &"kill", &"heal", &"refill").
+signal qa_cheat(action: StringName)
 ## The tutorial's Skip link was pressed.
 signal tutorial_skipped
 signal restart_pressed
@@ -55,6 +59,8 @@ var _pulse_tween: Tween
 @onready var _end_turn_button: Button = %EndTurnButton
 @onready var _view_button: Button = %ViewButton
 @onready var _speed_button: Button = %SpeedButton
+var _auto_button: Button
+var _qa_bar: VBoxContainer
 var _tutorial: TutorialOverlay
 @onready var _banner: Label = %Banner
 @onready var _result_panel: Control = %ResultPanel
@@ -67,6 +73,7 @@ func _ready() -> void:
 	_end_turn_button.pressed.connect(end_turn_pressed.emit)
 	_view_button.pressed.connect(view_toggle_pressed.emit)
 	_speed_button.pressed.connect(speed_pressed.emit)
+	_build_qa_controls()
 	_tutorial = TutorialOverlay.new()
 	_tutorial.skipped.connect(tutorial_skipped.emit)
 	$Root.add_child(_tutorial)  # Last: above the rest of the HUD.
@@ -266,6 +273,44 @@ func end_turn_rect() -> Rect2:
 
 func spell_slots_rect() -> Rect2:
 	return _spell_bar.get_node("Slots").get_global_rect()
+
+
+## The Auto toggle (QA tools) and, in QA battles, the cheat bar at the top left (its buttons
+## only pressable when a cheat can act: the player's turn).
+func show_qa_controls(auto_shown: bool, cheats_shown: bool, cheats_enabled := true) -> void:
+	_auto_button.visible = auto_shown
+	_qa_bar.visible = cheats_shown
+	for button: Button in _qa_bar.get_children():
+		button.disabled = not cheats_enabled
+
+
+func set_auto(on: bool) -> void:
+	_auto_button.set_pressed_no_signal(on)
+
+
+func _build_qa_controls() -> void:
+	_auto_button = Button.new()
+	_auto_button.name = "AutoButton"
+	_auto_button.text = tr("Auto")
+	_auto_button.tooltip_text = tr("The AI plays your heroes until you turn it off.")
+	_auto_button.toggle_mode = true
+	_auto_button.focus_mode = Control.FOCUS_NONE
+	_auto_button.visible = false
+	_auto_button.toggled.connect(auto_toggled.emit)
+	_speed_button.add_sibling(_auto_button)
+	_qa_bar = VBoxContainer.new()
+	_qa_bar.name = "QaBar"
+	_qa_bar.visible = false
+	_qa_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT, Control.PRESET_MODE_MINSIZE, 12)
+	for entry: Array in [[&"win", tr("Win now")], [&"lose", tr("Lose now")], [&"kill", tr("Kill pinned unit")],
+			[&"heal", tr("Heal the heroes")], [&"refill", tr("Refill AP and MP")]]:
+		var button := Button.new()
+		button.name = "Qa_" + entry[0]
+		button.text = entry[1]
+		button.focus_mode = Control.FOCUS_NONE
+		button.pressed.connect(qa_cheat.emit.bind(entry[0]))
+		_qa_bar.add_child(button)
+	$Root.add_child(_qa_bar)
 
 
 ## Shows the current battle speed on its button.

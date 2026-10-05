@@ -36,6 +36,8 @@ enum State { PLACING, IDLE, TARGETING, ANIMATING, ENEMY_TURN, ENDED }
 ## (no filmic tonemapping), so its lights are scaled down.
 const WEB_LIGHT_SCALE := 0.6
 
+## Where the camera starts: this far from the board's centre toward the start zone (0 to 1).
+const START_FOCUS_TOWARD_ZONE := 0.35
 ## Pause before each AI action, so the player can follow what happens.
 const ENEMY_ACTION_DELAY := 0.35
 ## Time scale of the "fast" battle speed.
@@ -121,6 +123,10 @@ func setup(battle_encounter: Encounter, player_units: Array[UnitData], modifiers
 ## The player's settings (battle speed, auto end turn); the Game root hands in its own, edited in
 ## place. A standalone battle uses the defaults.
 var settings := Settings.new()
+## A QA battle (from the QA screen): the cheat bar is offered; nothing of it is saved.
+var qa_battle := false
+## QA tools: the AI plays the heroes (EnemyAI is team-agnostic) until switched off.
+var auto_play := false
 ## The guided first steps (null: none, as in a standalone battle); the Game root hands it in.
 var tutorial: Tutorial
 var _step: Dictionary = {}
@@ -169,6 +175,8 @@ func _ready() -> void:
 	hud.leave_confirmed.connect(left_battle.emit)
 	hud.recenter_pressed.connect(recenter)
 	hud.speed_pressed.connect(cycle_battle_speed)
+	hud.auto_toggled.connect(set_auto_play)
+	hud.qa_cheat.connect(qa_cheat)
 	hud.tutorial_skipped.connect(_skip_tutorial)
 	apply_battle_speed()
 	hud.set_leave_available(not standalone)
@@ -213,8 +221,11 @@ func start_battle() -> bool:
 	units_view.build(battle_state, board_view)
 	event_player.setup(units_view, board_view, camera_rig)
 	camera_rig.set_bounds(Rect2(Vector2.ZERO, Vector2(battle_state.grid.size - Vector2i.ONE) * BoardView.CELL_SIZE))
-	camera_rig.focus(board_view.center())
-	camera_rig.face_toward(_spawn_center(parsed.player_spawns) - board_view.center())
+	camera_rig.fit_board(battle_state.grid.size)
+	# A third of the way to the start zone: on a big board the heroes stay clear of the HUD.
+	var zone_center := _spawn_center(parsed.player_spawns)
+	camera_rig.focus(board_view.center().lerp(zone_center, START_FOCUS_TOWARD_ZONE))
+	camera_rig.face_toward(zone_center - board_view.center())
 	hud.hide_result()
 	_placing_hero = -1
 	_pinned_unit = -1
@@ -224,6 +235,53 @@ func start_battle() -> bool:
 	if not opening_tip.is_empty():
 		_show_tip(opening_tip)
 	return true
+
+
+## Auto (QA tools): the AI plays the heroes from their next decision on; switched off, the
+## player takes over at the next hero turn (or at once, between two of the AI's actions).
+func set_auto_play(on: bool) -> void:
+	auto_play = on
+	hud.set_auto(on)
+	if on and input_state in [State.IDLE, State.TARGETING] and battle.state.current_unit().team == UnitState.Team.PLAYER:
+		selected_spell = -1
+		_set_state(State.ENEMY_TURN)
+		_run_enemy_action()
+
+
+## Whether Auto may be offered: QA tools on, and no tutorial step waiting for the player.
+func _auto_available() -> bool:
+	return settings.qa_tools and (tutorial == null or tutorial.next_step(Tutorial.BATTLE_STEPS).is_empty())
+
+
+## QA battles' cheats, on the player's turn: win, lose, kill the pinned unit, heal the
+## heroes, refill the acting hero's AP and MP.
+func qa_cheat(action: StringName) -> void:
+	if not qa_battle or not input_state in [State.IDLE, State.TARGETING]:
+		return
+	var events: Array[BattleEvents.Event] = []
+	match action:
+		&"win", &"lose":
+			var team := UnitState.Team.ENEMY if action == &"win" else UnitState.Team.PLAYER
+			for unit in battle.state.units:
+				if unit.team == team:
+					events.append_array(battle.qa_set_hp(unit.id, 0))
+		&"kill":
+			if _pinned_unit != -1:
+				events.append_array(battle.qa_set_hp(_pinned_unit, 0))
+		&"heal":
+			for unit in battle.state.units:
+				if unit.team == UnitState.Team.PLAYER:
+					events.append_array(battle.qa_set_hp(unit.id, unit.max_hp()))
+		&"refill":
+			var unit := battle.state.current_unit()
+			unit.ap = unit.max_ap()
+			unit.mp = unit.max_mp()
+			unit.commit_position()
+			_refresh_hud()
+			_enter_idle()
+			return
+	if not events.is_empty():
+		_play(events)
 
 
 ## Abandons the current battle (even mid-animation) and starts a new one.
@@ -497,7 +555,7 @@ func _begin_next() -> void:
 		hud.show_result(won, battle_seed)
 		battle_ended.emit(battle_state)
 		return
-	if battle_state.current_unit().team == UnitState.Team.PLAYER:
+	if battle_state.current_unit().team == UnitState.Team.PLAYER and not auto_play:
 		_enter_idle()
 	else:
 		_set_state(State.ENEMY_TURN)
@@ -583,6 +641,8 @@ func _set_state(new_state: State) -> void:
 	var player_turn := new_state == State.IDLE or new_state == State.TARGETING or new_state == State.PLACING
 	hud.set_player_controls_enabled(player_turn)
 	hud.set_placing(new_state == State.PLACING)
+	hud.show_qa_controls(_auto_available(), qa_battle and new_state != State.ENDED,
+			new_state == State.IDLE or new_state == State.TARGETING)
 	hud.set_selected_spell(selected_spell if new_state == State.TARGETING else -1)
 	board_view.clear_highlights()
 	units_view.clear_previews()

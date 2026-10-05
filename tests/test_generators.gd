@@ -40,7 +40,9 @@ func test_elite_and_boss_floors() -> void:
 	var boss := FloorGenerator.encounter(tower, 10)
 	assert_true(_labels(boss)[0].ends_with("Boss"), "floor 10: a boss")
 	assert_true(boss.spawns.size() >= 2, "with escorts")
-	assert_eq(boss.map.parse().grid.size, Vector2i(tower.map_settings.boss_size, tower.map_settings.boss_size), "a bigger map")
+	var band := tower.band_for(10)
+	var side := band.map_max_size + FloorBand.BOSS_SIZE_BONUS
+	assert_true(boss.map.parse().grid.size.x >= side, "a bigger map than the band's (%s)" % boss.map.parse().grid.size)
 
 
 func test_enemies_get_stronger_with_depth() -> void:
@@ -104,6 +106,9 @@ func test_each_layout_places_a_square_zone_away_from_the_enemies() -> void:
 					assert_eq(center.y, size.y - 2, "EDGE: at the bottom")
 				MapGenerator.Layout.CORNER:
 					assert_true(center == Vector2i(1, size.y - 2) or center == Vector2i(size.x - 2, size.y - 2), "CORNER: %s" % center)
+					var far_side := 1 if center.x == 1 else -1
+					for spawn in parsed.enemy_spawns:
+						assert_true((spawn.x - center.x) * far_side >= 1, "CORNER: %s toward the far corner from %s" % [spawn, center])
 				MapGenerator.Layout.AMBUSH:
 					assert_true(absi(center.x - size.x / 2) <= 1 and absi(center.y - size.y / 2) <= 1, "AMBUSH: in the middle")
 
@@ -171,3 +176,191 @@ func test_the_cap_holds_even_when_the_pool_draws_it_every_time() -> void:
 	for floor_number in range(1, 40):
 		var encounter := FloorGenerator.encounter(tower, floor_number)
 		assert_true(encounter.spawns.filter(func(s: EncounterSpawn) -> bool: return s.enemy == ghost).size() <= 1, "floor %d" % floor_number)
+
+
+func test_floors_are_built_from_the_bands_compositions() -> void:
+	var tower := load("res://data/tower/tower.tres") as TowerConfig
+	for floor_number in range(1, 130):
+		var encounter := FloorGenerator.encounter(tower, floor_number)
+		var band := tower.band_for(floor_number)
+		var boss := TowerConfig.is_boss_floor(floor_number)
+		var sizes := (band.boss_compositions if boss else band.compositions).map(func(c: CompositionData) -> int: return c.slots.size())
+		assert_true(encounter.spawns.size() in sizes, "floor %d: %d enemies, a composition's size" % [floor_number, encounter.spawns.size()])
+		assert_eq(encounter.get_validation_errors(), PackedStringArray(), "floor %d" % floor_number)
+		var roles := encounter.spawns.map(func(s: EncounterSpawn) -> EnemyData.Role: return s.enemy.role)
+		var matched := (band.boss_compositions if boss else band.compositions).any(func(c: CompositionData) -> bool:
+			return c.slots.map(func(slot: CompositionSlot) -> EnemyData.Role: return slot.enemy.role if slot.enemy != null else slot.role) == roles)
+		assert_true(matched, "floor %d: the roles follow a composition (%s)" % [floor_number, roles])
+		if boss:
+			assert_eq(encounter.spawns[0].preset, tower.boss_preset, "floor %d: the first slot is the boss" % floor_number)
+		elif TowerConfig.is_elite_floor(floor_number):
+			assert_eq(encounter.spawns[0].preset, tower.elite_preset, "floor %d: the first slot is the elite" % floor_number)
+
+
+func test_a_fixed_enemy_slot_and_the_weights() -> void:
+	var tower := (load("res://data/tower/tower.tres") as TowerConfig).duplicate(true) as TowerConfig
+	var pack := load("res://data/compositions/wolf_pack.tres") as CompositionData
+	var warg := load("res://data/enemies/warg.tres") as EnemyData
+	tower.bands[2].compositions = [pack] as Array[CompositionData]  # The band from floor 10.
+	var encounter := FloorGenerator.encounter(tower, 11)
+	assert_eq(encounter.spawns.slice(0, 2).map(func(s: EncounterSpawn) -> EnemyData: return s.enemy), [warg, warg], "two Wargs")
+	assert_eq(encounter.spawns[2].enemy.role, EnemyData.Role.RANGED)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var heavy := CompositionData.new()
+	heavy.weight = 9
+	var light := CompositionData.new()
+	var counts := {heavy: 0, light: 0}
+	for i in 1000:
+		counts[FloorGenerator._pick_composition([heavy, light] as Array[CompositionData], rng)] += 1
+	assert_true(counts[heavy] > 800 and counts[light] > 50, "about 9 to 1: %s" % [counts.values()])
+
+
+func test_a_band_without_compositions_still_draws_at_random() -> void:
+	var tower := (load("res://data/tower/tower.tres") as TowerConfig).duplicate(true) as TowerConfig
+	var band := tower.bands[2]
+	band.compositions = [] as Array[CompositionData]
+	band.boss_compositions = [] as Array[CompositionData]
+	var encounter := FloorGenerator.encounter(tower, 11)
+	assert_true(encounter.spawns.size() >= band.min_enemies and encounter.spawns.size() <= band.max_enemies)
+
+
+func test_a_composition_needing_a_role_the_pool_lacks_is_reported() -> void:
+	var band := (load("res://data/tower/tower.tres") as TowerConfig).bands[0].duplicate() as FloorBand
+	band.compositions = [load("res://data/compositions/shield_line.tres")] as Array[CompositionData]  # Tank, support: not before floor 10.
+	assert_true(Array(band.get_validation_errors()).any(func(e: String) -> bool: return "needs a tank" in e), str(band.get_validation_errors()))
+
+
+func _has_error(errors: PackedStringArray, part: String) -> bool:
+	return Array(errors).any(func(e: String) -> bool: return part in e)
+
+
+func test_compositions_maps_cant_hold_or_caps_they_break_are_reported() -> void:
+	var composition := CompositionData.new()
+	composition.label = "horde"
+	for i in MapGenerator.MAX_ENEMIES + 1:
+		composition.slots.append(CompositionSlot.new())
+	assert_true(_has_error(composition.get_validation_errors(), "at most %d enemies" % MapGenerator.MAX_ENEMIES))
+	var ghost := load("res://data/enemies/ghost.tres") as EnemyData
+	composition.slots = [] as Array[CompositionSlot]
+	for i in ghost.max_per_floor + 1:
+		var slot := CompositionSlot.new()
+		slot.enemy = ghost
+		composition.slots.append(slot)
+	assert_true(_has_error(composition.get_validation_errors(), "per floor"), str(composition.get_validation_errors()))
+	composition.weight = 0
+	assert_true(_has_error(composition.get_validation_errors(), "weight"))
+
+
+func test_band_map_sizes_and_weights_are_checked() -> void:
+	var band := _tower().bands[0].duplicate() as FloorBand
+	band.map_min_size = 0
+	band.map_max_size = 14
+	assert_true(_has_error(band.get_validation_errors(), "or neither"))
+	band.map_min_size = 6
+	assert_true(_has_error(band.get_validation_errors(), "map sizes must be"))
+	band.map_min_size = 12
+	band.map_max_size = 24
+	assert_true(_has_error(band.get_validation_errors(), "map sizes must be"))
+	band.map_max_size = 14
+	var typologies := band.map_typologies.duplicate()
+	typologies[typologies.keys()[0]] = 0
+	band.map_typologies = typologies
+	assert_true(_has_error(band.get_validation_errors(), "weight below 1"))
+
+
+func test_a_positioning_past_a_heros_reach_is_reported() -> void:
+	var positioning := Positioning.new()
+	positioning.max_distance = Positioning.MAX_DISTANCE + 1
+	assert_true(_has_error(positioning.get_validation_errors(), "kite"))
+
+
+func test_map_sizes_grow_with_the_tower_and_stop() -> void:
+	var tower := _tower()
+	for floor_number: int in [1, 7, 12, 33, 45, 99, 251]:  # Not boss floors (those get 2 more).
+		var size := FloorGenerator.encounter(tower, floor_number).map.parse().grid.size
+		var expected := Vector2i(9, 11) if floor_number < 10 else (Vector2i(12, 15) if floor_number < 40 else Vector2i(15, 18))
+		expected.y = maxi(expected.y, tower.map_settings.ambush_size)  # An ambush map is at least that big.
+		for side in [size.x, size.y]:
+			assert_true(side >= expected.x and side <= expected.y, "floor %d: %s within %s" % [floor_number, size, expected])
+	for floor_number: int in [500, 990]:  # Boss floors: 2 more, within the cap.
+		var boss_size := FloorGenerator.encounter(tower, floor_number).map.parse().grid.size
+		assert_true(maxi(boss_size.x, boss_size.y) <= FloorBand.MAX_MAP_SIZE, "floor %d: %s never past the cap" % [floor_number, boss_size])
+
+
+func test_every_typology_makes_playable_maps_quickly() -> void:
+	var settings := _tower().map_settings
+	for file in ResourceLoader.list_directory("res://data/maps/typologies"):
+		var typology := load("res://data/maps/typologies/" + file) as MapTypology
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 11
+		var playable := 0
+		var tries := 40
+		for i in tries:
+			var layout := i % 3 as MapGenerator.Layout
+			var map := MapGenerator._attempt(rng, settings, 2 + i % 4, layout, typology, Vector2i(12, 18))
+			if map != null and MapGenerator.is_playable(map, 2 + i % 4, settings.min_enemy_distance):
+				playable += 1
+		assert_true(playable >= tries / 2, "%s: %d of %d attempts playable (20 attempts per map)" % [file, playable, tries])
+
+
+func test_enemies_spawn_a_bounded_walk_away_on_any_board() -> void:
+	var tower := _tower()
+	var settings := tower.map_settings
+	for floor_number in range(40, 70):
+		var parsed := FloorGenerator.encounter(tower, floor_number).map.parse()
+		var to_zone := Movement.distances_to(parsed.grid, parsed.player_spawns)
+		var from_zone := Movement.distances_from(parsed.grid, parsed.player_spawns)
+		for spawn in parsed.enemy_spawns:
+			for distance: int in [to_zone.get(spawn, -1), from_zone.get(spawn, -1)]:  # Its walk, and the heroes'.
+				assert_true(distance >= settings.min_enemy_distance and distance <= settings.max_enemy_distance,
+						"floor %d: an enemy %d MP away on a %s board" % [floor_number, distance, parsed.grid.size])
+
+
+func test_stages_have_their_own_shape() -> void:
+	var tower := _tower()
+	var expected := {"ruined_gate": "ruins", "sunken_crypt": "crater", "sky_bastion": "islands"}
+	for stage in tower.stages:
+		var name := stage.resource_path.get_file().get_basename()
+		assert_eq(stage.map_typology.resource_path.get_file().get_basename(), expected[name], name)
+
+
+## Fingerprints of a few floors (every typology, an ambush, elite and boss floors) and the
+## stages: a change that alters the generated floors (noise settings, an extra random draw)
+## fails here, so it is made on purpose. After such a change, update GOLDEN_FLOORS from the
+## failure messages.
+const GOLDEN_FLOORS := {
+	"floor 1": "0564191eaa9ac41559df552e6b731bc7",
+	"floor 5": "ba1b4378508047a4d9e44ea296a2a4f8",
+	"floor 10": "6fb039c425bbca96868cc88e03959637",
+	"floor 13": "c14e51ea6dc118ef507867423d734074",
+	"floor 17": "7f57e50a306f52684b8446a6a6dd46c7",
+	"floor 22": "43a6c223d07d9ba5e36b704358a1cedb",
+	"floor 24": "59690552c054e7fe867c068695a4590d",
+	"floor 26": "275ba1f749cbc9017c74fe940541ef51",
+	"floor 31": "41b28ebfea9fdddb730721d5c60509ba",
+	"floor 40": "56dd170fb1825f56285f655bd9510399",
+	"floor 47": "75fb04c63ceff1e080d4fdb7760f9054",
+	"floor 58": "5a191b263d22f12b07318ddb683c07ca",
+	"floor 75": "ab7e0a3fa8168b45dee345a43558dedf",
+	"ruined_gate": "07b06c341ac9538bec8008532507e0c5",
+	"sunken_crypt": "894d51fbb552a490d7f8f96fa9451dfc",
+	"sky_bastion": "6cb5cf97848dcbae48bc42f685147774",
+}
+
+
+func _fingerprint(encounter: Encounter) -> String:
+	return (encounter.map.layout + "|" + ",".join(_labels(encounter))).md5_text()
+
+
+func test_floors_keep_their_exact_maps() -> void:
+	var tower := _tower()
+	var encounters := {}
+	for floor_number: int in [1, 5, 10, 13, 17, 22, 24, 26, 31, 40, 47, 58, 75]:
+		encounters["floor %d" % floor_number] = FloorGenerator.encounter(tower, floor_number)
+	for stage in tower.stages:
+		encounters[stage.resource_path.get_file().get_basename()] = FloorGenerator.stage_encounter(tower, stage)
+	for key: String in encounters:
+		var encounter: Encounter = encounters[key]
+		var typology := encounter.map_typology.resource_path.get_file().get_basename() if encounter.map_typology != null else "?"
+		assert_eq(_fingerprint(encounter), GOLDEN_FLOORS.get(key, ""), "%s (%s, %s)" % [key, typology, encounter.layout_name])

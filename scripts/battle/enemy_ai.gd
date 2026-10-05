@@ -11,6 +11,8 @@ extends RefCounted
 ## toward the nearest opponent. Team-agnostic: opponents are the units of the other team.
 ## It decides once per move segment: after a move it never repositions before casting (no
 ## rethinking, and the turn always ends), but it can move again after a cast.
+## A unit with a Positioning (its role's tactics) also scores where a plan ends, and with
+## nothing worth casting moves to its best cell instead of straight at the opponents.
 
 ## Distance of cells from which no opponent can be reached.
 const FAR_AWAY := 1 << 30
@@ -33,13 +35,18 @@ static func choose_next(state: BattleState, unit_id: int, profile: AIProfile = n
 		profile = AIProfile.new()
 
 	var reach := Movement.reach(state, unit_id)
-	var plan := _best_cast(state, unit_id, reach, profile)
+	var unit := state.units[unit_id]
+	var distances: Dictionary[Vector2i, int] = {}
+	if unit.positioning != null:
+		distances = _opponent_reach(state, unit_id)
+	var plan := _best_cast(state, unit_id, reach, profile, distances)
 	if plan != null:
-		if plan.cell != state.units[unit_id].cell:
+		if plan.cell != unit.cell:
 			return BattleActions.Move.new(unit_id, plan.cell)
 		return BattleActions.CastSpell.new(unit_id, plan.spell_index, plan.target)
 
-	var destination := _approach(state, unit_id, reach)
+	var destination := _best_position(state, unit_id, reach, distances) if unit.positioning != null \
+			else _approach(state, unit_id, reach)
 	if destination != state.units[unit_id].cell:
 		return BattleActions.Move.new(unit_id, destination)
 	return BattleActions.EndTurn.new(unit_id)
@@ -47,7 +54,8 @@ static func choose_next(state: BattleState, unit_id: int, profile: AIProfile = n
 
 ## Best cast with a positive score from any cell in reach, or null. Ties go to the plan
 ## needing the least MP, then to the first one found.
-static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, profile: AIProfile) -> Plan:
+static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, profile: AIProfile,
+		distances: Dictionary[Vector2i, int] = {}) -> Plan:
 	var unit := state.units[unit_id]
 	var positions: Array[Vector2i] = [unit.cell]
 	if not unit.moved:
@@ -79,8 +87,15 @@ static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, 
 					push_error("EnemyAI: simulated cast rejected: %s" % result.error)
 					continue
 				var score := _score(state, simulated, unit.team, profile)
+				if score <= 0.0:
+					continue  # Not worth casting, wherever it is cast from.
+				if unit.positioning != null:
+					# Where the cast leaves the caster (after its own moves, e.g. a charge), against
+					# where it leaves the opponents (pushed, pulled or killed).
+					var after := distances if _same_opponents(moved, simulated, unit.team) else _opponent_reach(simulated, unit_id)
+					score += unit.positioning.score(simulated, unit_id, simulated.units[unit_id].cell, after)
 				var cost := reach.cost_to(cell)
-				if score > 0.0 and (best == null or score > best.score
+				if (best == null or score > best.score
 						or (is_equal_approx(score, best.score) and cost < best.mp_cost)):
 					best = Plan.new()
 					best.cell = cell
@@ -176,17 +191,52 @@ static func _statuses_benefit(state: BattleState, unit: UnitState, profile: AIPr
 	return total
 
 
+## What the nearest living opponent must walk (MP) to reach each cell (a Dijkstra map; units
+## ignored): Positioning keeps a unit within the heroes' reach, so it is their walk that counts.
+static func _opponent_reach(state: BattleState, unit_id: int) -> Dictionary[Vector2i, int]:
+	return Movement.distances_from(state.grid, _opponent_cells(state, state.units[unit_id].team))
+
+
+static func _opponent_cells(state: BattleState, team: UnitState.Team) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	for other in state.units:
+		if other.is_alive() and other.team != team:
+			cells.append(other.cell)
+	return cells
+
+
+## Whether the opponents of `team` are alive on the same cells in both states.
+static func _same_opponents(before: BattleState, after: BattleState, team: UnitState.Team) -> bool:
+	for unit in before.units:
+		if unit.team != team and (unit.is_alive() != after.units[unit.id].is_alive() or unit.cell != after.units[unit.id].cell):
+			return false
+	return true
+
+
+## The cell in reach (or where it stands) its Positioning scores best; ties go to the
+## cheapest, so a unit already well placed stays. Not after a move this segment.
+static func _best_position(state: BattleState, unit_id: int, reach: Movement.Reach, distances: Dictionary[Vector2i, int]) -> Vector2i:
+	var unit := state.units[unit_id]
+	if unit.moved:
+		return unit.cell
+	var best := unit.cell
+	var best_score := unit.positioning.score(state, unit_id, unit.cell, distances)
+	for cell in reach.cells():
+		var score := unit.positioning.score(state, unit_id, cell, distances)  # Reads the other units only.
+		if score > best_score + 0.001 or (absf(score - best_score) <= 0.001 and best != unit.cell
+				and reach.cost_to(cell) < reach.cost_to(best)):
+			best = cell
+			best_score = score
+	return best
+
+
 ## The cell in reach closest (in walking cost) to an opponent, or the unit's own cell
 ## if no cell in reach gets closer.
 static func _approach(state: BattleState, unit_id: int, reach: Movement.Reach) -> Vector2i:
 	var unit := state.units[unit_id]
 	if unit.moved:
 		return unit.cell  # Already moved this segment: no second thoughts.
-	var opponents: Array[Vector2i] = []
-	for other in state.units:
-		if other.is_alive() and other.team != unit.team:
-			opponents.append(other.cell)
-	var distances := Movement.distances_to(state.grid, opponents)
+	var distances := Movement.distances_to(state.grid, _opponent_cells(state, unit.team))
 
 	var best := unit.cell
 	var best_distance: int = distances.get(unit.cell, FAR_AWAY)
