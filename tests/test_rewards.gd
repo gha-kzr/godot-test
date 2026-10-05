@@ -35,6 +35,18 @@ func test_a_win_gives_every_killed_enemys_xp_and_loot() -> void:
 	assert_eq(rewards.runes.map(func(r: RuneData) -> String: return r.display_name), ["Might", "Ward"])
 
 
+func test_deeper_enemies_drop_higher_level_runes() -> void:
+	var state := _state()
+	state.units[1].hp = 0
+	state.units[2].hp = 0
+	state.units[2].reward.enemy_level = 29
+	var rewards := BattleRewards.compute(state)
+	assert_true(rewards.runes[0].level <= 2, "a level 1 enemy")
+	assert_true(rewards.runes[1].level >= 6, "a level 29 enemy: 1 + 29 / 5")
+	assert_eq(rewards.runes[1].display_name, "Ward")
+	assert_true(rewards.runes[1].origin().level == 1)
+
+
 func test_a_loss_or_draw_gives_nothing() -> void:
 	var state := _state()
 	state.units[0].hp = 0

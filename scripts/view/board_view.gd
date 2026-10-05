@@ -23,6 +23,10 @@ const CELL_META := &"cell"
 const HIGHLIGHT_LIFT := 0.02
 const HIGHLIGHT_LAYER_GAP := 0.01
 const PIT_DEPTH := 2.0
+## Obstacles at least this tall (world units; two levels are one) fade when they hide a unit.
+const SEE_THROUGH_MIN_HEIGHT := 0.9
+## Obstacles one ray can fade, one behind the other.
+const MAX_HIDING_OBSTACLES := 3
 const NOISE_SIZE := 16
 ## Path cost labels: height above the cell, size, and colors (total, climbing steps).
 const PATH_LABEL_HEIGHT := 0.9
@@ -56,6 +60,8 @@ var _highlight_mesh := PlaneMesh.new()
 var _noise: ImageTexture
 var _noise_strength := -1.0
 var _path_labels := Node3D.new()
+## Obstacles that stand in front of units turn see-through (see ObstacleFade).
+var _fade := ObstacleFade.new()
 
 
 func _init() -> void:
@@ -65,6 +71,8 @@ func _init() -> void:
 	add_child(_highlights)
 	_path_labels.name = "PathLabels"
 	add_child(_path_labels)
+	_fade.name = "ObstacleFade"
+	add_child(_fade)
 	for kind: Highlight in Highlight.values():
 		var group := Node3D.new()
 		group.name = Highlight.keys()[kind].to_pascal_case()
@@ -89,7 +97,39 @@ func show_preview() -> void:
 		build(parsed.grid)
 
 
+## Fades the obstacles that hide any of `targets` (world positions) from `eye`: a ray from the eye
+## to each target against the board's colliders (a rock's own shape, not a box around it) that
+## meets an obstacle first. A few obstacles in a row all fade; terrain is never faded. The others
+## return. Physics queries: call it from a physics frame.
+func look_through(eye: Vector3, targets: Array[Vector3]) -> void:
+	var space := get_world_3d().direct_space_state if is_inside_tree() else null
+	var in_the_way: Array[Vector2i] = []
+	if space != null and grid != null:
+		for target in targets:
+			var skip: Array[RID] = []
+			for attempt in MAX_HIDING_OBSTACLES:
+				var query := PhysicsRayQueryParameters3D.create(eye, target, 1 << (BOARD_LAYER - 1))
+				query.exclude = skip
+				var hit := space.intersect_ray(query)
+				if hit.is_empty():
+					break
+				var body := hit["collider"] as CollisionObject3D
+				var cell: Vector2i = body.get_meta(CELL_META, NO_CELL)
+				if cell == NO_CELL or grid.type_at(cell) != Grid.CellType.OBSTACLE:
+					break  # Terrain (or nothing known) is in the way: not ours to fade.
+				if cell not in in_the_way:
+					in_the_way.append(cell)
+				skip.append(body.get_rid())
+	_fade.fade_only(in_the_way)
+
+
+## The see-through fade, for tests.
+func obstacle_fade() -> ObstacleFade:
+	return _fade
+
+
 func _clear_cells() -> void:
+	_fade.clear()
 	for child in _cells.get_children():
 		child.free()
 	grid = null
@@ -98,6 +138,7 @@ func _clear_cells() -> void:
 ## Rebuilds every cell for `board_grid`, clearing highlights.
 func build(board_grid: Grid) -> void:
 	grid = board_grid
+	_fade.clear()
 	for child in _cells.get_children():
 		child.free()
 	clear_highlights()
@@ -241,15 +282,21 @@ func _add_column(cell: Vector2i, is_obstacle: bool) -> void:
 		# The rules' own height (Grid.obstacle_levels): what is drawn is what blocks sight.
 		var block_height := grid.obstacle_levels(cell) * active_theme().level_height
 		var fill_width := CELL_SIZE * active_theme().block_fill
+		var drawn: Array[MeshInstance3D] = []
 		if not active_theme().obstacle_scenes.is_empty():
 			var scenes := active_theme().obstacle_scenes
 			var model := _fitted_model(scenes[posmod(hash(cell), scenes.size())], top, fill_width, block_height)
 			body.add_child(model)
 			hull = _hull_of(model)
+			drawn.assign(model.find_children("*", "MeshInstance3D", true, false))
 		else:
 			var block := _box(Vector3(fill_width, block_height, fill_width), top + block_height / 2.0, active_theme().obstacle_color)
 			block.name = "Obstacle"
 			body.add_child(block)
+			drawn.append(block)
+		# A tall obstacle fades when it hides a unit (see look_through).
+		if block_height >= SEE_THROUGH_MIN_HEIGHT:
+			_fade.register(cell, drawn)
 		collider_top = top + block_height
 
 	# The collider fills the whole cell (no gaps), so every pixel of the board picks a cell. An

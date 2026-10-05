@@ -59,6 +59,9 @@ msgstr "%s (terminé)"
 msgid "%s (enemies only)"
 msgstr "%s (ennemis uniquement)"
 
+msgid "%s (level %d)"
+msgstr "%s (niveau %d)"
+
 msgid "%s (locked)"
 msgstr "%s (verrouillé)"
 
@@ -293,6 +296,9 @@ msgstr "Boss"
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr "Boss vaincu ! Choisissez un bienfait, ou soignez l'équipe à la place."
 
+msgid "Break this rune for %d essence"
+msgstr "Briser cette rune pour %d essence"
+
 msgid "Bring a hero to level 10."
 msgstr "Amenez un héros au niveau 10."
 
@@ -421,12 +427,6 @@ msgstr "Affichage"
 msgid "Dread"
 msgstr "Effroi"
 
-msgid "Drop"
-msgstr "Jeter"
-
-msgid "Drop %s?"
-msgstr "Jeter %s ?"
-
 msgid "edge layout"
 msgstr "disposition face à face"
 
@@ -453,6 +453,12 @@ msgstr "Ennemis (ils prennent les apparitions du plateau)"
 
 msgid "Epic"
 msgstr "Épique"
+
+msgid "Essence comes from salvaging runes and pays for fusing three identical ones into a stronger rune."
+msgstr "L'essence vient du recyclage des runes et paie la fusion de trois runes identiques en une rune plus forte."
+
+msgid "Essence: %d"
+msgstr "Essence : %d"
 
 msgid "Every %d turns"
 msgstr "Tous les %d tours"
@@ -568,6 +574,24 @@ msgstr "Plein écran"
 msgid "Fully runed"
 msgstr "Pleinement runé"
 
+msgid "Fuse %d of these into one of level %d, for %d essence."
+msgstr "Fusionnez-en %d en une de niveau %d, pour %d essence."
+
+msgid "Fuse to level %d"
+msgstr "Fusionner au niveau %d"
+
+msgid "Fuse: 3 identical runes (same rune, same level) and some essence make one a level higher."
+msgstr "Fusion : 3 runes identiques (même rune, même niveau) et de l'essence donnent une rune d'un niveau de plus."
+
+msgid "Fused into %s."
+msgstr "Fusionné en %s."
+
+msgid "Fusing costs %d essence; you have %d."
+msgstr "La fusion coûte %d essence ; vous en avez %d."
+
+msgid "Fusing needs %d identical runes (the same rune at the same level)."
+msgstr "La fusion demande %d runes identiques (la même rune au même niveau)."
+
 msgid "Game"
 msgstr "Jeu"
 
@@ -577,8 +601,11 @@ msgstr "Spectre"
 msgid "Ghoul"
 msgstr "Goule"
 
-msgid "Give one of every rune"
-msgstr "Donner une rune de chaque"
+msgid "Give one of every rune (at this level, up to 10)"
+msgstr "Donner une de chaque rune (à ce niveau, jusqu'à 10)"
+
+msgid "Give this much essence"
+msgstr "Donner cette quantité d'essence"
 
 msgid "Gorged"
 msgstr "Repu"
@@ -753,6 +780,12 @@ msgstr "Couper le son"
 msgid "Mute or unmute all sound"
 msgstr "Couper ou rétablir tout le son"
 
+msgid "Need %d (have %d)"
+msgstr "Il faut %d (vous en avez %d)"
+
+msgid "Need %d essence"
+msgstr "Il faut %d essence"
+
 msgid "Next"
 msgstr "Suivant"
 
@@ -798,8 +831,8 @@ msgstr "Une fois par tour"
 msgid "One battle. Clearing it lets the tower go up to floor %d and start at floor %d."
 msgstr "Un seul combat. Le réussir permet à la tour de monter jusqu'à l'étage %d et de commencer à l'étage %d."
 
-msgid "One of every rune is in the stash."
-msgstr "Une rune de chaque est dans la réserve."
+msgid "One of every rune, at level %d, is in the stash."
+msgstr "Une de chaque rune, au niveau %d, est dans la réserve."
 
 msgid "Open field"
 msgstr "Plaine"
@@ -1039,6 +1072,15 @@ msgstr "Réserve de runes"
 msgid "Runes"
 msgstr "Runes"
 
+msgid "Salvage"
+msgstr "Recycler"
+
+msgid "Salvage %s for %d essence?"
+msgstr "Recycler %s pour %d essence ?"
+
+msgid "Salvaged %s: +%d essence."
+msgstr "%s recyclé : +%d essence."
+
 msgid "Save reset."
 msgstr "Sauvegarde effacée."
 
@@ -1207,11 +1249,17 @@ msgstr "Ce héros n'est pas disponible."
 msgid "That key can't be used."
 msgstr "Cette touche ne peut pas être utilisée."
 
+msgid "That rune is already at the highest level."
+msgstr "Cette rune est déjà au niveau maximum."
+
 msgid "That rune slot is empty."
 msgstr "Cet emplacement de rune est vide."
 
 msgid "That rune slot isn't free."
 msgstr "Cet emplacement de rune n'est pas libre."
+
+msgid "That rune's effect is flat: it has no levels to fuse."
+msgstr "L'effet de cette rune est fixe : elle n'a pas de niveaux à fusionner."
 
 msgid "That spell can't go there."
 msgstr "Ce sort ne peut pas aller là."
@@ -1224,6 +1272,9 @@ msgstr "Le combat n'a pas pu démarrer (voir le journal)."
 
 msgid "The best floor is now %d."
 msgstr "Le meilleur étage est maintenant %d."
+
+msgid "The essence is now %d."
+msgstr "L'essence est maintenant de %d."
 
 msgid "The floor's encounter is invalid: %s"
 msgstr "La rencontre de l'étage est invalide : %s"
@@ -1245,9 +1296,6 @@ msgstr "La tour est invalide : %s"
 
 msgid "These change your save (press twice to confirm)."
 msgstr "Ces outils modifient votre sauvegarde (appuyez deux fois pour confirmer)."
-
-msgid "Throw this rune away for good"
-msgstr "Jeter cette rune pour de bon"
 
 msgid "Tip"
 msgstr "Astuce"

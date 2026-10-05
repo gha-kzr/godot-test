@@ -85,13 +85,15 @@ func _show_rune_slots(record: HeroRecord) -> void:
 	HubStyle.clear_children(_rune_slots)
 	for slot in HeroRecord.RUNE_SLOTS:
 		var rune := record.runes[slot]
-		var button := HubStyle.button("(empty)" if rune == null else rune.display_name, "Slot%d" % slot)
-		button.custom_minimum_size = Vector2(170, 44)
+		var button := HubStyle.button("(empty)" if rune == null else rune.title(), "Slot%d" % slot)
+		button.custom_minimum_size = Vector2(96, 44)  # A long name clips (the tooltip has it) rather than widen the screen.
+		button.clip_text = true
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if rune == null:
 			button.disabled = true
 		else:
 			HubStyle.tint(button, rune.color())
-			button.tooltip_text = tr("%s %s: %s. Click to unequip.") % [tr(rune.rarity_name()), tr(rune.display_name), rune.describe()]
+			button.tooltip_text = tr("%s %s: %s. Click to unequip.") % [tr(rune.rarity_name()), rune.title(), rune.describe()]
 			button.pressed.connect(unequip_requested.emit.bind(slot))
 		_rune_slots.add_child(button)
 

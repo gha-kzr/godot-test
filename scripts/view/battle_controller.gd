@@ -454,6 +454,22 @@ func _physics_process(_delta: float) -> void:
 	if cell != _hovered_cell:
 		_hovered_cell = cell
 		_update_hover()
+	_update_see_through()
+
+
+## Obstacles that hide a living unit from the camera fade. (Not the hovered cell: the mouse only
+## ever picks what is in front, so fading for it just made rocks vanish at random.)
+func _update_see_through() -> void:
+	if camera_rig.camera == null or battle == null:
+		return
+	var targets: Array[Vector3] = []
+	for unit in battle.state.units:
+		var view := units_view.find_view(unit.id)
+		if unit.is_alive() and view != null:
+			# The feet are what a rock hides first, the middle what a taller thing would.
+			targets.append(view.global_position + Vector3.UP * 0.15)
+			targets.append(view.global_position + Vector3.UP * view.world_height() * 0.5)
+	board_view.look_through(camera_rig.camera.global_position, targets)
 
 
 ## The cell the mouse designates: none over the HUD, except over the inspect panel, where

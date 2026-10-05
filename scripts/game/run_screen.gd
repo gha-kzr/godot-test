@@ -106,7 +106,7 @@ func _report_lines(report: RunDirector.Report, profile: Profile) -> Array[String
 		if report.rewards.runes.is_empty():
 			lines.append(tr("No rune found."))
 		else:
-			lines.append(tr("Found: %s.") % ", ".join(report.rewards.runes.map(func(r: RuneData) -> String: return tr(r.display_name))))
+			lines.append(tr("Found: %s.") % ", ".join(report.rewards.runes.map(func(r: RuneData) -> String: return r.title())))
 	lines.append_array(report.lines)
 	return lines
 

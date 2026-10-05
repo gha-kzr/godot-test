@@ -15,8 +15,10 @@ signal equip_requested(hero_index: int, stash_index: int)
 signal unequip_requested(hero_index: int, slot: int)
 ## A hero's spells screen is wanted (to read them all and change the loadout).
 signal spells_pressed(hero_index: int)
-## A rune of the stash is to be thrown away for good (after its inline Yes).
-signal drop_requested(stash_index: int)
+## A rune of the stash is to be salvaged for essence (after its inline Yes).
+signal salvage_requested(stash_index: int)
+## Three identical runes around this stash index are to be fused into one a level higher.
+signal fuse_requested(stash_index: int)
 ## The player picked a hero's tab (the Game keeps it across screens).
 signal hero_selected(hero_index: int)
 ## The hint card was dismissed.
@@ -57,7 +59,8 @@ func _ready() -> void:
 	_stash.equip_requested.connect(func(index: int) -> void:
 		_on_equip_for_tutorial()
 		equip_requested.emit(selected_hero, index))
-	_stash.drop_requested.connect(drop_requested.emit)
+	_stash.salvage_requested.connect(salvage_requested.emit)
+	_stash.fuse_requested.connect(fuse_requested.emit)
 	_destinations.tower_pressed.connect(tower_pressed.emit)
 	_destinations.stage_pressed.connect(stage_pressed.emit)
 	_destinations.continue_pressed.connect(continue_pressed.emit)
@@ -139,7 +142,7 @@ func _restore_focus(focused: StringName) -> void:
 		return
 	var again := find_child(focused, true, false) as Control
 	# A rune left the stash, so its buttons are gone: land on the row that took its place.
-	var stash_row := RegEx.create_from_string("^(?:Stash|Drop|DropYes|DropNo)([0-9]+)$").search(String(focused))
+	var stash_row := RegEx.create_from_string("^(?:Stash|Fuse|Salvage|SalvageYes|SalvageNo)([0-9]+)$").search(String(focused))
 	if again == null and stash_row != null and _stash.focus_row(int(stash_row.get_string(1))):
 		return
 	if again != null and again.focus_mode == Control.FOCUS_ALL and again.is_visible_in_tree():

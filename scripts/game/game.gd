@@ -20,7 +20,9 @@ const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
 ## Distance of the mute button from the corner of the window.
-const OVERLAY_MARGIN := 8.0
+## The screens' own margins (24 at the sides, 16 at the top): the corner button lines up with their top bars.
+const OVERLAY_MARGIN_X := 24.0
+const OVERLAY_MARGIN_Y := 16.0
 ## How long an achievement toast stays.
 const TOAST_SECONDS := 3.5
 const AUDIO_SET := preload("res://data/audio/audio_set.tres")
@@ -150,8 +152,11 @@ func _on_qa_profile_action(action: StringName, value: int) -> void:
 			QaTools.set_levels(profile, value)
 			message = tr("Every hero is now level %d.") % profile.heroes[0].level
 		&"give_runes":
-			QaTools.give_every_rune(profile)
-			message = tr("One of every rune is in the stash.")
+			QaTools.give_every_rune(profile, value)
+			message = tr("One of every rune, at level %d, is in the stash.") % clampi(value, 1, RuneData.MAX_LEVEL)
+		&"give_essence":
+			QaTools.give_essence(profile, value)
+			message = tr("The essence is now %d.") % profile.essence
 		&"best_floor":
 			QaTools.set_best_floor(profile, value)
 			message = tr("The best floor is now %d.") % profile.best_depth
@@ -184,10 +189,10 @@ func _build_overlay() -> void:
 	add_child(overlay)
 	_mute_button = MuteButton.new()
 	_mute_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_mute_button.offset_left = -OVERLAY_MARGIN - 48.0
-	_mute_button.offset_right = -OVERLAY_MARGIN
-	_mute_button.offset_top = OVERLAY_MARGIN
-	_mute_button.offset_bottom = OVERLAY_MARGIN + 44.0
+	_mute_button.offset_left = -OVERLAY_MARGIN_X - 48.0
+	_mute_button.offset_right = -OVERLAY_MARGIN_X
+	_mute_button.offset_top = OVERLAY_MARGIN_Y
+	_mute_button.offset_bottom = OVERLAY_MARGIN_Y + 44.0
 	_mute_button.toggled.connect(_on_mute_toggled)
 	overlay.add_child(_mute_button)
 	_toast = PanelContainer.new()
@@ -288,7 +293,8 @@ func show_party(message := "") -> void:
 	party.equip_requested.connect(_on_equip_requested)
 	party.unequip_requested.connect(_on_unequip_requested)
 	party.spells_pressed.connect(show_spells)
-	party.drop_requested.connect(_on_drop_requested)
+	party.salvage_requested.connect(_on_salvage_requested)
+	party.fuse_requested.connect(_on_fuse_requested)
 	party.achievements_pressed.connect(show_achievements)
 	party.tutorial = tutorial
 	party.tutorial_changed.connect(_on_settings_changed)
@@ -487,14 +493,31 @@ func _on_loadout_requested(slot: int, spell: SpellData, hero_index: int) -> void
 		_show_toast(error)
 
 
-## A rune is thrown away for good, on the hub only (never during a fight). Maxima don't change
+## A rune is salvaged for essence, on the hub only (never during a fight). Maxima don't change
 ## (it wasn't equipped), so saved HP is untouched.
-func _on_drop_requested(stash_index: int) -> void:
+func _on_salvage_requested(stash_index: int) -> void:
 	if not screen is PartyScreen:
 		return
-	var error := profile.drop_rune(stash_index)
+	var rune := profile.stash[stash_index] if stash_index >= 0 and stash_index < profile.stash.size() else null
+	var value := rune.salvage_value() if rune != null else 0
+	var error := profile.salvage_rune(stash_index)
 	if error.is_empty() and not _save():
 		error = tr("Progress couldn't be saved.")
+	if error.is_empty():
+		error = tr("Salvaged %s: +%d essence.") % [rune.title(), value]
+	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
+
+
+## Three identical runes become one a level higher, for essence (hub only).
+func _on_fuse_requested(stash_index: int) -> void:
+	if not screen is PartyScreen:
+		return
+	var group := profile.fuse_group(stash_index)
+	var error := profile.fuse(stash_index)
+	if error.is_empty():
+		error = tr("Fused into %s.") % profile.stash[group.min()].title()
+		if not _save():
+			error = tr("Progress couldn't be saved.")
 	(screen as PartyScreen).show_profile(profile, _summary, error, tower)
 
 

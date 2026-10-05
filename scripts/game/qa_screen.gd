@@ -293,7 +293,8 @@ func _profile_tab() -> Control:
 	value.value_changed.connect(func(v: float) -> void: state.profile_value = int(v))
 	value_row.add_child(value)
 	tab.add_child(value_row)
-	for entry: Array in [[&"set_levels", tr("Set every hero to this level")], [&"give_runes", tr("Give one of every rune")],
+	for entry: Array in [[&"set_levels", tr("Set every hero to this level")], [&"give_runes", tr("Give one of every rune (at this level, up to 10)")],
+			[&"give_essence", tr("Give this much essence")],
 			[&"best_floor", tr("Set the best floor to this value")], [&"clear_stages", tr("Clear every stage")],
 			[&"start_run", tr("Start a tower run at this floor")]]:
 		tab.add_child(_confirm_button(entry[1], entry[0]))

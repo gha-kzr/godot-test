@@ -508,19 +508,65 @@ func test_leaving_a_fight_returns_to_the_hub_with_the_run_and_no_rewards() -> vo
 	game.free()
 
 
-func test_dropping_a_rune_is_saved_and_ignored_during_a_fight() -> void:
+func test_salvaging_a_rune_is_saved_and_ignored_during_a_fight() -> void:
 	var game := _game()
 	game.profile.stash.append(load("res://data/runes/might.tres") as RuneData)
 	game.profile.stash.append(load("res://data/runes/focus.tres") as RuneData)
 	game.show_party()
-	(game.screen.find_child("Drop0", true, false) as Button).pressed.emit()
-	(game.screen.find_child("DropYes0", true, false) as Button).pressed.emit()
+	(game.screen.find_child("Salvage0", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SalvageYes0", true, false) as Button).pressed.emit()
 	assert_eq(game.profile.stash.size(), 1, "gone")
 	assert_eq(_saved(game).stash.size(), 1, "and saved")
 	assert_true(game.screen is PartyScreen, "still on the hub")
 	game.start_tower(1)
-	game._on_drop_requested(0)
+	game._on_salvage_requested(0)
 	assert_eq(game.profile.stash.size(), 1, "never during a fight")
+	game.free()
+
+
+func test_salvaging_and_fusing_runes_change_the_essence_and_are_saved() -> void:
+	var game := _game()
+	var might := load("res://data/runes/might.tres") as RuneData
+	for i in 4:
+		game.profile.stash.append(might)
+	game.show_party()
+	game._on_salvage_requested(3)
+	assert_eq(game.profile.essence, might.salvage_value())
+	game.profile.essence = might.fuse_cost()
+	game._on_fuse_requested(0)
+	assert_eq(game.profile.stash.size(), 1)
+	assert_eq(game.profile.stash[0].level, 2)
+	assert_eq(game.profile.essence, 0)
+	var saved := _saved(game)
+	assert_eq([saved.stash.size(), saved.stash[0].level, saved.essence], [1, 2, 0], "all saved")
+	game.free()
+
+
+func test_salvaging_by_clicking_removes_exactly_the_clicked_rune() -> void:
+	var game := _game()
+	var might := load("res://data/runes/might.tres") as RuneData
+	var third := RuneData.leveled(might, 3)
+	game.profile.stash.assign([might, third, might, third])
+	game.show_party()
+	(game.screen.find_child("Salvage3", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SalvageYes3", true, false) as Button).pressed.emit()
+	assert_eq(game.profile.stash.map(func(r: RuneData) -> int: return r.level), [1, 3, 1], "the last row went")
+	assert_eq(game.profile.essence, third.salvage_value())
+	(game.screen.find_child("Salvage1", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SalvageYes1", true, false) as Button).pressed.emit()
+	assert_eq(game.profile.stash.map(func(r: RuneData) -> int: return r.level), [1, 1], "then the level 3 one")
+	game.free()
+
+
+func test_the_achievements_and_sound_buttons_sit_side_by_side_on_one_line() -> void:
+	var game := _game()
+	await _tree().process_frame
+	await _tree().process_frame
+	var trophy := game.screen.find_child("AchievementsButton", true, false) as Button
+	var speaker := game.find_child("MuteButton", true, false) as Button
+	assert_eq(trophy.global_position.y, speaker.global_position.y, "the same top")
+	assert_eq(trophy.size.y, speaker.size.y, "the same height")
+	assert_true(trophy.global_position.x + trophy.size.x < speaker.global_position.x, "side by side, not overlapping")
 	game.free()
 
 

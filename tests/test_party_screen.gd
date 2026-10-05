@@ -236,18 +236,42 @@ func _stash_profile() -> Profile:
 	return profile
 
 
+func test_the_stash_shows_essence_levels_and_a_fuse_button_for_three_identical_runes() -> void:
+	var profile := _profile()
+	var might := load("res://data/runes/might.tres") as RuneData
+	profile.stash = [might, RuneData.leveled(might, 3), might, might, load("res://data/runes/focus.tres")] as Array[RuneData]
+	profile.essence = 4
+	var screen := _screen(profile)
+	assert_eq((screen.find_child("EssenceLabel", true, false) as Label).text, "Essence: 4")
+	assert_true((screen.find_child("Stash1", true, false) as Button).text.contains("3"), "the level shows")
+	var fuse := screen.find_child("Fuse0", true, false) as Button
+	assert_true(fuse != null, "three Might at level 1")
+	assert_true(fuse.disabled and fuse.tooltip_text.contains("10"), "10 essence for level 2, and why not")
+	assert_eq((screen.find_child("Fuse1", true, false) as Button).text, "Need 3 (have 1)", "a lone level 3 says what is missing")
+	assert_true((screen.find_child("Fuse4", true, false) as Button).disabled, "a lone Focus")
+	profile.essence = 10
+	screen.show_profile(profile)
+	var requests: Array[int] = []
+	screen.fuse_requested.connect(func(index: int) -> void: requests.append(index))
+	fuse = screen.find_child("Fuse2", true, false) as Button
+	assert_false(fuse.disabled)
+	fuse.pressed.emit()
+	assert_eq(requests, [2] as Array[int])
+	screen.free()
+
+
 func test_drop_turns_a_row_into_an_inline_question_and_yes_asks_the_game() -> void:
 	var screen := _screen(_stash_profile())
 	var drops: Array[int] = []
-	screen.drop_requested.connect(func(index: int) -> void: drops.append(index))
-	(screen.find_child("Drop1", true, false) as Button).pressed.emit()
-	var question := screen.find_child("DropQuestion1", true, false) as Label
-	assert_eq(question.text, "Drop %s?" % load("res://data/runes/focus.tres").display_name)
+	screen.salvage_requested.connect(func(index: int) -> void: drops.append(index))
+	(screen.find_child("Salvage1", true, false) as Button).pressed.emit()
+	var question := screen.find_child("SalvageQuestion1", true, false) as Label
+	assert_eq(question.text, "Salvage %s for %d essence?" % [load("res://data/runes/focus.tres").display_name, (load("res://data/runes/focus.tres") as RuneData).salvage_value()])
 	assert_true(screen.find_child("Stash1", true, false) == null, "that row shows the question instead of the rune")
-	assert_true(screen.find_child("Stash0", true, false) != null and screen.find_child("Drop0", true, false) != null, "other rows are untouched")
-	assert_eq(screen.get_viewport().gui_get_focus_owner().name, &"DropNo1", "the safe answer is focused")
+	assert_true(screen.find_child("Stash0", true, false) != null and screen.find_child("Salvage0", true, false) != null, "other rows are untouched")
+	assert_eq(screen.get_viewport().gui_get_focus_owner().name, &"SalvageNo1", "the safe answer is focused")
 	assert_eq(drops.size(), 0, "asking isn't dropping")
-	(screen.find_child("DropYes1", true, false) as Button).pressed.emit()
+	(screen.find_child("SalvageYes1", true, false) as Button).pressed.emit()
 	assert_eq(drops, [1] as Array[int])
 	screen.free()
 
@@ -255,11 +279,11 @@ func test_drop_turns_a_row_into_an_inline_question_and_yes_asks_the_game() -> vo
 func test_no_puts_the_rune_back_and_keeps_the_focus_on_its_drop_button() -> void:
 	var screen := _screen(_stash_profile())
 	var drops := {"count": 0}
-	screen.drop_requested.connect(func(_index: int) -> void: drops.count += 1)
-	(screen.find_child("Drop2", true, false) as Button).pressed.emit()
-	(screen.find_child("DropNo2", true, false) as Button).pressed.emit()
-	assert_true(screen.find_child("Stash2", true, false) != null and screen.find_child("DropQuestion2", true, false) == null)
-	assert_eq(screen.get_viewport().gui_get_focus_owner().name, &"Drop2")
+	screen.salvage_requested.connect(func(_index: int) -> void: drops.count += 1)
+	(screen.find_child("Salvage2", true, false) as Button).pressed.emit()
+	(screen.find_child("SalvageNo2", true, false) as Button).pressed.emit()
+	assert_true(screen.find_child("Stash2", true, false) != null and screen.find_child("SalvageQuestion2", true, false) == null)
+	assert_eq(screen.get_viewport().gui_get_focus_owner().name, &"Salvage2")
 	assert_eq(drops.count, 0)
 	screen.free()
 
@@ -267,9 +291,9 @@ func test_no_puts_the_rune_back_and_keeps_the_focus_on_its_drop_button() -> void
 func test_focus_lands_on_the_next_rune_after_a_drop() -> void:
 	var profile := _stash_profile()
 	var screen := _screen(profile)
-	(screen.find_child("Drop2", true, false) as Button).pressed.emit()
-	(screen.find_child("DropYes2", true, false) as Button).pressed.emit()
-	profile.drop_rune(2)  # What the Game does, then it shows the profile again.
+	(screen.find_child("Salvage2", true, false) as Button).pressed.emit()
+	(screen.find_child("SalvageYes2", true, false) as Button).pressed.emit()
+	profile.salvage_rune(2)  # What the Game does, then it shows the profile again.
 	screen.show_profile(profile)
 	await _frame()
 	await _frame()
@@ -281,28 +305,28 @@ func test_focus_lands_on_the_next_rune_after_a_drop() -> void:
 func test_the_drop_question_stays_with_its_rune_when_the_stash_changes_elsewhere() -> void:
 	var profile := _stash_profile()
 	var screen := _screen(profile)
-	(screen.find_child("Drop2", true, false) as Button).pressed.emit()
-	assert_true(screen.find_child("DropQuestion2", true, false) != null)
+	(screen.find_child("Salvage2", true, false) as Button).pressed.emit()
+	assert_true(screen.find_child("SalvageQuestion2", true, false) != null)
 	var asked := profile.stash[2]
 	profile.stash.remove_at(0)  # E.g. an equip of the first rune.
 	screen.show_profile(profile)
-	assert_true(screen.find_child("DropQuestion1", true, false) != null, "the question moved up with its rune")
-	assert_eq((screen.find_child("DropQuestion1", true, false) as Label).text, "Drop %s?" % asked.display_name)
-	assert_true(screen.find_child("DropQuestion2", true, false) == null)
+	assert_true(screen.find_child("SalvageQuestion1", true, false) != null, "the question moved up with its rune")
+	assert_eq((screen.find_child("SalvageQuestion1", true, false) as Label).text, "Salvage %s for %d essence?" % [asked.display_name, asked.salvage_value()])
+	assert_true(screen.find_child("SalvageQuestion2", true, false) == null)
 	profile.stash.erase(asked)  # The asked rune itself left the list.
 	screen.show_profile(profile)
-	assert_true(screen.find_child("DropYes0", true, false) == null and screen.find_child("DropYes1", true, false) == null, "no stale question")
+	assert_true(screen.find_child("SalvageYes0", true, false) == null and screen.find_child("SalvageYes1", true, false) == null, "no stale question")
 	screen.free()
 
 
 func test_a_question_about_a_rune_that_left_doesnt_come_back_with_a_copy_of_it() -> void:
 	var profile := _stash_profile()
 	var screen := _screen(profile)
-	(screen.find_child("Drop0", true, false) as Button).pressed.emit()
+	(screen.find_child("Salvage0", true, false) as Button).pressed.emit()
 	var asked := profile.stash[0]
 	profile.stash.remove_at(0)
 	screen.show_profile(profile)  # The asked rune is gone.
 	profile.stash.append(asked)  # Found again later: the same resource.
 	screen.show_profile(profile)
-	assert_true(screen.find_child("DropYes2", true, false) == null, "a new rune is not the one that was asked about")
+	assert_true(screen.find_child("SalvageYes2", true, false) == null, "a new rune is not the one that was asked about")
 	screen.free()

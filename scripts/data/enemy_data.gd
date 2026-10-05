@@ -58,6 +58,7 @@ func build(level: int, preset: DifficultyPreset = null) -> Build:
 	var xp := float(xp_base + xp_per_level * (level - 1))
 	result.reward = UnitReward.new()
 	result.reward.loot_table = loot_table
+	result.reward.enemy_level = level
 	result.label = tr("%s Lv %d") % [tr(display_name()), level]
 	if preset != null:
 		# The multiplier applies to the levelled HP; it becomes a flat MAX_HP bonus.

@@ -32,6 +32,7 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 9c | QA tools | A QA switch: a floor browser with map previews, a playground, a quick team, profile tools, Auto (the AI plays the heroes) and cheats in QA battles that never touch the save | [decisions](decisions/2026-10-05-qa-tools.md) · [plan](plans/2026-10-05-qa-tools.md) |
 | 9d | Own models | Every hero, enemy, weapon and board rock built in the project from flat-shaded low-poly solids on named joints, with procedural animations (idle, walk, attack, cast, hit, death, victory, defeat); no downloaded 3D model left; a model stage to preview them | [decisions](decisions/2026-10-05-own-models.md) |
 | 9e | Model workshop | A workshop scene to refine a hand-built model without editing its recipe (a tree of joints and parts, sliders for move / turn / scale / color / glow / hide, a clip scrubber with per-joint pose overrides, undo, live reload), kept in a tweaks file per model that every rebuild re-applies (renames and orphans reported), and easing on the clip sets (strikes accelerate, recoveries settle) | [decisions](decisions/2026-10-05-model-workshop.md) · [plan](plans/2026-10-05-model-workshop.md) |
+| 11 | Loot depth and see-through props | Rune levels 1 to 10 (stats +20 % per level, AP and MP flat; drops follow depth), salvage into essence, fusing three identical runes for essence (no stash cap), levels and essence in the hub, QA tools to give them, and the see-through fade for obstacles that hide a unit | [decisions](decisions/2026-10-05-loot-depth.md) · [plan](plans/2026-10-05-loot-depth.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)
@@ -45,18 +46,17 @@ Makes levels look and play differently: props and floor types (with see-through 
 | Feature | Category | Pairs with |
 |---|---|---|
 | [More props and floor types](backlog.md#more-props-and-floor-types) | Art / content | biomes, bigger maps |
-| [See-through props and walls](backlog.md#see-through-props-and-walls) | Art / camera | props, ruins, camera |
+| [See-through props and walls](backlog.md#see-through-props-and-walls) (rocks done in 11; props and outlines left) | Art / camera | props, ruins, camera |
 | [More map typologies](backlog.md#more-map-typologies) | Content / procedural | bigger maps, biomes |
 | [Biomes that change every X floors](backlog.md#biomes-that-change-every-x-floors) | Content | props, map types, enemy roles |
 
-### 11. Loot depth
+### 11b. Rune diversity and balance
 
-Makes runes interesting and manageable: sets and power tiers, and the answer to the stash piling up (sell, fuse or cap), which settles whether the game has a currency.
+Only eight runes exist, and their levels, drops and essence numbers were set by reasoning, not tested. Grow the rune pool so builds differ (more runes per stat and damage type, a few with special effects) and balance them: how much a level is worth against a hero's own growth, the drop weights by rarity and depth, the essence prices of salvage and fuse, and what the flat AP / MP runes do without levels.
 
 | Feature | Category | Pairs with |
 |---|---|---|
-| [Rune sets and rune power tiers](backlog.md#rune-sets-and-rune-power-tiers) | Gameplay / content | save format, loot, hub |
-| [Rune economy: sell, fuse, stash cap](backlog.md#rune-economy-sell-fuse-stash-cap) | Core loop | a currency decision; meta progression |
+| [Rune diversity and balance](backlog.md#rune-diversity-and-balance) | Content / balance | rune levels (11), balance lab, loot tables, sets (later) |
 
 ### 12. Run structure and meta
 

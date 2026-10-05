@@ -30,6 +30,8 @@ var stash: Array[RuneData] = []
 var best_depth := 0
 ## Ids of the unlocked achievements (Achievements, data/achievements).
 var achievements: Array[String] = []
+## What salvaged runes give; fusing runes spends it (see RuneData.fuse_cost()).
+var essence := 0
 ## The first victory's starter rune was handed out (ProgressionConfig.first_rune).
 var starter_rune_given := false
 var cleared_stages: Array[StageData] = []
@@ -107,7 +109,7 @@ func equip(hero_index: int, stash_index: int, slot := -1) -> String:
 			return tr("%s has no free rune slot.") % tr(record.hero.display_name())
 	elif slot < 0 or slot >= HeroRecord.RUNE_SLOTS or record.runes[slot] != null:
 		return tr("That rune slot isn't free.")
-	if rune.is_unique() and rune in record.runes:
+	if rune.is_unique() and record.runes.any(func(worn: RuneData) -> bool: return worn != null and worn.origin() == rune.origin()):
 		return tr("%s is %s: one per hero.") % [tr(rune.display_name), tr(rune.rarity_name()).to_lower()]
 	record.runes[slot] = rune
 	stash.remove_at(stash_index)
@@ -123,12 +125,70 @@ func assign_spell(hero_index: int, slot: int, spell: SpellData) -> String:
 	return tr("That spell can't go there.") if not error.is_empty() else ""
 
 
-## Throws a rune of the stash away for good: no undo, no refund (there is no currency). Returns
-## an error message, or "".
-func drop_rune(stash_index: int) -> String:
+## Salvages a rune of the stash: it is gone for good and gives its essence. Returns an error
+## message, or "".
+func salvage_rune(stash_index: int) -> String:
 	if stash_index < 0 or stash_index >= stash.size():
 		return tr("No such rune in the stash.")
+	essence += stash[stash_index].salvage_value()
 	stash.remove_at(stash_index)
+	return ""
+
+
+## The stash indices a fuse of the rune at `stash_index` would use: itself and the next copies of
+## the same rune at the same level, RuneData.FUSE_COPIES in all; empty when there aren't enough.
+func fuse_group(stash_index: int) -> Array[int]:
+	var group: Array[int] = []
+	if stash_index < 0 or stash_index >= stash.size():
+		return group
+	var rune := stash[stash_index]
+	group.append(stash_index)
+	for index in stash.size():
+		if group.size() < RuneData.FUSE_COPIES and index != stash_index and stash[index].is_same_kind(rune):
+			group.append(index)
+	if group.size() < RuneData.FUSE_COPIES:
+		group.clear()
+	return group
+
+
+## How many runes of the stash are the same rune at the same level as the one at `stash_index`
+## (itself included).
+func copies_of(stash_index: int) -> int:
+	if stash_index < 0 or stash_index >= stash.size():
+		return 0
+	return stash.filter(func(r: RuneData) -> bool: return r.is_same_kind(stash[stash_index])).size()
+
+
+## Why the rune at `stash_index` can't be fused now ("" when it can).
+func fuse_error(stash_index: int) -> String:
+	if stash_index < 0 or stash_index >= stash.size():
+		return tr("No such rune in the stash.")
+	var rune := stash[stash_index]
+	if not rune.can_level():
+		return tr("That rune's effect is flat: it has no levels to fuse.")
+	if rune.level >= RuneData.MAX_LEVEL:
+		return tr("That rune is already at the highest level.")
+	if fuse_group(stash_index).is_empty():
+		return tr("Fusing needs %d identical runes (the same rune at the same level).") % RuneData.FUSE_COPIES
+	if essence < rune.fuse_cost():
+		return tr("Fusing costs %d essence; you have %d.") % [rune.fuse_cost(), essence]
+	return ""
+
+
+## Fuses the rune at `stash_index` with its copies into one a level higher, for essence. Returns an
+## error message, or "".
+func fuse(stash_index: int) -> String:
+	var error := fuse_error(stash_index)
+	if not error.is_empty():
+		return error
+	var rune := stash[stash_index]
+	var group := fuse_group(stash_index)
+	essence -= rune.fuse_cost()
+	var result := RuneData.leveled(rune, rune.level + 1)
+	group.sort()
+	for index in range(group.size() - 1, -1, -1):
+		stash.remove_at(group[index])
+	stash.insert(group[0], result)
 	return ""
 
 
@@ -202,15 +262,15 @@ func to_dict() -> Dictionary:
 	for record in heroes:
 		var rune_refs: Array = []
 		for rune in record.runes:
-			rune_refs.append(_ref(rune) if rune != null else null)
+			rune_refs.append(_rune_ref(rune) if rune != null else null)
 		hero_entries.append({"hero": _ref(record.hero), "xp": record.xp, "runes": rune_refs,
 				"loadout": record.spells().map(func(spell: SpellData) -> Dictionary: return _ref(spell))})
 	var stash_refs: Array = []
 	for rune in stash:
-		stash_refs.append(_ref(rune))
+		stash_refs.append(_rune_ref(rune))
 	return {"version": SAVE_VERSION, "heroes": hero_entries, "unlocked": _hero_refs(unlocked),
 			"party": _hero_refs(party), "stash": stash_refs, "best_depth": best_depth,
-			"starter_rune_given": starter_rune_given, "achievements": achievements,
+			"starter_rune_given": starter_rune_given, "essence": essence, "achievements": achievements,
 			"cleared_stages": cleared_stages.map(func(s: StageData) -> Dictionary: return _ref(s)),
 			"run": run.to_dict() if run != null else null}
 
@@ -267,6 +327,8 @@ static func from_dict(data: Dictionary, from_roster: Roster) -> Profile:
 	var depth: Variant = data.get("best_depth", 0)
 	profile.best_depth = maxi(0, int(depth)) if depth is int or depth is float else 0
 	profile.starter_rune_given = data.get("starter_rune_given", false) == true
+	var saved_essence: Variant = data.get("essence", 0)
+	profile.essence = maxi(0, int(saved_essence)) if saved_essence is int or saved_essence is float else 0
 	for id: Variant in _array(data, "achievements"):
 		if id is String and id not in profile.achievements:
 			profile.achievements.append(id)
@@ -344,4 +406,14 @@ static func _load_rune(ref: Variant) -> RuneData:
 	var rune := load(path) as RuneData if ResourceLoader.exists(path) else null
 	if rune == null:
 		push_warning("Profile: unknown rune %s skipped" % path)
-	return rune
+		return null
+	var saved_level: Variant = ref.get("level", 1) if ref is Dictionary else 1
+	return RuneData.leveled(rune, int(saved_level) if saved_level is int or saved_level is float else 1)
+
+
+## A rune's saved reference: its file and, above level 1, its level.
+static func _rune_ref(rune: RuneData) -> Dictionary:
+	var ref := _ref(rune.origin())
+	if rune.level > 1:
+		ref["level"] = rune.level
+	return ref

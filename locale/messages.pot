@@ -69,6 +69,10 @@ msgstr ""
 msgid "%s (enemies only)"
 msgstr ""
 
+#: scripts/data/rune_data.gd
+msgid "%s (level %d)"
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd scripts/game/hub/hero_tabs.gd
 msgid "%s (locked)"
 msgstr ""
@@ -381,6 +385,10 @@ msgstr ""
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr ""
 
+#: scripts/game/hub/rune_stash.gd
+msgid "Break this rune for %d essence"
+msgstr ""
+
 #: data/achievements/level_10.tres
 msgid "Bring a hero to level 10."
 msgstr ""
@@ -551,14 +559,6 @@ msgstr ""
 msgid "Dread"
 msgstr ""
 
-#: scripts/game/hub/rune_stash.gd
-msgid "Drop"
-msgstr ""
-
-#: scripts/game/hub/rune_stash.gd
-msgid "Drop %s?"
-msgstr ""
-
 #: scripts/progression/qa_tools.gd
 msgid "edge layout"
 msgstr ""
@@ -593,6 +593,14 @@ msgstr ""
 
 #: scripts/data/rune_data.gd
 msgid "Epic"
+msgstr ""
+
+#: scenes/game/hub/rune_stash.tscn
+msgid "Essence comes from salvaging runes and pays for fusing three identical ones into a stronger rune."
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Essence: %d"
 msgstr ""
 
 #: scripts/view/hud/spell_bar.gd
@@ -747,6 +755,30 @@ msgstr ""
 msgid "Fully runed"
 msgstr ""
 
+#: scripts/game/hub/rune_stash.gd
+msgid "Fuse %d of these into one of level %d, for %d essence."
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Fuse to level %d"
+msgstr ""
+
+#: scenes/game/hub/rune_stash.tscn
+msgid "Fuse: 3 identical runes (same rune, same level) and some essence make one a level higher."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Fused into %s."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "Fusing costs %d essence; you have %d."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "Fusing needs %d identical runes (the same rune at the same level)."
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Game"
 msgstr ""
@@ -760,7 +792,11 @@ msgid "Ghoul"
 msgstr ""
 
 #: scripts/game/qa_screen.gd
-msgid "Give one of every rune"
+msgid "Give one of every rune (at this level, up to 10)"
+msgstr ""
+
+#: scripts/game/qa_screen.gd
+msgid "Give this much essence"
 msgstr ""
 
 #: data/statuses/gorged.tres
@@ -993,6 +1029,14 @@ msgstr ""
 msgid "Mute or unmute all sound"
 msgstr ""
 
+#: scripts/game/hub/rune_stash.gd
+msgid "Need %d (have %d)"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Need %d essence"
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "Next"
 msgstr ""
@@ -1054,7 +1098,7 @@ msgid "One battle. Clearing it lets the tower go up to floor %d and start at flo
 msgstr ""
 
 #: scripts/game/game.gd
-msgid "One of every rune is in the stash."
+msgid "One of every rune, at level %d, is in the stash."
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -1373,6 +1417,18 @@ msgstr ""
 msgid "Runes"
 msgstr ""
 
+#: scripts/game/hub/rune_stash.gd
+msgid "Salvage"
+msgstr ""
+
+#: scripts/game/hub/rune_stash.gd
+msgid "Salvage %s for %d essence?"
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "Salvaged %s: +%d essence."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "Save reset."
 msgstr ""
@@ -1598,11 +1654,19 @@ msgid "That key can't be used."
 msgstr ""
 
 #: scripts/progression/profile.gd
+msgid "That rune is already at the highest level."
+msgstr ""
+
+#: scripts/progression/profile.gd
 msgid "That rune slot is empty."
 msgstr ""
 
 #: scripts/progression/profile.gd
 msgid "That rune slot isn't free."
+msgstr ""
+
+#: scripts/progression/profile.gd
+msgid "That rune's effect is flat: it has no levels to fuse."
 msgstr ""
 
 #: scripts/progression/profile.gd
@@ -1619,6 +1683,10 @@ msgstr ""
 
 #: scripts/game/game.gd
 msgid "The best floor is now %d."
+msgstr ""
+
+#: scripts/game/game.gd
+msgid "The essence is now %d."
 msgstr ""
 
 #: scripts/game/game.gd
@@ -1647,10 +1715,6 @@ msgstr ""
 
 #: scripts/game/qa_screen.gd
 msgid "These change your save (press twice to confirm)."
-msgstr ""
-
-#: scripts/game/hub/rune_stash.gd
-msgid "Throw this rune away for good"
 msgstr ""
 
 #: scenes/game/hint_card.tscn

@@ -24,7 +24,7 @@ the maps feel empty: a single green terrain and a few rocks. Add floor variety (
 
 *Milestone: 10 World · Category: Art / camera · Pairs with: props, ruins, camera*
 
-today obstacles are low rocks, so the board stays readable from every camera angle; once the ruins' blocks (and props such as columns or trees) become real walls, they will hide the units, the cells and the hover behind them. When something stands between the camera and a unit or the hovered cell, fade it (dithered or alpha transparency, or a cut-out circle around the units: the usual x-ray / occlusion fade of isometric tactics games), and maybe show hidden units as outlines. Questions for the grill: which objects fade (every prop and obstacle, or only tall ones), fade by camera ray to each unit and the cursor or by a screen-space circle, outlines for hidden units, the cost on the web build's Compatibility renderer. Touches `BoardView` (obstacle materials), `UnitView` (outlines), the camera rig (rays), and the shaders.
+done for obstacles in milestone 11: a rock (or any obstacle at least one world unit tall) between the camera and a unit's feet or middle, or the hovered floor cell, fades (`ObstacleFade`: dithered alpha on the desktop renderer, plain alpha on the web's Compatibility one). Left for when props and walls arrive: registering them with the fade (any `MeshInstance3D` set and a box), taller things that hide a unit's head, and an outline for a unit that stays hidden anyway. Question: whether the fade should be a setting.
 
 ## More map typologies
 
@@ -40,15 +40,21 @@ the tower changes setting every few floors (for example every 10, with the boss)
 
 ## Rune sets and rune power tiers
 
-*Milestone: 11 Loot depth · Category: Gameplay / content · Pairs with: save format, loot, hub*
+*Milestone: later (rune levels were built in 11) · Category: Gameplay / content · Pairs with: save format, loot, hub*
 
-two independent ideas on runes. **Sets**: runes belong to a set (Fire, Guardian…), and wearing several pieces of a set grants bonuses (2 / 4 pieces), independent of a rune's rarity. **Power tiers**: every effect a rune gives has its own rarity tier (normal power, rare power, epic, legendary: the same stat comes in tiers of strength, e.g. +4 / +8 / +14 Power), so a rune is a set, a main effect with a tier, and perhaps secondary effects with their own tiers. Touches `RuneData` (a set, effect tiers), the drop rules (`LootTable`: roll the tier per effect, rarity weights), the hub (set bonus display, tier colors on each effect), balance, and the save format (runes would need to save their rolled tiers, not only a file path). Questions: how many sets and pieces, whether rune rarity (the slot rules: epic and above one per hero) stays separate from effect tiers, fixed or rolled effects.
+milestone 11 gave runes **levels** (a rune is its file at a level 1 to 10, stats scaled, saved as `{rune, level}`). Left: **sets** (runes of a set grant bonuses at 2 / 4 pieces, independent of rarity), and **rolled effect tiers** (each effect of a rune with its own rolled strength, a rune = a set, a main effect and maybe secondary ones; the save would store the rolled values). Questions: how many sets and pieces, whether rolled effects are wanted on top of levels, and how levels and rolls combine.
+
+## Rune diversity and balance
+
+*Milestone: 11b Rune diversity and balance · Category: Content / balance · Pairs with: rune levels (11), balance lab, loot tables, rune sets*
+
+there are eight runes (Might, Focus, Quickness, Vitality, Stone Skin, Fire Ward, Venom Ward, Swiftness), so builds barely differ and the numbers around them are untested. **Diversity:** more runes per stat (Power, HP, initiative, each resistance, damage taken) with different shapes (a big single stat against a pair of small ones; a trade-off such as more Power for more damage taken), runes for the damage types that have none (Holy, Frost, Physical), and a few special effects (the earlier decision left them for later: lifesteal, thorns, a bonus on the first turn, a shield at the start of a fight), each as a new `EffectData`-style kind; flat AP / MP runes now have no levels, so they need another way to stay interesting (rarity, trade-offs). **Balance:** what a rune level is worth against a hero's own growth and the level cap (level 10 is 2.8 times the base amount, only the last tier of enemies drops it), drop weights by rarity and by depth (`LootTable`, `RARITY_WEIGHTS`, `level_for_enemy`), the essence prices (salvage 1 / 3 / 8 / 20 times the level, fuse 5 times the new level, three copies) and whether the tower gives enough copies to fuse at all, the resistance cap against stacked resistance runes. **Tools:** the balance lab's tower runs (they equip found runes) should use rune levels, fusing and salvaging like a player does, and report how strong the party gets per floor. Questions for the grill: how many runes and which kinds of special effects, whether runes get names and short stories, whether sets (the other half of the old "Rune sets" idea) come now or later, and whether the numbers should be tuned by simulation or by playtests.
 
 ## Rune economy: sell, fuse, stash cap
 
-*Milestone: 11 Loot depth · Category: Core loop · Pairs with: a currency decision; meta progression*
+*Milestone: later (salvage and fuse were built in 11) · Category: Core loop · Pairs with: meta progression*
 
-dropping a rune is done (5d), but the stash can still grow large, and a dropped rune is just gone. Options to grill: (b) **sell** runes for a currency — needs something to spend it on (a shop for runes? a level-up or respec cost? run boons?), so it is really an economy milestone; (c) **salvage / fuse** runes (three commons into a rare) — keeps runes as the currency, no money needed; (d) a **stash cap** that forces the choice (with the hub warning when full). Questions: is a currency wanted in the game at all, what would it buy, and is the stash a collection or just an inventory? Touches `Profile` (stash, save format), `RuneStash` and the drop rules (`LootTable`).
+milestone 11 built salvage (a rune breaks into essence) and fuse (three identical runes plus essence make one a level higher); there is no stash cap and no gold. Left: whether essence (or a real currency) buys anything else (rerolls, respec, a rune shop), selling, a stash cap, and sorting or filtering a long stash.
 
 ## Meta progression
 

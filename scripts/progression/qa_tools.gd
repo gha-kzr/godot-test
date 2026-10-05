@@ -143,9 +143,15 @@ static func set_levels(profile: Profile, level: int) -> void:
 		record.settle_loadout()
 
 
-static func give_every_rune(profile: Profile) -> void:
+## One of every rune, at `level` (1 to RuneData.MAX_LEVEL), in the stash.
+static func give_every_rune(profile: Profile, level := 1) -> void:
 	for rarity in RuneData.Rarity.values():
-		profile.stash.append_array(runes_of(rarity))
+		for rune in runes_of(rarity):
+			profile.stash.append(RuneData.leveled(rune, level))
+
+
+static func give_essence(profile: Profile, amount: int) -> void:
+	profile.essence += maxi(0, amount)
 
 
 static func set_best_floor(profile: Profile, floor_number: int) -> void:
