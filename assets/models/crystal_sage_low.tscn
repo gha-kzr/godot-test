@@ -906,7 +906,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, -0.06), Vector3(0, 0, 0.2), Vector3(0, 0, 0.18), Vector3(0, 0, 0)]
 }
@@ -918,7 +918,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -930,7 +930,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.10471976, -0.2443461, 0), Vector3(0.2443461, 0.20943952, 0), Vector3(0.20943952, 0.17453292, 0), Vector3(0, 0, 0)]
 }
@@ -942,7 +942,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(0.6981317, 0, -0.29670596), Vector3(-1.4835298, 0, -0.12217305), Vector3(-1.3962634, 0, -0.12217305), Vector3(0, 0, -0.12217305)]
 }
@@ -954,7 +954,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(-0.17453292, 0, 0.17453292), Vector3(0.2617994, 0, 0.17453292), Vector3(0.2617994, 0, 0.17453292), Vector3(-0.17453292, 0, 0.17453292)]
 }
@@ -966,7 +966,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -978,7 +978,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -990,7 +990,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.18, 0.32, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1005,7 +1005,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0.08, 0), Vector3(0, 0.1, 0), Vector3(0, 0.08, 0), Vector3(0, 0, 0.12), Vector3(0, 0, 0)]
 }
@@ -1017,7 +1017,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(-0.2443461, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0.13962634, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1029,7 +1029,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.13962634, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.13962634, 0, 0), Vector3(0.2443461, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1041,7 +1041,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(-2.6179938, 0, -0.38397244), Vector3(-2.7925267, 0, -0.47123888), Vector3(-2.6179938, 0, -0.38397244), Vector3(-1.4835298, 0, -0.20943952), Vector3(0, 0, -0.12217305)]
 }
@@ -1053,7 +1053,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(-2.7925267, 0, 0.43633232), Vector3(-2.9670596, 0, 0.5235988), Vector3(-2.7925267, 0, 0.43633232), Vector3(-1.6580627, 0, 0.2617994), Vector3(-0.17453292, 0, 0.17453292)]
 }
@@ -1065,7 +1065,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1077,7 +1077,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1089,7 +1089,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1104,7 +1104,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0.04, -0.06), Vector3(0, 0.2, -0.1)]
 }
@@ -1116,7 +1116,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.2617994, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1128,7 +1128,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1140,7 +1140,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(0, 0, -0.64577186), Vector3(0, 0, -1.0821041)]
 }
@@ -1152,7 +1152,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(-0.17453292, 0, 0.6981317), Vector3(-0.17453292, 0, 1.134464)]
 }
@@ -1164,7 +1164,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0.13962634)]
 }
@@ -1176,7 +1176,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, -0.13962634)]
 }
@@ -1188,7 +1188,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-1.5707964, 0, 0)]
 }
@@ -1203,7 +1203,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, -0.07, 0.02), Vector3(0, -0.08, 0.02)]
 }
@@ -1215,7 +1215,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.4886922, 0, 0), Vector3(0.55850536, 0, 0)]
 }
@@ -1227,7 +1227,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.55850536, 0, 0), Vector3(0.62831855, 0, 0)]
 }
@@ -1239,7 +1239,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(0.13962634, 0, -0.12217305), Vector3(0.17453292, 0, -0.12217305)]
 }
@@ -1251,7 +1251,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(-0.03490658, 0, 0.17453292), Vector3(0, 0, 0.17453292)]
 }
@@ -1263,7 +1263,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.17453292, 0, 0)]
 }
@@ -1275,7 +1275,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.17453292, 0, 0)]
 }
@@ -1287,7 +1287,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1302,7 +1302,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, -0.12), Vector3(0, 0, 0)]
 }
@@ -1314,7 +1314,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.38397244, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1326,7 +1326,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1338,7 +1338,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(0.34906584, 0, -0.55850536), Vector3(0, 0, -0.12217305)]
 }
@@ -1350,7 +1350,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(0.17453292, 0, 0.61086524), Vector3(-0.17453292, 0, 0.17453292)]
 }
@@ -1362,7 +1362,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1374,7 +1374,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1386,7 +1386,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1645,7 +1645,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, -0.05), Vector3(0, 0, -0.04), Vector3(0, 0, 0)]
 }
@@ -1657,7 +1657,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1669,7 +1669,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(-0.034906585, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1681,7 +1681,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(-1.5707964, 0, -0.47123888), Vector3(0.6981317, 0, -1.2566371), Vector3(0.7330383, 0, -1.2740904), Vector3(-1.2217305, 0, -0.64577186), Vector3(-1.0471976, 0, -0.55850536), Vector3(0, 0, -0.12217305)]
 }
@@ -1693,7 +1693,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(-1.7453293, 0, 0.17453292), Vector3(-1.7802358, 0, 0.17453292), Vector3(-1.7802358, 0, 0.17453292), Vector3(-1.8325957, 0, 0.17453292), Vector3(-1.8325957, 0, 0.17453292), Vector3(-0.17453292, 0, 0.17453292)]
 }
@@ -1705,7 +1705,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1717,7 +1717,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1729,7 +1729,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1743,7 +1743,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, -0.06, 0), Vector3(0, 0.28, 0), Vector3(0, 0, 0), Vector3(0, 0.2, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1755,7 +1755,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1767,7 +1767,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1779,7 +1779,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.12217305), Vector3(0.43633232, 0, -0.12217305), Vector3(-2.8797932, 0, -0.38397244), Vector3(-2.0943952, 0, -0.38397244), Vector3(-2.8797932, 0, -0.38397244), Vector3(-1.7453293, 0, -0.29670596), Vector3(0, 0, -0.12217305)]
 }
@@ -1791,7 +1791,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.17453292, 0, 0.17453292), Vector3(0.2617994, 0, 0.17453292), Vector3(-3.054326, 0, 0.43633232), Vector3(-2.268928, 0, 0.43633232), Vector3(-3.054326, 0, 0.43633232), Vector3(-1.9198622, 0, 0.34906584), Vector3(-0.17453292, 0, 0.17453292)]
 }
@@ -1803,7 +1803,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1815,7 +1815,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1827,7 +1827,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1945,439 +1945,439 @@ _data = {
 &"Walk": SubResource("Animation_kcn7k")
 }
 
-[node name="CrystalSageLow" type="Node3D" unique_id=542220015]
+[node name="CrystalSageLow" type="Node3D" unique_id=1090304604]
 
-[node name="Rig" type="Node3D" parent="." unique_id=303046882]
+[node name="Rig" type="Node3D" parent="." unique_id=79242984]
 
-[node name="Leg_L" type="Node3D" parent="Rig" unique_id=1034815307]
+[node name="Leg_L" type="Node3D" parent="Rig" unique_id=1850177503]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.46, 0)
 
-[node name="Shin" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1919958430]
+[node name="Shin" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1027838534]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_b50t6")
 
-[node name="Foot" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1464662750]
+[node name="Foot" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1717169503]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.425, 0.045)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_6ff01")
 
-[node name="Leg_R" type="Node3D" parent="Rig" unique_id=383160609]
+[node name="Leg_R" type="Node3D" parent="Rig" unique_id=915539472]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.46, 0)
 
-[node name="Shin" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1005344291]
+[node name="Shin" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1555783314]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_ngjqm")
 
-[node name="Foot" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1555928326]
+[node name="Foot" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1120228997]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.425, 0.045)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_uvqwa")
 
-[node name="Hips" type="Node3D" parent="Rig" unique_id=990829925]
+[node name="Hips" type="Node3D" parent="Rig" unique_id=1889661514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 
-[node name="Skirt" type="MeshInstance3D" parent="Rig/Hips" unique_id=1891203070]
+[node name="Skirt" type="MeshInstance3D" parent="Rig/Hips" unique_id=215499720]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 material_override = SubResource("StandardMaterial3D_3p21o")
 mesh = SubResource("ArrayMesh_bi783")
 
-[node name="HemTrim" type="MeshInstance3D" parent="Rig/Hips" unique_id=2001791162]
+[node name="HemTrim" type="MeshInstance3D" parent="Rig/Hips" unique_id=1683247955]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.285, 0)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_ax2eg")
 
-[node name="Panel" type="MeshInstance3D" parent="Rig/Hips" unique_id=437048732]
+[node name="Panel" type="MeshInstance3D" parent="Rig/Hips" unique_id=1532497184]
 transform = Transform3D(1, 0, 0, 0, 0.99026805, 0.1391731, 0, -0.1391731, 0.99026805, 0, -0.12, 0.2)
 material_override = SubResource("StandardMaterial3D_5rilj")
 mesh = SubResource("ArrayMesh_poenr")
 
-[node name="PanelTrim1" type="MeshInstance3D" parent="Rig/Hips" unique_id=1830535999]
+[node name="PanelTrim1" type="MeshInstance3D" parent="Rig/Hips" unique_id=72938381]
 transform = Transform3D(1, 0, 0, 0, 0.99026805, 0.1391731, 0, -0.1391731, 0.99026805, 0.11, -0.12, 0.2)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_8ddgw")
 
-[node name="PanelTrim-1" type="MeshInstance3D" parent="Rig/Hips" unique_id=1136464699]
+[node name="PanelTrim-1" type="MeshInstance3D" parent="Rig/Hips" unique_id=638605693]
 transform = Transform3D(1, 0, 0, 0, 0.99026805, 0.1391731, 0, -0.1391731, 0.99026805, -0.11, -0.12, 0.2)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_rf3ru")
 
-[node name="Belt" type="MeshInstance3D" parent="Rig/Hips" unique_id=2066580982]
+[node name="Belt" type="MeshInstance3D" parent="Rig/Hips" unique_id=427811145]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0)
 material_override = SubResource("StandardMaterial3D_jgja4")
 mesh = SubResource("ArrayMesh_4s0ss")
 
-[node name="BeltTrim" type="MeshInstance3D" parent="Rig/Hips" unique_id=1486088528]
+[node name="BeltTrim" type="MeshInstance3D" parent="Rig/Hips" unique_id=656154543]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_dx7hx")
 
-[node name="Torso" type="MeshInstance3D" parent="Rig/Hips" unique_id=449765068]
+[node name="Torso" type="MeshInstance3D" parent="Rig/Hips" unique_id=1764751282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_aso7i")
 
-[node name="Pec1" type="MeshInstance3D" parent="Rig/Hips" unique_id=1143127320]
+[node name="Pec1" type="MeshInstance3D" parent="Rig/Hips" unique_id=196633996]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.36, 0.14)
 material_override = SubResource("StandardMaterial3D_c5boc")
 mesh = SubResource("ArrayMesh_80a3e")
 
-[node name="Pec-1" type="MeshInstance3D" parent="Rig/Hips" unique_id=1046501619]
+[node name="Pec-1" type="MeshInstance3D" parent="Rig/Hips" unique_id=325497543]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.36, 0.14)
 material_override = SubResource("StandardMaterial3D_c5boc")
 mesh = SubResource("ArrayMesh_pi116")
 
-[node name="Crack" type="MeshInstance3D" parent="Rig/Hips" unique_id=1229414752]
+[node name="Crack" type="MeshInstance3D" parent="Rig/Hips" unique_id=90470473]
 transform = Transform3D(0.88294756, 0.46947157, 0, -0.46947157, 0.88294756, 0, 0, 0, 1, -0.12, 0.43, 0.157)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_ygupq")
 
-[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="Rig/Hips" unique_id=1105511696]
+[node name="@MeshInstance3D@2" type="MeshInstance3D" parent="Rig/Hips" unique_id=910445544]
 transform = Transform3D(0.9396926, -0.34202012, 0, 0.34202012, 0.9396926, 0, 0, 0, 1, 0.02, 0.32, 0.157)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_ub7ht")
 
-[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="Rig/Hips" unique_id=25062213]
+[node name="@MeshInstance3D@3" type="MeshInstance3D" parent="Rig/Hips" unique_id=1580589958]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, -0.05, 0.19, 0.157)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_7nnh5")
 
-[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="Rig/Hips" unique_id=191747714]
+[node name="@MeshInstance3D@4" type="MeshInstance3D" parent="Rig/Hips" unique_id=1242154578]
 transform = Transform3D(0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 0, 0, 0, 1, -0.17, 0.3, 0.157)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_f3cop")
 
-[node name="Sash" type="Node3D" parent="Rig/Hips" unique_id=363237731]
+[node name="Sash" type="Node3D" parent="Rig/Hips" unique_id=760746351]
 transform = Transform3D(0.83867055, 0.54463905, 0, -0.54463905, 0.83867055, 0, 0, 0, 1, 0.04, 0.26, 0.152)
 
-[node name="Cloth" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=1322121106]
+[node name="Cloth" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=929420870]
 material_override = SubResource("StandardMaterial3D_3p21o")
 mesh = SubResource("ArrayMesh_q3uvj")
 
-[node name="SashTrim1" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=499594680]
+[node name="SashTrim1" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=346192416]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0, 0)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_tsp4r")
 
-[node name="SashTrim-1" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=1353410599]
+[node name="SashTrim-1" type="MeshInstance3D" parent="Rig/Hips/Sash" unique_id=1785249700]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.075, 0, 0)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_b658k")
 
-[node name="Head" type="Node3D" parent="Rig/Hips" unique_id=342394056]
+[node name="Head" type="Node3D" parent="Rig/Hips" unique_id=979790386]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 
-[node name="Neck" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2127041320]
+[node name="Neck" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=471292647]
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_ymfrq")
 
-[node name="Skull" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=32801296]
+[node name="Skull" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=546217781]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_8jkfy")
 
-[node name="Jaw" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2033433331]
+[node name="Jaw" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2042642294]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.06)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_x7tuu")
 
-[node name="Brow" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1914292320]
+[node name="Brow" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1457221802]
 transform = Transform3D(1, 0, 0, 0, 0.99026805, -0.1391731, 0, 0.1391731, 0.99026805, 0, 0.255, 0.165)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_3srh5")
 
-[node name="Nose" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=930522740]
+[node name="Nose" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1434047658]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0.2)
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_e3ui1")
 
-[node name="Eye1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1354164811]
+[node name="Eye1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2142544194]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.085, 0.215, 0.185)
 material_override = SubResource("StandardMaterial3D_0uwux")
 mesh = SubResource("ArrayMesh_wbrhx")
 
-[node name="Eye-1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1686084678]
+[node name="Eye-1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2045159001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.085, 0.215, 0.185)
 material_override = SubResource("StandardMaterial3D_0uwux")
 mesh = SubResource("ArrayMesh_6vyko")
 
-[node name="CrystalBody0" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1686682712]
+[node name="CrystalBody0" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1005619855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4578, 0)
 material_override = SubResource("StandardMaterial3D_t5fow")
 mesh = SubResource("ArrayMesh_ae23y")
 
-[node name="CrystalTip0" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=493469346]
+[node name="CrystalTip0" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=220379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.64779997, 0)
 material_override = SubResource("StandardMaterial3D_t5fow")
 mesh = SubResource("ArrayMesh_kgwsc")
 
-[node name="CrystalBody1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=958799300]
+[node name="CrystalBody1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=222244890]
 transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202015, 0, 0.34202015, 0.9396926, 0, 0.4028914, 0.10180788)
 material_override = SubResource("StandardMaterial3D_0ghbb")
 mesh = SubResource("ArrayMesh_2v1c1")
 
-[node name="CrystalTip1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1751626605]
+[node name="CrystalTip1" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1682287820]
 transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202015, 0, 0.34202015, 0.9396926, 0, 0.5438453, 0.15311089)
 material_override = SubResource("StandardMaterial3D_0ghbb")
 mesh = SubResource("ArrayMesh_s7xxt")
 
-[node name="CrystalBody2" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=183844133]
+[node name="CrystalBody2" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=598420121]
 transform = Transform3D(0.95476943, 0.29619813, -0.02611386, -0.29619813, 0.9396926, -0.17101008, -0.026113862, 0.17101006, 0.9849232, 0.08541357, 0.39415228, 0.049313545)
 material_override = SubResource("StandardMaterial3D_g8k3t")
 mesh = SubResource("ArrayMesh_w3jkj")
 
-[node name="CrystalTip2" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1958661537]
+[node name="CrystalTip2" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1232388715]
 transform = Transform3D(0.95476943, 0.29619813, -0.02611386, -0.29619813, 0.9396926, -0.17101008, -0.026113862, 0.17101006, 0.9849232, 0.12540032, 0.52101076, 0.07239991)
 material_override = SubResource("StandardMaterial3D_g8k3t")
 mesh = SubResource("ArrayMesh_1du47")
 
-[node name="CrystalBody3" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=158506007]
+[node name="CrystalBody3" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1829522074]
 transform = Transform3D(0.95476943, 0.29619813, 0.02611386, -0.29619813, 0.9396926, 0.17101008, 0.026113862, -0.17101006, 0.9849232, 0.082658924, 0.3854131, -0.04772315)
 material_override = SubResource("StandardMaterial3D_pe87p")
 mesh = SubResource("ArrayMesh_hq4al")
 
-[node name="CrystalTip3" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=67256776]
+[node name="CrystalTip3" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1382846996]
 transform = Transform3D(0.95476943, 0.29619813, 0.02611386, -0.29619813, 0.9396926, 0.17101008, 0.026113862, -0.17101006, 0.9849232, 0.1182027, 0.49817625, -0.06824436)
 material_override = SubResource("StandardMaterial3D_pe87p")
 mesh = SubResource("ArrayMesh_1e1x5")
 
-[node name="CrystalBody4" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2089891002]
+[node name="CrystalBody4" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1428731881]
 transform = Transform3D(1, 4.1885395e-17, 7.385526e-18, -4.1885395e-17, 0.9396926, 0.34202015, 7.385525e-18, -0.34202015, 0.9396926, 1.2467869e-17, 0.4028914, -0.10180788)
 material_override = SubResource("StandardMaterial3D_arrey")
 mesh = SubResource("ArrayMesh_7786k")
 
-[node name="CrystalTip4" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1210703439]
+[node name="CrystalTip4" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1638985528]
 transform = Transform3D(1, 4.1885395e-17, 7.385526e-18, -4.1885395e-17, 0.9396926, 0.34202015, 7.385525e-18, -0.34202015, 0.9396926, 1.8750679e-17, 0.5438453, -0.15311089)
 material_override = SubResource("StandardMaterial3D_arrey")
 mesh = SubResource("ArrayMesh_tsc1b")
 
-[node name="CrystalBody5" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=12684616]
+[node name="CrystalBody5" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=332560705]
 transform = Transform3D(0.95476943, -0.29619813, -0.02611386, 0.29619813, 0.9396926, 0.17101008, -0.026113862, -0.17101006, 0.9849232, -0.08541357, 0.39415228, -0.049313545)
 material_override = SubResource("StandardMaterial3D_l26io")
 mesh = SubResource("ArrayMesh_kgftk")
 
-[node name="CrystalTip5" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=215666256]
+[node name="CrystalTip5" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1747912471]
 transform = Transform3D(0.95476943, -0.29619813, -0.02611386, 0.29619813, 0.9396926, 0.17101008, -0.026113862, -0.17101006, 0.9849232, -0.12540032, 0.52101076, -0.07239991)
 material_override = SubResource("StandardMaterial3D_l26io")
 mesh = SubResource("ArrayMesh_mnj5c")
 
-[node name="CrystalBody6" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1568284296]
+[node name="CrystalBody6" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=378459586]
 transform = Transform3D(0.95476943, -0.29619813, 0.02611386, 0.29619813, 0.9396926, -0.17101008, 0.026113862, 0.17101006, 0.9849232, -0.082658924, 0.3854131, 0.04772315)
 material_override = SubResource("StandardMaterial3D_gv56q")
 mesh = SubResource("ArrayMesh_ywlxw")
 
-[node name="CrystalTip6" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=727750475]
+[node name="CrystalTip6" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=659771827]
 transform = Transform3D(0.95476943, -0.29619813, 0.02611386, 0.29619813, 0.9396926, -0.17101008, 0.026113862, 0.17101006, 0.9849232, -0.1182027, 0.49817625, 0.06824436)
 material_override = SubResource("StandardMaterial3D_gv56q")
 mesh = SubResource("ArrayMesh_milsx")
 
-[node name="CrystalBody7" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1259035720]
+[node name="CrystalBody7" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=606484120]
 transform = Transform3D(0.9267595, 0.36187676, -0.100806884, -0.36187673, 0.7880107, -0.4980806, -0.10080689, 0.49808064, 0.86125124, 0.10472629, 0.33985668, 0.14414337)
 material_override = SubResource("StandardMaterial3D_t5fow")
 mesh = SubResource("ArrayMesh_ys7ss")
 
-[node name="CrystalTip7" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=118346970]
+[node name="CrystalTip7" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1410310952]
 transform = Transform3D(0.9267595, 0.36187676, -0.100806884, -0.36187673, 0.7880107, -0.4980806, -0.10080689, 0.49808064, 0.86125124, 0.14091396, 0.41865775, 0.19395143)
 material_override = SubResource("StandardMaterial3D_t5fow")
 mesh = SubResource("ArrayMesh_4qkri")
 
-[node name="CrystalBody8" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=72853047]
+[node name="CrystalBody8" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=807715757]
 transform = Transform3D(0.8082539, 0.5855289, 0.062302083, -0.5855289, 0.7880107, 0.19024988, 0.06230209, -0.19024988, 0.97975683, 0.17308098, 0.34474236, -0.05623742)
 material_override = SubResource("StandardMaterial3D_0ghbb")
 mesh = SubResource("ArrayMesh_l6ap0")
 
-[node name="CrystalTip8" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=22033979]
+[node name="CrystalTip8" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=2144839181]
 transform = Transform3D(0.8082539, 0.5855289, 0.062302083, -0.5855289, 0.7880107, 0.19024988, 0.06230209, -0.19024988, 0.97975683, 0.23748916, 0.43142354, -0.0771649)
 material_override = SubResource("StandardMaterial3D_0ghbb")
 mesh = SubResource("ArrayMesh_lq2cl")
 
-[node name="CrystalBody9" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1304883214]
+[node name="CrystalBody9" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=183966192]
 transform = Transform3D(1, 7.53968e-17, 2.5961198e-17, -7.539679e-17, 0.7880107, 0.6156615, 2.5961202e-17, -0.6156615, 0.7880107, 2.1819656e-17, 0.33985668, -0.17817101)
 material_override = SubResource("StandardMaterial3D_g8k3t")
 mesh = SubResource("ArrayMesh_rl1o1")
 
-[node name="CrystalTip9" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=197399460]
+[node name="CrystalTip9" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=356971502]
 transform = Transform3D(1, 7.53968e-17, 2.5961198e-17, -7.539679e-17, 0.7880107, 0.6156615, 2.5961202e-17, -0.6156615, 0.7880107, 2.9359337e-17, 0.41865775, -0.23973715)
 material_override = SubResource("StandardMaterial3D_g8k3t")
 mesh = SubResource("ArrayMesh_xmohq")
 
-[node name="CrystalBody10" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=45907283]
+[node name="CrystalBody10" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=732091053]
 transform = Transform3D(0.8082539, -0.5855289, -0.062302083, 0.5855289, 0.7880107, 0.19024988, -0.06230209, -0.19024988, 0.97975683, -0.17308098, 0.34474236, -0.05623742)
 material_override = SubResource("StandardMaterial3D_pe87p")
 mesh = SubResource("ArrayMesh_g8nlr")
 
-[node name="CrystalTip10" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=485935164]
+[node name="CrystalTip10" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1124983032]
 transform = Transform3D(0.8082539, -0.5855289, -0.062302083, 0.5855289, 0.7880107, 0.19024988, -0.06230209, -0.19024988, 0.97975683, -0.23748916, 0.43142354, -0.0771649)
 material_override = SubResource("StandardMaterial3D_pe87p")
 mesh = SubResource("ArrayMesh_jrdoq")
 
-[node name="CrystalBody11" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1308213960]
+[node name="CrystalBody11" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1700306183]
 transform = Transform3D(0.9267595, -0.36187676, 0.100806884, 0.36187673, 0.7880107, -0.4980806, 0.10080689, 0.49808064, 0.86125124, -0.10472629, 0.33985668, 0.14414337)
 material_override = SubResource("StandardMaterial3D_arrey")
 mesh = SubResource("ArrayMesh_qtwt1")
 
-[node name="CrystalTip11" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1569024182]
+[node name="CrystalTip11" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1004144066]
 transform = Transform3D(0.9267595, -0.36187676, 0.100806884, 0.36187673, 0.7880107, -0.4980806, 0.10080689, 0.49808064, 0.86125124, -0.14091396, 0.41865775, 0.19395143)
 material_override = SubResource("StandardMaterial3D_arrey")
 mesh = SubResource("ArrayMesh_b6ko2")
 
-[node name="ShoulderCloth" type="MeshInstance3D" parent="Rig/Hips" unique_id=929608081]
+[node name="ShoulderCloth" type="MeshInstance3D" parent="Rig/Hips" unique_id=1905805590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.44, 0)
 material_override = SubResource("StandardMaterial3D_3p21o")
 mesh = SubResource("ArrayMesh_6qu1v")
 
-[node name="Arm_L" type="Node3D" parent="Rig/Hips" unique_id=782264669]
+[node name="Arm_L" type="Node3D" parent="Rig/Hips" unique_id=755418307]
 transform = Transform3D(0.9848077, -0.17364818, 0, 0.17101006, 0.96984625, 0.17364818, -0.03015369, -0.17101006, 0.9848077, 0.3, 0.4, 0)
 
-[node name="Sleeve" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=1277590469]
+[node name="Sleeve" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=1020493929]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 material_override = SubResource("StandardMaterial3D_3p21o")
 mesh = SubResource("ArrayMesh_16ytq")
 
-[node name="SleeveTrim" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=51837008]
+[node name="SleeveTrim" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=1868328863]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 material_override = SubResource("StandardMaterial3D_6h05l")
 mesh = SubResource("ArrayMesh_xeic4")
 
-[node name="Forearm_L" type="Node3D" parent="Rig/Hips/Arm_L" unique_id=310312227]
+[node name="Forearm_L" type="Node3D" parent="Rig/Hips/Arm_L" unique_id=1622274077]
 transform = Transform3D(1, 0, 0, 0, -0.08715577, 0.9961947, 0, -0.9961947, -0.08715577, 0, -0.3, 0)
 
-[node name="Forearm" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L" unique_id=1273173001]
+[node name="Forearm" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L" unique_id=1730752868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.14, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_j6jp1")
 
-[node name="Hand_L" type="Node3D" parent="Rig/Hips/Arm_L/Forearm_L" unique_id=1800166585]
+[node name="Hand_L" type="Node3D" parent="Rig/Hips/Arm_L/Forearm_L" unique_id=1287705041]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 
-[node name="Palm" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=1575702202]
+[node name="Palm" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=1377615649]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_4sded")
 
-[node name="Fingers" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=893193192]
+[node name="Fingers" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=1926088869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, 0)
 material_override = SubResource("StandardMaterial3D_c5boc")
 mesh = SubResource("ArrayMesh_bcq5b")
 
-[node name="FlameCore" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=1544951047]
+[node name="FlameCore" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=585280804]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0.1)
 material_override = SubResource("StandardMaterial3D_imeq7")
 mesh = SubResource("ArrayMesh_3bcn6")
 
-[node name="FlameTip" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=1785288921]
+[node name="FlameTip" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Forearm_L/Hand_L" unique_id=126142489]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -0.01, 0.21)
 material_override = SubResource("StandardMaterial3D_h43up")
 mesh = SubResource("ArrayMesh_qwg48")
 
-[node name="Shoulder_R" type="MeshInstance3D" parent="Rig/Hips" unique_id=447197360]
+[node name="Shoulder_R" type="MeshInstance3D" parent="Rig/Hips" unique_id=1631360767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29, 0.44, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_cvwpx")
 
-[node name="Arm_R" type="Node3D" parent="Rig/Hips" unique_id=2065914280]
+[node name="Arm_R" type="Node3D" parent="Rig/Hips" unique_id=10902520]
 transform = Transform3D(0.99254614, 0.12186935, 0, -0.12186935, 0.99254614, 0, 0, 0, 1, -0.3, 0.4, 0)
 
-[node name="Arm" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=514814436]
+[node name="Arm" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1265835583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_u2j56")
 
-[node name="Bicep" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=2133431474]
+[node name="Bicep" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=213939999]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, 0.005)
 material_override = SubResource("StandardMaterial3D_c5boc")
 mesh = SubResource("ArrayMesh_4dagv")
 
-[node name="Hand_R" type="Node3D" parent="Rig/Hips/Arm_R" unique_id=807428840]
+[node name="Hand_R" type="Node3D" parent="Rig/Hips/Arm_R" unique_id=2095472264]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
 
-[node name="Fist" type="MeshInstance3D" parent="Rig/Hips/Arm_R/Hand_R" unique_id=277036876]
+[node name="Fist" type="MeshInstance3D" parent="Rig/Hips/Arm_R/Hand_R" unique_id=859793451]
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_0mkhn")
 
-[node name="Vein" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=763484052]
+[node name="Vein" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1945071739]
 transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, 0, -0.14, 0.066)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_1mf3v")
 
-[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=2058104903]
+[node name="@MeshInstance3D@5" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1954324721]
 transform = Transform3D(0.81915206, 0.57357645, 0, -0.57357645, 0.81915206, 0, 0, 0, 1, 0, -0.24, 0.058)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_joq7n")
 
-[node name="@MeshInstance3D@6" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=2049901299]
+[node name="@MeshInstance3D@6" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1278823881]
 transform = Transform3D(0.90630776, -0.42261827, 0, 0.42261827, 0.90630776, 0, 0, 0, 1, 0, -0.3, 0.056)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_uvx08")
 
-[node name="@MeshInstance3D@7" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=901337866]
+[node name="@MeshInstance3D@7" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=835754025]
 transform = Transform3D(0.087155804, -0.9961947, 0, 0.9961947, 0.087155804, 0, 0, 0, 1, 0, -0.2, 0.064)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_yu3u7")
 
-[node name="VeinSide" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=733391000]
+[node name="VeinSide" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1614233600]
 transform = Transform3D(1, 0, 0, 0, 0.90630776, -0.42261827, 0, 0.42261827, 0.90630776, -0.068, -0.12, 0)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_sofsp")
 
-[node name="@MeshInstance3D@8" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=598654525]
+[node name="@MeshInstance3D@8" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=447764700]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, -0.062, -0.26, 0)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_in5fq")
 
-[node name="@MeshInstance3D@9" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1183938943]
+[node name="@MeshInstance3D@9" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1022914657]
 transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202012, 0, 0.34202012, 0.9396926, -0.062, -0.33, 0)
 material_override = SubResource("StandardMaterial3D_6cw34")
 mesh = SubResource("ArrayMesh_t2jy2")
 
-[node name="Orbit" type="Node3D" parent="Rig" unique_id=692406119]
+[node name="Orbit" type="Node3D" parent="Rig" unique_id=1272912934]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.75, 0)
 
-[node name="Shard0" type="Node3D" parent="Rig/Orbit" unique_id=695612713]
+[node name="Shard0" type="Node3D" parent="Rig/Orbit" unique_id=2008065262]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05, 0.38, 0.05)
 
-[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard0" unique_id=689024960]
+[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard0" unique_id=599064636]
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_sxnav")
 
-[node name="Shard1" type="Node3D" parent="Rig/Orbit" unique_id=1716847402]
+[node name="Shard1" type="Node3D" parent="Rig/Orbit" unique_id=994494866]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -0.12)
 
-[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard1" unique_id=1260994639]
+[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard1" unique_id=556881032]
 transform = Transform3D(0.9230449, -0.18584287, 0.33682406, 0.25488698, 0.9512512, -0.17364818, -0.28813303, 0.24613714, 0.9254165, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_3uv1n")
 mesh = SubResource("ArrayMesh_slbjx")
 
-[node name="Shard2" type="Node3D" parent="Rig/Orbit" unique_id=882111102]
+[node name="Shard2" type="Node3D" parent="Rig/Orbit" unique_id=281299497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.05, 0.12)
 
-[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard2" unique_id=834016913]
+[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard2" unique_id=873359947]
 material_override = SubResource("StandardMaterial3D_jvvlx")
 mesh = SubResource("ArrayMesh_nd1q4")
 
-[node name="Shard3" type="Node3D" parent="Rig/Orbit" unique_id=231780290]
+[node name="Shard3" type="Node3D" parent="Rig/Orbit" unique_id=2005854163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -0.1, -0.05)
 
-[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard3" unique_id=1026805442]
+[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard3" unique_id=1153188930]
 transform = Transform3D(0.9230449, -0.18584287, 0.33682406, 0.25488698, 0.9512512, -0.17364818, -0.28813303, 0.24613714, 0.9254165, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_ubl6v")
 mesh = SubResource("ArrayMesh_arj37")
 
-[node name="Shard4" type="Node3D" parent="Rig/Orbit" unique_id=575977398]
+[node name="Shard4" type="Node3D" parent="Rig/Orbit" unique_id=1294636000]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, -0.3, 0.08)
 
-[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard4" unique_id=1269039077]
+[node name="Chunk" type="MeshInstance3D" parent="Rig/Orbit/Shard4" unique_id=926483232]
 material_override = SubResource("StandardMaterial3D_2sk7l")
 mesh = SubResource("ArrayMesh_slqmy")
 
-[node name="Shard5" type="Node3D" parent="Rig/Orbit" unique_id=1215023011]
+[node name="Shard5" type="Node3D" parent="Rig/Orbit" unique_id=1101504121]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.45, -0.1)
 
-[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard5" unique_id=1154707075]
+[node name="Gem" type="MeshInstance3D" parent="Rig/Orbit/Shard5" unique_id=985179079]
 transform = Transform3D(0.9230449, -0.18584287, 0.33682406, 0.25488698, 0.9512512, -0.17364818, -0.28813303, 0.24613714, 0.9254165, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_f2cji")
 mesh = SubResource("ArrayMesh_avgos")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1478531082]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1761069968]
 libraries/ = SubResource("AnimationLibrary_wek0w")

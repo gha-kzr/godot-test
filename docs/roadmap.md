@@ -31,20 +31,12 @@ Each milestone starts by settling its open decisions (`godot-grill`), then a pla
 | 9b | Bigger maps | Map sizes per band (9–11 up to 15–18, never bigger), six map typologies from seeded noise (open field, mountain, crater, islands, canyon, ruins), enemies a bounded walk away, a camera that fits the board | [decisions](decisions/2026-10-04-maps.md) · [plan](plans/2026-10-04-maps.md) |
 | 9c | QA tools | A QA switch: a floor browser with map previews, a playground, a quick team, profile tools, Auto (the AI plays the heroes) and cheats in QA battles that never touch the save | [decisions](decisions/2026-10-05-qa-tools.md) · [plan](plans/2026-10-05-qa-tools.md) |
 | 9d | Own models | Every hero, enemy, weapon and board rock built in the project from flat-shaded low-poly solids on named joints, with procedural animations (idle, walk, attack, cast, hit, death, victory, defeat); no downloaded 3D model left; a model stage to preview them | [decisions](decisions/2026-10-05-own-models.md) |
+| 9e | Model workshop | A workshop scene to refine a hand-built model without editing its recipe (a tree of joints and parts, sliders for move / turn / scale / color / glow / hide, a clip scrubber with per-joint pose overrides, undo, live reload), kept in a tweaks file per model that every rebuild re-applies (renames and orphans reported), and easing on the clip sets (strikes accelerate, recoveries settle) | [decisions](decisions/2026-10-05-model-workshop.md) · [plan](plans/2026-10-05-model-workshop.md) |
 | — | Web build | A single-threaded web export published on GitHub Pages (`tools/export_web.sh --publish` builds and commits the `gh-pages` branch) | `README.md` |
 
 ## Next milestones (proposed)
 
 The backlog grouped into milestones, in the order I would build them: each follows the ones whose systems it needs and ends in something playable on its own. The order can change if priorities do. Full descriptions and open questions are in [`backlog.md`](backlog.md); each milestone starts with a grill and a plan, like the finished ones.
-
-### 9e. Model workshop
-
-Makes the hand-built models easy to refine without a code change: tweaks (part positions, sizes, colors, joint rest poses) kept in a file next to each model and re-applied when the draft is rebuilt, clips as editable pose tables, and a workshop scene with sliders, a pose scrubber and live reload. Also the animation upgrades the first drafts lack (easing, follow-through, anticipation, two-segment limbs) and, if wanted, richer solids for more detailed creatures.
-
-| Feature | Category | Pairs with |
-|---|---|---|
-| [Model workshop](backlog.md#model-workshop) | Tools / art | own models (9d), spell stage |
-| [Better animations](backlog.md#better-animations) | Animation | clip sets, model workshop |
 
 ### 10. World
 
@@ -77,12 +69,13 @@ Gives runs a shape and lasting value: meta progression (needs the currency decid
 
 ### 13. Reach
 
-Widens who can play, once screens and strings have settled: better tooltips and more hints, a way to see status effects, save slots, gamepad support and Android / touch.
+Widens who can play, once screens and strings have settled: better tooltips and more hints, a way to see status effects, a clearer achievement unlock, save slots, gamepad support and Android / touch.
 
 | Feature | Category | Pairs with |
 |---|---|---|
 | [Better tooltips and more hints](backlog.md#better-tooltips-and-more-hints) | UX / onboarding | first-run hints, glossary tooltips, localization |
 | [Visualize status effects](backlog.md#visualize-status-effects) | UX / battle readability | statuses, unit cards, tooltips |
+| [Clearer achievement unlock](backlog.md#clearer-achievement-unlock) | UX / feedback | achievements, toasts, audio |
 | [Multiple games (save slots)](backlog.md#multiple-games-save-slots) | Core / profile | save format |
 | [Gamepad support](backlog.md#gamepad-support) | Platform | focus navigation already on screens |
 | [Android and touch](backlog.md#android-and-touch) | Platform | camera drag already shaped for it |
@@ -95,5 +88,6 @@ The final pass when content stops moving: a balance pass with the balance lab, a
 |---|---|---|
 | [Balance observations from playtests](backlog.md#balance-observations-from-playtests) | Balance | level cap, area spells, tower bands |
 | [Balance pass and release checks](backlog.md#balance-pass-and-release-checks) | Balance / release | content stable |
+| [Better animations](backlog.md#better-animations) (or any milestone) | Animation | clip sets, model workshop |
 | [Sound and animation leftovers](backlog.md#sound-and-animation-leftovers) (or any milestone: it is small) | Audio / animation | audio set, unit model |
 

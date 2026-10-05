@@ -26,7 +26,7 @@ var fov := 35.0
 
 func _ready() -> void:
 	_read_arguments()
-	_build_environment()
+	build_environment(self)
 	var models: Array[UnitModel] = []
 	for index in unit_names.size():
 		var entry := unit_names[index]
@@ -40,7 +40,7 @@ func _ready() -> void:
 			push_error("ModelStage: no unit '%s'" % entry)
 			continue
 		var x := (index - (unit_names.size() - 1) * 0.5) * gap
-		_add_tile(Vector3(x, 0.0, 0.0))
+		add_tile(self, Vector3(x, 0.0, 0.0))
 		var model := UnitModel.new()
 		add_child(model)
 		model.position = Vector3(x, 0.0, 0.0)
@@ -81,7 +81,8 @@ func _read_arguments() -> void:
 			"fov": fov = float(parts[1])
 
 
-func _build_environment() -> void:
+## The stage's sky and the battle's light, under `parent` (shared with the model workshop).
+static func build_environment(parent: Node) -> void:
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color(0.1, 0.11, 0.14)
@@ -91,16 +92,17 @@ func _build_environment() -> void:
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	var world := WorldEnvironment.new()
 	world.environment = environment
-	add_child(world)
+	parent.add_child(world)
 	var light := DirectionalLight3D.new()
 	light.transform = Transform3D(Basis(Vector3(0.866025, 0, -0.5), Vector3(-0.353553, 0.707107, -0.612372),
 			Vector3(0.353553, 0.707107, 0.612372)), Vector3(0, 10, 0))
 	light.light_energy = 1.1
 	light.shadow_enabled = true
-	add_child(light)
+	parent.add_child(light)
 
 
-func _add_tile(position_: Vector3) -> void:
+## A floor tile at `position_`.
+static func add_tile(parent: Node, position_: Vector3) -> void:
 	var tile := MeshInstance3D.new()
 	var box := BoxMesh.new()
 	box.size = Vector3(1.0, 0.1, 1.0)
@@ -109,7 +111,7 @@ func _add_tile(position_: Vector3) -> void:
 	material.albedo_color = Color(0.45, 0.46, 0.5)
 	box.material = material
 	tile.position = position_ + Vector3(0, -0.05, 0)
-	add_child(tile)
+	parent.add_child(tile)
 
 
 func _build_camera() -> void:

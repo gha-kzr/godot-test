@@ -347,7 +347,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, -0.05), Vector3(0, 0, 0)]
 }
@@ -359,7 +359,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -371,7 +371,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -383,7 +383,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(-1.5707964, 0, -0.6806784), Vector3(-1.3962634, 0, -0.90757126), Vector3(-1.4835298, 0, -0.24434608), Vector3(0, 0, -0.06981317)]
 }
@@ -395,7 +395,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-2.0943952, 0, 0.06981317), Vector3(-2.1293015, 0, 0.06981317), Vector3(-2.1816616, 0, 0.06981317), Vector3(-0.5235988, 0, 0.06981317)]
 }
@@ -407,7 +407,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -419,7 +419,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -431,7 +431,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.45, 0.52, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -458,7 +458,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0.08, 0), Vector3(0, 0.1, 0), Vector3(0, 0.08, 0), Vector3(0, 0, 0.12), Vector3(0, 0, 0)]
 }
@@ -470,7 +470,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(-0.2443461, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0.13962634, 0, 0), Vector3(0, 0, 0)]
 }
@@ -482,7 +482,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.13962634, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.13962634, 0, 0), Vector3(0.2443461, 0, 0), Vector3(0, 0, 0)]
 }
@@ -494,7 +494,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(-2.6179938, 0, -0.33161256), Vector3(-2.7925267, 0, -0.418879), Vector3(-2.6179938, 0, -0.33161256), Vector3(-1.4835298, 0, -0.15707964), Vector3(0, 0, -0.06981317)]
 }
@@ -506,7 +506,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-3.1415925, 0, 0.33161256), Vector3(-3.3161254, 0, 0.418879), Vector3(-3.1415925, 0, 0.33161256), Vector3(-2.0071287, 0, 0.15707964), Vector3(-0.5235988, 0, 0.06981317)]
 }
@@ -518,7 +518,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -530,7 +530,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -542,7 +542,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.4, 0.55, 0.68, 0.9),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -569,7 +569,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0.04, -0.06), Vector3(0, 0.15, -0.1)]
 }
@@ -581,7 +581,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.2617994, 0, 0), Vector3(0, 0, 0)]
 }
@@ -593,7 +593,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0, 0, 0)]
 }
@@ -605,7 +605,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(0, 0, -0.593412), Vector3(0, 0, -1.0297443)]
 }
@@ -617,7 +617,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-0.5235988, 0, 0.593412), Vector3(-0.5235988, 0, 1.0297443)]
 }
@@ -629,7 +629,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0.13962634)]
 }
@@ -641,7 +641,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, -0.13962634)]
 }
@@ -653,7 +653,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 2.2, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-1.5707964, 0, 0)]
 }
@@ -680,7 +680,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, -0.07, 0.02), Vector3(0, -0.08, 0.02)]
 }
@@ -692,7 +692,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.4886922, 0, 0), Vector3(0.55850536, 0, 0)]
 }
@@ -704,7 +704,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0.55850536, 0, 0), Vector3(0.62831855, 0, 0)]
 }
@@ -716,7 +716,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(0.13962634, 0, -0.06981317), Vector3(0.17453292, 0, -0.06981317)]
 }
@@ -728,7 +728,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-0.38397247, 0, 0.06981317), Vector3(-0.34906587, 0, 0.06981317)]
 }
@@ -740,7 +740,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.17453292, 0, 0)]
 }
@@ -752,7 +752,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(-0.17453292, 0, 0)]
 }
@@ -764,7 +764,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.6, 1.2),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -791,7 +791,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, -0.12), Vector3(0, 0, 0)]
 }
@@ -803,7 +803,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.38397244, 0, 0), Vector3(0, 0, 0)]
 }
@@ -815,7 +815,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -827,7 +827,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(0.34906584, 0, -0.5061455), Vector3(0, 0, -0.06981317)]
 }
@@ -839,7 +839,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-0.17453295, 0, 0.5061455), Vector3(-0.5235988, 0, 0.06981317)]
 }
@@ -851,7 +851,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -863,7 +863,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -875,7 +875,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.08, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.20943952, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1014,7 +1014,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, -0.05), Vector3(0, 0, -0.04), Vector3(0, 0, 0)]
 }
@@ -1026,7 +1026,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1038,7 +1038,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(-0.05235988, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(-0.06981317, 0, 0), Vector3(-0.034906585, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1050,7 +1050,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(-1.5707964, 0, -0.418879), Vector3(0.6981317, 0, -1.2042772), Vector3(0.7330383, 0, -1.2217305), Vector3(-1.2217305, 0, -0.593412), Vector3(-1.0471976, 0, -0.5061455), Vector3(0, 0, -0.06981317)]
 }
@@ -1062,7 +1062,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-2.0943952, 0, 0.06981317), Vector3(-2.1293015, 0, 0.06981317), Vector3(-2.1293015, 0, 0.06981317), Vector3(-2.1816616, 0, 0.06981317), Vector3(-2.1816616, 0, 0.06981317), Vector3(-0.5235988, 0, 0.06981317)]
 }
@@ -1074,7 +1074,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1086,7 +1086,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1098,7 +1098,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.26, 0.32, 0.37, 0.5, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 1, 1, 2.2, 0.5, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1124,7 +1124,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, -0.06, 0), Vector3(0, 0.28, 0), Vector3(0, 0, 0), Vector3(0, 0.2, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1136,7 +1136,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(0, 0, 0), Vector3(-0.17453292, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1148,7 +1148,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1160,7 +1160,7 @@ tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, -0.06981317), Vector3(0.43633232, 0, -0.06981317), Vector3(-2.8797932, 0, -0.33161256), Vector3(-2.0943952, 0, -0.33161256), Vector3(-2.8797932, 0, -0.33161256), Vector3(-1.7453293, 0, -0.24434608), Vector3(0, 0, -0.06981317)]
 }
@@ -1172,7 +1172,7 @@ tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(-0.5235988, 0, 0.06981317), Vector3(-0.087266475, 0, 0.06981317), Vector3(-3.4033918, 0, 0.33161256), Vector3(-2.6179938, 0, 0.33161256), Vector3(-3.4033918, 0, 0.33161256), Vector3(-2.268928, 0, 0.24434608), Vector3(-0.5235988, 0, 0.06981317)]
 }
@@ -1184,7 +1184,7 @@ tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1196,7 +1196,7 @@ tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1208,7 +1208,7 @@ tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.12, 0.3, 0.5, 0.7, 0.88, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"transitions": PackedFloat32Array(0.5, 0.5, 2.2, 0.5, 2.2, 0.5, 1),
 "update": 0,
 "values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
 }
@@ -1350,185 +1350,185 @@ _data = {
 &"Walk": SubResource("Animation_02odu")
 }
 
-[node name="SkeletonArcher" type="Node3D" unique_id=1300772248]
+[node name="SkeletonArcher" type="Node3D" unique_id=1002243951]
 
-[node name="Rig" type="Node3D" parent="." unique_id=50668067]
+[node name="Rig" type="Node3D" parent="." unique_id=1402452431]
 
-[node name="Leg_L" type="Node3D" parent="Rig" unique_id=16135531]
+[node name="Leg_L" type="Node3D" parent="Rig" unique_id=2017027463]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.4, 0)
 
-[node name="Femur" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=2078505297]
+[node name="Femur" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=545869850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_js1ar")
 
-[node name="Knee" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1511698720]
+[node name="Knee" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1481746311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_inog5")
 
-[node name="Boot" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1317350161]
+[node name="Boot" type="MeshInstance3D" parent="Rig/Leg_L" unique_id=1523352511]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0.025)
 material_override = SubResource("StandardMaterial3D_utevr")
 mesh = SubResource("ArrayMesh_x0hxh")
 
-[node name="Leg_R" type="Node3D" parent="Rig" unique_id=837237175]
+[node name="Leg_R" type="Node3D" parent="Rig" unique_id=1136984694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, 0.4, 0)
 
-[node name="Femur" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1050389600]
+[node name="Femur" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=731246818]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_47gkx")
 
-[node name="Knee" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=401567394]
+[node name="Knee" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=386677730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_7gab8")
 
-[node name="Boot" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=52100468]
+[node name="Boot" type="MeshInstance3D" parent="Rig/Leg_R" unique_id=1401666773]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0.025)
 material_override = SubResource("StandardMaterial3D_utevr")
 mesh = SubResource("ArrayMesh_161py")
 
-[node name="Hips" type="Node3D" parent="Rig" unique_id=1164583472]
+[node name="Hips" type="Node3D" parent="Rig" unique_id=1423154653]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
-[node name="Pelvis" type="MeshInstance3D" parent="Rig/Hips" unique_id=833222694]
+[node name="Pelvis" type="MeshInstance3D" parent="Rig/Hips" unique_id=465858090]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_drk72")
 
-[node name="Spine" type="MeshInstance3D" parent="Rig/Hips" unique_id=449921819]
+[node name="Spine" type="MeshInstance3D" parent="Rig/Hips" unique_id=399041000]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.02)
 material_override = SubResource("StandardMaterial3D_l62yl")
 mesh = SubResource("ArrayMesh_fovav")
 
-[node name="Cavity" type="MeshInstance3D" parent="Rig/Hips" unique_id=1493800954]
+[node name="Cavity" type="MeshInstance3D" parent="Rig/Hips" unique_id=401619962]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0)
 material_override = SubResource("StandardMaterial3D_oh0q8")
 mesh = SubResource("ArrayMesh_1o76m")
 
-[node name="Rib0" type="MeshInstance3D" parent="Rig/Hips" unique_id=1389030304]
+[node name="Rib0" type="MeshInstance3D" parent="Rig/Hips" unique_id=150240934]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_ustgi")
 
-[node name="Rib1" type="MeshInstance3D" parent="Rig/Hips" unique_id=1850130977]
+[node name="Rib1" type="MeshInstance3D" parent="Rig/Hips" unique_id=260508594]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.235, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_56w0d")
 
-[node name="Rib2" type="MeshInstance3D" parent="Rig/Hips" unique_id=1320842040]
+[node name="Rib2" type="MeshInstance3D" parent="Rig/Hips" unique_id=1047600720]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_tht4o")
 
-[node name="Rib3" type="MeshInstance3D" parent="Rig/Hips" unique_id=1987451767]
+[node name="Rib3" type="MeshInstance3D" parent="Rig/Hips" unique_id=1179585733]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.385, 0.01)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_11sp1")
 
-[node name="Breastbone" type="MeshInstance3D" parent="Rig/Hips" unique_id=54345418]
+[node name="Breastbone" type="MeshInstance3D" parent="Rig/Hips" unique_id=1385336603]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0.1)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_avu5b")
 
-[node name="Head" type="Node3D" parent="Rig/Hips" unique_id=1645420653]
+[node name="Head" type="Node3D" parent="Rig/Hips" unique_id=1028106751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
 
-[node name="Neck" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1145223034]
+[node name="Neck" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=473941053]
 material_override = SubResource("StandardMaterial3D_l62yl")
 mesh = SubResource("ArrayMesh_kfv6q")
 
-[node name="Skull" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1224233799]
+[node name="Skull" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=65581158]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_0a2k4")
 
-[node name="Jaw" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=869177279]
+[node name="Jaw" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=46207197]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.07)
 material_override = SubResource("StandardMaterial3D_l62yl")
 mesh = SubResource("ArrayMesh_rgjfh")
 
-[node name="Teeth" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1429116070]
+[node name="Teeth" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1250631714]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.085, 0.145)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_lh48t")
 
-[node name="Nose" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=286696151]
+[node name="Nose" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1365484391]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0.2)
 material_override = SubResource("StandardMaterial3D_oh0q8")
 mesh = SubResource("ArrayMesh_jw0nd")
 
-[node name="Socket_L" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1432866983]
+[node name="Socket_L" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1616564595]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.085, 0.22, 0.175)
 material_override = SubResource("StandardMaterial3D_oh0q8")
 mesh = SubResource("ArrayMesh_u7qxn")
 
-[node name="Glow_L" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=959097353]
+[node name="Glow_L" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=594121029]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.085, 0.22, 0.2)
 material_override = SubResource("StandardMaterial3D_776df")
 mesh = SubResource("ArrayMesh_oh7c5")
 
-[node name="Socket_R" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=681176770]
+[node name="Socket_R" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1797167355]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.085, 0.22, 0.175)
 material_override = SubResource("StandardMaterial3D_oh0q8")
 mesh = SubResource("ArrayMesh_8x5nm")
 
-[node name="Glow_R" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=1698087579]
+[node name="Glow_R" type="MeshInstance3D" parent="Rig/Hips/Head" unique_id=894598402]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.085, 0.22, 0.2)
 material_override = SubResource("StandardMaterial3D_776df")
 mesh = SubResource("ArrayMesh_hnnc6")
 
-[node name="Plate_L" type="MeshInstance3D" parent="Rig/Hips" unique_id=68915247]
+[node name="Plate_L" type="MeshInstance3D" parent="Rig/Hips" unique_id=1101752103]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_37xel")
 mesh = SubResource("ArrayMesh_rcmay")
 
-[node name="Arm_L" type="Node3D" parent="Rig/Hips" unique_id=117397917]
+[node name="Arm_L" type="Node3D" parent="Rig/Hips" unique_id=582735501]
 transform = Transform3D(0.9975641, -0.06975647, 0, 0.060410876, 0.8639158, 0.5, -0.034878235, -0.49878204, 0.8660254, 0.23, 0.43, 0)
 
-[node name="Humerus" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=644943337]
+[node name="Humerus" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=439134694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_kwtab")
 
-[node name="Elbow" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=1678323767]
+[node name="Elbow" type="MeshInstance3D" parent="Rig/Hips/Arm_L" unique_id=752221232]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_p47k4")
 
-[node name="Hand_L" type="Node3D" parent="Rig/Hips/Arm_L" unique_id=3183845]
+[node name="Hand_L" type="Node3D" parent="Rig/Hips/Arm_L" unique_id=1659405836]
 transform = Transform3D(1, 0, 0, 0, 0.8660254, -0.5, 0, 0.5, 0.8660254, 0, -0.36, 0)
 
-[node name="Glove" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Hand_L" unique_id=1918590491]
+[node name="Glove" type="MeshInstance3D" parent="Rig/Hips/Arm_L/Hand_L" unique_id=2137534165]
 material_override = SubResource("StandardMaterial3D_utevr")
 mesh = SubResource("ArrayMesh_n6200")
 
-[node name="Plate_R" type="MeshInstance3D" parent="Rig/Hips" unique_id=1174296228]
+[node name="Plate_R" type="MeshInstance3D" parent="Rig/Hips" unique_id=1666437525]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, 0.45, 0)
 material_override = SubResource("StandardMaterial3D_37xel")
 mesh = SubResource("ArrayMesh_v4uke")
 
-[node name="Arm_R" type="Node3D" parent="Rig/Hips" unique_id=1546401071]
+[node name="Arm_R" type="Node3D" parent="Rig/Hips" unique_id=1768817392]
 transform = Transform3D(0.9975641, 0.06975647, 0, -0.06975647, 0.9975641, 0, 0, 0, 1, -0.23, 0.43, 0)
 
-[node name="Humerus" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1077301877]
+[node name="Humerus" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=2126087896]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_pkyua")
 
-[node name="Elbow" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=1386081747]
+[node name="Elbow" type="MeshInstance3D" parent="Rig/Hips/Arm_R" unique_id=2012638161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
 material_override = SubResource("StandardMaterial3D_l1fb2")
 mesh = SubResource("ArrayMesh_0qr6j")
 
-[node name="Hand_R" type="Node3D" parent="Rig/Hips/Arm_R" unique_id=1847064120]
+[node name="Hand_R" type="Node3D" parent="Rig/Hips/Arm_R" unique_id=481637022]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.36, 0)
 
-[node name="Glove" type="MeshInstance3D" parent="Rig/Hips/Arm_R/Hand_R" unique_id=767982242]
+[node name="Glove" type="MeshInstance3D" parent="Rig/Hips/Arm_R/Hand_R" unique_id=1504444837]
 material_override = SubResource("StandardMaterial3D_utevr")
 mesh = SubResource("ArrayMesh_8j8sw")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=763034633]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1093797365]
 libraries/ = SubResource("AnimationLibrary_ojjl5")

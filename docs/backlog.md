@@ -8,17 +8,11 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 What milestones 6b to 7 left out on purpose: **turn start** stays silent (no candidate liked); a smoother blend between clips (walk to attack); the death sound is heavy, so its gain (`sfx_gain_db`) may need adjusting by ear. Hub and title share one track on purpose.
 
-## Model workshop
-
-*Milestone: 9e Model workshop · Category: Tools / art · Pairs with: own models (9d), spell stage*
-
-Models are drafted from code (a recipe per creature, see `docs/decisions/2026-10-05-own-models.md`); refining them should not need a code change or a new draft. Idea: a **tweaks file** per model (`assets/models/<name>.tweaks.tres`) overriding parts by name (position, rotation, scale, color), joint rest poses and animation poses by clip, time and joint, re-applied by `tools/build_models.gd` so a rebuilt draft keeps them (orphaned tweaks are reported, not lost); the **clips as pose tables** (time → joint → degrees) editable in the Inspector instead of code; and a **workshop scene** like the spell stage (sliders and gizmos on parts and joints, a pose scrubber, live reload when a file is saved, undo-friendly Save into the tweaks file). Questions for the grill: an editor plugin (Design panel) or an in-game QA screen; how tweaks follow a part that a new draft renames; whether the recipes stay the source of truth or a model is "ejected" into a hand-edited scene once polished.
-
 ## Better animations
 
-*Milestone: 9e Model workshop · Category: Animation · Pairs with: clip sets, model workshop*
+*Milestone: 14 Balance and release, or any · Category: Animation · Pairs with: clip sets, model workshop*
 
-The first clips are one-pass linear poses and look raw. In order of cost and payoff: easing on strikes and recoveries; follow-through (the head, tail and plume lag behind the body); anticipation and squash-and-stretch; two-segment limbs (elbows and knees: more parts per creature, the biggest quality jump); per-creature attack feel (a heavier swing for the Brute and the Yeti). Possibly a higher detail tier for the solids (bevels, lathes, smooth shading) if the style should grow.
+Easing is in (9e: `SNAP` and `SETTLE` on strikes, wind-ups and recoveries) and one creature's poses can be hand-tuned in the model workshop, but the clip sets are still short lists of poses. Left, in order of cost and payoff: follow-through (the head, tail and plume lag behind the body: a plume or a tail needs its own joint, and a follower track derived from the body's with a delay); anticipation and squash-and-stretch on landings; two-segment limbs (elbows and knees: more parts per creature, the biggest quality jump); per-creature attack feel (a heavier swing for the Brute and the Yeti, as shared tables or as tweaks); a smoother blend between clips. Possibly a higher detail tier for the solids (bevels, lathes, smooth shading) if the style should grow.
 
 ## More props and floor types
 
@@ -67,6 +61,12 @@ lasting upgrades between runs. A currency or points earned by runs (floors clear
 *Milestone: 12 Run structure and meta · Category: Core loop · Pairs with: rune economy, meta progression; needs a full grill*
 
 the tower is a straight line of floors. The idea: between floors, choose a path on a small map (Slay the Spire style): normal fight, elite (harder, better loot), rest (heal), shop or a rune forge, mystery event, boss at the end. It would make a run a series of decisions and give use to the rune economy and the boons. Open and to be elaborated before anything is built: how long a run is (still floors of 10 with a boss? a map per act?), how paths branch and how much is visible ahead, what the non-fight nodes do (and so what currency and items exist: this depends on the rune economy and meta progression), how it fits the deterministic floors-by-number design (daily seeds, the "same for everyone" rule), whether endless climbing stays, and how the run screen and `RunState` / `RunDirector` change (the saved run would store the map and the position). Needs a full grill.
+
+## Clearer achievement unlock
+
+*Milestone: 13 Reach · Category: UX / feedback · Pairs with: achievements, toasts, audio*
+
+an achievement unlock gets a notification or popup the player can't miss. Today a unlock shows a small toast for 3.5 seconds at the top of the screen (`Game`, `TOAST_SECONDS`), which is easy to miss in the middle of a battle result or the run screen, where it also overlaps the title. Ideas: a popup card with the achievement's name, description and icon that stays until dismissed or for longer, a sound (a short jingle in the audio set), a queue when several unlock at once (a boss floor can unlock two), showing it again in the achievements list as "new" until seen, and not covering the result or run screen's buttons. Question for the grill: whether it should block (like the tips) or stay passive but more visible. Every new text needs its French translation.
 
 ## Visualize status effects
 

@@ -18,5 +18,5 @@ Settled with the owner after a prototype of three units (Knight, Warg, Ghost). R
 - `tests/test_modeling.gd`: solids closed and facing outward, every recipe saved, the full animation set on joints that exist, loops that close, a unit about as tall as its `model_height`.
 
 ## Open / deferred
-- A **model workshop** to refine a drafted model by hand without a code change (tweaks kept across rebuilds, pose-table clips, richer animation): the next milestone.
-- Higher detail tiers (bevels, lathes, smooth shading) and two-segment limbs (elbows, knees): with the workshop.
+- A **model workshop** (done in 9e: `docs/decisions/2026-10-05-model-workshop.md`).
+- Higher detail tiers (bevels, lathes, smooth shading) and two-segment limbs (elbows, knees): see the backlog ("Better animations").

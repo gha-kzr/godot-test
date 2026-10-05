@@ -19,7 +19,18 @@ var root: Node3D
 ## Every joint by the name it was given ("Arm.L"; the node itself is "Arm_L").
 var joints: Dictionary[String, Node3D] = {}
 
+## The tweaks the next kits are built with (the build tool sets it around one recipe's build()).
+static var tweaks_for_build: ModelTweaks
+
+## The model's hand-made polish (null: none), applied by apply_tweaks().
+var tweaks: ModelTweaks = tweaks_for_build
+## Tweaks (and pose overrides) whose node, joint or clip the recipe no longer has.
+var orphans: PackedStringArray = []
+
 var _materials: Dictionary[String, StandardMaterial3D] = {}
+## Each part's color (as it should look on screen) and emissive strength, for recoloring.
+var _looks: Dictionary[MeshInstance3D, Dictionary] = {}
+var _tweaks_applied := false
 
 
 func _init(model_name := "Model") -> void:
@@ -47,9 +58,30 @@ func part(parent: Node3D, part_name: String, mesh: Mesh, color: Color, position 
 	instance.position = position
 	instance.rotation_degrees = rotation_degrees
 	instance.material_override = material(color, emissive)
+	_looks[instance] = {"color": color, "emissive": emissive}
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	(parent if parent != null else root).add_child(instance)
 	return instance
+
+
+## The part's `{color, emissive}` as the recipe (or a tweak) gave them.
+func look_of(part_node: MeshInstance3D) -> Dictionary:
+	return _looks.get(part_node, {"color": Color.WHITE, "emissive": 0.0})
+
+
+func set_look(part_node: MeshInstance3D, color: Color, emissive: float) -> void:
+	_looks[part_node] = {"color": color, "emissive": emissive}
+
+
+## Applies the tweaks once, after the recipe has built the joints and parts and set their rest
+## poses (so clips, which are offsets from rest, follow the tweaked rest). RigAnimator.build()
+## and save() call it.
+func apply_tweaks() -> void:
+	if _tweaks_applied:
+		return
+	_tweaks_applied = true
+	if tweaks != null:
+		orphans.append_array(tweaks.apply(self))
 
 
 func material(color: Color, emissive := 0.0) -> StandardMaterial3D:
@@ -70,6 +102,7 @@ func material(color: Color, emissive := 0.0) -> StandardMaterial3D:
 ## Saves the model as a scene at `path`: owners set, the AnimationPlayer (if any) included.
 ## A rebuilt model keeps its UID (the unit files refer to it); a new one gets one.
 func save(path: String) -> Error:
+	apply_tweaks()
 	_own(root, root)
 	var scene := PackedScene.new()
 	var error := scene.pack(root)

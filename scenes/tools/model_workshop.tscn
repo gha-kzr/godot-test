@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cnq32o4os3vsy"]
+
+[ext_resource type="Script" uid="uid://cdsgh5syymqv3" path="res://scripts/tools/model_workshop.gd" id="1_workshop"]
+
+[node name="ModelWorkshop" type="Node3D"]
+script = ExtResource("1_workshop")
