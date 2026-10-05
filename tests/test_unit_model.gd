@@ -1,14 +1,14 @@
 extends TestCase
-## UnitModel: one animation contract over any pack's model, skin colors, hit flash.
+## UnitModel: one animation contract over any model, held items, hit flash.
 
-const KNIGHT := preload("res://assets/quaternius/characters/Knight_Male.fbx")
-const BARREL := preload("res://assets/quaternius/dungeon/Barrel.fbx")
+const KNIGHT := preload("res://assets/models/knight.tscn")
+const BARREL := preload("res://assets/models/rock_1.tscn")
 
 
-func _model(scene: PackedScene = KNIGHT, skin := Color(0, 0, 0, 0)) -> UnitModel:
+func _model(scene: PackedScene = KNIGHT) -> UnitModel:
 	var model := UnitModel.new()
 	(Engine.get_main_loop() as SceneTree).root.add_child(model)
-	model.setup(scene, 0.5, skin)
+	model.setup(scene, 1.0)
 	return model
 
 
@@ -31,7 +31,7 @@ func _scene_with_animations(names: Array[String]) -> PackedScene:
 	return scene
 
 
-func test_the_packs_animations_resolve_from_logical_names() -> void:
+func test_a_models_animations_resolve_from_logical_names() -> void:
 	var model := _model()
 	for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death", &"Victory", &"Defeat"]:
 		assert_true(model.has_animation(logical), "%s found" % logical)
@@ -49,6 +49,18 @@ func test_another_packs_names_work_through_the_suffix_after_a_bar() -> void:
 	model.free()
 
 
+func test_shoot_falls_back_to_cast_then_attack() -> void:
+	var with_cast := _model(_scene_with_animations(["Idle", "Cast", "Attack"] as Array[String]))
+	assert_true(with_cast.has_animation(&"Shoot"), "a model without a Shoot clip casts")
+	with_cast.free()
+	var attack_only := _model(_scene_with_animations(["Idle", "Attack"] as Array[String]))
+	assert_true(attack_only.has_animation(&"Shoot"), "or attacks")
+	attack_only.free()
+	var own := _model(_scene_with_animations(["Idle", "Shoot", "Cast"] as Array[String]))
+	assert_true(own.play(&"Shoot") > 0.0)
+	own.free()
+
+
 func test_a_model_without_animations_is_fine() -> void:
 	var model := _model(BARREL)
 	assert_false(model.has_animation(&"Idle"))
@@ -59,31 +71,11 @@ func test_a_model_without_animations_is_fine() -> void:
 func test_idle_and_walk_loop_but_actions_do_not() -> void:
 	var model := _model()
 	var player := model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
-	assert_eq(player.get_animation("CharacterArmature|Idle").loop_mode, Animation.LOOP_LINEAR)
-	assert_eq(player.get_animation("CharacterArmature|Walk").loop_mode, Animation.LOOP_LINEAR)
-	assert_eq(player.get_animation("CharacterArmature|Death").loop_mode, Animation.LOOP_NONE)
-	assert_eq(player.current_animation, "CharacterArmature|Idle", "starts idle")
+	assert_eq(player.get_animation("Idle").loop_mode, Animation.LOOP_LINEAR)
+	assert_eq(player.get_animation("Walk").loop_mode, Animation.LOOP_LINEAR)
+	assert_eq(player.get_animation("Death").loop_mode, Animation.LOOP_NONE)
+	assert_eq(player.current_animation, "Idle", "starts idle")
 	model.free()
-
-
-func _skin_albedo(model: UnitModel) -> Color:
-	for mesh in model.find_children("*", "MeshInstance3D", true, false):
-		var instance := mesh as MeshInstance3D
-		for surface in instance.mesh.get_surface_count():
-			var material := instance.mesh.surface_get_material(surface) as BaseMaterial3D
-			if material != null and material.resource_name == "Skin":
-				return material.albedo_color
-	return Color(-1, -1, -1)
-
-
-func test_skin_color_is_set_per_model_without_touching_the_shared_material() -> void:
-	var tan := Color(0.95, 0.78, 0.64)
-	var colored := _model(KNIGHT, tan)
-	var plain := _model()
-	assert_eq(_skin_albedo(colored), tan)
-	assert_ne(_skin_albedo(plain), tan, "another instance of the same model keeps the pack's skin")
-	colored.free()
-	plain.free()
 
 
 func test_flash_overlays_the_model_then_clears() -> void:
@@ -109,7 +101,7 @@ func test_reset_clears_the_flash_and_the_held_pose() -> void:
 	model.reset()
 	var player := model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	assert_true(mesh.material_overlay == null, "no flash left")
-	assert_eq(player.current_animation, "CharacterArmature|Idle", "standing again")
+	assert_eq(player.current_animation, "Idle", "standing again")
 	model.free()
 
 
@@ -123,16 +115,16 @@ func test_an_action_animation_restarts_when_asked_again_and_returns_to_idle_by_i
 	model.play(&"Attack")  # A second cast, quickly.
 	assert_true(player.current_animation_position < 0.2, "playing it again restarts it instead of being ignored: %f" % player.current_animation_position)
 	for i in 600:
-		if player.current_animation.ends_with("|Idle"):
+		if player.current_animation == "Idle":
 			break
 		await (Engine.get_main_loop() as SceneTree).process_frame
-	assert_true(player.current_animation.ends_with("|Idle"), "an action ends back at Idle: %s" % player.current_animation)
+	assert_true(player.current_animation == "Idle", "an action ends back at Idle: %s" % player.current_animation)
 	model.play(&"Death")
 	for i in 600:
 		if not player.is_playing():
 			break
 		await (Engine.get_main_loop() as SceneTree).process_frame
-	assert_true(player.assigned_animation.ends_with("|Death"), "but a death stays: %s" % player.assigned_animation)
+	assert_true(player.assigned_animation == "Death", "but a death stays: %s" % player.assigned_animation)
 	model.free()
 
 
@@ -143,43 +135,45 @@ func test_a_mangled_export_resolves_through_any_part_between_bars() -> void:
 	model.free()
 
 
-func test_the_monsters_have_the_animations_the_game_needs() -> void:
-	for path in ["res://assets/quaternius/monsters/Skeleton.glb", "res://assets/quaternius/monsters/Zombie.glb", "res://assets/quaternius/monsters/Ghost.glb"]:
-		var model := _model(load(path) as PackedScene)
-		for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death"]:
-			assert_true(model.has_animation(logical), "%s: %s" % [path.get_file(), logical])
+func test_every_unit_model_has_the_animations_the_game_needs() -> void:
+	for file in DirAccess.get_files_at("res://data/units"):
+		var data := load("res://data/units/" + file) as UnitData
+		if data == null or data.model_scene == null:
+			continue
+		var model := _model(data.model_scene)
+		for logical: StringName in [&"Idle", &"Walk", &"Attack", &"Cast", &"Hit", &"Death", &"Victory", &"Defeat"]:
+			assert_true(model.has_animation(logical), "%s: %s" % [file, logical])
 		model.free()
 
 
 func test_a_held_item_replaces_a_part_of_the_model() -> void:
-	var skeleton := load("res://data/units/skeleton_archer.tres") as UnitData
-	var model := _model(skeleton.model_scene)
-	model.hold(skeleton.held_item, skeleton.held_item_replaces, skeleton.held_item_scale, skeleton.held_item_rotation)
-	assert_false((model.find_child("Weapon_Dagger", true, false) as Node3D).visible, "the dagger is hidden")
+	var knight := load("res://data/units/knight.tres") as UnitData
+	var model := _model(knight.model_scene)
+	model.hold(knight.held_item, "Shield", 1.0, Vector3.ZERO)
+	assert_false((model.find_child("Shield", true, false) as Node3D).visible, "the shield is hidden")
 	var held := model.find_child("HeldItem", true, false) as Node3D
-	assert_true(held != null, "the bow is held")
-	assert_eq(held.get_parent(), model.find_child("Weapon_Dagger", true, false).get_parent(), "on the same bone")
+	assert_true(held != null, "the item is held")
+	assert_eq(held.get_parent(), model.find_child("Shield", true, false).get_parent(), "on the same joint")
 	model.free()
 
 
 func test_holding_in_place_of_a_missing_part_is_reported() -> void:
 	var model := _model()
 	expect_error("no part named")
-	model.hold(load("res://assets/quaternius/props/WoodenBow.glb"), "NoSuchPart", 1.0, Vector3.ZERO)
+	model.hold(load("res://assets/models/bow.tscn"), "NoSuchPart", 1.0, Vector3.ZERO)
 	assert_true(model.find_child("HeldItem", true, false) == null)
 	model.free()
 
 
-func test_a_held_item_can_hang_from_a_bone() -> void:
-	var knight := load("res://data/units/knight.tres") as UnitData
-	var model := _model(knight.model_scene)
-	model.hold(knight.held_item, "", knight.held_item_scale, knight.held_item_rotation, knight.held_item_bone)
-	var attachment := model.find_child("HeldItemBone", true, false) as BoneAttachment3D
-	assert_true(attachment != null, "a bone attachment")
-	assert_eq(attachment.bone_name, "Fist.R")
-	assert_eq(attachment.get_node("HeldItem").get_parent(), attachment, "the sword hangs from it")
-	expect_error("no bone named")
-	model.hold(knight.held_item, "", 1.0, Vector3.ZERO, "NoSuchBone")
+func test_a_held_item_can_hang_from_a_joint() -> void:
+	var hero := load("res://data/units/knight.tres") as UnitData
+	var model := _model(hero.model_scene)
+	model.hold(hero.held_item, "", hero.held_item_scale, hero.held_item_rotation, hero.held_item_bone)
+	var held := model.find_child("HeldItem", true, false) as Node3D
+	assert_true(held != null, "the sword is held")
+	assert_eq(held.get_parent().name, hero.held_item_bone.validate_node_name(), "it hangs from the joint")
+	expect_error("no joint named")
+	model.hold(hero.held_item, "", 1.0, Vector3.ZERO, "NoSuchJoint")
 	model.free()
 
 

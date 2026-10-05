@@ -103,7 +103,7 @@ func setup(unit: UnitState, board: BoardView) -> void:
 		_placeholder = null
 		_model = UnitModel.new()
 		_body.add_child(_model)
-		_model.setup(unit.data.model_scene, unit.data.model_scale, unit.data.skin_color)
+		_model.setup(unit.data.model_scene, unit.data.model_scale)
 		if unit.data.held_item != null:
 			_model.hold(unit.data.held_item, unit.data.held_item_replaces, unit.data.held_item_scale,
 					unit.data.held_item_rotation, unit.data.held_item_bone, unit.data.held_item_offset)
@@ -118,6 +118,11 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	_head_height = unit.data.model_height if _model != null else PLACEHOLDER_HEIGHT
 	_layout_anchors(_head_height)
 	sync(unit)
+
+
+## How tall the unit is drawn, in world units (with its elite / boss scale).
+func world_height() -> float:
+	return _head_height * _visual_scale
 
 
 ## Puts the HP label, status icons, damage preview and click target around a unit `height`
@@ -529,6 +534,20 @@ func _add_aura(status: StatusData) -> void:
 
 func aura_count() -> int:
 	return _auras.size()
+
+
+## The screen rectangle around the status icons above the unit (a single icon's worth when it
+## carries none yet), for `camera`.
+func status_row_rect(camera: Camera3D) -> Rect2:
+	var center := _status_row.global_position
+	var half_width := maxf(_status_tags.size(), 1) * STATUS_TAG_SPACING / 2.0
+	var left := camera.unproject_position(center - camera.global_basis.x * half_width)
+	var right := camera.unproject_position(center + camera.global_basis.x * half_width)
+	var low := camera.unproject_position(center - camera.global_basis.y * STATUS_ICON_SIZE * 0.5)
+	var high := camera.unproject_position(center + camera.global_basis.y * STATUS_ICON_SIZE * 0.5)
+	var middle := camera.unproject_position(center)
+	return Rect2(Vector2(minf(left.x, right.x), minf(low.y, high.y)), Vector2(absf(right.x - left.x), absf(low.y - high.y))) \
+			if middle.is_finite() else Rect2()
 
 
 ## Centers the tags in a row along the row node's local X.

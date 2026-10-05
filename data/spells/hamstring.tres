@@ -27,6 +27,7 @@ status = ExtResource("6_8euco")
 script = ExtResource("7_22t7y")
 display_name = "Hamstring"
 icon = ExtResource("7_7p5ph")
+cast_animation = &"Shoot"
 min_range = 2
 max_range = 5
 area = SubResource("Resource_7uvpo")

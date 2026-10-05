@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_ercm6"]
 [ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="2_c20o5"]
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_asbja"]
-[ext_resource type="PackedScene" uid="uid://dhtkgkf5ymitd" path="res://assets/quaternius/monsters/Yeti.glb" id="4_6xs04"]
+[ext_resource type="PackedScene" uid="uid://bngmkvstor5wc" path="res://assets/models/yeti.tscn" id="4_6xs04"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_uiwww"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_8piqr"]
 [ext_resource type="Resource" uid="uid://dthl8432dsfh" path="res://data/spells/icy_grasp.tres" id="7_alvru"]
@@ -30,5 +30,5 @@ spells = Array[ExtResource("6_8piqr")]([ExtResource("7_alvru"), ExtResource("8_r
 innate_modifiers = Array[ExtResource("1_ercm6")]([SubResource("Resource_wgc3n"), SubResource("Resource_rw3og")])
 color = Color(0.85, 0.9, 0.95, 1)
 model_scene = ExtResource("4_6xs04")
-model_scale = 0.48
+model_scale = 1.0
 model_height = 1.6

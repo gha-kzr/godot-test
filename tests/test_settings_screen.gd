@@ -144,7 +144,7 @@ func test_credits_show_tables_and_headings_but_not_contributor_prose() -> void:
 
 func test_the_real_credits_list_the_assets_without_the_rules() -> void:
 	var text := CreditsScreen.credits_text()
-	assert_true(text.contains("Quaternius") and text.contains("Lorc") and text.contains("CC0 1.0") and text.contains("game-icons.net"), text)
+	assert_true(text.contains("Kenney") and text.contains("Lorc") and text.contains("CC0 1.0") and text.contains("game-icons.net"), text)
 	assert_false(text.contains("Add a row"), "contributor rules stay out of the game")
 	assert_false(text.contains("http"), "no raw links")
 	assert_false(text.contains("`"), "no markdown marks")
@@ -215,7 +215,7 @@ func test_the_credits_have_a_screen_of_their_own_reached_from_the_settings_and_l
 	(game.screen.find_child("CreditsButton", true, false) as Button).pressed.emit()
 	assert_true(game.screen is CreditsScreen, "the credits screen")
 	var text := (game.screen.find_child("Credits", true, false) as Label).text
-	assert_true(text.contains("Quaternius") and text.contains("Kenney"), "lists the assets")
+	assert_true(text.contains("Lorc") and text.contains("Kenney"), "lists the assets")
 	var credits_back := game.screen.find_child("BackButton", true, false) as Button
 	assert_true(credits_back.icon != null and credits_back.text.is_empty(), "with a back arrow too")
 	credits_back.pressed.emit()

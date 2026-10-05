@@ -27,6 +27,7 @@ status = ExtResource("6_uksnl")
 script = ExtResource("9_3lcak")
 display_name = "Pinning Shot"
 icon = ExtResource("7_qc3gs")
+cast_animation = &"Shoot"
 projectile = ExtResource("8_aem5g")
 projectile_speed = 20.0
 cooldown = 2

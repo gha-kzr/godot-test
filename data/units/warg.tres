@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://cq2is62u2aswd"]
 
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_pk6dt"]
-[ext_resource type="PackedScene" uid="uid://dtkujvtdxp0vs" path="res://assets/quaternius/monsters/Husky.glb" id="2_uoq4m"]
+[ext_resource type="PackedScene" uid="uid://bbxoby8frojc8" path="res://assets/models/warg.tscn" id="2_uoq4m"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="3_vou23"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="4_e23dl"]
 [ext_resource type="Resource" uid="uid://b3rbcvcvf5k4d" path="res://data/spells/pounce.tres" id="5_r0jml"]
@@ -15,5 +15,5 @@ initiative = 118
 spells = Array[ExtResource("4_e23dl")]([ExtResource("5_r0jml"), ExtResource("6_tgc6r")])
 color = Color(0.5, 0.5, 0.55, 1)
 model_scene = ExtResource("2_uoq4m")
-model_scale = 0.26
+model_scale = 1.0
 model_height = 0.9

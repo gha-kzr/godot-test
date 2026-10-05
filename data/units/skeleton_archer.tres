@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_cqn20"]
 [ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="2_yohwy"]
 [ext_resource type="Resource" uid="uid://bpx5i7f4hovmg" path="res://data/damage_types/poison.tres" id="3_tqycv"]
-[ext_resource type="PackedScene" uid="uid://cv3dy8gwgkme" path="res://assets/quaternius/monsters/Skeleton.glb" id="4_xgpck"]
+[ext_resource type="PackedScene" uid="uid://bhypgvhbfqcyf" path="res://assets/models/skeleton_archer.tscn" id="4_xgpck"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_so867"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_dvg16"]
 [ext_resource type="Resource" uid="uid://dlbpiywp7yi2b" path="res://data/spells/bone_arrow.tres" id="7_4adne"]
 [ext_resource type="Resource" uid="uid://dpghh463pnknb" path="res://data/spells/pinning_shot.tres" id="8_7me43"]
 [ext_resource type="Resource" uid="uid://qrqa601eopcl" path="res://data/spells/bone_rain.tres" id="9_7g6u6"]
-[ext_resource type="PackedScene" uid="uid://dsyhqrft5rhir" path="res://assets/quaternius/props/WoodenBow.glb" id="held_bow"]
+[ext_resource type="PackedScene" uid="uid://cbvr5kv6juado" path="res://assets/models/bow.tscn" id="held_bow"]
 
 [sub_resource type="Resource" id="Resource_qbnho"]
 script = ExtResource("1_cqn20")
@@ -33,8 +33,8 @@ spells = Array[ExtResource("6_dvg16")]([ExtResource("7_4adne"), ExtResource("8_7
 innate_modifiers = Array[ExtResource("1_cqn20")]([SubResource("Resource_qbnho"), SubResource("Resource_0ff36")])
 color = Color(0.9, 0.88, 0.8, 1)
 model_scene = ExtResource("4_xgpck")
-model_scale = 0.95
-model_height = 1.3
+model_scale = 1.0
+model_height = 1.26
 held_item = ExtResource("held_bow")
-held_item_replaces = "Weapon_Dagger"
-held_item_scale = 0.0075
+held_item_bone = "Hand.L"
+held_item_scale = 1.2

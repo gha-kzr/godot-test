@@ -348,6 +348,19 @@ func _hub_hint(game: Game) -> Control:
 	return game.screen.get_node("%HintCard") as Control
 
 
+func test_the_rune_step_waits_for_a_first_rune_and_holds_the_hub_hint_back() -> void:
+	var game := _game()  # Reset hints, stash holding a rune, nothing equipped yet.
+	game.profile.stash.append(load("res://data/runes/vitality.tres") as RuneData)
+	game.show_party()
+	assert_true((game.screen as PartyScreen).has_tutorial_step(), "the stash is lit")
+	assert_false(_hub_hint(game).visible, "the tip waits for the next visit")
+	game.profile.heroes[0].runes[0] = load("res://data/runes/vitality.tres") as RuneData
+	game.show_party()
+	assert_false((game.screen as PartyScreen).has_tutorial_step(), "a hero already wears a rune")
+	assert_true(_hub_hint(game).visible, "so the tip shows")
+	game.free()
+
+
 func test_the_hub_hint_shows_once_and_its_dismissal_is_saved() -> void:
 	var game := _game()
 	assert_true(_hub_hint(game).visible, "first visit")

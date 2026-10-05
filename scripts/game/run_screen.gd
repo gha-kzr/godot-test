@@ -30,9 +30,9 @@ var choice := NONE
 @onready var _hint_card: HintCard = %HintCard
 
 
-## Shows a dismissable tip card.
+## Shows a dismissable tip card lighting the party row (levels, XP).
 func show_hint(text: String) -> void:
-	_hint_card.show_hint(text)
+	_hint_card.show_hint(text, HintCard.around(_party_row))
 
 
 ## `title`: e.g. "Floor 3 cleared". The next step comes from profile.run (null once the run ended).

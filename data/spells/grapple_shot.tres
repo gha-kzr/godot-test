@@ -29,6 +29,7 @@ target_filter = 2
 script = ExtResource("7_4g4wy")
 display_name = "Grapple Shot"
 icon = ExtResource("6_uftiu")
+cast_animation = &"Shoot"
 cooldown = 2
 min_range = 2
 max_range = 6

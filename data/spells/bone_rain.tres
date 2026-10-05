@@ -23,6 +23,7 @@ damage_type = ExtResource("3_fppvx")
 script = ExtResource("7_qwnqs")
 display_name = "Bone Rain"
 icon = ExtResource("5_3oxt6")
+cast_animation = &"Shoot"
 projectile = ExtResource("6_2yvgc")
 projectile_speed = 16.0
 projectile_falls = true

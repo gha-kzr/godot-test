@@ -233,7 +233,7 @@ func start_battle() -> bool:
 	_refresh_hud()
 	_set_state(State.PLACING)
 	if not opening_tip.is_empty():
-		_show_tip(opening_tip)
+		_show_tip(opening_tip, _unit_spotlight(_first_enemy_id()))  # The elite or boss opens the enemy list.
 	return true
 
 
@@ -595,12 +595,43 @@ func _cheer(winners: UnitState.Team, state: BattleState) -> void:
 				view.play_victory()
 
 
-## Shows a one-time tip card (not while a tutorial step is up, and never twice).
-func _show_tip(id: String) -> void:
+## Shows a one-time tip card (not while a tutorial step is up, and never twice), lighting
+## the screen area `spotlight` returns (none by default).
+func _show_tip(id: String, spotlight := Callable()) -> void:
 	if hints == null or not hints.should_show(id) or hud.is_tutorial_active():
 		return
 	_tip_id = id
-	hud.show_hint(hints.text(id))
+	hud.show_hint(hints.text(id), spotlight)
+
+
+## A spotlight on a unit (feet to head), followed as it moves.
+func _unit_spotlight(unit_id: int) -> Callable:
+	return func() -> Rect2: return _unit_screen_rect(unit_id)
+
+
+## A spotlight on the status icons above a unit.
+func _status_spotlight(unit_id: int) -> Callable:
+	return func() -> Rect2:
+		var view := units_view.find_view(unit_id)
+		return view.status_row_rect(camera_rig.camera) if view != null and camera_rig.camera != null else Rect2()
+
+
+func _first_enemy_id() -> int:
+	for unit in battle.state.units:
+		if unit.team == UnitState.Team.ENEMY:
+			return unit.id
+	return -1
+
+
+## The screen rectangle around a unit as drawn right now, feet to head (empty if it has no view).
+func _unit_screen_rect(unit_id: int) -> Rect2:
+	var view := units_view.find_view(unit_id)
+	if view == null or camera_rig.camera == null:
+		return Rect2()
+	var feet := camera_rig.camera.unproject_position(view.global_position)
+	var head := camera_rig.camera.unproject_position(view.global_position + Vector3.UP * view.world_height())
+	var height := absf(feet.y - head.y)
+	return Rect2(Vector2(feet.x - height * 0.4, minf(feet.y, head.y)), Vector2(height * 0.8, height))
 
 
 func _on_tip_dismissed() -> void:
@@ -612,7 +643,7 @@ func _on_tip_dismissed() -> void:
 
 func _on_event_played(event: BattleEvents.Event) -> void:
 	if event is BattleEvents.StatusApplied:
-		_show_tip("first_status")
+		_show_tip("first_status", _status_spotlight((event as BattleEvents.StatusApplied).unit_id))
 	_hud_model.apply(event)
 	_show_turn()
 	if event is BattleEvents.TurnStarted:

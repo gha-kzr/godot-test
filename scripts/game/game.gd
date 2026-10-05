@@ -293,7 +293,7 @@ func show_party(message := "") -> void:
 	party.tutorial = tutorial
 	party.tutorial_changed.connect(_on_settings_changed)
 	party.show_profile(profile, _summary, message, tower)
-	if hints.should_show("hub_intro"):
+	if hints.should_show("hub_intro") and not party.has_tutorial_step():  # It comes at the next visit.
 		party.show_hint(hints.text("hub_intro"))
 		party.hint_dismissed.connect(_dismiss_hint.bind("hub_intro"))
 

@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_f1ukc"]
 [ext_resource type="Resource" uid="uid://bpx5i7f4hovmg" path="res://data/damage_types/poison.tres" id="2_gb7on"]
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="3_bg161"]
-[ext_resource type="PackedScene" uid="uid://mo6kw1i5alc8" path="res://assets/quaternius/monsters/MushroomKing.glb" id="4_2t87s"]
+[ext_resource type="PackedScene" uid="uid://d150j4wornrpf" path="res://assets/models/mushroom_sage.tscn" id="4_2t87s"]
+[ext_resource type="PackedScene" uid="uid://bd18pt831ngqt" path="res://assets/models/spore_staff.tscn" id="held_prop"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_bg8ho"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_wn61f"]
 [ext_resource type="Resource" uid="uid://bl567krny66uj" path="res://data/spells/spore_mend.tres" id="7_aq0c5"]
@@ -31,5 +32,9 @@ spells = Array[ExtResource("6_wn61f")]([ExtResource("7_aq0c5"), ExtResource("8_b
 innate_modifiers = Array[ExtResource("1_f1ukc")]([SubResource("Resource_6vbw0"), SubResource("Resource_ay3rr")])
 color = Color(0.3, 0.6, 0.7, 1)
 model_scene = ExtResource("4_2t87s")
-model_scale = 0.4
-model_height = 1.35
+model_scale = 1.0
+model_height = 1.3
+held_item = ExtResource("held_prop")
+held_item_bone = "Hand.R"
+held_item_scale = 1.0
+held_item_rotation = Vector3(35, 0, 0)

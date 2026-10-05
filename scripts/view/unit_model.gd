@@ -1,20 +1,20 @@
 class_name UnitModel
 extends Node3D
-## A character model from an asset pack, behind one animation contract. The model's own
-## AnimationPlayer is found by type; the animations the game needs are asked for by a logical
-## name (Idle, Walk, Attack, Cast, Hit, Death, Victory, Defeat) and resolved to whatever the
-## model calls them: each part of a name between "|" (Blender's "Armature|Idle", or a mangled
-## export's "Armature|Armature|Idle|Armature|Id") is compared against candidates, so models
-## from different packs work, and a missing animation just
-## does nothing (the caller falls back to a tween). Also re-colors the skin material and
-## flashes the model (hit feedback). Adding a hero or enemy is a model file plus data.
+## A unit's model (a hand-built scene, see ModelKit), behind one animation contract. The model's
+## own AnimationPlayer is found by type; the animations the game needs are asked for by a
+## logical name (Idle, Walk, Attack, Cast, Shoot, Hit, Death, Victory, Defeat) and resolved to whatever
+## the model calls them: each part of a name between "|" (an imported "Armature|Idle") is
+## compared against candidates, so a scene from another source works too, and a missing
+## animation just does nothing (the caller falls back to a tween). Also flashes the model (hit
+## feedback). Adding a hero or enemy is a model scene plus data.
 
 ## Logical name → candidate animation names, in order of preference.
 const ANIMATIONS := {
 	&"Idle": ["Idle", "Flying_Idle"],
 	&"Walk": ["Walk", "Run", "Fast_Flying"],
 	&"Attack": ["SwordSlash", "Sword", "Weapon", "Punch", "Attack"],
-	&"Cast": ["Shoot_OneHanded", "SwordSlash", "Sword", "Weapon", "Punch", "Attack"],
+	&"Cast": ["Cast", "Shoot_OneHanded", "SwordSlash", "Sword", "Weapon", "Punch", "Attack"],
+	&"Shoot": ["Shoot", "Cast", "Attack"],
 	&"Hit": ["RecieveHit", "HitRecieve", "HitReact", "Idle_HitReact_Left", "Hit"],
 	&"Death": ["Death"],
 	&"Victory": ["Victory"],
@@ -22,7 +22,6 @@ const ANIMATIONS := {
 }
 ## Animations that loop.
 const LOOPING: Array[StringName] = [&"Idle", &"Walk"]
-const SKIN_MATERIAL := "Skin"
 const BLEND := 0.1
 
 var _player: AnimationPlayer
@@ -36,9 +35,8 @@ var _borrowed: Dictionary[String, String] = {}
 var _clip_serial := 0
 
 
-## Instances `scene` under this node at `model_scale` and starts its Idle. `skin_color` with
-## alpha 0 leaves the pack's skin alone.
-func setup(scene: PackedScene, model_scale: float, skin_color: Color) -> void:
+## Instances `scene` under this node at `model_scale` and starts its Idle.
+func setup(scene: PackedScene, model_scale: float) -> void:
 	var model := scene.instantiate() as Node3D
 	add_child(model)
 	scale = Vector3.ONE * model_scale
@@ -46,8 +44,6 @@ func setup(scene: PackedScene, model_scale: float, skin_color: Color) -> void:
 	_player = players[0] as AnimationPlayer if not players.is_empty() else null
 	for mesh in model.find_children("*", "MeshInstance3D", true, false):
 		_meshes.append(mesh as MeshInstance3D)
-	if skin_color.a > 0.0:
-		_apply_skin(skin_color)
 	if _player != null:
 		for logical in ANIMATIONS:
 			var real := _resolve(logical)
@@ -60,8 +56,8 @@ func setup(scene: PackedScene, model_scale: float, skin_color: Color) -> void:
 
 ## Gives the model `item` to hold (see UnitData.held_item): in place of its part named
 ## `replaces` (hidden; the item is added beside it, so it follows the same bone, with the
-## part's transform), or else on the bone `bone`; then `item_scale`, `rotation_degrees` and
-## `offset` on top. A missing part or bone is reported and nothing changes.
+## part's transform), or else on the joint `bone`; then `item_scale`, `rotation_degrees` and
+## `offset` on top. A missing part or joint is reported and nothing changes.
 func hold(item: PackedScene, replaces: String, item_scale: float, rotation_degrees: Vector3,
 		bone := "", offset := Vector3.ZERO) -> void:
 	if item == null:
@@ -78,16 +74,10 @@ func hold(item: PackedScene, replaces: String, item_scale: float, rotation_degre
 		parent = part.get_parent() as Node3D
 		base = part.transform
 	else:
-		var skeletons := find_children("*", "Skeleton3D", true, false)
-		var skeleton := skeletons[0] as Skeleton3D if not skeletons.is_empty() else null
-		if skeleton == null or skeleton.find_bone(bone) == -1:
-			push_error("UnitModel: no bone named '%s' to hold an item" % bone)
+		parent = find_child(bone.validate_node_name(), true, false) as Node3D  # "Hand.R" is the node Hand_R.
+		if parent == null:
+			push_error("UnitModel: no joint named '%s' to hold an item" % bone)
 			return
-		var attachment := BoneAttachment3D.new()
-		attachment.name = "HeldItemBone"
-		attachment.bone_name = bone
-		skeleton.add_child(attachment)
-		parent = attachment
 	var held := item.instantiate() as Node3D
 	held.name = "HeldItem"
 	held.transform = base * place
@@ -179,7 +169,7 @@ func _borrow(source: PackedScene, animation_name: String) -> String:
 		return ""
 	var missing := _missing_tracks(found)
 	if found.get_track_count() == 0 or missing > found.get_track_count() / 4:
-		push_warning("UnitModel: the animation \"%s\" of %s doesn't fit this skeleton (%d of %d tracks have no bone here)" % [
+		push_warning("UnitModel: the animation \"%s\" of %s doesn't fit this model (%d of %d tracks have no joint here)" % [
 				animation_name, source.resource_path, missing, found.get_track_count()])
 		return ""
 	found.loop_mode = Animation.LOOP_NONE
@@ -191,7 +181,7 @@ func _borrow(source: PackedScene, animation_name: String) -> String:
 	return _borrowed[key]
 
 
-## How many of the animation's tracks point at a node or bone this model doesn't have.
+## How many of the animation's tracks point at a node this model doesn't have.
 func _missing_tracks(animation: Animation) -> int:
 	var root := _player.get_node_or_null(_player.root_node)
 	var missing := 0
@@ -199,8 +189,6 @@ func _missing_tracks(animation: Animation) -> int:
 		var path := animation.track_get_path(track)
 		var node := root.get_node_or_null(NodePath(path.get_concatenated_names())) if root != null else null
 		if node == null:
-			missing += 1
-		elif node is Skeleton3D and path.get_subname_count() > 0 and (node as Skeleton3D).find_bone(path.get_subname(0)) == -1:
 			missing += 1
 	return missing
 
@@ -237,25 +225,3 @@ func _resolve(logical: StringName) -> String:
 			if candidate in animation.split("|"):
 				return animation
 	return ""
-
-
-## Gives each mesh its own copy of the geometry with the "Skin" material in `color` (the
-## imported meshes and materials are shared by every instance of the same model). A copied
-## mesh (a few hundred KB per unit) rather than a surface override: freeing an instance that
-## holds an override material logs an engine error in the headless dummy renderer, which the
-## test runner counts as a failure.
-func _apply_skin(color: Color) -> void:
-	for mesh in _meshes:
-		if mesh.mesh == null:
-			continue
-		var own_mesh := mesh.mesh.duplicate() as Mesh
-		var changed := false
-		for surface in own_mesh.get_surface_count():
-			var material := own_mesh.surface_get_material(surface) as BaseMaterial3D
-			if material != null and material.resource_name == SKIN_MATERIAL:
-				var own := material.duplicate() as BaseMaterial3D
-				own.albedo_color = color
-				own_mesh.surface_set_material(surface, own)
-				changed = true
-		if changed:
-			mesh.mesh = own_mesh

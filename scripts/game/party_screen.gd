@@ -83,17 +83,27 @@ func show_profile(profile: Profile, summary := "", message := "", tower: TowerCo
 	_refresh_tutorial()
 
 
-## The rune step: when the stash holds a rune, light it and wait for the equip.
+## The rune step: when the stash holds a rune and no hero wears one yet, light the stash and
+## wait for the equip (a player who already equips runes, e.g. after "Show hints again", knows how).
 func _refresh_tutorial() -> void:
 	_step = {}
 	_tutorial_overlay.clear()
-	if tutorial == null or _profile == null or _profile.stash.is_empty():
+	if tutorial == null or _profile == null or _profile.stash.is_empty() or _wears_a_rune():
 		return
 	var step := tutorial.next_step(Tutorial.HUB_STEPS)
 	if step.is_empty():
 		return
 	_step = step
 	_tutorial_overlay.show_step(Tutorial.text_of(step), _stash.get_global_rect())
+
+
+func _wears_a_rune() -> bool:
+	return _profile.heroes.any(func(hero: HeroRecord) -> bool: return hero.runes.any(func(r: RuneData) -> bool: return r != null))
+
+
+## Whether the tutorial is lighting something now (a tip card would fight with its dim).
+func has_tutorial_step() -> bool:
+	return not _step.is_empty()
 
 
 func _process(_delta: float) -> void:
@@ -138,9 +148,9 @@ func _restore_focus(focused: StringName) -> void:
 		focus_first()
 
 
-## Shows a dismissable hint card above the party.
+## Shows a dismissable hint card; it lights the destinations (the tower and the stages).
 func show_hint(text: String) -> void:
-	_hint_card.show_hint(text)
+	_hint_card.show_hint(text, HintCard.around(_destinations))
 
 
 func select_hero(hero_index: int) -> void:

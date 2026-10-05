@@ -274,14 +274,14 @@ func test_preview_badge_shows_amount_skull_and_status_icons() -> void:
 
 # --- Models ---
 
-const KNIGHT_MODEL := preload("res://assets/quaternius/characters/Knight_Male.fbx")
+const KNIGHT_MODEL := preload("res://assets/models/knight.tscn")
 
 
 func _model_unit(unit_name: String, initiative: int, height := 1.4) -> UnitData:
 	var data := BattleFixtures.unit(unit_name, initiative, 3, 6, 20)
 	data.spells = [BattleFixtures.damage_spell()] as Array[SpellData]
 	data.model_scene = KNIGHT_MODEL
-	data.model_scale = 0.5
+	data.model_scale = 1.0
 	data.model_height = height
 	return data
 
@@ -305,7 +305,7 @@ func test_a_unit_with_a_model_replaces_the_capsule_and_starts_idle() -> void:
 	assert_true(view.has_model())
 	var capsule := view.get_node("Body").find_child("Placeholder", true, false)
 	assert_true(capsule == null or capsule.is_queued_for_deletion(), "the capsule is on its way out")
-	assert_true(_animation_of(view).ends_with("|Idle"), _animation_of(view))
+	assert_true(_animation_of(view) == "Idle", _animation_of(view))
 	_done(stage)
 
 
@@ -352,19 +352,19 @@ func test_walking_hitting_casting_and_dying_play_their_animations() -> void:
 	var wait := func(seconds: float) -> void:
 		await (Engine.get_main_loop() as SceneTree).create_timer(seconds).timeout
 	(func() -> void: await view.play_move([Vector2i(1, 0)] as Array[Vector2i])).call()  # Runs until its first await.
-	assert_true(_animation_of(view).ends_with("|Walk"), "walking: %s" % _animation_of(view))
+	assert_true(_animation_of(view) == "Walk", "walking: %s" % _animation_of(view))
 	await wait.call(2.0)
-	assert_true(_animation_of(view).ends_with("|Idle"), "idle again")
+	assert_true(_animation_of(view) == "Idle", "idle again")
 	(func() -> void: await view.play_cast(Vector2i(2, 0), BattleFixtures.damage_spell(3, 1, 1))).call()
-	assert_true(_animation_of(view).ends_with("|SwordSlash"), "a melee spell slashes: %s" % _animation_of(view))
+	assert_true(_animation_of(view) == "Attack", "a melee spell slashes: %s" % _animation_of(view))
 	await wait.call(2.0)
 	var victim := stage.units.view(1)
 	(func() -> void: await victim.play_hit(3, 10)).call()
-	assert_true(_animation_of(victim).ends_with("|RecieveHit"), "hit: %s" % _animation_of(victim))
+	assert_true(_animation_of(victim) == "Hit", "hit: %s" % _animation_of(victim))
 	await wait.call(2.0)
-	assert_true(_animation_of(victim).ends_with("|Idle"), "back to idle when it survives")
+	assert_true(_animation_of(victim) == "Idle", "back to idle when it survives")
 	(func() -> void: await victim.play_death()).call()
-	assert_true(_animation_of(victim).ends_with("|Death"), "death: %s" % _animation_of(victim))
+	assert_true(_animation_of(victim) == "Death", "death: %s" % _animation_of(victim))
 	await wait.call(3.0)
 	assert_false(victim.visible)
 	_done(stage)
@@ -393,7 +393,7 @@ func test_a_synced_dead_then_alive_unit_stands_again() -> void:
 	assert_false(victim.visible)
 	stage.units.sync(stage.battle.state)  # The state says it is alive (a desync or an undo).
 	assert_true(victim.visible)
-	assert_true(_animation_of(victim).ends_with("|Idle"), "not left in the Death pose: %s" % _animation_of(victim))
+	assert_true(_animation_of(victim) == "Idle", "not left in the Death pose: %s" % _animation_of(victim))
 	_done(stage)
 
 
@@ -403,7 +403,7 @@ func test_a_hit_that_did_no_damage_plays_no_hit_animation() -> void:
 	victim.model().play(&"Walk")  # Mid-walk, say: a hit that does nothing must not touch its animation.
 	(func() -> void: await victim.play_hit(0, 20)).call()
 	await (Engine.get_main_loop() as SceneTree).create_timer(0.8).timeout
-	assert_true(_animation_of(victim).ends_with("|Walk"), "untouched: %s" % _animation_of(victim))
+	assert_true(_animation_of(victim) == "Walk", "untouched: %s" % _animation_of(victim))
 	await (Engine.get_main_loop() as SceneTree).create_timer(1.0).timeout
 	_done(stage)
 
@@ -412,10 +412,10 @@ func test_casting_and_hitting_dont_hold_the_queue_for_the_whole_animation() -> v
 	var stage := _model_stage("0p 0 0 0e")
 	var hero := stage.units.view(0)
 	await hero.play_cast(Vector2i(1, 0), BattleFixtures.damage_spell(3, 1, 1))
-	assert_true(_animation_of(hero).ends_with("|SwordSlash"), "the queue moved on while the slash goes on: %s" % _animation_of(hero))
+	assert_true(_animation_of(hero) == "Attack", "the queue moved on while the slash goes on: %s" % _animation_of(hero))
 	var victim := stage.units.view(1)
 	await victim.play_hit(3, 10)
-	assert_true(_animation_of(victim).ends_with("|RecieveHit"), "same for the flinch: %s" % _animation_of(victim))
+	assert_true(_animation_of(victim) == "Hit", "same for the flinch: %s" % _animation_of(victim))
 	_done(stage)
 
 

@@ -41,6 +41,40 @@ func test_the_card_is_hidden_until_shown_and_reports_dismissal_once() -> void:
 	card.free()
 
 
+func test_a_shown_card_blocks_the_screen_behind_it_until_dismissed() -> void:
+	var host := Control.new()
+	(Engine.get_main_loop() as SceneTree).root.add_child(host)
+	var card := (load("res://scenes/game/hint_card.tscn") as PackedScene).instantiate() as HintCard
+	host.add_child(card)
+	host.add_child(Control.new())  # Something added later would otherwise sit above the card.
+	card.show_hint("Do this.")
+	var blocker := host.get_node("HintBlocker") as Control
+	assert_true(blocker.visible)
+	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_STOP)
+	assert_eq(host.get_child(-1), card, "the card is on top")
+	assert_eq(host.get_child(-2), blocker, "just over what it blocks")
+	card.dismiss()
+	assert_false(blocker.visible)
+	host.free()
+
+
+func test_a_card_can_light_an_area_and_sits_beside_it() -> void:
+	var host := Control.new()
+	host.size = Vector2(800, 600)
+	(Engine.get_main_loop() as SceneTree).root.add_child(host)
+	var card := (load("res://scenes/game/hint_card.tscn") as PackedScene).instantiate() as HintCard
+	host.add_child(card)
+	var lit := Rect2(300, 400, 200, 100)
+	card.show_hint("Look here.", func() -> Rect2: return lit)
+	var blocker := host.get_node("HintBlocker") as Control
+	assert_true(card.is_processing(), "follows the area every frame")
+	assert_false(Rect2(card.position, card.size).intersects(lit), "the card doesn't cover what it lights")
+	card.dismiss()
+	assert_false(card.is_processing())
+	assert_false(blocker.visible)
+	host.free()
+
+
 func after_each_clean() -> void:
 	SettingsApplier.reset_bindings(Settings.new())
 

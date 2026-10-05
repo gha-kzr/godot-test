@@ -813,11 +813,11 @@ func test_an_enemy_turn_moves_the_camera_only_when_the_enemy_is_off_screen() -> 
 
 func test_the_winners_cheer_on_the_result_screen() -> void:
 	var hero := _fighter("P0", 200)
-	hero.model_scene = load("res://assets/quaternius/characters/Knight_Male.fbx")
-	hero.model_scale = 0.5
+	hero.model_scene = load("res://assets/models/knight.tscn")
+	hero.model_scale = 1.0
 	var foe := _fighter("E0", 100)
-	foe.model_scene = load("res://assets/quaternius/characters/Goblin_Male.fbx")
-	foe.model_scale = 0.5
+	foe.model_scene = load("res://assets/models/orc_guard.tscn")
+	foe.model_scale = 1.0
 	var controller := _controller("0p 0 0e", [hero], [foe])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 	for unit in controller.battle.state.units:
@@ -825,7 +825,7 @@ func test_the_winners_cheer_on_the_result_screen() -> void:
 			unit.hp = 0
 	controller._begin_next()
 	var player := controller.units_view.view(0).model().find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
-	assert_true(player.current_animation.ends_with("|Victory"), "the surviving hero cheers: %s" % player.current_animation)
+	assert_true(player.current_animation == "Victory", "the surviving hero cheers: %s" % player.current_animation)
 	var lost := _controller("0p 0 0e", [_fighter("P0", 200)], [foe])
 	assert_true(await _wait_for(lost, [BattleController.State.IDLE]))
 	for unit in lost.battle.state.units:
@@ -833,7 +833,7 @@ func test_the_winners_cheer_on_the_result_screen() -> void:
 			unit.hp = 0
 	lost._begin_next()
 	var enemy_player := lost.units_view.view(1).model().find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
-	assert_true(enemy_player.current_animation.ends_with("|Victory"), "after a loss the enemies cheer: %s" % enemy_player.current_animation)
+	assert_true(enemy_player.current_animation == "Victory", "after a loss the enemies cheer: %s" % enemy_player.current_animation)
 
 
 func test_aiming_a_backslash_marks_where_the_hero_lands() -> void:

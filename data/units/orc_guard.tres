@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_i2lhu"]
 [ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="2_4204x"]
 [ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="3_ki4fc"]
-[ext_resource type="PackedScene" uid="uid://gpxoeeprq6b3" path="res://assets/quaternius/monsters/Orc.glb" id="4_6tx0c"]
+[ext_resource type="PackedScene" uid="uid://bv0luv5bfw05p" path="res://assets/models/orc_guard.tscn" id="4_6tx0c"]
+[ext_resource type="PackedScene" uid="uid://dfypef78ff1li" path="res://assets/models/orc_club.tscn" id="held_prop"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_i57fm"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_ve4yk"]
 [ext_resource type="Resource" uid="uid://by6km62redrcd" path="res://data/spells/club.tres" id="7_7osrc"]
@@ -32,5 +33,9 @@ spells = Array[ExtResource("6_ve4yk")]([ExtResource("7_7osrc"), ExtResource("8_a
 innate_modifiers = Array[ExtResource("1_i2lhu")]([SubResource("Resource_8e84h"), SubResource("Resource_apapg")])
 color = Color(0.45, 0.65, 0.3, 1)
 model_scene = ExtResource("4_6tx0c")
-model_scale = 0.45
-model_height = 1.5
+model_scale = 1.0
+model_height = 1.45
+held_item = ExtResource("held_prop")
+held_item_bone = "Hand.R"
+held_item_scale = 1.0
+held_item_rotation = Vector3(40, 0, 0)

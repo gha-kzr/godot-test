@@ -20,6 +20,7 @@ target_filter = 2
 script = ExtResource("6_d8uub")
 display_name = "Hunter's Mark"
 icon = ExtResource("5_lyw6l")
+cast_animation = &"Shoot"
 ap_cost = 2
 max_range = 7
 area = SubResource("Resource_m7na3")

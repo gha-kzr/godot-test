@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_4not8"]
 [ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="2_cjn0t"]
 [ext_resource type="Resource" uid="uid://bpx5i7f4hovmg" path="res://data/damage_types/poison.tres" id="3_6417e"]
-[ext_resource type="PackedScene" uid="uid://ejsc2gka0y3g" path="res://assets/quaternius/monsters/Zombie.glb" id="4_rtmyb"]
+[ext_resource type="PackedScene" uid="uid://uia7ufu3r08h" path="res://assets/models/ghoul.tscn" id="4_rtmyb"]
 [ext_resource type="Script" uid="uid://q7sih56ik1gi" path="res://scripts/data/unit_data.gd" id="5_pqc82"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_l8dxe"]
 [ext_resource type="Resource" uid="uid://ljmd26clkr6d" path="res://data/spells/rend.tres" id="7_feakb"]
@@ -31,5 +31,5 @@ spells = Array[ExtResource("6_l8dxe")]([ExtResource("7_feakb"), ExtResource("8_7
 innate_modifiers = Array[ExtResource("1_4not8")]([SubResource("Resource_dm441"), SubResource("Resource_wdrua")])
 color = Color(0.5, 0.75, 0.35, 1)
 model_scene = ExtResource("4_rtmyb")
-model_scale = 1.1
-model_height = 1.4
+model_scale = 1.0
+model_height = 1.26

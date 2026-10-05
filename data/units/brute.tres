@@ -7,7 +7,8 @@
 [ext_resource type="Resource" uid="uid://ckifhakluxq1r" path="res://data/spells/smash.tres" id="3_57etr"]
 [ext_resource type="Resource" uid="uid://gkwl7ku4qpqi" path="res://data/spells/ground_slam.tres" id="4_pfxpi"]
 [ext_resource type="Resource" uid="uid://c71jd5qaybrc8" path="res://data/spells/crippling_blow.tres" id="5_jcwbx"]
-[ext_resource type="PackedScene" uid="uid://dkclr1it5nf3c" path="res://assets/quaternius/characters/Viking_Male.fbx" id="99_model"]
+[ext_resource type="PackedScene" uid="uid://hokthpspth0m" path="res://assets/models/brute.tscn" id="99_model"]
+[ext_resource type="PackedScene" uid="uid://b01aumav100em" path="res://assets/models/brute_axe.tscn" id="held_prop"]
 
 [sub_resource type="Resource" id="Resource_h41ih"]
 script = ExtResource("1_v264x")
@@ -24,6 +25,9 @@ spells = Array[ExtResource("2_jcwbx")]([ExtResource("3_57etr"), ExtResource("4_p
 innate_modifiers = Array[ExtResource("1_v264x")]([SubResource("Resource_h41ih")])
 color = Color(0.85, 0.25, 0.2, 1)
 model_scene = ExtResource("99_model")
-model_scale = 0.58
-model_height = 1.55
-skin_color = Color(0.88, 0.68, 0.54, 1)
+model_scale = 1.0
+model_height = 1.6
+held_item = ExtResource("held_prop")
+held_item_bone = "Hand.R"
+held_item_scale = 1.0
+held_item_rotation = Vector3(40, 0, 0)

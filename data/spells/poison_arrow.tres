@@ -27,6 +27,7 @@ status = ExtResource("5_27co1")
 script = ExtResource("6_glmtx")
 display_name = "Poison Arrow"
 icon = ExtResource("7_k24g2")
+cast_animation = &"Shoot"
 min_range = 2
 max_range = 6
 height_extends_range = true

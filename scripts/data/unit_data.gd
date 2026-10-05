@@ -17,21 +17,19 @@ extends Resource
 @export_group("Visuals")
 ## Placeholder color used when no model_scene is set.
 @export var color := Color.WHITE
-## Optional model from an asset pack; replaces the placeholder capsule. Its animations are
-## found by name (see UnitModel), so models from any pack work; a new hero or enemy is a model
-## file plus these fields.
+## Optional hand-built model (a scene saved by tools/build_models.gd); replaces the placeholder
+## capsule. Its animations are found by name (see UnitModel); a new hero or enemy is a recipe
+## plus these fields.
 @export var model_scene: PackedScene
 ## Scales the model to the board (a cell is one world unit wide).
 @export_range(0.05, 5.0) var model_scale := 1.0
 ## How tall the scaled model stands, in world units: where the HP label, status icons and
 ## damage preview float, and how tall the click target is.
 @export_range(0.3, 4.0) var model_height := 1.1
-## Replaces the model's "Skin" material color; alpha 0 keeps the pack's own.
-@export var skin_color := Color(0, 0, 0, 0)
 ## A prop the model holds (a hero's weapon, the Skeleton Archer's bow). It takes the place of
-## the model's node named `held_item_replaces` (hidden; same bone and orientation), or, with
-## that empty, hangs from the bone `held_item_bone` (e.g. "Fist.R"). Then `held_item_scale`,
-## `held_item_rotation` (degrees) and `held_item_offset` (in the bone's space) place it.
+## the model's node named `held_item_replaces` (hidden; same joint and orientation), or, with
+## that empty, hangs from the joint `held_item_bone` (e.g. "Hand.R"). Then `held_item_scale`,
+## `held_item_rotation` (degrees) and `held_item_offset` (in the joint's space) place it.
 @export var held_item: PackedScene
 @export var held_item_replaces := ""
 @export var held_item_bone := ""

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="BoardTheme" format=3 uid="uid://cskvbgof62kp1"]
 
 [ext_resource type="Script" uid="uid://bwl8xwjbwm5t4" path="res://scripts/view/board_theme.gd" id="1_theme"]
-[ext_resource type="PackedScene" uid="uid://8wqf70yvjoux" path="res://assets/quaternius/dungeon/Rock1.fbx" id="2_rock1"]
-[ext_resource type="PackedScene" uid="uid://dwl6oyodslbow" path="res://assets/quaternius/dungeon/Rock2.fbx" id="3_rock2"]
-[ext_resource type="PackedScene" uid="uid://ejn6i6lul80c" path="res://assets/quaternius/dungeon/Rock3.fbx" id="4_rock3"]
+[ext_resource type="PackedScene" uid="uid://miyu8xg8eqm" path="res://assets/models/rock_1.tscn" id="2_rock1"]
+[ext_resource type="PackedScene" uid="uid://bogxe0p8kdqyg" path="res://assets/models/rock_2.tscn" id="3_rock2"]
+[ext_resource type="PackedScene" uid="uid://cne45yep5a25t" path="res://assets/models/rock_3.tscn" id="4_rock3"]
 
 [resource]
 script = ExtResource("1_theme")

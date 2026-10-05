@@ -15,11 +15,11 @@ func test_two_quick_casts_each_show_their_effects() -> void:
 	var bolt := BattleFixtures.damage_spell(2, 1, 3, 3)
 	(bolt.effects[0] as DamageEffect).damage_type = fire
 	caster.spells = [bolt] as Array[SpellData]
-	caster.model_scene = load("res://assets/quaternius/characters/Knight_Male.fbx")
-	caster.model_scale = 0.5
+	caster.model_scene = load("res://assets/models/knight.tscn")
+	caster.model_scale = 1.0
 	var target := BattleFixtures.unit("E0", 100, 3, 6, 80)
-	target.model_scene = load("res://assets/quaternius/characters/Goblin_Male.fbx")
-	target.model_scale = 0.5
+	target.model_scene = load("res://assets/models/orc_guard.tscn")
+	target.model_scale = 1.0
 	var controller := BATTLE_SCENE.instantiate() as BattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0e 0", [target])

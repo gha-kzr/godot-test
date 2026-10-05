@@ -8,11 +8,23 @@ Features and ideas not built yet, in the order of the proposed milestones in [`r
 
 What milestones 6b to 7 left out on purpose: **turn start** stays silent (no candidate liked); a smoother blend between clips (walk to attack); the death sound is heavy, so its gain (`sfx_gain_db`) may need adjusting by ear. Hub and title share one track on purpose.
 
+## Model workshop
+
+*Milestone: 9e Model workshop · Category: Tools / art · Pairs with: own models (9d), spell stage*
+
+Models are drafted from code (a recipe per creature, see `docs/decisions/2026-10-05-own-models.md`); refining them should not need a code change or a new draft. Idea: a **tweaks file** per model (`assets/models/<name>.tweaks.tres`) overriding parts by name (position, rotation, scale, color), joint rest poses and animation poses by clip, time and joint, re-applied by `tools/build_models.gd` so a rebuilt draft keeps them (orphaned tweaks are reported, not lost); the **clips as pose tables** (time → joint → degrees) editable in the Inspector instead of code; and a **workshop scene** like the spell stage (sliders and gizmos on parts and joints, a pose scrubber, live reload when a file is saved, undo-friendly Save into the tweaks file). Questions for the grill: an editor plugin (Design panel) or an in-game QA screen; how tweaks follow a part that a new draft renames; whether the recipes stay the source of truth or a model is "ejected" into a hand-edited scene once polished.
+
+## Better animations
+
+*Milestone: 9e Model workshop · Category: Animation · Pairs with: clip sets, model workshop*
+
+The first clips are one-pass linear poses and look raw. In order of cost and payoff: easing on strikes and recoveries; follow-through (the head, tail and plume lag behind the body); anticipation and squash-and-stretch; two-segment limbs (elbows and knees: more parts per creature, the biggest quality jump); per-creature attack feel (a heavier swing for the Brute and the Yeti). Possibly a higher detail tier for the solids (bevels, lathes, smooth shading) if the style should grow.
+
 ## More props and floor types
 
 *Milestone: 10 World · Category: Art / content · Pairs with: biomes, bigger maps*
 
-the maps feel empty: a single green terrain and a few rocks. Add floor variety (grass, dirt, stone, water-like or hazard tiles by theme, per-region or per-band looks) and props (barrels, chests, columns, bones, torches, trees; the Quaternius dungeon pack already has many, only five files are imported), placed by the map generator on cells that don't change the rules (decoration only), or with rules later (cover, hazards, slowing floors). Questions for the grill: purely visual first, or floor types with effects (a gameplay milestone); themes per tower band; how props avoid hiding units and the click targets. Touches `BoardTheme` / `BoardView` (floor variants, prop scenes), `MapGenerator` (decoration pass, a map-token or a separate layer), and credits.
+the maps feel empty: a single green terrain and a few rocks. Add floor variety (grass, dirt, stone, water-like or hazard tiles by theme, per-region or per-band looks) and props (barrels, chests, columns, bones, torches, trees; props are drawn with the own-models kit (`ModelKit` recipes)), placed by the map generator on cells that don't change the rules (decoration only), or with rules later (cover, hazards, slowing floors). Questions for the grill: purely visual first, or floor types with effects (a gameplay milestone); themes per tower band; how props avoid hiding units and the click targets. Touches `BoardTheme` / `BoardView` (floor variants, prop scenes), `MapGenerator` (decoration pass, a map-token or a separate layer), and credits.
 
 ## See-through props and walls
 
@@ -56,11 +68,23 @@ lasting upgrades between runs. A currency or points earned by runs (floors clear
 
 the tower is a straight line of floors. The idea: between floors, choose a path on a small map (Slay the Spire style): normal fight, elite (harder, better loot), rest (heal), shop or a rune forge, mystery event, boss at the end. It would make a run a series of decisions and give use to the rune economy and the boons. Open and to be elaborated before anything is built: how long a run is (still floors of 10 with a boss? a map per act?), how paths branch and how much is visible ahead, what the non-fight nodes do (and so what currency and items exist: this depends on the rune economy and meta progression), how it fits the deterministic floors-by-number design (daily seeds, the "same for everyone" rule), whether endless climbing stays, and how the run screen and `RunState` / `RunDirector` change (the saved run would store the map and the position). Needs a full grill.
 
+## Visualize status effects
+
+*Milestone: 13 Reach · Category: UX / battle readability · Pairs with: statuses, unit cards, tooltips*
+
+a way to see at a glance which statuses a unit carries and what they do (poison, a shield like Sheltered, slows, buffs). Today a status shows as a small icon with its turns left above the unit, a soft looping aura and a line on the unit card. Ideas: a clearer icon set and colors (positive vs negative), a hover tooltip on the icon with its name, effect and turns left (also on the turn order's chips), a stack of icons that stays readable with 3 or more statuses, a "what this status does" glossary reachable from the card, a preview of the statuses a spell would apply or remove (already a hint while aiming), tick numbers floating when poison or regeneration fires, and a distinct aura per status so a unit's state reads from the board. Question for the grill: how much to show on the board before it gets cluttered, and whether colour-blind-safe shapes are needed.
+
 ## Multiple games (save slots)
 
 *Milestone: 13 Reach · Category: Core / profile · Pairs with: save format*
 
 one profile today (`user://profile.json`, plus `settings.cfg` apart). Allow several saved games: a slot list on the title screen (New game, Continue, Delete, with each slot's summary: heroes' levels, best floor, a saved run), each slot its own profile file (`profile_<n>.json`, an index of slots in a small file), settings staying shared. Needs: a migration of the current save into slot 1, "Reset save" becoming per-slot, `Game` holding the active slot, the web build's storage (browser `user://`, per browser) and a limit on the number of slots; questions for the grill: how many slots, whether slots can be named or copied, and whether this is also meant as multiple players sharing one device. (If "multiple game" meant several runs in parallel inside one save, that is a different, larger design: say so.)
+
+## Better tooltips and more hints
+
+*Milestone: 13 Reach · Category: UX / onboarding · Pairs with: first-run hints, glossary tooltips, localization*
+
+the one-time tip cards (hub intro, first status, elite and boss floors, level-up) are now modal: a dim blocks the screen until **Got it**. Improve them and add more. Improve: look and placement (a pointer to what the tip is about, the card next to it rather than a fixed corner), a short title per tip, several tips chained as a step-by-step when one topic needs it, a "Tips" list in the settings to reread any tip, and consistent wording with the glossary tooltips (AP, MP, HP, Power, resistances). More: spells screen and loadout, rune slots and rarities, cooldowns and movement spells, placement, line of sight and height, sudden death, boons, stages, the QA tools' first use. Questions for the grill: which tips must block (modal) and which can stay passive, how to avoid tip fatigue (a cap per session, skip all), and whether tips get illustrations. Every new text needs its French translation.
 
 ## Gamepad support
 

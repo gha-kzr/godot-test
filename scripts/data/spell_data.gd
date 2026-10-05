@@ -17,13 +17,13 @@ extends Resource
 ## else the generic `cast`.
 @export var cast_sound: StringName = &""
 @export_group("Cast timing")
-## A model file (an imported .fbx / .glb) whose animation the caster borrows for this spell. Its
-## skeleton must carry the same bones as the caster's (the Quaternius characters share one
-## rig); a file that doesn't fit is reported and the caster's own animation plays instead.
+## A model scene whose animation the caster borrows for this spell. It must carry the same
+## joints as the caster's (the hand-built bipeds share one rig); a scene that doesn't fit is
+## reported and the caster's own animation plays instead.
 ## Empty: the caster's own animation (`cast_animation`).
 @export var animation_scene: PackedScene
-## Which animation of `animation_scene` (the part after a "|" counts: "SwordSlash" finds
-## "CharacterArmature|SwordSlash"); empty takes its first one.
+## Which animation of `animation_scene` (the part after a "|" counts: "Attack" finds
+## "Armature|Attack"); empty takes its first one.
 @export var animation_name := ""
 ## The part of the animation that plays, in seconds: from `animation_start` to `animation_end`
 ## (0: to its end), at `animation_speed`. Cuts a long clip down to the swing.

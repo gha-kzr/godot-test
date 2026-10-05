@@ -2,9 +2,9 @@ extends TestCase
 ## Per-spell cast timing: cut and borrowed animations, the delay before the effects land and
 ## projectiles.
 
-const KNIGHT := preload("res://assets/quaternius/characters/Knight_Male.fbx")
-const WIZARD := preload("res://assets/quaternius/characters/Wizard.fbx")
-const BARREL := preload("res://assets/quaternius/dungeon/Barrel.fbx")
+const KNIGHT := preload("res://assets/models/knight.tscn")
+const WIZARD := preload("res://assets/models/mage.tscn")
+const BARREL := preload("res://assets/models/rock_1.tscn")
 const TIME_SCALE := 10.0
 
 
@@ -33,7 +33,7 @@ func _tree() -> SceneTree:
 func _model(scene: PackedScene) -> UnitModel:
 	var model := UnitModel.new()
 	_tree().root.add_child(model)
-	model.setup(scene, 0.5, Color(0, 0, 0, 0))
+	model.setup(scene, 1.0)
 	return model
 
 
@@ -74,10 +74,10 @@ func test_a_clip_is_cut_and_sped_up_then_hands_back_to_idle() -> void:
 	assert_true(player.current_animation_position >= 0.19, "it starts at the cut's start: %f" % player.current_animation_position)
 	assert_eq(player.speed_scale, 1.0, "the player's own speed scale stays 1")
 	for i in 600:
-		if player.current_animation.ends_with("|Idle"):
+		if player.current_animation == "Idle":
 			break
 		await _tree().process_frame
-	assert_true(player.current_animation.ends_with("|Idle"), "back to Idle at the cut's end: %s" % player.current_animation)
+	assert_true(player.current_animation == "Idle", "back to Idle at the cut's end: %s" % player.current_animation)
 	model.free()
 	Engine.time_scale = 1.0
 
@@ -89,17 +89,17 @@ func test_a_later_animation_is_not_cut_short_by_an_earlier_clips_timer() -> void
 	model.play(&"Death")
 	for i in 120:
 		await _tree().process_frame
-	assert_true(_player_of(model).assigned_animation.ends_with("|Death"), "the death stays: %s" % _player_of(model).assigned_animation)
+	assert_true(_player_of(model).assigned_animation == "Death", "the death stays: %s" % _player_of(model).assigned_animation)
 	model.free()
 	Engine.time_scale = 1.0
 
 
 func test_an_animation_can_be_borrowed_from_another_model_file() -> void:
 	var model := _model(WIZARD)
-	var length := model.play_clip(&"Attack", KNIGHT, "SwordSlash")
+	var length := model.play_clip(&"Attack", KNIGHT, "Attack")
 	assert_true(length > 0.0, "the wizard swings the knight's sword slash")
 	assert_true(_player_of(model).current_animation.begins_with("borrowed_"), "it plays the borrowed clip: %s" % _player_of(model).current_animation)
-	assert_eq(model.play_clip(&"Attack", KNIGHT, "SwordSlash"), length, "borrowed once, found again")
+	assert_eq(model.play_clip(&"Attack", KNIGHT, "Attack"), length, "borrowed once, found again")
 	assert_true(model.play_clip(&"Attack", KNIGHT, "") > 0.0, "an empty name takes the file's first animation")
 	model.free()
 
@@ -142,7 +142,7 @@ func test_a_spell_with_a_borrowed_clip_makes_its_caster_play_it() -> void:
 	hero.model_scale = 0.5
 	var spell := _spell()
 	spell.animation_scene = KNIGHT
-	spell.animation_name = "SwordSlash"
+	spell.animation_name = "Attack"
 	hero.spells = [spell] as Array[SpellData]
 	var stage := Stage.new(Battle.new(BattleFixtures.state_with("0p 0 0 0e", [hero], [BattleFixtures.unit("E0", 100, 3, 6, 40)])))
 	stage.battle.start()

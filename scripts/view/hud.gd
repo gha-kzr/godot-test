@@ -89,6 +89,7 @@ func _ready() -> void:
 	_order_overlay.unit_pressed.connect(chip_pressed.emit)  # Same as a timeline chip: look at it.
 	_inspect_card.closed.connect(card_closed.emit)
 	_hint_card.dismissed.connect(hint_dismissed.emit)
+	_hint_card.visibility_changed.connect(_refresh_buttons)  # A shown hint is modal.
 	_menu_button.pressed.connect(_open_leave_panel)
 	_recenter_button.pressed.connect(recenter_pressed.emit)
 	_recenter_button.text = tr("Recenter (%s)") % SettingsApplier.key_text(&"camera_recenter")
@@ -119,6 +120,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			and (event as InputEventKey).keycode in [KEY_ENTER, KEY_KP_ENTER]:
 		_hint_card.dismiss()
 		get_viewport().set_input_as_handled()
+		return
+	if _hint_card.visible:
 		return
 	if event.is_action_pressed(&"show_order"):
 		_order_overlay.toggle()
@@ -183,7 +186,7 @@ func _open_leave_panel() -> void:
 
 ## Whether a full-screen panel (order, leave question, result) is over the board.
 func is_modal_open() -> bool:
-	return _order_overlay.is_open() or _leave_panel.visible or _result_panel.visible
+	return _order_overlay.is_open() or _leave_panel.visible or _result_panel.visible or _hint_card.visible
 
 
 ## Closes the leave confirmation if it's open; true if it was (Esc closes it first).
@@ -236,9 +239,9 @@ func set_placing(placing: bool) -> void:
 	_refresh_buttons()
 
 
-## Shows a dismissable hint card (top right).
-func show_hint(text: String) -> void:
-	_hint_card.show_hint(text)
+## Shows a dismissable hint card (top right); `spotlight` returns the screen area it lights.
+func show_hint(text: String, spotlight := Callable()) -> void:
+	_hint_card.show_hint(text, spotlight)
 
 
 ## The persistent guidance line under the turn order ("" hides it).
@@ -385,6 +388,6 @@ static func spell_description(spell: SpellData) -> String:
 
 
 func _refresh_buttons() -> void:
-	var overlay_open := _order_overlay.is_open() or _leave_panel.visible
+	var overlay_open := _order_overlay.is_open() or _leave_panel.visible or _hint_card.visible
 	_spell_bar.set_locked(not _controls_enabled or _placing or overlay_open)
 	_end_turn_button.disabled = not _controls_enabled or overlay_open
