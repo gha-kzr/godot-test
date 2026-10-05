@@ -22,7 +22,7 @@ Milestone 7 of [`docs/roadmap.md`](../roadmap.md). The pin-on-attack item left i
 - The save folder is kept with `custom_user_dir_name = "Godot/app_userdata/godot-test"` (the plain name would have moved it to `~/Library/Application Support/godot-test`).
 - On Linux the default user folder is `~/.local/share/godot/app_userdata/...` (lowercase): the pinned folder name keeps saves in place on macOS and Windows only.
 - A profile saved before this milestone gets the starter rune on its next win and meets the tutorial (skippable); beta, no migration.
-- The repository was renamed `rune-ascent` afterwards (so was the local folder, and the Pages address is now `https://gha-kzr.github.io/rune-ascent/`); the save folder keeps the old name.
+- The repository was renamed `rune-ascent` afterwards (so was the local folder, and the Pages address is now `https://gha-kzr.github.io/rune-ascent/`); the save folder was renamed `rune-ascent` too (beta: the old saves were left behind, no migration).
 
 ## Open / deferred
 - The exact list of achievements is settled while implementing (data files, easy to extend).

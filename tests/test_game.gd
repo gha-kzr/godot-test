@@ -633,7 +633,7 @@ func test_the_title_uses_the_owners_artwork_when_there_is_some_else_the_text() -
 	title.free()
 	assert_eq(Game.TITLE, "Rune Ascent")
 	assert_eq(ProjectSettings.get_setting("application/config/name"), "Rune Ascent")
-	assert_true(ProjectSettings.globalize_path("user://").contains("godot-test"), "saves stay in the old folder: " + ProjectSettings.globalize_path("user://"))
+	assert_true(ProjectSettings.globalize_path("user://").contains("rune-ascent"), "saves live in the rune-ascent folder: " + ProjectSettings.globalize_path("user://"))
 
 
 func test_the_shipped_branding_is_found_and_the_start_screen_shows_it() -> void:
