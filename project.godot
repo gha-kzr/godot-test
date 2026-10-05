@@ -13,7 +13,7 @@ config_version=5
 config/name="Rune Ascent"
 run/main_scene="res://scenes/game/game.tscn"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="Godot/app_userdata/rune-ascent"
+config/custom_user_dir_name="Godot/app_userdata/rune-ascent-multiplayer"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://ui/branding/icon.png"
 

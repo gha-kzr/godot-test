@@ -1,4 +1,6 @@
-# Rune Ascent
+# Rune Ascent: multiplayer fork
+
+An attempt at turning [Rune Ascent](https://github.com/gha-kzr/rune-ascent) multiplayer. This repository is a clone of it (`git remote` `upstream`; take its fixes with `git fetch upstream && git merge upstream/main`), with its own save folder (`rune-ascent-multiplayer`). Network code goes in `scripts/net/`; the rules layer is kept as it is so upstream merges stay clean. Everything below is the original game's README.
 
 A turn-based tactical roguelite made with a Godot 4.7 project and an AI agent (the repository, the folder and the save folder are all `rune-ascent`; `application/config/custom_user_dir_name` sets the save folder).
 
