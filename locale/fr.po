@@ -77,6 +77,9 @@ msgstr "%s terminé"
 msgid "%s cleared! The tower now goes up to floor %d, and you can start at floor %d."
 msgstr "%s terminé ! La tour monte maintenant jusqu'à l'étage %d, et vous pouvez commencer à l'étage %d."
 
+msgid "%s coming back"
+msgstr "%s qui revient"
+
 msgid "%s damage"
 msgstr "%s dégâts"
 
@@ -109,6 +112,9 @@ msgstr "%s joue..."
 
 msgid "%s is already used by %s."
 msgstr "%s est déjà utilisée par %s."
+
+msgid "%s is away: the AI takes over soon"
+msgstr "%s est absent : l'IA prend bientôt le relais"
 
 msgid "%s is reserved for the menus."
 msgstr "%s est réservée aux menus."
@@ -170,11 +176,26 @@ msgstr "%s : %s.\nRareté : %s (une par héros). Cliquez pour équiper sur le h�
 msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
 msgstr "%s : %s.\nRareté : %s. Cliquez pour équiper sur le héros sélectionné."
 
+msgid "(AI)"
+msgstr "(IA)"
+
+msgid "(away)"
+msgstr "(absent)"
+
 msgid "(empty)"
 msgstr "(vide)"
 
+msgid "(host)"
+msgstr "(hôte)"
+
+msgid "(nobody to invite)"
+msgstr "(personne à inviter)"
+
 msgid "(none)"
 msgstr "(aucun)"
+
+msgid "(you)"
+msgstr "(vous)"
 
 msgid "+%d XP for each hero."
 msgstr "+%d XP pour chaque héros."
@@ -190,6 +211,9 @@ msgstr "Un étage de boss ! Le boss est bien plus fort. Le vaincre offre un bien
 
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
 msgstr "Un héros a gagné un niveau : ses stats augmentent, et certains niveaux enseignent un nouveau sort."
+
+msgid "A new player"
+msgstr "Un nouveau joueur"
 
 msgid "A run waits at floor %d: Continue run on the hub."
 msgstr "Une ascension attend à l'étage %d : Continuer l'ascension depuis l'équipe."
@@ -250,6 +274,9 @@ msgstr "Automatique"
 
 msgid "Back"
 msgstr "Retour"
+
+msgid "Back to the lobby"
+msgstr "Retour au salon"
 
 msgid "Back to the party"
 msgstr "Retour à l'équipe"
@@ -364,6 +391,9 @@ msgstr "Terminez d'abord l'étage %d de la tour."
 msgid "Click a teal cell to place %s (Esc to deselect)"
 msgstr "Cliquez sur une case turquoise pour placer %s (Échap pour désélectionner)"
 
+msgid "Click a teal cell to place your hero, then press Ready (%s)"
+msgstr "Cliquez sur une case turquoise pour placer votre héros, puis appuyez sur Prêt (%s)"
+
 msgid "Click to look at this unit"
 msgstr "Cliquez pour regarder cette unité"
 
@@ -385,6 +415,15 @@ msgstr "Gourdin"
 msgid "Common"
 msgstr "Commun"
 
+msgid "Connect the player"
+msgstr "Connecter le joueur"
+
+msgid "Connected relays: %s"
+msgstr "Relais connectés : %s"
+
+msgid "Connecting... the player appears in the list when it works."
+msgstr "Connexion en cours... le joueur apparaît dans la liste quand ça marche."
+
 msgid "Continue run"
 msgstr "Continuer l'ascension"
 
@@ -393,6 +432,18 @@ msgstr "Poursuivre l'ascension"
 
 msgid "Controls"
 msgstr "Commandes"
+
+msgid "Copy the code"
+msgstr "Copier le code"
+
+msgid "Copy the invite link"
+msgstr "Copier le lien d'invitation"
+
+msgid "Copy the reply link"
+msgstr "Copier le lien de réponse"
+
+msgid "Copy the room link"
+msgstr "Copier le lien de la salle"
 
 msgid "Crater"
 msgstr "Cratère"
@@ -427,6 +478,9 @@ msgstr "Affichage"
 msgid "Dread"
 msgstr "Effroi"
 
+msgid "each side needs a player"
+msgstr "chaque camp doit avoir un joueur"
+
 msgid "edge layout"
 msgstr "disposition face à face"
 
@@ -451,6 +505,9 @@ msgstr "Termine votre tour tout seul quand un héros ne peut ni se déplacer ni 
 msgid "Enemies (they take the board's spawns)"
 msgstr "Ennemis (ils prennent les apparitions du plateau)"
 
+msgid "Enter a room code or paste an invite first."
+msgstr "Saisissez d'abord un code de salle ou collez une invitation."
+
 msgid "Epic"
 msgstr "Épique"
 
@@ -469,6 +526,9 @@ msgstr "Tous les héros sont maintenant niveau %d."
 msgid "Every stage is cleared."
 msgstr "Toutes les épreuves sont terminées."
 
+msgid "everyone must be ready"
+msgstr "tout le monde doit être prêt"
+
 msgid "facing edges"
 msgstr "bords opposés"
 
@@ -483,6 +543,9 @@ msgstr "Combattre"
 
 msgid "Fight it"
 msgstr "L'affronter"
+
+msgid "Fight other players, one hero each. Nothing to install and no server: the players connect to each other directly."
+msgstr "Affrontez d'autres joueurs, un héros chacun. Rien à installer et aucun serveur : les joueurs se connectent directement entre eux."
 
 msgid "Fill all six rune slots of one hero."
 msgstr "Remplissez les six emplacements de rune d'un héros."
@@ -555,6 +618,9 @@ msgstr "Couronne de concentration"
 
 msgid "Found: %s."
 msgstr "Trouvé : %s."
+
+msgid "Friends can join with the room code. If that doesn't work for them (a strict network), make an invite, send the link, then paste the reply they send back: each player needs their own invite."
+msgstr "Vos amis peuvent rejoindre avec le code de la salle. Si cela ne marche pas pour eux (réseau strict), créez une invitation, envoyez le lien, puis collez la réponse qu'ils renvoient : chaque joueur a besoin de sa propre invitation."
 
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
@@ -646,6 +712,9 @@ msgstr "Les astuces s'afficheront à nouveau."
 msgid "Holy"
 msgstr "Sacré"
 
+msgid "Host a match"
+msgstr "Héberger une partie"
+
 msgid "HP %d   AP %d   MP %d   Initiative %d"
 msgstr "PV %d   PA %d   PM %d   Initiative %d"
 
@@ -670,6 +739,9 @@ msgstr "Initiative : plus elle est haute, plus l'unité joue tôt."
 msgid "Instant (skip animations)"
 msgstr "Instantané (sans animations)"
 
+msgid "Invite players"
+msgstr "Inviter des joueurs"
+
 msgid "Iron Ward"
 msgstr "Garde de fer"
 
@@ -678,6 +750,15 @@ msgstr "Îles et ponts"
 
 msgid "It's your turn. Blue cells are where you can walk: each step costs MP. Click one."
 msgstr "C'est votre tour. Les cases bleues sont celles où vous pouvez marcher : chaque pas coûte des PM. Cliquez sur l'une d'elles."
+
+msgid "Join"
+msgstr "Rejoindre"
+
+msgid "Join a match"
+msgstr "Rejoindre une partie"
+
+msgid "Joining the match"
+msgstr "Connexion à la partie"
 
 msgid "Jumps to the target cell (climbs up to %d levels)"
 msgstr "Saute sur la case ciblée (monte jusqu'à %d niveaux)"
@@ -717,6 +798,9 @@ msgstr "Quitter la tour"
 msgid "Legendary"
 msgstr "Légendaire"
 
+msgid "Let the AI play my hero"
+msgstr "Laisser l'IA jouer mon héros"
+
 msgid "Level 10"
 msgstr "Niveau 10"
 
@@ -732,17 +816,38 @@ msgstr "Ligne"
 msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
 msgstr "Sélection : les sorts emmenés au combat (l'emplacement 1 est la touche 1)"
 
+msgid "Looking for the room... The host answers as soon as they see you."
+msgstr "Recherche de la salle... L'hôte répond dès qu'il vous voit."
+
 msgid "Lose now"
 msgstr "Perdre"
 
 msgid "Mage"
 msgstr "Mage"
 
+msgid "Make an invite"
+msgstr "Créer une invitation"
+
+msgid "Map and rules"
+msgstr "Carte et règles"
+
+msgid "Map number"
+msgstr "Numéro de carte"
+
+msgid "Map shape"
+msgstr "Forme de la carte"
+
+msgid "Map size"
+msgstr "Taille de la carte"
+
 msgid "Marked"
 msgstr "Marqué"
 
 msgid "Master volume"
 msgstr "Volume général"
+
+msgid "Match lobby"
+msgstr "Salon de la partie"
 
 msgid "Mend"
 msgstr "Soin"
@@ -768,6 +873,12 @@ msgstr "PM 0 / 0"
 msgid "MP: movement points. Walking costs 1 per cell (and 1 more per step up); they refill every turn."
 msgstr "PM : points de mouvement. Marcher coûte 1 par case (et 1 de plus en montant) ; ils se rechargent à chaque tour."
 
+msgid "Multiplayer"
+msgstr "Multijoueur"
+
+msgid "Multiplayer needs the web version of the game (it uses the browser's WebRTC)."
+msgstr "Le multijoueur demande la version web du jeu (il utilise le WebRTC du navigateur)."
+
 msgid "Mushroom Sage"
 msgstr "Sage champignon"
 
@@ -785,6 +896,9 @@ msgstr "Il faut %d (vous en avez %d)"
 
 msgid "Need %d essence"
 msgstr "Il faut %d essence"
+
+msgid "New map"
+msgstr "Nouvelle carte"
 
 msgid "Next"
 msgstr "Suivant"
@@ -846,8 +960,14 @@ msgstr "Les cases orange peuvent être ciblées. Cliquez sur un ennemi pour lui 
 msgid "Orc Guard"
 msgstr "Garde orque"
 
+msgid "out of step with the host"
+msgstr "désynchronisé de l'hôte"
+
 msgid "Party"
 msgstr "Équipe"
+
+msgid "Paste the reply link or code here"
+msgstr "Collez ici le lien ou le code de réponse"
 
 msgid "Physical"
 msgstr "Physique"
@@ -876,6 +996,12 @@ msgstr "Jouer"
 msgid "Play again"
 msgstr "Rejouer"
 
+msgid "Play my hero again"
+msgstr "Rejouer mon héros"
+
+msgid "Players"
+msgstr "Joueurs"
+
 msgid "Playground"
 msgstr "Bac à sable"
 
@@ -896,6 +1022,12 @@ msgstr "Puissance : tous %+d%%\nRésist. : %s"
 
 msgid "Power: percent added to the damage and heals of the unit's spells."
 msgstr "Puissance : pourcentage ajouté aux dégâts et aux soins des sorts de l'unité."
+
+msgid "Preparing the invite... (a few seconds)"
+msgstr "Préparation de l'invitation... (quelques secondes)"
+
+msgid "Preparing your reply... (a few seconds)"
+msgstr "Préparation de votre réponse... (quelques secondes)"
 
 msgid "Press a key for %s (Esc to cancel)."
 msgstr "Appuyez sur une touche pour %s (Échap pour annuler)."
@@ -985,8 +1117,17 @@ msgstr "Atteignez l'étage 30 de la tour."
 msgid "Reach floor 40 of the tower."
 msgstr "Atteignez l'étage 40 de la tour."
 
+msgid "Ready"
+msgstr "Prêt"
+
+msgid "ready"
+msgstr "prêt"
+
 msgid "Ready (%s)"
 msgstr "Prêt (%s)"
+
+msgid "Ready. Waiting for the other players..."
+msgstr "Prêt. En attente des autres joueurs..."
 
 msgid "Really reset? Levels, runes and runs are lost."
 msgstr "Vraiment réinitialiser ? Niveaux, runes et parties sont perdus."
@@ -1026,6 +1167,12 @@ msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus de
 
 msgid "Role: %s"
 msgstr "Rôle : %s"
+
+msgid "Room code, or invite link"
+msgstr "Code de salle, ou lien d'invitation"
+
+msgid "Room code: %s"
+msgstr "Code de la salle : %s"
 
 msgid "Round %d"
 msgstr "Round %d"
@@ -1084,6 +1231,18 @@ msgstr "%s recyclé : +%d essence."
 msgid "Save reset."
 msgstr "Sauvegarde effacée."
 
+msgid "Seconds before the AI replaces a player who left"
+msgstr "Secondes avant que l'IA remplace un joueur parti"
+
+msgid "Seconds per turn"
+msgstr "Secondes par tour"
+
+msgid "Send this link to the player. When they send a reply back, paste it below."
+msgstr "Envoyez ce lien au joueur. Quand il vous renvoie une réponse, collez-la ci-dessous."
+
+msgid "Send this reply to the host. You are connected as soon as they paste it."
+msgstr "Envoyez cette réponse à l'hôte. Vous serez connecté dès qu'il la collera."
+
 msgid "Set every hero to this level"
 msgstr "Mettre tous les héros à ce niveau"
 
@@ -1107,6 +1266,12 @@ msgstr "Abrité"
 
 msgid "Show hints again"
 msgstr "Réafficher les astuces"
+
+msgid "Side A"
+msgstr "Camp A"
+
+msgid "Side B"
+msgstr "Camp B"
 
 msgid "Side view (%s)"
 msgstr "Vue de côté (%s)"
@@ -1198,11 +1363,17 @@ msgstr "Épreuves"
 msgid "Start a tower run at this floor"
 msgstr "Commencer une ascension à cet étage"
 
+msgid "Start the match"
+msgstr "Lancer la partie"
+
 msgid "Stay"
 msgstr "Rester"
 
 msgid "Stone Skin Rune"
 msgstr "Rune de peau de pierre"
+
+msgid "Sudden death: every hero loses %d%% HP every turn"
+msgstr "Mort subite : chaque héros perd %d %% de ses PV à chaque tour"
 
 msgid "Sudden death: the party loses %d%% HP every turn"
 msgstr "Mort subite : l'équipe perd %d%% de ses PV à chaque tour"
@@ -1225,6 +1396,9 @@ msgstr "Poussée"
 msgid "Swift Stride"
 msgstr "Foulée rapide"
 
+msgid "Taking long? Ask the host for an invite link instead."
+msgstr "Ça prend du temps ? Demandez plutôt un lien d'invitation à l'hôte."
+
 msgid "Tank"
 msgstr "Tank"
 
@@ -1246,6 +1420,9 @@ msgstr "Se téléporte sur la case ciblée"
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."
 
+msgid "That isn't possible right now."
+msgstr "Ce n'est pas possible pour le moment."
+
 msgid "That key can't be used."
 msgstr "Cette touche ne peut pas être utilisée."
 
@@ -1260,6 +1437,12 @@ msgstr "Cet emplacement de rune n'est pas libre."
 
 msgid "That rune's effect is flat: it has no levels to fuse."
 msgstr "L'effet de cette rune est fixe : elle n'a pas de niveaux à fusionner."
+
+msgid "that seat belongs to someone else"
+msgstr "cette place appartient à quelqu'un d'autre"
+
+msgid "that seat is taken"
+msgstr "cette place est prise"
 
 msgid "That spell can't go there."
 msgstr "Ce sort ne peut pas aller là."
@@ -1281,6 +1464,24 @@ msgstr "La rencontre de l'étage est invalide : %s"
 
 msgid "The floor's own"
 msgstr "Celui de l'étage"
+
+msgid "the game state differs from the host's (desync)"
+msgstr "l'état de la partie diffère de celui de l'hôte (désynchronisation)"
+
+msgid "the match has started"
+msgstr "la partie a déjà commencé"
+
+msgid "the match is full"
+msgstr "la partie est pleine"
+
+msgid "The match is going on."
+msgstr "La partie est en cours."
+
+msgid "The match is over: waiting for the host to open a new lobby."
+msgstr "La partie est finie : en attente que l'hôte ouvre un nouveau salon."
+
+msgid "the match refused you"
+msgstr "la partie vous a refusé"
 
 msgid "The party is fully healed."
 msgstr "L'équipe est entièrement soignée."
@@ -1339,6 +1540,12 @@ msgstr "Tourner la caméra à droite"
 msgid "Turn order"
 msgstr "Ordre de jeu"
 
+msgid "Turn: %d s"
+msgstr "Tour : %d s"
+
+msgid "Type the room code the host gave you (or paste their room link). With an invite link instead, you will get a reply to send back to them."
+msgstr "Saisissez le code de salle donné par l'hôte (ou collez son lien de salle). Avec un lien d'invitation, vous obtiendrez une réponse à lui renvoyer."
+
 msgid "UI scale"
 msgstr "Échelle de l'interface"
 
@@ -1365,6 +1572,9 @@ msgstr "Volée"
 
 msgid "Wail"
 msgstr "Lamentation"
+
+msgid "Waiting for the host to start. Pick your hero and side, then press Ready."
+msgstr "En attente de l'hôte. Choisissez votre héros et votre camp, puis appuyez sur Prêt."
 
 msgid "Warg"
 msgstr "Warg"
@@ -1411,6 +1621,12 @@ msgstr "Oui, réinitialiser"
 msgid "Yeti"
 msgstr "Yéti"
 
+msgid "You are the host. Not ready to start yet: %s."
+msgstr "Vous êtes l'hôte. Pas encore prêt à lancer : %s."
+
+msgid "You are the host: start when everyone is ready."
+msgstr "Vous êtes l'hôte : lancez la partie quand tout le monde est prêt."
+
 msgid "You found a rune! Click it in the stash to equip it on the selected hero."
 msgstr "Vous avez trouvé une rune ! Cliquez dessus dans la réserve pour l'équiper sur le héros sélectionné."
 
@@ -1425,6 +1641,9 @@ msgstr "Vous avez quitté le combat QA."
 
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr "Vos héros sont sur les cases turquoise. Appuyez sur Prêt ({end_turn}) pour lancer le combat."
+
+msgid "Your name"
+msgstr "Votre nom"
 
 msgid "your next %d turns"
 msgstr "vos %d prochains tours"
