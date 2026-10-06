@@ -90,6 +90,7 @@ func test_nobody_joins_a_full_lobby_or_a_match_that_started_unless_they_left_it(
 	var bob := _hub()
 	bob.join("Bob", host.room_code)
 	_run([host, bob], 8)
+	host.session.set_field("side", 0)
 	host.session.set_ready(true)
 	bob.session.set_field("side", 1)
 	_run([host, bob], 2)
@@ -113,6 +114,7 @@ func test_a_player_who_left_comes_back_to_their_own_seat_with_their_token() -> v
 	_run([host, bob], 8)
 	var bobs_token := bob.token
 	host.session.configure("grace", 100)
+	host.session.set_field("side", 0)
 	host.session.set_ready(true)
 	bob.session.set_field("side", 1)
 	_run([host, bob], 2)

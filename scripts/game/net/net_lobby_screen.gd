@@ -1,6 +1,7 @@
 class_name NetLobbyScreen
 extends Screen
-## Before the fight, in cards: your seat (name, hero cards, side, ready), the two teams side by side, the invite card (the
+## Before the fight, in cards: your player (name, hero cards, team, ready), the two teams side by side (blue and red,
+## with whoever has not chosen yet under them, and a Remove button for the host), the invite card (the
 ## room code to copy or read out, and a manual invite for players who can't use the code), and the map and rules (the
 ## host's choices, with the map drawn from above). Everything a player changes goes through the match session, so every
 ## screen shows the same lobby.
@@ -9,6 +10,9 @@ signal invite_requested(for_seat: int)
 signal reply_pasted(text: String)
 signal leave_requested
 
+## How long what a player said stays on their row.
+const EMOTE_SECONDS := 5.0
+
 var session: MatchSession
 
 var _banner: Label
@@ -16,6 +20,10 @@ var _seat_card: Control
 var _name_edit: LineEdit
 var _hero_row: HBoxContainer
 var _hero_shown := -1
+var _unassigned_card: Control
+var _unassigned_box: VBoxContainer
+var _emote_bar: HFlowContainer
+var _emotes_seen: Dictionary[int, Array] = {}
 var _side_a: Button
 var _side_b: Button
 var _ready: CheckBox
@@ -54,6 +62,7 @@ func bind(match_session: MatchSession) -> void:
 	session = match_session
 	_build()
 	session.changed.connect(refresh)
+	session.emote_received.connect(_on_emote)
 	refresh()
 
 
@@ -98,6 +107,7 @@ func _build() -> void:
 	main.add_child(left)
 	_build_seat_card(left)
 	_build_teams(left)
+	_build_emotes(left)
 	_build_invite(left)
 	var right := VBoxContainer.new()
 	right.custom_minimum_size = Vector2(350, 0)
@@ -117,13 +127,13 @@ func _build() -> void:
 	bottom.add_child(_start)
 
 
-## Your seat: name, hero, side, ready.
+## Your player: name, hero, team, ready.
 func _build_seat_card(parent: Control) -> void:
-	var box := NetUi.card(parent, tr("Your seat"))
+	var box := NetUi.card(parent, tr("Your player"))
 	_seat_card = box.get_parent()
 	_name_edit = LineEdit.new()
 	_name_edit.name = "NameEdit"
-	_name_edit.placeholder_text = "Your name"
+	_name_edit.placeholder_text = NetUi.random_name()
 	_name_edit.max_length = MatchState.MAX_NAME
 	_name_edit.custom_minimum_size = Vector2(0, 40)
 	_name_edit.text_submitted.connect(func(text: String) -> void: _rename(text))
@@ -147,6 +157,7 @@ func _build_seat_card(parent: Control) -> void:
 	_ready = CheckBox.new()
 	_ready.name = "Ready"
 	_ready.text = "Ready"
+	_ready.tooltip_text = tr("Pick a team first")
 	_ready.toggled.connect(func(on: bool) -> void: session.set_ready(on))
 	line.add_child(_ready)
 
@@ -154,7 +165,8 @@ func _build_seat_card(parent: Control) -> void:
 func _side_button(side: int, group: ButtonGroup) -> Button:
 	var button := Button.new()
 	button.name = "Side%s" % ("A" if side == 0 else "B")
-	button.text = tr("Side A") if side == 0 else tr("Side B")
+	button.text = NetUi.side_name(side)
+	NetUi.side_button(button, side)
 	button.toggle_mode = true
 	button.button_group = group
 	button.custom_minimum_size = Vector2(110, 40)
@@ -167,7 +179,7 @@ func _build_teams(parent: Control) -> void:
 	row.add_theme_constant_override("separation", 12)
 	parent.add_child(row)
 	for side in 2:
-		var box := NetUi.card(row, tr("Side A") if side == 0 else tr("Side B"), NetUi.SIDE_COLORS[side])
+		var box := NetUi.card(row, NetUi.side_name(side), NetUi.SIDE_COLORS[side])
 		box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		box.get_parent().name = "Team%s" % ("A" if side == 0 else "B")
 		_team_titles.append(box.get_child(0) as Label)
@@ -175,12 +187,35 @@ func _build_teams(parent: Control) -> void:
 		list.add_theme_constant_override("separation", 4)
 		box.add_child(list)
 		_team_boxes.append(list)
+	var waiting := NetUi.card(parent, tr("Not in a team yet"))
+	waiting.get_parent().name = "TeamNone"
+	_unassigned_card = waiting.get_parent()
+	_unassigned_box = VBoxContainer.new()
+	_unassigned_box.add_theme_constant_override("separation", 4)
+	waiting.add_child(_unassigned_box)
+
+
+## Quick messages: a button each, and what the others said shows on their row for a few seconds.
+func _build_emotes(parent: Control) -> void:
+	var box := NetUi.card(parent, tr("Say something"))
+	_emote_bar = HFlowContainer.new()
+	_emote_bar.name = "Emotes"
+	_emote_bar.add_theme_constant_override("h_separation", 6)
+	_emote_bar.add_theme_constant_override("v_separation", 6)
+	box.add_child(_emote_bar)
+	for index in Emotes.count():
+		var button := HubStyle.button(Emotes.TEXTS[index], "Emote%d" % index)
+		button.pressed.connect(func() -> void: session.send_emote(index))
+		_emote_bar.add_child(button)
 
 
 func _build_settings(parent: Control) -> void:
 	var box := NetUi.card(parent, tr("Map and rules"))
 	_preview = MapPreview.new()
 	_preview.custom_minimum_size = Vector2(300, 300)
+	_preview.zone_color = NetUi.SIDE_COLORS[0]
+	_preview.enemy_color = NetUi.SIDE_COLORS[1]
+	_preview.enemy_as_square = true
 	box.add_child(_preview)
 	_typology = OptionButton.new()
 	_typology.name = "Typology"
@@ -323,7 +358,7 @@ func refresh() -> void:
 	if not in_lobby:
 		_banner.text = tr("The match is over: waiting for the host to open a new lobby.") if state.is_over() else tr("The match is going on.")
 	elif not is_host:
-		_banner.text = tr("Waiting for the host to start. Pick your hero and side, then press Ready.")
+		_banner.text = tr("Waiting for the host to start. Pick your hero and your team, then press Ready.")
 	else:
 		var problem := state.start_problem()
 		_banner.text = tr("You are the host: start when everyone is ready.") if problem.is_empty() else tr("You are the host. Not ready to start yet: %s.") % problem
@@ -333,6 +368,7 @@ func _rename(text: String) -> void:
 	var mine := session.state.seats.get(session.my_id) as MatchState.Seat
 	var clean := text.strip_edges()
 	if mine != null and not clean.is_empty() and clean != mine.name:
+		NetUi.save_name(clean)
 		session.set_field("name", clean)
 
 
@@ -354,6 +390,8 @@ func _refresh_seat(in_lobby: bool) -> void:
 	_side_a.set_pressed_no_signal(me.side == 0)
 	_side_b.set_pressed_no_signal(me.side == 1)
 	_ready.set_pressed_no_signal(me.ready)
+	_ready.disabled = me.side < 0
+	_ready.tooltip_text = tr("Pick a team first") if me.side < 0 else ""
 
 
 func _on_hero_picked(index: int) -> void:
@@ -361,21 +399,46 @@ func _on_hero_picked(index: int) -> void:
 	session.set_field("hero", index)
 
 
-## The two teams, side by side: who is on each, with their hero and what they are doing.
+## The two teams, side by side: who is on each, with their hero and what they are doing; the players who have not
+## chosen a team yet are under them. The host can remove anyone but themself.
 func _refresh_teams(in_lobby: bool) -> void:
 	for side in 2:
 		HubStyle.clear_children(_team_boxes[side])
 		var seats := session.state.seats_on(side)
-		_team_titles[side].text = "%s  (%d/%d)" % [tr("Side A") if side == 0 else tr("Side B"), seats.size(), MatchState.MAX_PER_SIDE]
+		_team_titles[side].text = "%s  (%d/%d)" % [NetUi.side_name(side), seats.size(), MatchState.MAX_PER_SIDE]
 		if seats.is_empty():
 			NetUi.note(_team_boxes[side], tr("Nobody yet."))
 		for seat in seats:
-			var row := Label.new()
-			row.name = "Seat%d" % seat.id
-			row.text = _seat_text(seat, in_lobby)
-			row.add_theme_color_override("font_color", NetUi.SIDE_COLORS[side])
-			row.clip_text = true
-			_team_boxes[side].add_child(row)
+			_add_seat_row(_team_boxes[side], seat, in_lobby, NetUi.SIDE_COLORS[side])
+	HubStyle.clear_children(_unassigned_box)
+	var waiting := session.state.seats_on(-1)
+	_unassigned_card.visible = not waiting.is_empty()
+	for seat in waiting:
+		_add_seat_row(_unassigned_box, seat, in_lobby, Color(0.8, 0.8, 0.85))
+
+
+func _add_seat_row(parent: Control, seat: MatchState.Seat, in_lobby: bool, color: Color) -> void:
+	var line := HBoxContainer.new()
+	parent.add_child(line)
+	var row := Label.new()
+	row.name = "Seat%d" % seat.id
+	row.text = _seat_text(seat, in_lobby)
+	row.add_theme_color_override("font_color", color)
+	row.clip_text = true
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(row)
+	if session.is_host() and in_lobby and seat.id != session.my_id:
+		var kick := HubStyle.button("Remove", "Kick%d" % seat.id)
+		kick.tooltip_text = tr("Remove this player from the match: they cannot come back.")
+		kick.pressed.connect(func() -> void: session.kick(seat.id))
+		line.add_child(kick)
+
+
+## What a player said: shown on their row for a few seconds.
+func _on_emote(seat_id: int, emote_id: int) -> void:
+	_emotes_seen[seat_id] = [emote_id, Time.get_ticks_msec()]
+	refresh()
+	get_tree().create_timer(EMOTE_SECONDS).timeout.connect(refresh)
 
 
 func _seat_text(seat: MatchState.Seat, in_lobby: bool) -> String:
@@ -388,6 +451,9 @@ func _seat_text(seat: MatchState.Seat, in_lobby: bool) -> String:
 		text += " " + tr("(away)")
 	if seat.ready and in_lobby:
 		text += " · " + tr("ready")
+	var said: Array = _emotes_seen.get(seat.id, [])
+	if not said.is_empty() and Time.get_ticks_msec() - int(said[1]) < EMOTE_SECONDS * 1000.0:
+		text += "  “%s”" % Emotes.text(int(said[0]))
 	return text
 
 

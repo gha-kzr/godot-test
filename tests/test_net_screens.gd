@@ -33,7 +33,8 @@ func test_the_front_page_hosts_or_joins_with_a_name() -> void:
 	var joined := []
 	menu.host_requested.connect(func(player_name: String) -> void: hosted.append(player_name))
 	menu.join_requested.connect(func(player_name: String, text: String) -> void: joined.append([player_name, text]))
-	(menu.find_child("NameEdit", true, false) as LineEdit).text = "  Alice "
+	NetUi.save_name("Alice")
+	assert_true(menu.find_child("NameEdit", true, false) == null and menu.find_child("Heroes", true, false) == null, "name and hero are chosen in the lobby")
 	(menu.find_child("HostButton", true, false) as Button).pressed.emit()
 	assert_eq(hosted, ["Alice"])
 	(menu.find_child("JoinButton", true, false) as Button).pressed.emit()
@@ -58,7 +59,11 @@ func test_the_lobby_lets_each_player_change_only_their_own_seat_and_the_host_the
 	guest_lobby.bind(rig.sessions[2])
 	await _frames()
 	assert_eq(host_lobby.find_child("HeroPicker", true, false).get_child_count(), PvpHeroes.hero_count(), "a card for each hero, for my own seat")
-	assert_true(host_lobby.find_child("Seat1", true, false) != null and host_lobby.find_child("Seat2", true, false) != null, "both players are in the teams")
+	assert_true(host_lobby.find_child("Seat1", true, false) != null and host_lobby.find_child("Seat2", true, false) != null, "both players are listed")
+	assert_true(host_lobby.find_child("TeamNone", true, false).visible, "nobody has a team yet")
+	assert_true((host_lobby.find_child("Ready", true, false) as CheckBox).disabled, "no team, no ready")
+	assert_true(host_lobby.find_child("Kick2", true, false) != null and host_lobby.find_child("Kick1", true, false) == null, "the host removes others, not themself")
+	assert_true(guest_lobby.find_child("Kick1", true, false) == null, "a guest removes nobody")
 	assert_true((host_lobby.find_child("Typology", true, false) as OptionButton).disabled == false, "the host edits the rules")
 	assert_true((guest_lobby.find_child("Typology", true, false) as OptionButton).disabled, "a guest only reads them")
 	assert_true((guest_lobby.find_child("Size", true, false) as SpinBox).editable == false)
@@ -70,6 +75,10 @@ func test_the_lobby_lets_each_player_change_only_their_own_seat_and_the_host_the
 	assert_eq(rig.sessions[1].state.seats[2].hero, 1)
 	assert_eq(rig.sessions[1].state.seats[2].side, 1)
 	assert_eq(NetUi.saved_hero(), 1, "and the lobby will start with that hero next time")
+	assert_false((guest_lobby.find_child("Ready", true, false) as CheckBox).disabled, "a team: ready is possible")
+	(host_lobby.find_child("Kick2", true, false) as Button).pressed.emit()
+	rig.net.flush()
+	assert_false(rig.sessions[1].state.seats.has(2), "the host removed Bob")
 	host_lobby.free()
 	guest_lobby.free()
 
@@ -78,6 +87,7 @@ func test_each_team_card_lists_its_players_with_their_hero() -> void:
 	var rig := NetRig.new()
 	rig.host(1, "Alice")
 	rig.guest(2, "Bob")
+	rig.sessions[1].set_field("side", 0)
 	rig.sessions[2].set_field("side", 1)
 	rig.sessions[2].set_field("hero", 1)
 	rig.net.flush()
@@ -113,6 +123,7 @@ func test_the_start_button_waits_until_everyone_is_ready() -> void:
 	var lobby := NetLobbyScreen.new()
 	_root().add_child(lobby)
 	lobby.bind(rig.sessions[1])
+	rig.sessions[1].set_field("side", 0)
 	rig.sessions[2].set_field("side", 1)
 	rig.net.flush()
 	var start := lobby.find_child("StartButton", true, false) as Button
@@ -258,6 +269,7 @@ func test_the_fight_opens_on_both_screens_and_leads_back_to_the_lobby() -> void:
 	fakes.flush()
 	await _frames()
 	guest.hub.session.set_field("side", 1)
+	host.hub.session.set_field("side", 0)
 	fakes.flush()
 	host.hub.session.set_ready(true)
 	guest.hub.session.set_ready(true)
@@ -271,20 +283,80 @@ func test_the_fight_opens_on_both_screens_and_leads_back_to_the_lobby() -> void:
 	guest.free()
 
 
-func test_the_front_page_offers_the_heroes_and_remembers_the_pick() -> void:
+func test_the_front_page_has_no_name_or_hero_to_pick_and_names_players_by_themselves() -> void:
 	_sandbox()
-	var menu := NetMenuScreen.new()
-	_root().add_child(menu)
-	var heroes := menu.find_child("Heroes", true, false)
-	assert_eq(heroes.get_child_count(), PvpHeroes.hero_count())
-	assert_true((heroes.get_child(0) as Button).button_pressed, "the first time, the first hero")
-	(menu.find_child("Hero2", true, false) as Button).pressed.emit()
-	assert_eq(NetUi.saved_hero(), 2)
-	var again := NetMenuScreen.new()
-	_root().add_child(again)
-	assert_true((again.find_child("Hero2", true, false) as Button).button_pressed, "next time it is already picked")
-	menu.free()
-	again.free()
+	var name_made := NetUi.saved_name()
+	assert_true(name_made in NetUi.NAMES, "a random name from the list")
+	assert_eq(NetUi.saved_name(), name_made, "kept for next time")
+	NetUi.save_name("Zed")
+	assert_eq(NetUi.saved_name(), "Zed", "until they pick their own")
+
+
+func test_a_hero_card_shows_clearly_whether_it_is_the_chosen_one() -> void:
+	var picked := []
+	var card := NetUi.hero_card(1, false, func(index: int) -> void: picked.append(index))
+	var mark := card.find_child("Chosen", true, false) as Label
+	assert_false(mark.visible)
+	card.button_pressed = true
+	assert_true(mark.visible, "the mark shows at once, before the host answers")
+	var normal := card.get_theme_stylebox("normal") as StyleBoxFlat
+	var pressed := card.get_theme_stylebox("pressed") as StyleBoxFlat
+	assert_true(pressed.border_width_left > normal.border_width_left and pressed.bg_color != normal.bg_color, "a different look")
+	card.free()
+
+
+func test_the_info_button_opens_the_hero_stats_and_spells_without_picking_it() -> void:
+	var picked := []
+	var holder := Control.new()
+	holder.size = Vector2(900, 700)
+	_root().add_child(holder)
+	var card := NetUi.hero_card(0, false, func(index: int) -> void: picked.append(index))
+	holder.add_child(card)
+	(holder.find_child("Info0", true, false) as Button).pressed.emit()
+	var popup := holder.find_child("HeroInfo", true, false)
+	assert_true(popup != null, "the popup opened")
+	assert_eq(picked, [], "the card was not picked")
+	var info := PvpHeroes.details(0)
+	assert_eq(info["spells"].size(), 5)
+	for spell: Dictionary in info["spells"]:
+		assert_false(spell["lines"].is_empty(), "each spell says what it does")
+	assert_true(info["power"] > 0)
+	(popup.find_child("CloseInfo", true, false) as Button).pressed.emit()
+	await _frames()
+	assert_true(holder.find_child("HeroInfo", true, false) == null, "closed")
+	holder.free()
+
+
+func test_the_teams_are_blue_and_red_everywhere() -> void:
+	assert_eq(NetUi.side_name(0), "Blue team")
+	assert_eq(NetUi.side_name(1), "Red team")
+	assert_eq(NetStatusPanel.SIDE_COLORS, NetUi.SIDE_COLORS)
+	var lobby := NetLobbyScreen.new()
+	var rig := NetRig.new()
+	rig.host(1)
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	assert_true(lobby.find_children("*", "MapPreview", true, false).size() == 1)
+	var map_preview := lobby.find_children("*", "MapPreview", true, false)[0] as MapPreview
+	assert_eq(map_preview.zone_color, NetUi.SIDE_COLORS[0])
+	assert_eq(map_preview.enemy_color, NetUi.SIDE_COLORS[1])
+	lobby.free()
+
+
+func test_emotes_show_on_the_lobby_and_the_fight_panel() -> void:
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	rig.guest(2, "Bob")
+	assert_eq(MatchSession.EMOTE_COUNT, Emotes.count())
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	rig.sessions[2].send_emote(1)
+	rig.net.flush()
+	assert_true((lobby.find_child("Seat2", true, false) as Label).text.contains(Emotes.text(1)))
+	(lobby.find_child("Emote2", true, false) as Button).pressed.emit()
+	rig.net.flush()
+	lobby.free()
 
 
 func test_the_lobby_opens_with_the_hero_the_player_likes() -> void:

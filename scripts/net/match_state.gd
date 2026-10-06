@@ -6,6 +6,7 @@ extends RefCounted
 ## dictionary with a kind "k":
 ##   join {id, name, token}   a player arrives (or comes back: the same token)
 ##   drop {id}                a player left (lobby: gone; battle: disconnected)
+##   kick {id}                the host removed a player from the lobby (they can't come back)
 ##   set {id, f, v}           a player's hero, side, ready flag or name (lobby)
 ##   cfg {f, v}               a setting: typology, size, seed, turn, grace (lobby)
 ##   start {}                 builds the map and the battle (lobby, everyone ready)
@@ -31,7 +32,8 @@ class Seat extends RefCounted:
 	## the secret gets their seat back after a disconnect.
 	var token := ""
 	var hero := 0
-	var side := 0
+	## 0 or 1; -1 until the player picks one (nobody is put on a side for them).
+	var side := -1
 	var ready := false
 	var connected := true
 	## Played by the AI (the player left); returning: they are back and will get the hero back at a safe moment.
@@ -48,6 +50,8 @@ var battle: Battle
 ## Seat id -> the id of its hero's unit, once the battle exists.
 var unit_of_seat: Dictionary[int, int] = {}
 var placed: Dictionary[int, bool] = {}
+## Hashes of the tokens of the players the host removed: they can't join this match again.
+var banned: Array[String] = []
 
 
 func entry_count() -> int:
@@ -105,8 +109,11 @@ func is_over() -> bool:
 func start_problem() -> String:
 	if phase != Phase.LOBBY:
 		return TranslationServer.translate("the match has started")
+	for id in seats:
+		if seats[id].side < 0:
+			return TranslationServer.translate("everyone must pick a team")
 	if seats_on(0).is_empty() or seats_on(1).is_empty():
-		return TranslationServer.translate("each side needs a player")
+		return TranslationServer.translate("each team needs a player")
 	for id in seats:
 		if not seats[id].ready:
 			return TranslationServer.translate("everyone must be ready")
@@ -142,6 +149,7 @@ func _apply(entry: Dictionary) -> String:
 	match entry.get("k"):
 		"join": return _join(entry)
 		"drop": return _drop(entry)
+		"kick": return _kick(entry)
 		"set": return _set_seat(entry)
 		"cfg": return _cfg(entry)
 		"start": return _start()
@@ -158,6 +166,8 @@ func _join(entry: Dictionary) -> String:
 	var token: Variant = entry.get("token")
 	if id is not int or token is not String or (token as String).length() != 64:
 		return "bad join"
+	if token in banned:
+		return TranslationServer.translate("you were removed from this match")
 	var existing := _seat_with_hash(token)
 	if existing != null:
 		existing.connected = true
@@ -174,7 +184,6 @@ func _join(entry: Dictionary) -> String:
 	seat.id = id
 	seat.token = token
 	seat.name = _clean_name(entry.get("name"), "Player %d" % id)
-	seat.side = 0 if seats_on(0).size() <= seats_on(1).size() else 1
 	seats[id] = seat
 	return ""
 
@@ -184,6 +193,15 @@ func _seat_with_hash(hashed: String) -> Seat:
 		if seats[id].token == hashed:
 			return seats[id]
 	return null
+
+
+func _kick(entry: Dictionary) -> String:
+	var id: Variant = entry.get("id")
+	if phase != Phase.LOBBY or id is not int or not seats.has(id):
+		return "can't remove that player now"
+	banned.append(seats[id].token)
+	seats.erase(id)
+	return ""
 
 
 func _drop(entry: Dictionary) -> String:
@@ -222,6 +240,8 @@ func _set_seat(entry: Dictionary) -> String:
 		"ready":
 			if value is not bool:
 				return "bad flag"
+			if value and seat.side < 0:
+				return TranslationServer.translate("pick a team first")
 			seat.ready = value
 		"name":
 			seat.name = _clean_name(value, seat.name)

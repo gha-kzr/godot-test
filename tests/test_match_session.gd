@@ -34,8 +34,56 @@ func test_players_join_and_see_the_same_lobby() -> void:
 		assert_true(rig.sessions[id].is_synced)
 	assert_true(rig.in_step())
 	assert_eq(rig.sessions[2].host_id, 1)
-	assert_eq(rig.sessions[1].state.seats_on(0).size() + rig.sessions[1].state.seats_on(1).size(), 3)
-	assert_true(absi(rig.sessions[1].state.seats_on(0).size() - rig.sessions[1].state.seats_on(1).size()) <= 1, "sides are balanced")
+	for id in [1, 2, 3]:
+		assert_eq(rig.sessions[1].state.seats[id].side, -1, "nobody is put on a side for them")
+
+
+func test_nobody_can_ready_up_without_a_side() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	var refusals := []
+	rig.sessions[1].rejected.connect(func(why: String) -> void: refusals.append(why))
+	rig.sessions[1].set_ready(true)
+	rig.net.flush()
+	assert_false(rig.sessions[1].state.seats[1].ready)
+	assert_eq(refusals.size(), 1)
+	rig.sessions[1].set_field("side", 0)
+	rig.sessions[1].set_ready(true)
+	rig.net.flush()
+	assert_true(rig.sessions[1].state.seats[1].ready)
+
+
+func test_the_host_removes_a_player_who_cannot_come_back() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.guest(3)
+	rig.sessions[2].kick(3)  # Not the host: refused.
+	rig.net.flush()
+	assert_true(rig.sessions[1].state.seats.has(3))
+	rig.sessions[1].kick(3)
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seat_ids(), [1, 2] as Array[int])
+	assert_true(rig.sessions[3].halted_now(), "the removed player is told")
+	assert_true(MatchState.token_hash(NetRig.token_of(3)) in rig.sessions[1].state.banned, "and cannot rejoin")
+	assert_true(rig.in_step())
+
+
+func test_emotes_reach_the_others_and_not_too_often() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	var seen := []
+	rig.sessions[1].emote_received.connect(func(id: int, emote: int) -> void: seen.append([id, emote]))
+	rig.sessions[2].send_emote(3)
+	rig.sessions[2].send_emote(4)  # Too soon: dropped.
+	rig.sessions[2].send_emote(99)  # Not an emote.
+	rig.net.flush()
+	assert_eq(seen, [[2, 3]])
+	rig.run(2.0)
+	rig.sessions[2].send_emote(4)
+	rig.net.flush()
+	assert_eq(seen, [[2, 3], [2, 4]])
 
 
 func test_a_player_changes_hero_and_side_but_not_someone_elses() -> void:
@@ -67,6 +115,7 @@ func test_the_host_sets_the_map_and_everyone_gets_the_same_battle() -> void:
 	rig.sessions[1].configure("size", 15)
 	rig.sessions[1].configure("seed", 4242)
 	rig.sessions[1].configure("turn", 45)
+	rig.sessions[1].set_field("side", 0)
 	rig.sessions[2].set_field("side", 1)
 	rig.net.flush()
 	assert_ne(rig.sessions[1].state.start_problem(), "", "nobody is ready")
@@ -89,6 +138,7 @@ func test_changing_a_setting_unreadies_everyone() -> void:
 	var rig := NetRig.new()
 	rig.host(1)
 	rig.guest(2)
+	rig.sessions[2].set_field("side", 1)
 	rig.sessions[2].set_ready(true)
 	rig.net.flush()
 	assert_true(rig.sessions[1].state.seats[2].ready)
@@ -106,7 +156,8 @@ func test_a_side_holds_four_players_at_most() -> void:
 		rig.sessions[id].set_field("side", 0)
 	rig.net.flush()
 	assert_eq(rig.sessions[1].state.seats_on(0).size(), 4)
-	assert_eq(rig.sessions[1].state.seats_on(1).size(), 2)
+	assert_eq(rig.sessions[1].state.seats_on(1).size(), 0, "the others stay where they were")
+	assert_eq(rig.sessions[1].state.seats[6].side, -1)
 	assert_true(rig.in_step())
 
 

@@ -26,6 +26,9 @@ msgid_plural "%d turns"
 msgstr[0] "%d tour"
 msgstr[1] "%d tours"
 
+msgid "%s  (%d AP)"
+msgstr "%s  (%d PA)"
+
 msgid "%s  Lv %d"
 msgstr "%s  Niv. %d"
 
@@ -305,6 +308,9 @@ msgstr "Morsure"
 msgid "Blink"
 msgstr "Clignement"
 
+msgid "Blue team"
+msgstr "Équipe bleue"
+
 msgid "Board"
 msgstr "Plateau"
 
@@ -369,6 +375,9 @@ msgstr "Gelé"
 
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr "Choisissez une cible pour %s (cases orange). Échap pour annuler"
+
+msgid "Chosen"
+msgstr "Choisi"
 
 msgid "Circle"
 msgstr "Cercle"
@@ -481,8 +490,8 @@ msgstr "Affichage"
 msgid "Dread"
 msgstr "Effroi"
 
-msgid "each side needs a player"
-msgstr "chaque camp doit avoir un joueur"
+msgid "each team needs a player"
+msgstr "chaque équipe doit avoir un joueur"
 
 msgid "edge layout"
 msgstr "disposition face à face"
@@ -531,6 +540,9 @@ msgstr "Toutes les épreuves sont terminées."
 
 msgid "everyone must be ready"
 msgstr "tout le monde doit être prêt"
+
+msgid "everyone must pick a team"
+msgstr "tout le monde doit choisir une équipe"
 
 msgid "facing edges"
 msgstr "bords opposés"
@@ -676,6 +688,12 @@ msgstr "Donner une de chaque rune (à ce niveau, jusqu'à 10)"
 msgid "Give this much essence"
 msgstr "Donner cette quantité d'essence"
 
+msgid "Good game!"
+msgstr "Belle partie !"
+
+msgid "Good luck!"
+msgstr "Bonne chance !"
+
 msgid "Gorged"
 msgstr "Repu"
 
@@ -705,6 +723,9 @@ msgstr "soigne %s"
 
 msgid "heals %s (%d%% Power)"
 msgstr "soigne %s (%d%% Puissance)"
+
+msgid "Hello!"
+msgstr "Salut !"
 
 msgid "Hero"
 msgstr "Héros"
@@ -921,6 +942,9 @@ msgstr "Suivant"
 msgid "Next level: %s"
 msgstr "Niveau suivant : %s"
 
+msgid "Nice one!"
+msgstr "Bien joué !"
+
 msgid "No"
 msgstr "Non"
 
@@ -951,6 +975,9 @@ msgstr "aucune"
 msgid "Normal"
 msgstr "Normal"
 
+msgid "Not in a team yet"
+msgstr "Pas encore dans une équipe"
+
 msgid "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
 msgstr "Rien de ce combat n'est conservé : il recommencera depuis le début quand vous le rejouerez. Échap pour rester."
 
@@ -966,6 +993,9 @@ msgstr "Un seul combat. Le réussir permet à la tour de monter jusqu'à l'étag
 msgid "One of every rune, at level %d, is in the stash."
 msgstr "Une de chaque rune, au niveau %d, est dans la réserve."
 
+msgid "Oops!"
+msgstr "Oups !"
+
 msgid "Open field"
 msgstr "Plaine"
 
@@ -977,6 +1007,9 @@ msgstr "Les cases orange peuvent être ciblées. Cliquez sur un ennemi pour lui 
 
 msgid "Orc Guard"
 msgstr "Garde orque"
+
+msgid "Ouch!"
+msgstr "Aïe !"
 
 msgid "out of step with the host"
 msgstr "désynchronisé de l'hôte"
@@ -992,6 +1025,12 @@ msgstr "Physique"
 
 msgid "Pick a boon, or heal the party instead."
 msgstr "Choisissez un bienfait, ou soignez l'équipe à la place."
+
+msgid "Pick a team first"
+msgstr "Choisissez d'abord une équipe"
+
+msgid "pick a team first"
+msgstr "choisissez d'abord une équipe"
 
 msgid "Pick at least one enemy."
 msgstr "Choisissez au moins un ennemi."
@@ -1034,6 +1073,9 @@ msgstr "Bond"
 
 msgid "Power %+d%%   Damage taken %+d%%"
 msgstr "Puissance %+d%%   Dégâts subis %+d%%"
+
+msgid "Power %d"
+msgstr "Puissance %d"
 
 msgid "Power: All %+d%%\nResist: %s"
 msgstr "Puissance : tous %+d%%\nRésist. : %s"
@@ -1159,11 +1201,20 @@ msgstr "Recentrer (%s)"
 msgid "Recenter camera"
 msgstr "Recentrer la caméra"
 
+msgid "Red team"
+msgstr "Équipe rouge"
+
 msgid "Refill AP and MP"
 msgstr "Rendre PA et PM"
 
 msgid "Regeneration"
 msgstr "Régénération"
+
+msgid "Remove"
+msgstr "Retirer"
+
+msgid "Remove this player from the match: they cannot come back."
+msgstr "Retirer ce joueur du match : il ne pourra pas revenir."
 
 msgid "Rend"
 msgstr "Lacérer"
@@ -1182,6 +1233,9 @@ msgstr "Résistance : %s"
 
 msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
 msgstr "Résistance : pourcentage de dégâts en moins d'un type (jamais plus des trois quarts pour les héros ; un ennemi peut être immunisé)."
+
+msgid "Resistances: %s"
+msgstr "Résistances : %s"
 
 msgid "Role: %s"
 msgstr "Rôle : %s"
@@ -1249,6 +1303,9 @@ msgstr "%s recyclé : +%d essence."
 msgid "Save reset."
 msgstr "Sauvegarde effacée."
 
+msgid "Say something"
+msgstr "Dire quelque chose"
+
 msgid "Seconds before the AI replaces a player who left"
 msgstr "Secondes avant que l'IA remplace un joueur parti"
 
@@ -1284,12 +1341,6 @@ msgstr "Abrité"
 
 msgid "Show hints again"
 msgstr "Réafficher les astuces"
-
-msgid "Side A"
-msgstr "Camp A"
-
-msgid "Side B"
-msgstr "Camp B"
 
 msgid "Side view (%s)"
 msgstr "Vue de côté (%s)"
@@ -1387,6 +1438,9 @@ msgstr "Commencer une ascension à cet étage"
 msgid "Start the match"
 msgstr "Lancer la partie"
 
+msgid "Stats and spells in detail"
+msgstr "Statistiques et sorts en détail"
+
 msgid "Stay"
 msgstr "Rester"
 
@@ -1438,6 +1492,9 @@ msgstr "Équipe : %s"
 msgid "Teleports to the target cell"
 msgstr "Se téléporte sur la case ciblée"
 
+msgid "Thanks!"
+msgstr "Merci !"
+
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."
 
@@ -1488,6 +1545,9 @@ msgstr "Celui de l'étage"
 
 msgid "the game state differs from the host's (desync)"
 msgstr "l'état de la partie diffère de celui de l'hôte (désynchronisation)"
+
+msgid "The host removed you from the match."
+msgstr "L'hôte vous a retiré du match."
 
 msgid "the match has started"
 msgstr "la partie a déjà commencé"
@@ -1594,8 +1654,11 @@ msgstr "Volée"
 msgid "Wail"
 msgstr "Lamentation"
 
-msgid "Waiting for the host to start. Pick your hero and side, then press Ready."
-msgstr "En attente de l'hôte. Choisissez votre héros et votre camp, puis appuyez sur Prêt."
+msgid "Wait for me"
+msgstr "Attendez-moi"
+
+msgid "Waiting for the host to start. Pick your hero and your team, then press Ready."
+msgstr "En attente du lancement par l'hôte. Choisissez votre héros et votre équipe, puis appuyez sur Prêt."
 
 msgid "Warg"
 msgstr "Warg"
@@ -1642,9 +1705,6 @@ msgstr "Oui, réinitialiser"
 msgid "Yeti"
 msgstr "Yéti"
 
-msgid "You"
-msgstr "Vous"
-
 msgid "You are the host. Not ready to start yet: %s."
 msgstr "Vous êtes l'hôte. Pas encore prêt à lancer : %s."
 
@@ -1663,14 +1723,11 @@ msgstr "Vous avez quitté le combat. Il recommence quand vous poursuivez l'ascen
 msgid "You left the QA battle."
 msgstr "Vous avez quitté le combat QA."
 
-msgid "Your hero (the lobby starts with it; you can change it there)"
-msgstr "Votre héros (le salon commence avec lui ; vous pouvez le changer là-bas)"
+msgid "you were removed from this match"
+msgstr "vous avez été retiré de ce match"
 
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr "Vos héros sont sur les cases turquoise. Appuyez sur Prêt ({end_turn}) pour lancer le combat."
-
-msgid "Your name"
-msgstr "Votre nom"
 
 msgid "your next %d turns"
 msgstr "vos %d prochains tours"
@@ -1678,5 +1735,5 @@ msgstr "vos %d prochains tours"
 msgid "your next turn"
 msgstr "votre prochain tour"
 
-msgid "Your seat"
-msgstr "Votre place"
+msgid "Your player"
+msgstr "Votre joueur"

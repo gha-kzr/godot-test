@@ -1,17 +1,14 @@
 class_name NetMenuScreen
 extends Screen
-## The multiplayer front page, in cards: who you are (a name and the hero you like to play: the lobby starts with it),
-## then two separate ways in: host a match, or join one with a room code (or an invite link). An invite link opened in
-## the browser fills the code in and joins by itself.
+## The multiplayer front page, in cards: two separate ways in, host a match or join one with a room code (or an invite
+## link). An invite link opened in the browser fills the code in and joins by itself. Name, hero and team are chosen in
+## the lobby (the name starts as the last one used, or a random one).
 
 signal host_requested(player_name: String)
 signal join_requested(player_name: String, code: String)
 
-var _name_edit: LineEdit
 var _code_edit: LineEdit
 var _status: Label
-var _heroes: HBoxContainer
-var _hero := 0
 
 
 func _ready() -> void:
@@ -39,7 +36,6 @@ func _ready() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
 	NetUi.note(column, tr("Fight other players, one hero each. Nothing to install and no server: the players connect to each other directly."))
-	_build_you(column)
 	var ways := HBoxContainer.new()
 	ways.add_theme_constant_override("separation", 14)
 	column.add_child(ways)
@@ -56,38 +52,6 @@ func _ready() -> void:
 	var back := HubStyle.button("Back", "BackButton")
 	back.pressed.connect(back_pressed.emit)
 	column.add_child(back)
-
-
-func _build_you(parent: Control) -> void:
-	var box := NetUi.card(parent, tr("You"))
-	_name_edit = LineEdit.new()
-	_name_edit.name = "NameEdit"
-	_name_edit.placeholder_text = "Your name"
-	_name_edit.max_length = MatchState.MAX_NAME
-	_name_edit.custom_minimum_size = Vector2(0, 44)
-	_name_edit.text = _saved_name()
-	box.add_child(_name_edit)
-	NetUi.note(box, tr("Your hero (the lobby starts with it; you can change it there)"))
-	_heroes = HBoxContainer.new()
-	_heroes.name = "Heroes"
-	_heroes.add_theme_constant_override("separation", 10)
-	box.add_child(_heroes)
-	_hero = NetUi.saved_hero()
-	_fill_heroes()
-
-
-func _fill_heroes() -> void:
-	HubStyle.clear_children(_heroes)
-	var group := ButtonGroup.new()
-	for index in PvpHeroes.hero_count():
-		var card := NetUi.hero_card(index, index == _hero, _pick_hero)
-		card.button_group = group
-		_heroes.add_child(card)
-
-
-func _pick_hero(index: int) -> void:
-	_hero = index
-	NetUi.save_hero(index)
 
 
 func _build_host(parent: Control) -> void:
@@ -129,12 +93,10 @@ func show_message(text: String) -> void:
 
 
 func player_name() -> String:
-	var typed := _name_edit.text.strip_edges()
-	return typed if not typed.is_empty() else "Player"
+	return NetUi.saved_name()
 
 
 func _on_host() -> void:
-	_save_name()
 	host_requested.emit(player_name())
 
 
@@ -143,19 +105,4 @@ func _on_join() -> void:
 	if text.is_empty():
 		_status.text = "Enter a room code or paste an invite first."
 		return
-	_save_name()
 	join_requested.emit(player_name(), text)
-
-
-func _saved_name() -> String:
-	var file := ConfigFile.new()
-	if file.load(NetUi.player_file) == OK:
-		return str(file.get_value("player", "name", ""))
-	return ""
-
-
-func _save_name() -> void:
-	var file := ConfigFile.new()
-	file.load(NetUi.player_file)
-	file.set_value("player", "name", _name_edit.text.strip_edges())
-	file.save(NetUi.player_file)

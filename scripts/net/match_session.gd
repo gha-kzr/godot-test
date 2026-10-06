@@ -22,9 +22,14 @@ signal rejected(reason: String)
 ## The match can't go on (a desync, the match was full or already started...).
 signal halted(reason: String)
 signal synced
+## Another player sent an emote (a seat id and an emote number).
+signal emote_received(seat_id: int, emote_id: int)
 
 const PING_INTERVAL := 2.0
 const PEER_TIMEOUT := 8.0
+## How many emotes there are, and how often a player may send one.
+const EMOTE_COUNT := 8
+const EMOTE_COOLDOWN := 1.5
 const DEFAULT_AI_DELAY := 0.6
 const ELECTION_WAIT := 1.0
 ## Entries that carry the state's fingerprint, so a peer that drifted is noticed at once.
@@ -61,6 +66,7 @@ var _election_pulling := false
 var _held: Array = []
 ## Peers I asked for entries (a catch-up pull): their `entries` are accepted from them.
 var _pulling: Dictionary[int, bool] = {}
+var _last_emote: Dictionary[int, float] = {}
 
 
 ## The player who opens the match: seat id = their transport id, host from the start.
@@ -165,6 +171,23 @@ func back_to_lobby() -> void:
 	propose({"k": "lobby"})
 
 
+## The host removes a player from the lobby: they cannot join this match again.
+func kick(seat_id: int) -> void:
+	propose({"k": "kick", "id": seat_id})
+
+
+## A quick message to the other players, shown over my hero (not part of the match log: it is only for show).
+func send_emote(emote_id: int) -> void:
+	if emote_id < 0 or emote_id >= EMOTE_COUNT:
+		return
+	var last: float = _last_emote.get(my_id, -100.0)
+	if _now - last < EMOTE_COOLDOWN and last >= 0.0:
+		return
+	_last_emote[my_id] = _now
+	transport.broadcast({"m": "emote", "e": emote_id})
+	emote_received.emit(my_id, emote_id)
+
+
 ## Lets the AI play my hero (to finish the fight without me), or takes it back.
 func hand_to_ai(on: bool) -> void:
 	propose({"k": "ai", "id": my_id, "v": on})
@@ -228,7 +251,18 @@ func _on_message(from: int, message: Dictionary) -> void:
 		"pull": _on_pull(from, message.get("from"))
 		"elected": _on_elected(from, message.get("host"), message.get("have"))
 		"have": _on_have(from, message.get("n"))
+		"emote": _on_emote(from, message.get("e"))
 		"bye": _on_peer_lost(from)
+
+
+func _on_emote(from: int, emote_id: Variant) -> void:
+	if emote_id is not int or emote_id < 0 or emote_id >= EMOTE_COUNT or not state.seats.has(from):
+		return
+	var last: float = _last_emote.get(from, -100.0)
+	if _now - last < EMOTE_COOLDOWN and last >= 0.0:
+		return  # Too often: ignored.
+	_last_emote[from] = _now
+	emote_received.emit(from, emote_id)
 
 
 func _on_hello(from: int, message: Dictionary) -> void:
@@ -369,7 +403,7 @@ func _authorize(entry: Dictionary, from: int, internal: bool) -> String:
 			if asked == from and (entry.get("v") == true or state.current_seat() != from):
 				return ""
 			return "only the host can"
-		"cfg", "start", "go", "lobby", "drop":
+		"cfg", "start", "go", "lobby", "drop", "kick":
 			return "" if from == host_id else "only the host can"
 		"act":
 			if entry.get("sys") == true:
@@ -392,6 +426,9 @@ func _after_applied(entry: Dictionary) -> void:
 		_seen[nonce] = true
 		_pending = _pending.filter(func(p: Dictionary) -> bool: return str(p.get("c")) != nonce)
 	var kind: String = entry["k"]
+	if kind == "kick" and entry.get("id") == my_id:
+		_halt(TranslationServer.translate("The host removed you from the match."))
+		return
 	if kind == "drop" and state.phase == MatchState.Phase.BATTLE:
 		_absent_since[int(entry["id"])] = _now
 	if kind == "join" or (kind == "ai" and entry.get("v") == false):

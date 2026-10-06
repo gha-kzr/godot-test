@@ -44,3 +44,25 @@ static func summary(hero_index: int) -> Dictionary:
 	var role := TranslationServer.translate("Melee fighter") if Placement.reach_score(unit) < 3.0 else TranslationServer.translate("Ranged")
 	return {"name": hero_name(hero_index), "role": role, "hp": state.max_hp(), "ap": state.max_ap(), "mp": state.max_mp(),
 			"spell_icons": icons, "spell_names": names}
+
+
+## Everything the info popup shows: the summary, plus power, resistances and each spell in full.
+static func details(hero_index: int) -> Dictionary:
+	var built := build(hero_index)
+	var unit: UnitData = built["unit"]
+	var state := UnitState.new(0, unit, UnitState.Team.PLAYER, Vector2i.ZERO)
+	state.permanent_modifiers.assign(built["modifiers"])
+	var info := summary(hero_index)
+	info["power"] = state.power()
+	var resistances: Array[String] = []
+	for damage_type in state.resistance_types():
+		var percent := state.resistance_percent(damage_type)
+		if percent != 0:
+			resistances.append("%s %d %%" % [TranslationServer.translate(damage_type.display_name), percent])
+	info["resistances"] = resistances
+	var spells: Array[Dictionary] = []
+	for spell in unit.spells:
+		spells.append({"name": TranslationServer.translate(spell.display_name), "icon": spell.display_icon(), "ap": spell.ap_cost,
+				"lines": SpellBar.detail_lines(spell)})
+	info["spells"] = spells
+	return info

@@ -25,6 +25,10 @@ msgid_plural "%d turns"
 msgstr[0] ""
 msgstr[1] ""
 
+#: scripts/game/net/net_ui.gd
+msgid "%s  (%d AP)"
+msgstr ""
+
 #: scripts/game/hub/hero_tabs.gd
 msgid "%s  Lv %d"
 msgstr ""
@@ -397,6 +401,10 @@ msgstr ""
 msgid "Blink"
 msgstr ""
 
+#: scripts/game/net/net_ui.gd
+msgid "Blue team"
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "Board"
 msgstr ""
@@ -483,6 +491,10 @@ msgstr ""
 msgid "Choose a target for %s (orange cells). Esc to cancel"
 msgstr ""
 
+#: scripts/game/net/net_ui.gd
+msgid "Chosen"
+msgstr ""
+
 #: scripts/data/area_shape.gd
 msgid "Circle"
 msgstr ""
@@ -531,7 +543,7 @@ msgstr ""
 msgid "Climb the tower to fight floor after floor, or try a stage: one hard battle that unlocks higher floors."
 msgstr ""
 
-#: scenes/battle/hud/order_overlay.tscn
+#: scripts/game/net/net_ui.gd scenes/battle/hud/order_overlay.tscn
 msgid "Close"
 msgstr ""
 
@@ -632,7 +644,7 @@ msgid "Dread"
 msgstr ""
 
 #: scripts/net/match_state.gd
-msgid "each side needs a player"
+msgid "each team needs a player"
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -697,6 +709,10 @@ msgstr ""
 
 #: scripts/net/match_state.gd
 msgid "everyone must be ready"
+msgstr ""
+
+#: scripts/net/match_state.gd
+msgid "everyone must pick a team"
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -891,6 +907,14 @@ msgstr ""
 msgid "Give this much essence"
 msgstr ""
 
+#: scripts/net/emotes.gd
+msgid "Good game!"
+msgstr ""
+
+#: scripts/net/emotes.gd
+msgid "Good luck!"
+msgstr ""
+
 #: data/statuses/gorged.tres
 msgid "Gorged"
 msgstr ""
@@ -929,6 +953,10 @@ msgstr ""
 
 #: scripts/data/heal_effect.gd
 msgid "heals %s (%d%% Power)"
+msgstr ""
+
+#: scripts/net/emotes.gd
+msgid "Hello!"
 msgstr ""
 
 #: scenes/game/hub/hero_panel.tscn
@@ -1217,6 +1245,10 @@ msgstr ""
 msgid "Next level: %s"
 msgstr ""
 
+#: scripts/net/emotes.gd
+msgid "Nice one!"
+msgstr ""
+
 #: scripts/game/hub/rune_stash.gd scenes/game/settings_screen.tscn
 msgid "No"
 msgstr ""
@@ -1257,6 +1289,10 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Not in a team yet"
+msgstr ""
+
 #: scenes/battle/hud.tscn
 msgid "Nothing from this fight is kept: it starts over from the beginning when you play it again. Esc to stay."
 msgstr ""
@@ -1277,6 +1313,10 @@ msgstr ""
 msgid "One of every rune, at level %d, is in the stash."
 msgstr ""
 
+#: scripts/net/emotes.gd
+msgid "Oops!"
+msgstr ""
+
 #: scripts/progression/qa_tools.gd
 msgid "Open field"
 msgstr ""
@@ -1291,6 +1331,10 @@ msgstr ""
 
 #: data/units/orc_guard.tres
 msgid "Orc Guard"
+msgstr ""
+
+#: scripts/net/emotes.gd
+msgid "Ouch!"
 msgstr ""
 
 #: scripts/net/match_session.gd
@@ -1311,6 +1355,14 @@ msgstr ""
 
 #: scripts/game/game.gd
 msgid "Pick a boon, or heal the party instead."
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Pick a team first"
+msgstr ""
+
+#: scripts/net/match_state.gd
+msgid "pick a team first"
 msgstr ""
 
 #: scripts/game/qa_screen.gd
@@ -1367,6 +1419,10 @@ msgstr ""
 
 #: scripts/game/hub/hero_panel.gd
 msgid "Power %+d%%   Damage taken %+d%%"
+msgstr ""
+
+#: scripts/game/net/net_ui.gd
+msgid "Power %d"
 msgstr ""
 
 #: scripts/view/hud/unit_info.gd
@@ -1533,12 +1589,24 @@ msgstr ""
 msgid "Recenter camera"
 msgstr ""
 
+#: scripts/game/net/net_ui.gd
+msgid "Red team"
+msgstr ""
+
 #: scripts/view/hud.gd
 msgid "Refill AP and MP"
 msgstr ""
 
 #: data/spells/regeneration.tres data/statuses/regeneration.tres
 msgid "Regeneration"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Remove"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Remove this player from the match: they cannot come back."
 msgstr ""
 
 #: data/spells/rend.tres
@@ -1563,6 +1631,10 @@ msgstr ""
 
 #: scripts/data/glossary.gd
 msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
+msgstr ""
+
+#: scripts/game/net/net_ui.gd
+msgid "Resistances: %s"
 msgstr ""
 
 #: scripts/view/hud/unit_card.gd
@@ -1654,6 +1726,10 @@ msgid "Save reset."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
+msgid "Say something"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
 msgid "Seconds before the AI replaces a player who left"
 msgstr ""
 
@@ -1699,14 +1775,6 @@ msgstr ""
 
 #: scenes/game/settings_screen.tscn
 msgid "Show hints again"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Side A"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Side B"
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -1837,6 +1905,10 @@ msgstr ""
 msgid "Start the match"
 msgstr ""
 
+#: scripts/game/net/net_ui.gd
+msgid "Stats and spells in detail"
+msgstr ""
+
 #: scenes/battle/hud.tscn
 msgid "Stay"
 msgstr ""
@@ -1905,6 +1977,10 @@ msgstr ""
 msgid "Teleports to the target cell"
 msgstr ""
 
+#: scripts/net/emotes.gd
+msgid "Thanks!"
+msgstr ""
+
 #: scripts/progression/profile.gd
 msgid "That hero isn't available."
 msgstr ""
@@ -1971,6 +2047,10 @@ msgstr ""
 
 #: scripts/net/match_session.gd
 msgid "the game state differs from the host's (desync)"
+msgstr ""
+
+#: scripts/net/match_session.gd
+msgid "The host removed you from the match."
 msgstr ""
 
 #: scripts/net/match_state.gd
@@ -2113,8 +2193,12 @@ msgstr ""
 msgid "Wail"
 msgstr ""
 
+#: scripts/net/emotes.gd
+msgid "Wait for me"
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
-msgid "Waiting for the host to start. Pick your hero and side, then press Ready."
+msgid "Waiting for the host to start. Pick your hero and your team, then press Ready."
 msgstr ""
 
 #: data/units/warg.tres
@@ -2177,10 +2261,6 @@ msgstr ""
 msgid "Yeti"
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
-msgid "You"
-msgstr ""
-
 #: scripts/game/net/net_lobby_screen.gd
 msgid "You are the host. Not ready to start yet: %s."
 msgstr ""
@@ -2205,16 +2285,12 @@ msgstr ""
 msgid "You left the QA battle."
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
-msgid "Your hero (the lobby starts with it; you can change it there)"
+#: scripts/net/match_state.gd
+msgid "you were removed from this match"
 msgstr ""
 
 #: scripts/progression/tutorial.gd
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd scripts/game/net/net_menu_screen.gd
-msgid "Your name"
 msgstr ""
 
 #: scripts/data/apply_status_effect.gd
@@ -2226,5 +2302,5 @@ msgid "your next turn"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
-msgid "Your seat"
+msgid "Your player"
 msgstr ""

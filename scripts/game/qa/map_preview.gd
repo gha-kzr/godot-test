@@ -12,6 +12,12 @@ const ENEMY := Color(0.95, 0.3, 0.25)
 ## The highest level drawn with the lightest green.
 const TOP_LEVEL := 4
 
+## What the two start areas look like: a square for the heroes' zone, a dot for the enemies' spawns.
+## A PvP lobby draws both as squares, in the teams' colours.
+var zone_color := ZONE
+var enemy_color := ENEMY
+var enemy_as_square := false
+
 var _parsed: MapData.ParseResult
 
 
@@ -36,6 +42,9 @@ func _draw() -> void:
 			var square := Rect2(origin + Vector2(x, y) * cell, Vector2.ONE * cell)
 			draw_rect(square.grow(-1.0), color)
 			if at in _parsed.player_spawns:
-				draw_rect(square.grow(-cell * 0.25), ZONE)
+				draw_rect(square.grow(-cell * 0.25), zone_color)
 			elif at in _parsed.enemy_spawns:
-				draw_circle(square.get_center(), cell * 0.3, ENEMY)
+				if enemy_as_square:
+					draw_rect(square.grow(-cell * 0.25), enemy_color)
+				else:
+					draw_circle(square.get_center(), cell * 0.3, enemy_color)

@@ -3,12 +3,17 @@ extends PanelContainer
 ## In the fight: who plays which hero (a colour for the side), who is a player, who the AI and who has
 ## dropped out, the seconds left on the turn, and a button to let the AI play my hero (or take it back).
 
-const SIDE_COLORS: Array[Color] = [Color(0.45, 0.65, 1.0), Color(1.0, 0.5, 0.45)]
+const SIDE_COLORS: Array[Color] = NetUi.SIDE_COLORS
 
 var _session: MatchSession
 var _rows: VBoxContainer
 var _timer_label: Label
 var _toggle: Button
+var _emote_bar: HFlowContainer
+var _emotes_seen: Dictionary[int, Array] = {}
+
+## How long what a player said stays next to their name.
+const EMOTE_SECONDS := 5.0
 
 
 func bind(session: MatchSession) -> void:
@@ -33,7 +38,19 @@ func bind(session: MatchSession) -> void:
 	_toggle.focus_mode = Control.FOCUS_NONE
 	_toggle.pressed.connect(_on_toggle)
 	box.add_child(_toggle)
+	_emote_bar = HFlowContainer.new()
+	_emote_bar.name = "Emotes"
+	_emote_bar.custom_minimum_size = Vector2(260, 0)
+	box.add_child(_emote_bar)
+	for index in Emotes.count():
+		var emote := Button.new()
+		emote.name = "Emote%d" % index
+		emote.text = Emotes.TEXTS[index]
+		emote.focus_mode = Control.FOCUS_NONE
+		emote.pressed.connect(func() -> void: session.send_emote(index))
+		_emote_bar.add_child(emote)
 	session.changed.connect(refresh)
+	session.emote_received.connect(_on_emote)
 	refresh()
 
 
@@ -57,11 +74,20 @@ func refresh() -> void:
 		row.theme_type_variation = &"SmallLabel"
 		row.add_theme_color_override("font_color", SIDE_COLORS[seat.side])
 		row.text = describe(seat, id == _session.my_id)
+		var said: Array = _emotes_seen.get(id, [])
+		if not said.is_empty() and Time.get_ticks_msec() - int(said[1]) < EMOTE_SECONDS * 1000.0:
+			row.text += "  “%s”" % Emotes.text(int(said[0]))
 		_rows.add_child(row)
 	var mine := _session.state.seats.get(_session.my_id) as MatchState.Seat
 	_toggle.visible = mine != null
 	if mine != null:
 		_toggle.text = tr("Play my hero again") if mine.ai else tr("Let the AI play my hero")
+
+
+func _on_emote(seat_id: int, emote_id: int) -> void:
+	_emotes_seen[seat_id] = [emote_id, Time.get_ticks_msec()]
+	refresh()
+	get_tree().create_timer(EMOTE_SECONDS).timeout.connect(refresh)
 
 
 ## "Alice: Knight", with the tag that matters: (AI), (away) or (you).
