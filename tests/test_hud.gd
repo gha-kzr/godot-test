@@ -380,6 +380,20 @@ func test_hovering_a_spell_shows_its_details_in_a_panel_above_the_bar() -> void:
 	hud.free()
 
 
+func test_the_slot_under_the_mouse_is_found_even_when_disabled_and_after_a_rebuild() -> void:
+	var hud := _hud()
+	var bar := hud.get_node("%SpellBar") as SpellBar
+	hud.show_spells(_spells(), 1)  # Both cost more than 1 AP: disabled.
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_true(bar.slot(0).disabled and bar.slot(1).disabled)
+	assert_eq(bar.slot_at(bar.slot(1).get_global_rect().get_center()), 1, "a disabled slot is found")
+	assert_eq(bar.slot_at(Vector2(-50, -50)), -1, "nothing there")
+	hud.show_spells(_spells(), 10)  # Rebuilt (after an action): the lookup follows the new slots.
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_eq(bar.slot_at(bar.slot(0).get_global_rect().get_center()), 0)
+	hud.free()
+
+
 func test_spell_slots_are_square_icons_with_cost_and_key() -> void:
 	var hud := _hud()
 	hud.show_spells(_spells(), 10)

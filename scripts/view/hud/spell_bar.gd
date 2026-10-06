@@ -14,7 +14,10 @@ const MAX_KEYED_SLOTS := 9
 const SLOT_SIZE := Vector2(64, 64)
 const HEAL_TINT := Color(0.55, 1.0, 0.6)
 
+var _spells: Array[SpellData] = []
 var _spell_costs: Array[int] = []
+## The slot whose details are shown because the mouse is over it (-1: none); see _process().
+var _hovered_slot := -1
 var _cooldowns: Array[int] = []
 var _ap := 0
 var _locked := false
@@ -30,10 +33,40 @@ func _ready() -> void:
 	_details.hide()
 
 
+## The slots are rebuilt after every action, and a slot created under a mouse that does not move never gets
+## mouse_entered: its details would stay hidden until the mouse left and came back. So the slot under the mouse is also
+## looked up every frame (a disabled slot too: a spell that costs too much is the one a player reads).
+func _process(_delta: float) -> void:
+	if not is_visible_in_tree():
+		return
+	var index := slot_at(get_global_mouse_position())
+	var over := get_viewport().gui_get_hovered_control()
+	if over != null and over != _slots and not _slots.is_ancestor_of(over):
+		index = -1  # Something else is in front (a menu, a popup).
+	if index == _hovered_slot:
+		return
+	if index >= 0:
+		_hovered_slot = index
+		show_details(_spells[index])
+	else:
+		_hovered_slot = -1
+		hide_details()
+
+
+## The slot under `point` (global coordinates), -1 for none.
+func slot_at(point: Vector2) -> int:
+	for i in _slots.get_child_count():
+		if i < _spells.size() and (_slots.get_child(i) as Control).get_global_rect().has_point(point):
+			return i
+	return -1
+
+
 ## One slot per spell; spells costing more than `ap`, or with turns of cooldown left
 ## (`cooldowns`, per slot; empty: none), are disabled.
 func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
 	hide_details()
+	_hovered_slot = -1
+	_spells.assign(spells)
 	# Removed at once, freed at the end of the frame: a slot may be rebuilt from inside its own `pressed`.
 	for child in _slots.get_children():
 		_slots.remove_child(child)
