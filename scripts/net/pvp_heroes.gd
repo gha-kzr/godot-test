@@ -6,8 +6,15 @@ extends RefCounted
 const ROSTER := "res://data/pvp/roster.tres"
 
 
+static var _roster: PvpRoster
+
+
+## Kept in a static: a plain load() frees the roster (and every class under it) as soon as the caller lets go of it,
+## so every call read it again from disk (about 120 ms each, seconds for a screen of hero cards).
 static func roster() -> PvpRoster:
-	return load(ROSTER) as PvpRoster
+	if _roster == null:
+		_roster = load(ROSTER) as PvpRoster
+	return _roster
 
 
 static func hero_count() -> int:
