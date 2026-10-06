@@ -546,3 +546,16 @@ func test_a_player_left_alone_is_told_the_others_are_gone() -> void:
 	rig.guest(2)
 	rig.net.flush()
 	assert_false(rig.sessions[2].connection_lost)
+
+
+func test_the_fight_starts_when_the_placement_time_is_up() -> void:
+	var rig := _rig(2, 1)
+	rig.sessions[1].set_placed(true)  # Player 2 never presses Ready.
+	rig.run(10.0)
+	assert_false(_battle_started(rig), "still placing")
+	assert_true(rig.sessions[2].placement_seconds_left() > 15.0 and rig.sessions[2].placement_seconds_left() < 21.0, "the guest sees the clock too")
+	rig.run(MatchSession.PLACEMENT_SECONDS)
+	assert_true(_battle_started(rig), "the host started it")
+	assert_true(rig.sessions[2].state.battle.state.started)
+	assert_eq(rig.sessions[1].placement_seconds_left(), -1.0)
+	assert_true(rig.in_step())

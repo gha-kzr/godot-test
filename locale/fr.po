@@ -329,6 +329,9 @@ msgstr "Boss"
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr "Boss vaincu ! Choisissez un bienfait, ou soignez l'équipe à la place."
 
+msgid "Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox."
+msgstr "Brave limite WebRTC : dans les réglages de Brave (Confidentialité et sécurité), réglez \"Politique de gestion des IP WebRTC\" sur \"Interface publique et privée par défaut\", ou essayez Chrome ou Firefox."
+
 msgid "Break this rune for %d essence"
 msgstr "Briser cette rune pour %d essence"
 
@@ -1055,6 +1058,9 @@ msgstr "Tir clouant"
 
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr "Placez vos héros : cliquez sur l'un, puis sur une case turquoise. Prêt (%s) pour combattre"
+
+msgid "Placement: %d s"
+msgstr "Placement : %d s"
 
 msgid "Play"
 msgstr "Jouer"

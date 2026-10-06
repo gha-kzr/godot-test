@@ -429,6 +429,10 @@ msgstr ""
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr ""
 
+#: scripts/game/net/net_flow.gd scripts/game/net/net_join_screen.gd
+msgid "Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox."
+msgstr ""
+
 #: scripts/game/hub/rune_stash.gd
 msgid "Break this rune for %d essence"
 msgstr ""
@@ -1395,6 +1399,10 @@ msgstr ""
 
 #: scripts/view/battle_controller.gd
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
+msgstr ""
+
+#: scripts/net/net_status_panel.gd
+msgid "Placement: %d s"
 msgstr ""
 
 #: scenes/game/title_screen.tscn

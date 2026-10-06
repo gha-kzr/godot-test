@@ -45,6 +45,8 @@ const ENTRY_FIELDS := {
 	"start": [], "go": [], "lobby": [], "drop": ["id"], "kick": ["id"], "act": ["a", "by", "sys"],
 }
 const MAX_FIELD_TEXT := 80
+## Seconds each player has to place their hero before the fight starts (the host starts it when the time is up).
+const PLACEMENT_SECONDS := 30.0
 
 var transport: NetTransport
 var my_id := 0
@@ -67,6 +69,7 @@ var _dead: Dictionary[int, bool] = {}
 var _absent_since: Dictionary[int, float] = {}
 var _turn_unit := -2
 var _turn_elapsed := 0.0
+var _placement_elapsed := 0.0
 var _ai_wait := 0.0
 var _electing := false
 var _election_deadline := 0.0
@@ -226,6 +229,8 @@ func tick(delta: float) -> void:
 		_budget[id] = minf(PROPOSALS_BURST, _budget[id] + delta * PROPOSALS_PER_SECOND)
 	if state.battle != null and state.battle.state.started and not state.battle.state.is_over():
 		_turn_elapsed += delta  # Everyone counts the turn (the host's clock decides when it ends).
+	elif state.battle != null and not state.battle.state.started:
+		_placement_elapsed += delta
 	_ping_timer += delta
 	if _ping_timer >= PING_INTERVAL:
 		_ping_timer = 0.0
@@ -518,6 +523,8 @@ func _after_applied(entry: Dictionary) -> void:
 		_absent_since[int(entry["id"])] = _now
 	if kind == "join" or (kind == "ai" and entry.get("v") == false):
 		_absent_since.erase(int(entry["id"]))
+	if kind == "start" or kind == "lobby":
+		_placement_elapsed = 0.0
 	if kind == "act" or kind == "go" or kind == "start" or kind == "lobby":
 		_ai_wait = 0.0
 		_note_turn()
@@ -530,6 +537,13 @@ func _note_turn() -> void:
 	if unit != _turn_unit:
 		_turn_unit = unit
 		_turn_elapsed = 0.0
+
+
+## Seconds left to place heroes (-1 when the fight has begun or there is no battle).
+func placement_seconds_left() -> float:
+	if state.battle == null or state.battle.state.started:
+		return -1.0
+	return maxf(0.0, PLACEMENT_SECONDS - _placement_elapsed)
 
 
 ## Seconds left on the current turn (the host's clock; -1 when there is no timer).
@@ -657,7 +671,7 @@ func _host_tick(delta: float) -> void:
 		elif seat.ai and seat.returning and id != state.current_seat():
 			_host_submit(my_id, {"k": "ai", "id": id, "v": false})  # Back at a moment that isn't their hero's turn.
 	if not state.battle.state.started:
-		if state.everyone_placed():
+		if state.everyone_placed() or _placement_elapsed >= PLACEMENT_SECONDS:
 			_host_submit(my_id, {"k": "go"})
 		return
 	var current := state.current_seat()

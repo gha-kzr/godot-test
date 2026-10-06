@@ -72,7 +72,10 @@ func _process(delta: float) -> void:
 		join.show_connecting(hub.join_details())
 		if _connecting_for > CONNECT_TIMEOUT:
 			_connecting_for = 0.0
-			_on_failed(TranslationServer.translate("Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."))
+			var why := TranslationServer.translate("Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players.")
+			if WebPage.is_brave():
+				why += " " + TranslationServer.translate("Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox.")
+			_on_failed(why)
 
 
 # --- Screens --------------------------------------------------------------------------------

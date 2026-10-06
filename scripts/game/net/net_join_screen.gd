@@ -92,6 +92,8 @@ func show_search(trackers: String, details := "") -> void:
 
 ## The host answered: the two browsers are now opening a direct connection.
 func show_connecting(details: String) -> void:
+	if WebPage.is_brave() and not details.is_empty():
+		details += "\n" + tr("Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox.")
 	_reply.visible = false
 	_copy_link.visible = false
 	_copy_code.visible = false

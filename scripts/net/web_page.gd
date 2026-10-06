@@ -43,6 +43,11 @@ static func query(key: String) -> String:
 	return ""
 
 
+## Whether the page runs in Brave (it limits what WebRTC may reveal, which can stop two players from connecting).
+static func is_brave() -> bool:
+	return is_web() and JavaScriptBridge.eval("typeof navigator.brave !== 'undefined'", true) == true
+
+
 ## Keeps the game running while its tab is hidden. A browser stops a hidden tab's animation frames, and the game's loop
 ## with them: a host who looks at another tab would stop answering the players who join, and a player would look gone.
 ## While the page is hidden the loop is driven by a timer instead (browsers run those about once a second, enough to

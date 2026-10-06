@@ -134,8 +134,9 @@ and settings live in the browser, separate from the original game's.
 ## Known limits
 
 - Up to 8 players (4 per side); no spectators; no chat (quick emotes only).
-- Placement has no timer: a connected player who never presses Ready blocks the start of the fight (the host can hand
-  their hero to the AI only once the fight has started).
+- Placement lasts at most 30 seconds (a fixed time): the host then starts the fight with the heroes where they stand.
+- Two browsers that cannot find a common network path (Brave's default WebRTC privacy policy, strict company or school
+  networks) never connect: there is no relay (TURN). The join screen shows what the browser found.
 - A match needs a human host in a visible tab (browsers slow down background tabs); if the host leaves, another player takes over.
 - Without TURN some networks cannot connect (use another player as host, or an invite from someone who can reach both).
 - If every human leaves, the match is over: the log only lives in the players' browsers.

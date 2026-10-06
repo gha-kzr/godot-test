@@ -57,9 +57,10 @@ func bind(session: MatchSession) -> void:
 func _process(_delta: float) -> void:
 	if _session == null:
 		return
+	var placing := _session.placement_seconds_left()
 	var left := _session.turn_seconds_left()
-	_timer_label.visible = left >= 0.0
-	_timer_label.text = tr("Turn: %d s") % ceili(left)
+	_timer_label.visible = left >= 0.0 or placing >= 0.0
+	_timer_label.text = tr("Placement: %d s") % ceili(placing) if placing >= 0.0 else tr("Turn: %d s") % ceili(left)
 
 
 func refresh() -> void:

@@ -7,7 +7,7 @@ export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export async function launch(port = 9333, profile = '/tmp/e2e-chrome-profile') {
   const proc = spawn(CHROME, [
     '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
-    '--disable-features=WebRtcHideLocalIpsWithMdns', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
+    ...(process.env.E2E_MDNS === '1' ? [] : ['--disable-features=WebRtcHideLocalIpsWithMdns']), '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
     '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', '--window-size=1280,720',
     '--no-first-run', '--no-default-browser-check', 'about:blank',
   ], { stdio: 'ignore' });
