@@ -11,8 +11,13 @@ func _sandbox() -> void:
 	DirAccess.remove_absolute(TEST_FILE)
 
 
+## Every test here uses its own player file: the screens save the name and the hero, and the real file is the player's.
+func _init() -> void:
+	NetUi.player_file = TEST_FILE
+
+
 func after_each_clean() -> void:
-	NetUi.player_file = "user://net_player.cfg"
+	NetUi.player_file = TEST_FILE
 	DirAccess.remove_absolute(TEST_FILE)
 
 

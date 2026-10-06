@@ -35,7 +35,6 @@ func _ready() -> void:
 	title.text = "Multiplayer"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
-	NetUi.note(column, tr("Fight other players, one hero each. Nothing to install and no server: the players connect to each other directly."))
 	var ways := HBoxContainer.new()
 	ways.add_theme_constant_override("separation", 14)
 	column.add_child(ways)
@@ -57,7 +56,6 @@ func _ready() -> void:
 func _build_host(parent: Control) -> void:
 	var box := NetUi.card(parent, tr("Host a match"), Color(0.5, 0.85, 0.55), 340)
 	box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	NetUi.note(box, tr("Start a match and get a room code to give to your friends. You choose the map and the rules."))
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
@@ -70,7 +68,6 @@ func _build_host(parent: Control) -> void:
 func _build_join(parent: Control) -> void:
 	var box := NetUi.card(parent, tr("Join a match"), Color(0.5, 0.7, 1.0), 340)
 	box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	NetUi.note(box, tr("Type the room code the host gave you (or paste their room link). With an invite link instead, you will get a reply to send back to them."))
 	_code_edit = LineEdit.new()
 	_code_edit.name = "CodeEdit"
 	_code_edit.placeholder_text = "Room code, or invite link"

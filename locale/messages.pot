@@ -735,10 +735,6 @@ msgstr ""
 msgid "Fight it"
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
-msgid "Fight other players, one hero each. Nothing to install and no server: the players connect to each other directly."
-msgstr ""
-
 #: data/achievements/full_runes.tres
 msgid "Fill all six rune slots of one hero."
 msgstr ""
@@ -833,10 +829,6 @@ msgstr ""
 
 #: scripts/game/run_screen.gd
 msgid "Found: %s."
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Friends can join with the room code, or by opening the room link."
 msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
@@ -1893,10 +1885,6 @@ msgstr ""
 msgid "Stages"
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
-msgid "Start a match and get a room code to give to your friends. You choose the map and the rules."
-msgstr ""
-
 #: scripts/game/qa_screen.gd
 msgid "Start a tower run at this floor"
 msgstr ""
@@ -2151,10 +2139,6 @@ msgstr ""
 
 #: scripts/net/net_status_panel.gd
 msgid "Turn: %d s"
-msgstr ""
-
-#: scripts/game/net/net_menu_screen.gd
-msgid "Type the room code the host gave you (or paste their room link). With an invite link instead, you will get a reply to send back to them."
 msgstr ""
 
 #: scenes/game/settings_screen.tscn

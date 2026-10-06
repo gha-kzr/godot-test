@@ -559,9 +559,6 @@ msgstr "Combattre"
 msgid "Fight it"
 msgstr "L'affronter"
 
-msgid "Fight other players, one hero each. Nothing to install and no server: the players connect to each other directly."
-msgstr "Affrontez d'autres joueurs, un héros chacun. Rien à installer et aucun serveur : les joueurs se connectent directement entre eux."
-
 msgid "Fill all six rune slots of one hero."
 msgstr "Remplissez les six emplacements de rune d'un héros."
 
@@ -633,9 +630,6 @@ msgstr "Couronne de concentration"
 
 msgid "Found: %s."
 msgstr "Trouvé : %s."
-
-msgid "Friends can join with the room code, or by opening the room link."
-msgstr "Vos amis peuvent rejoindre avec le code de la salle, ou en ouvrant le lien de la salle."
 
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
@@ -1429,9 +1423,6 @@ msgstr "Maître des épreuves"
 msgid "Stages"
 msgstr "Épreuves"
 
-msgid "Start a match and get a room code to give to your friends. You choose the map and the rules."
-msgstr "Lancez une partie et obtenez un code de salle à donner à vos amis. Vous choisissez la carte et les règles."
-
 msgid "Start a tower run at this floor"
 msgstr "Commencer une ascension à cet étage"
 
@@ -1623,9 +1614,6 @@ msgstr "Ordre de jeu"
 
 msgid "Turn: %d s"
 msgstr "Tour : %d s"
-
-msgid "Type the room code the host gave you (or paste their room link). With an invite link instead, you will get a reply to send back to them."
-msgstr "Saisissez le code de salle donné par l'hôte (ou collez son lien de salle). Avec un lien d'invitation, vous obtiendrez une réponse à lui renvoyer."
 
 msgid "UI scale"
 msgstr "Échelle de l'interface"

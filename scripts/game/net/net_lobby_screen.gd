@@ -265,7 +265,6 @@ func _build_invite(parent: Control) -> void:
 	_copy_room.pressed.connect(func() -> void: WebPage.copy(_room_link))
 	_copy_room.hide()
 	share.add_child(_copy_room)
-	NetUi.note(box, tr("Friends can join with the room code, or by opening the room link."))
 	_manual_toggle = HubStyle.button("Manual invite (if the room code does not work for someone)", "ManualToggle")
 	_manual_toggle.toggle_mode = true
 	_manual_toggle.toggled.connect(func(on: bool) -> void: _manual_box.visible = on)
