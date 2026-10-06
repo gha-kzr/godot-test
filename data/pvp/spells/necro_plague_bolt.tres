@@ -14,8 +14,8 @@ script = ExtResource("1_fap7i")
 
 [sub_resource type="Resource" id="Resource_jnaiu"]
 script = ExtResource("4_s114o")
-min_amount = 9
-max_amount = 11
+min_amount = 10
+max_amount = 12
 damage_type = ExtResource("3_lg644")
 
 [sub_resource type="Resource" id="Resource_kc7qx"]

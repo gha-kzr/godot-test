@@ -27,7 +27,7 @@ damage_type = ExtResource("3_w8vk4")
 [resource]
 script = ExtResource("5_x3sjf")
 display_name = "Wraith"
-max_hp = 105
+max_hp = 115
 ap = 7
 mp = 5
 initiative = 112

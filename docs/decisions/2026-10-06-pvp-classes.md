@@ -40,6 +40,17 @@ made with it (numbers in the spec file); after that it is a tool for the next pa
 (no plan over two turns, never holds a stealth on purpose, cannot kite perfectly), so classes built on tricks (Rogue,
 Necromancer, Ranger, Priestess) read lower than they play; the point is to catch a class far from the others.
 
+## Last measured (final numbers, AI-vs-AI; about +-8 points of noise at these sample sizes)
+- 4v4, 40 random games: Knight 37, Necromancer 42, Priestess 42, Rogue 39, Wraith 50, Monk 54, Ranger 55, Sorceress 65,
+  Goblin 65 (% of the games each class was in).
+- 2v2 and 3v3 (60 and 50 games, before the last small changes): every class between 29 and 75, the Necromancer and Rogue
+  lowest and the Sorceress, Priestess and Monk highest.
+- 1v1 matrix: classes between 42 and 60 % on average, except the Knight (about 85: it never has to chase a clumsy AI
+  kiter) and the Priestess (13: a healer alone, by design), and the Wraith that beats every physical class and loses to
+  fire, poison and holy as designed.
+- Last changes after these runs: Knight 180 HP and Charge every third turn, Smite 12-15, Sorceress Firebolt 22-27,
+  Necromancer 150 HP and heavier Rot, Rogue 110 HP.
+
 ## Not done
 - Models and animations for the new classes; per-class sounds; real spell effects (they borrow other spells').
 - Per-class tutorials or a "class guide" screen beyond the card and the (i) popup.

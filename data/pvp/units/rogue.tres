@@ -12,7 +12,7 @@
 [resource]
 script = ExtResource("2_pmp4c")
 display_name = "Rogue"
-max_hp = 105
+max_hp = 110
 ap = 7
 mp = 6
 initiative = 115

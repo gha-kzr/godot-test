@@ -110,7 +110,11 @@ random peer ids and message sizes. Players see names and hero choices.
 
 ## Fairness and rules
 
-- Heroes: the roster's three heroes at level 30 with the default five-spell loadout, no runes; their level is never shown.
+- Classes: nine PvP classes of their own (`data/pvp/`, see `docs/decisions/2026-10-06-pvp-classes.md`): Knight, Ranger,
+  Sorceress, Necromancer, Rogue, Priestess, Goblin, Wraith and Monk, each with five spells at a fixed strength. No levels,
+  no runes, no Power (the spell numbers are what they show), so unit cards show no Power or resistances. Duplicates are
+  allowed. Some classes use stealth (the Rogue's Vanish): hidden from the other team until it attacks, is hurt, or an
+  enemy stands next to it. This is a rule and a display choice only; every player's client holds the whole match.
 - Maps: the same shapes as the tower's (open field, mountain, crater, islands, canyon, ruins), made *symmetric under a
   half turn* with a 3 x 3 start zone for each side (`PvpMap`), so neither side is favoured; the map is drawn again on every
   peer from three numbers (shape, size, seed), and the lobby previews it with the QA map preview.

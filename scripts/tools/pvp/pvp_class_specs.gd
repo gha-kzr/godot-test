@@ -26,7 +26,7 @@ static func statuses() -> Dictionary:
 		"nimble": {"name": "Light fingers", "label": "L", "dur": 1, "positive": true, "color": [1.0, 0.85, 0.4], "mods": [["ap", 1]]},
 		# --- Harmful ---
 		"plague": {"name": "Plague", "label": "P", "dur": 3, "color": [0.55, 0.9, 0.3], "ticks": [["dmg", 9, 9, "poison"]], "aura": "poison"},
-		"rot": {"name": "Rot", "label": "T", "dur": 2, "color": [0.5, 0.7, 0.2], "ticks": [["dmg", 15, 15, "poison"]], "aura": "poison"},
+		"rot": {"name": "Rot", "label": "T", "dur": 2, "color": [0.5, 0.7, 0.2], "ticks": [["dmg", 17, 17, "poison"]], "aura": "poison"},
 		"miasma": {"name": "Miasma", "label": "M", "dur": 3, "color": [0.4, 0.8, 0.5], "ticks": [["dmg", 6, 6, "poison"]], "mods": [["mp", -1]], "aura": "poison"},
 		"rooted": {"name": "Rooted", "label": "Ro", "dur": 1, "color": [0.6, 0.45, 0.25], "mods": [["mp", -9]], "aura": "crippled"},
 		"slowed": {"name": "Slowed", "label": "S", "dur": 2, "color": [0.5, 0.8, 1.0], "mods": [["mp", -2]], "aura": "chilled"},
@@ -42,7 +42,7 @@ static func spells() -> Dictionary:
 	return {
 		# --- Knight ---
 		"knight_slash": {"name": "Slash", "from": "slash", "ap": 3, "range": [1, 1], "fx": [["dmg", 16, 20, "physical"]]},
-		"knight_charge": {"name": "Charge", "from": "charge", "ap": 3, "range": [2, 5], "los": false, "cd": 2, "target": "any",
+		"knight_charge": {"name": "Charge", "from": "charge", "ap": 3, "range": [2, 5], "los": false, "cd": 3, "target": "any",
 				"fx": [["move", "charge", 1, "caster"], ["dmg", 11, 15, "physical", "enemies"]]},
 		"knight_bash": {"name": "Shield Bash", "from": "shield_bash", "ap": 3, "range": [1, 1], "cd": 1,
 				"fx": [["dmg", 10, 14, "physical"], ["move", "push", 2, "enemies"]]},
@@ -60,16 +60,16 @@ static func spells() -> Dictionary:
 		"ranger_backslash": {"name": "Backslash", "from": "backslash", "ap": 2, "range": [1, 1], "cd": 1, "los": false,
 				"fx": [["dmg", 9, 11, "physical", "enemies"], ["move", "retreat", 4, "caster"]]},
 		# --- Sorceress: pure damage ---
-		"sorc_firebolt": {"name": "Firebolt", "from": "firebolt", "ap": 3, "range": [2, 6], "height": true, "fx": [["dmg", 24, 29, "fire"]]},
+		"sorc_firebolt": {"name": "Firebolt", "from": "firebolt", "ap": 3, "range": [2, 6], "height": true, "fx": [["dmg", 22, 27, "fire"]]},
 		"sorc_fireball": {"name": "Fireball", "from": "fireball", "ap": 4, "range": [3, 6], "area": ["circle", 1],
-				"fx": [["dmg", 18, 22, "fire", "enemies"]]},
+				"fx": [["dmg", 16, 20, "fire", "enemies"]]},
 		"sorc_frost_spike": {"name": "Frost Spike", "from": "frost_lance", "ap": 2, "range": [2, 5], "cd": 1, "fx": [["dmg", 15, 19, "frost"]]},
 		"sorc_meteor": {"name": "Meteor", "from": "fireball", "ap": 6, "range": [4, 7], "cd": 4, "area": ["circle", 2],
-				"fx": [["dmg", 40, 48, "fire", "enemies"]]},
+				"fx": [["dmg", 36, 44, "fire", "enemies"]]},
 		"sorc_blink": {"name": "Blink", "from": "blink", "ap": 2, "range": [1, 4], "los": false, "cd": 3, "fx": [["move", "teleport", 1, "caster"]]},
 		# --- Necromancer: damage over time and alterations ---
 		"necro_plague_bolt": {"name": "Plague Bolt", "from": "spore_bolt", "ap": 3, "range": [2, 5],
-				"fx": [["dmg", 9, 11, "poison"], ["status", "plague", "enemies"]]},
+				"fx": [["dmg", 10, 12, "poison"], ["status", "plague", "enemies"]]},
 		"necro_rot": {"name": "Rot Curse", "from": "spore_hex", "ap": 3, "range": [2, 5], "fx": [["status", "rot", "enemies"]]},
 		"necro_miasma": {"name": "Miasma", "from": "spore_hex", "ap": 4, "range": [3, 6], "area": ["circle", 1],
 				"fx": [["status", "miasma", "enemies"]]},
@@ -85,7 +85,7 @@ static func spells() -> Dictionary:
 		"rogue_hamstring": {"name": "Hamstring", "from": "hamstring", "ap": 2, "range": [1, 1], "cd": 1,
 				"fx": [["dmg", 7, 9, "physical"], ["status", "slowed", "enemies"]]},
 		# --- Priestess: heals and boosts, very little damage ---
-		"priest_smite": {"name": "Smite", "from": "smite", "ap": 3, "range": [1, 4], "fx": [["dmg", 11, 14, "holy"]]},
+		"priest_smite": {"name": "Smite", "from": "smite", "ap": 3, "range": [1, 4], "fx": [["dmg", 12, 15, "holy"]]},
 		"priest_heal": {"name": "Healing Touch", "from": "mend", "ap": 3, "range": [1, 4], "target": "ally", "fx": [["heal", 22, 28, "allies"]]},
 		"priest_rain": {"name": "Mending Rain", "from": "regeneration", "ap": 4, "range": [0, 4], "area": ["circle", 1],
 				"fx": [["status", "regrowth", "allies"]]},
@@ -104,12 +104,12 @@ static func spells() -> Dictionary:
 		# --- Wraith ---
 		"wraith_touch": {"name": "Spectral Touch", "from": "chill_touch", "ap": 3, "range": [1, 3], "fx": [["dmg", 14, 18, "frost"]]},
 		"wraith_wail": {"name": "Wail", "from": "wail", "ap": 3, "range": [0, 0], "los": false, "cd": 2, "area": ["circle", 2],
-				"fx": [["dmg", 6, 8, "frost", "enemies"], ["status", "dread", "enemies"]]},
+				"fx": [["dmg", 8, 10, "frost", "enemies"], ["status", "dread", "enemies"]]},
 		"wraith_phase": {"name": "Phase Walk", "from": "blink", "ap": 2, "range": [1, 4], "los": false, "cd": 2, "fx": [["move", "teleport", 1, "caster"]]},
 		"wraith_siphon": {"name": "Life Siphon", "from": "icy_grasp", "ap": 3, "range": [1, 3], "fx": [["dmg", 10, 12, "frost", "enemies", {"lifesteal": 60}]]},
 		"wraith_chill": {"name": "Grave Chill", "from": "chill_touch", "ap": 2, "range": [2, 5], "fx": [["dmg", 8, 10, "frost"], ["status", "slowed", "enemies"]]},
 		# --- Monk: pushes, pulls and quick feet ---
-		"monk_palm": {"name": "Palm Strike", "from": "club", "ap": 2, "range": [1, 1], "fx": [["dmg", 11, 15, "physical"]]},
+		"monk_palm": {"name": "Palm Strike", "from": "club", "ap": 2, "range": [1, 1], "fx": [["dmg", 10, 14, "physical"]]},
 		"monk_dash": {"name": "Flying Kick", "from": "charge", "ap": 3, "range": [2, 4], "los": false, "cd": 2, "target": "any",
 				"fx": [["move", "charge", 1, "caster"], ["dmg", 10, 14, "physical", "enemies"]]},
 		"monk_staff": {"name": "Whirling Staff", "from": "whirlwind", "ap": 3, "range": [0, 0], "los": false, "area": ["circle", 1], "cd": 1,
@@ -124,7 +124,7 @@ static func spells() -> Dictionary:
 ## Per class: unit stats, its spells in key order, and what the lobby shows. `look` borrows a single-player model.
 static func heroes() -> Dictionary:
 	return {
-		"knight": {"name": "Knight", "gender": "male", "hp": 185, "ap": 7, "mp": 4, "init": 100, "look": "knight", "color": [0.25, 0.45, 0.9],
+		"knight": {"name": "Knight", "gender": "male", "hp": 180, "ap": 7, "mp": 4, "init": 100, "look": "knight", "color": [0.25, 0.45, 0.9],
 				"role": "Frontline bruiser", "desc": "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove.",
 				"spells": ["knight_slash", "knight_charge", "knight_bash", "knight_guard", "knight_whirlwind"]},
 		"ranger": {"name": "Ranger", "gender": "neutral", "hp": 130, "ap": 7, "mp": 5, "init": 108, "look": "ranger", "color": [0.3, 0.75, 0.4],
@@ -133,10 +133,10 @@ static func heroes() -> Dictionary:
 		"sorceress": {"name": "Sorceress", "gender": "female", "hp": 85, "ap": 7, "mp": 4, "init": 105, "look": "mage", "color": [0.85, 0.4, 0.3],
 				"ai": "ranged", "role": "Glass cannon", "desc": "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team.",
 				"spells": ["sorc_firebolt", "sorc_fireball", "sorc_frost_spike", "sorc_meteor", "sorc_blink"]},
-		"necromancer": {"name": "Necromancer", "gender": "male", "hp": 140, "ap": 7, "mp": 4, "init": 100, "color": [0.45, 0.25, 0.55],
+		"necromancer": {"name": "Necromancer", "gender": "male", "hp": 150, "ap": 7, "mp": 4, "init": 100, "color": [0.45, 0.25, 0.55],
 				"ai": "ranged", "role": "Curses and poison", "desc": "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing.",
 				"spells": ["necro_plague_bolt", "necro_rot", "necro_miasma", "necro_grasp", "necro_drain"]},
-		"rogue": {"name": "Rogue", "gender": "female", "hp": 105, "ap": 7, "mp": 6, "init": 115, "color": [0.25, 0.3, 0.35],
+		"rogue": {"name": "Rogue", "gender": "female", "hp": 110, "ap": 7, "mp": 6, "init": 115, "color": [0.25, 0.3, 0.35],
 				"role": "Assassin", "desc": "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her.",
 				"spells": ["rogue_dagger", "rogue_ambush", "rogue_vanish", "rogue_shadow_step", "rogue_hamstring"]},
 		"priestess": {"name": "Priestess", "gender": "female", "hp": 150, "ap": 7, "mp": 4, "init": 100, "color": [0.95, 0.9, 0.6],
@@ -145,7 +145,7 @@ static func heroes() -> Dictionary:
 		"goblin": {"name": "Goblin", "gender": "male", "hp": 100, "ap": 7, "mp": 6, "init": 120, "color": [0.45, 0.7, 0.25],
 				"ai": "ranged", "role": "Bomb thrower", "desc": "Fast, sneaky and reckless: bombs and dynamite hurt everyone around, friends included. Steals action points.",
 				"spells": ["goblin_sling", "goblin_bomb", "goblin_pickpocket", "goblin_scamper", "goblin_dynamite"]},
-		"wraith": {"name": "Wraith", "gender": "neutral", "hp": 105, "ap": 7, "mp": 5, "init": 112, "look": "ghost", "color": [0.55, 0.4, 0.8],
+		"wraith": {"name": "Wraith", "gender": "neutral", "hp": 115, "ap": 7, "mp": 5, "init": 112, "look": "ghost", "color": [0.55, 0.4, 0.8],
 				"role": "Spirit", "desc": "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies.",
 				"spells": ["wraith_touch", "wraith_wail", "wraith_phase", "wraith_siphon", "wraith_chill"],
 				"resist": [["physical", 70], ["holy", -50]]},

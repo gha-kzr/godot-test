@@ -14,7 +14,7 @@
 [resource]
 script = ExtResource("4_jypm5")
 display_name = "Knight"
-max_hp = 185
+max_hp = 180
 ap = 7
 mp = 4
 spells = Array[ExtResource("5_srk7i")]([ExtResource("6_0ojqh"), ExtResource("7_5vui4"), ExtResource("8_mr7id"), ExtResource("9_guxgh"), ExtResource("10_to8xr")])

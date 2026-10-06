@@ -12,7 +12,7 @@
 [resource]
 script = ExtResource("2_4yiv5")
 display_name = "Necromancer"
-max_hp = 140
+max_hp = 150
 ap = 7
 mp = 4
 spells = Array[ExtResource("3_hekuj")]([ExtResource("4_1o28n"), ExtResource("5_fy8uf"), ExtResource("6_blgon"), ExtResource("7_qbogk"), ExtResource("8_uxmpk")])

@@ -17,8 +17,8 @@ size = 2
 
 [sub_resource type="Resource" id="Resource_l5t3p"]
 script = ExtResource("5_0cdcc")
-min_amount = 40
-max_amount = 48
+min_amount = 36
+max_amount = 44
 damage_type = ExtResource("4_a6lki")
 target_filter = 2
 
