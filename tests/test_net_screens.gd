@@ -332,6 +332,29 @@ func test_the_info_button_opens_the_hero_stats_and_spells_without_picking_it() -
 	holder.free()
 
 
+func test_scrolling_past_the_end_of_the_spell_list_does_not_close_the_popup() -> void:
+	var holder := Control.new()
+	holder.size = Vector2(900, 700)
+	_root().add_child(holder)
+	holder.add_child(NetUi.hero_card(0, false, func(_index: int) -> void: pass))
+	(holder.find_child("Info0", true, false) as Button).pressed.emit()
+	var popup := holder.find_child("HeroInfo", true, false) as Control
+	for wheel in [MOUSE_BUTTON_WHEEL_DOWN, MOUSE_BUTTON_WHEEL_UP]:
+		var event := InputEventMouseButton.new()
+		event.button_index = wheel
+		event.pressed = true
+		popup.gui_input.emit(event)
+	await _frames()
+	assert_true(holder.find_child("HeroInfo", true, false) != null, "the wheel left the popup open")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	popup.gui_input.emit(click)
+	await _frames()
+	assert_true(holder.find_child("HeroInfo", true, false) == null, "a click outside closes it")
+	holder.free()
+
+
 func test_the_teams_are_blue_and_red_everywhere() -> void:
 	assert_eq(NetUi.side_name(0), "Blue team")
 	assert_eq(NetUi.side_name(1), "Red team")

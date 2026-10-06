@@ -168,7 +168,10 @@ static func show_hero_info(from: Control, hero_index: int) -> void:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			overlay.queue_free()
 		elif event is InputEventMouseButton and event.pressed:
-			overlay.queue_free())
+			# The wheel reaches the overlay once the spell list is at its end: it must not close the popup.
+			if event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+				overlay.queue_free()
+			overlay.accept_event())
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.6)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
