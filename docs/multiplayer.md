@@ -67,6 +67,33 @@ talk through a player both can reach.
   trackers are only needed to *connect* (and to let someone back in): a fight in progress does not depend on them.
   They are community services with no guarantee; if both are down, use invite links.
 
+## Security: what is and is not protected
+
+**Your computer and your data.** The game runs inside the browser's sandbox. Nothing a player sends is ever run as code:
+messages are JSON read with strict type checks (anything malformed is dropped, never a crash), no engine object or
+resource is loaded from the network, names are length-limited and shown as plain text, and the page reads or writes no
+file outside the browser's own storage (saves, a name, a rejoin token). Opening an invite or room link only opens this
+same page. That makes the game a low risk for a laptop, but "100 % safe" is not a promise anyone can make: the browser, the
+engine and WebRTC themselves can have flaws, and a lookalike site could imitate a link, so open links only when they start
+with the game's own address.
+
+**What other people learn.** WebRTC shows each player's IP address to the others, and the STUN servers and the trackers
+see the IP address of anyone who connects (and nothing readable: see above). The trackers also see the hashed room name,
+random peer ids and message sizes. Players see names and hero choices.
+
+**What a player (or the host) can do to the others.** The match is only as trustworthy as the people in it:
+- The **host** is the authority: it numbers and checks the entries, but it could also write entries that favour it, and
+  the other players would apply them as long as the rules allow them. Play with people you would trust as host.
+- A player cannot act for another player's hero (the host refuses it), cannot push entries to the others (only the host's
+  entries, or entries I asked for while catching up, are taken), cannot pose as someone else on a direct link, and
+  cannot read or use another player's rejoin token (the shared log keeps only a hash of it). A player who is a *relay*
+  between two others can still lie about who a relayed message came from; a forged entry only makes the victim stop with
+  a "desync" message (it fails the fingerprint check), it cannot make them play a different game unnoticed.
+- Any player can disrupt: send a lot of messages, leave at a bad moment, hand their hero to the AI. Anyone who knows
+  the room code can join the lobby (an invite link carries the code too, so share links like passwords).
+- The room code is about 59 bits and its tracker name comes out of the same slow key derivation as the encryption keys
+  (PBKDF2, 3000 rounds), so guessing it is out of reach, but a code posted publicly is of course public.
+
 ## Fairness and rules
 
 - Heroes: the roster's three heroes at level 30 with the default five-spell loadout, no runes; their level is never shown.

@@ -12,6 +12,8 @@ signal text_received(text: String)
 var remote_id := 0
 var is_open := false
 var is_closed := false
+## Whether the link was ever open (one that closed before opening failed to connect).
+var was_open := false
 
 
 ## Sends text to the other end (dropped when the link isn't open).
@@ -31,6 +33,7 @@ func poll() -> void:
 func _mark_open() -> void:
 	if not is_open and not is_closed:
 		is_open = true
+		was_open = true
 		opened.emit()
 
 

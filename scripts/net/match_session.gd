@@ -29,6 +29,8 @@ const DEFAULT_AI_DELAY := 0.6
 const ELECTION_WAIT := 1.0
 ## Entries that carry the state's fingerprint, so a peer that drifted is noticed at once.
 const HASHED: Array[String] = ["act", "go", "start", "lobby"]
+## No honest log is longer than this (a message with more is dropped).
+const MAX_ENTRIES := 20000
 
 var transport: NetTransport
 var my_id := 0
@@ -57,6 +59,8 @@ var _election_deadline := 0.0
 var _election_have: Dictionary[int, int] = {}
 var _election_pulling := false
 var _held: Array = []
+## Peers I asked for entries (a catch-up pull): their `entries` are accepted from them.
+var _pulling: Dictionary[int, bool] = {}
 
 
 ## The player who opens the match: seat id = their transport id, host from the start.
@@ -65,7 +69,7 @@ static func open_as_host(net: NetTransport, player_name: String, token: String) 
 	session._setup(net, player_name, token)
 	session.host_id = session.my_id
 	session.is_synced = true
-	session._host_submit(session.my_id, {"k": "join", "id": session.my_id, "name": player_name, "token": token}, true)
+	session._host_submit(session.my_id, {"k": "join", "id": session.my_id, "name": player_name, "token": MatchState.token_hash(token)}, true)
 	return session
 
 
@@ -215,7 +219,7 @@ func _on_message(from: int, message: Dictionary) -> void:
 		return
 	match message.get("m"):
 		"hello": _on_hello(from, message)
-		"entry": _on_entry(from, message.get("e"))
+		"entry": _on_host_entry(from, message.get("e"))
 		"entries": _on_entries(from, message)
 		"submit": _on_submit(from, message.get("p"))
 		"reject": _on_reject(message)
@@ -239,7 +243,7 @@ func _on_hello(from: int, message: Dictionary) -> void:
 	if existing != null and existing.id != from:
 		transport.send(from, {"m": "refused", "why": TranslationServer.translate("that seat belongs to someone else")})
 		return
-	var error := _host_submit(from, {"k": "join", "id": from, "name": message.get("name", ""), "token": token}, true)
+	var error := _host_submit(from, {"k": "join", "id": from, "name": message.get("name", ""), "token": MatchState.token_hash(token)}, true)
 	if not error.is_empty():
 		transport.send(from, {"m": "refused", "why": error})
 		return
@@ -255,12 +259,13 @@ func _on_redirect(message: Dictionary) -> void:
 
 func _on_entries(from: int, message: Dictionary) -> void:
 	var list: Variant = message.get("list")
-	if list is not Array:
+	if list is not Array or (list as Array).size() > MAX_ENTRIES or not _trusts_entries_from(from):
 		return
 	for entry: Variant in list:
-		_on_entry(from, entry)
+		_apply_entry(from, entry)
 		if halted_now():
 			return
+	_pulling.erase(from)  # The answer to my pull came; later entries are taken from the host only.
 	_election_pulling = false
 	if not is_synced:
 		is_synced = true
@@ -268,13 +273,24 @@ func _on_entries(from: int, message: Dictionary) -> void:
 		changed.emit()
 
 
-func _on_entry(from: int, entry: Variant) -> void:
+## Entries come from the host, or from a peer I asked (catching up, or a new host collecting the longest log).
+func _trusts_entries_from(from: int) -> bool:
+	return from == host_id or _pulling.has(from)
+
+
+func _on_host_entry(from: int, entry: Variant) -> void:
+	if from == host_id:
+		_apply_entry(from, entry)
+
+
+func _apply_entry(from: int, entry: Variant) -> void:
 	if entry is not Dictionary or entry.get("n") is not int:
 		return
 	var number: int = entry["n"]
 	if number <= state.entry_count():
 		return
 	if number > state.entry_count() + 1:
+		_pulling[from] = true
 		transport.send(from, {"m": "pull", "from": state.entry_count()})
 		return
 	var error := state.apply(entry)
@@ -463,6 +479,7 @@ func _election_tick() -> void:
 		if best != -1 and (not waiting or _now >= _election_deadline):
 			_election_pulling = true
 			_election_deadline = _now + ELECTION_WAIT
+			_pulling[best] = true
 			transport.send(best, {"m": "pull", "from": state.entry_count()})
 			return
 	if (not waiting and not _election_pulling) or _now >= _election_deadline:

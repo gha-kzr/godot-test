@@ -70,3 +70,12 @@ func test_tracker_ids_are_always_twenty_printable_characters_that_survive_json()
 				assert_true(character.unicode_at(0) >= 32 and character.unicode_at(0) < 256)
 			var back: Variant = NetJson.parse(NetJson.stringify({"id": id}))
 			assert_eq(back["id"], id, "the same after JSON")
+
+
+func test_the_rooms_name_on_the_tracker_is_not_a_fast_hash_of_the_code() -> void:
+	var hasher := HashingContext.new()
+	hasher.start(HashingContext.HASH_SHA256)
+	hasher.update(("rune-ascent-multiplayer/room/" + "abcdefghjkmn").to_utf8_buffer())
+	var fast := RoomCode.binary_string(hasher.finish().slice(0, 20))
+	assert_ne(RoomCode.info_hash("abcdefghjkmn"), fast, "it comes out of the slow derivation")
+	assert_eq(RoomCode.info_hash("abcdefghjkmn"), RoomCode.info_hash("abcdefghjkmn"), "but is the same for everyone")

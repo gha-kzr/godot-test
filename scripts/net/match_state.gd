@@ -27,7 +27,8 @@ const SUDDEN_DEATH_PERCENT := 10
 class Seat extends RefCounted:
 	var id := 0
 	var name := ""
-	## A secret only this player knows: it gets their seat back after a disconnect.
+	## A hash of a secret only this player knows (the log is shared with every player, so never the secret itself):
+	## the secret gets their seat back after a disconnect.
 	var token := ""
 	var hero := 0
 	var side := 0
@@ -82,11 +83,18 @@ func current_seat() -> int:
 	return seat_of_unit(battle.state.turn_order.current_unit_id())
 
 
-func seat_for_token(token: String) -> Seat:
+## The seat of the player who holds this secret token, or null.
+func seat_for_token(secret: String) -> Seat:
+	var hashed := token_hash(secret)
 	for id in seats:
-		if seats[id].token == token:
+		if seats[id].token == hashed:
 			return seats[id]
 	return null
+
+
+## What the log keeps of a player's token.
+static func token_hash(secret: String) -> String:
+	return ("rune-ascent-multiplayer/token/" + secret).sha256_text()
 
 
 func is_over() -> bool:
@@ -148,9 +156,9 @@ func _apply(entry: Dictionary) -> String:
 func _join(entry: Dictionary) -> String:
 	var id: Variant = entry.get("id")
 	var token: Variant = entry.get("token")
-	if id is not int or token is not String or (token as String).length() < 8 or (token as String).length() > 64:
+	if id is not int or token is not String or (token as String).length() != 64:
 		return "bad join"
-	var existing := seat_for_token(token)
+	var existing := _seat_with_hash(token)
 	if existing != null:
 		existing.connected = true
 		if existing.ai:
@@ -169,6 +177,13 @@ func _join(entry: Dictionary) -> String:
 	seat.side = 0 if seats_on(0).size() <= seats_on(1).size() else 1
 	seats[id] = seat
 	return ""
+
+
+func _seat_with_hash(hashed: String) -> Seat:
+	for id in seats:
+		if seats[id].token == hashed:
+			return seats[id]
+	return null
 
 
 func _drop(entry: Dictionary) -> String:

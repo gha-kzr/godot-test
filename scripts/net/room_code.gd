@@ -53,13 +53,10 @@ static func link_for(page_url: String, code: String) -> String:
 	return "%s#%s=%s" % [page_url.get_slice("#", 0), LINK_KEY, code]
 
 
-## The 20-byte name of the room on a tracker: a hash of the code (the tracker never sees the code), as
-## a "binary string" (one character per byte, as the tracker protocol wants it).
+## The 20-byte name of the room on a tracker (never the code, and not a fast hash of it: see RoomCrypto.room_id), as a
+## "binary string" (one character per byte, as the tracker protocol wants it).
 static func info_hash(code: String) -> String:
-	var hasher := HashingContext.new()
-	hasher.start(HashingContext.HASH_SHA256)
-	hasher.update(("rune-ascent-multiplayer/room/" + code).to_utf8_buffer())
-	return binary_string(hasher.finish().slice(0, 20))
+	return binary_string(RoomCrypto.room_id(code))
 
 
 ## A fresh random 20-byte peer id as a binary string.

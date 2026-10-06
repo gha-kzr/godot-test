@@ -13,7 +13,10 @@ extends NetTransport
 ## Reachable = direct links plus what each direct peer says it is linked to.
 
 const MAX_PIECE := 12000
-const LINK_TIMEOUT := 20.0
+const LINK_TIMEOUT := 15.0
+## A link to a player the newcomer should reach directly is tried again this many times, after a growing pause.
+const MAX_BUILD_ATTEMPTS := 4
+const RETRY_PAUSE := 3.0
 
 var factory: LinkFactory
 var _id := 0
@@ -23,6 +26,10 @@ var _peer_links: Dictionary[int, Array] = {}
 var _reachable: Array[int] = []
 ## Links being built through the mesh, by remote id: [link, started_at].
 var _building: Dictionary[int, Array] = {}
+## Tries made so far, and when the next one is due, for the links a newcomer builds.
+var _attempts: Dictionary[int, int] = {}
+var _retry_at: Dictionary[int, float] = {}
+var _built_by_me: Dictionary[int, bool] = {}
 ## Links made for invites, waiting for their answer (by remote id).
 var _invited: Dictionary[int, NetLink] = {}
 var _clock := 0.0
@@ -128,8 +135,13 @@ func poll(delta := 0.0) -> void:
 		var entry: Array = _building[id]
 		(entry[0] as NetLink).poll()
 		if _clock - float(entry[1]) > LINK_TIMEOUT and not (entry[0] as NetLink).is_open:
-			(entry[0] as NetLink).close()
+			(entry[0] as NetLink).close()  # Its closed signal schedules the retry.
 			_building.erase(id)
+	for id in _retry_at.keys():
+		if _clock >= _retry_at[id]:
+			_retry_at.erase(id)
+			if not _links.has(id) and not _building.has(id) and _reachable.has(id):
+				_build_link(id)
 
 
 # --- Links ----------------------------------------------------------------------------------
@@ -141,7 +153,16 @@ func _watch(link: NetLink, remote_id: int) -> void:
 	link.text_received.connect(_on_text.bind(link))
 
 
+func _retry_later(remote_id: int) -> void:
+	var tries: int = _attempts.get(remote_id, 0) + 1
+	_attempts[remote_id] = tries
+	if tries <= MAX_BUILD_ATTEMPTS:
+		_retry_at[remote_id] = _clock + RETRY_PAUSE * tries
+
+
 func _on_opened(link: NetLink) -> void:
+	_attempts.erase(link.remote_id)
+	_retry_at.erase(link.remote_id)
 	var existing: NetLink = _links.get(link.remote_id)
 	if existing != null and existing != link:
 		existing.close()
@@ -163,6 +184,9 @@ func _on_closed(link: NetLink) -> void:
 		_invited.erase(link.remote_id)
 	if _building.has(link.remote_id) and _building[link.remote_id][0] == link:
 		_building.erase(link.remote_id)
+	# A link this newcomer made to a player that never opened: try again a little later.
+	if _built_by_me.has(link.remote_id) and not link.was_open:
+		_retry_later(link.remote_id)
 
 
 func _send_links(link: NetLink) -> void:
@@ -215,10 +239,13 @@ func _on_text(text: String, link: NetLink) -> void:
 	if envelope is not Dictionary:
 		return
 	match envelope.get("t"):
-		"g": _deliver(envelope.get("f"), envelope.get("b"))
-		"fwd": _on_forward(envelope)
+		"g":
+			# A direct message speaks for the player at the other end of the link, nobody else.
+			if envelope.get("f") == link.remote_id:
+				_deliver(link.remote_id, envelope.get("b"))
+		"fwd": _on_forward(link, envelope)
 		"links": _on_links(link, envelope.get("ids"))
-		"rtc": _on_rtc(envelope)
+		"rtc": _on_rtc(link, envelope)
 		"part": _on_part(link, envelope)
 
 
@@ -227,11 +254,18 @@ func _deliver(from: Variant, body: Variant) -> void:
 		message_received.emit(from, body)
 
 
-func _on_forward(envelope: Dictionary) -> void:
+## A message passing through. A player relaying it must have received it from its sender; the receiver takes it
+## from a relay that says it is linked to the sender. (A relay on the path can still lie about who it came
+## from: players in a match trust each other that far.)
+func _on_forward(link: NetLink, envelope: Dictionary) -> void:
 	var to: Variant = envelope.get("to")
+	var from: Variant = envelope.get("f")
+	if to is not int or from is not int:
+		return
 	if to == _id:
-		_deliver(envelope.get("f"), envelope.get("b"))
-	elif to is int and _links.has(to) and _links[to].is_open:
+		if from != _id and from in _peer_links.get(link.remote_id, []):
+			_deliver(from, envelope.get("b"))
+	elif from == link.remote_id and _links.has(to) and _links[to].is_open:
 		_links[to].send_text(NetJson.stringify(envelope))
 
 
@@ -249,6 +283,7 @@ func _on_links(link: NetLink, ids: Variant) -> void:
 
 ## The newcomer asks `other` for a link, the setup messages passing through a shared peer.
 func _build_link(other: int) -> void:
+	_built_by_me[other] = true
 	var link := factory.offer(other, func(blob: String) -> void: _send_rtc(other, "offer", blob))
 	if link == null:
 		return
@@ -256,13 +291,13 @@ func _build_link(other: int) -> void:
 	_building[other] = [link, _clock]
 
 
-func _on_rtc(envelope: Dictionary) -> void:
+func _on_rtc(sender: NetLink, envelope: Dictionary) -> void:
 	var to: Variant = envelope.get("to")
 	var from: Variant = envelope.get("f")
 	if to is not int or from is not int:
 		return
 	if to != _id:
-		if _links.has(to) and _links[to].is_open:
+		if from == sender.remote_id and _links.has(to) and _links[to].is_open:
 			_links[to].send_text(NetJson.stringify(envelope))
 		return
 	var blob := str(envelope.get("blob", ""))

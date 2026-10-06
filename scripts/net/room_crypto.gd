@@ -45,6 +45,12 @@ static func open(sealed: String, code: String) -> String:
 	return _unpad(plain).get_string_from_utf8()
 
 
+## The 20 bytes that name the room on a tracker. They come out of the same slow derivation as the keys, so someone
+## who sees the name cannot try codes at hash speed.
+static func room_id(code: String) -> PackedByteArray:
+	return _keys(code)[2]
+
+
 static func _looks_base64(text: String) -> bool:
 	if text.length() < 88 or text.length() % 4 != 0 or text.length() > 270000:
 		return false
@@ -56,8 +62,8 @@ static func _looks_base64(text: String) -> bool:
 
 static func _keys(code: String) -> Array:
 	if not _cache.has(code):
-		var derived := _pbkdf2(code.to_utf8_buffer(), SALT.to_utf8_buffer(), ROUNDS, 64)
-		_cache[code] = [derived.slice(0, 32), derived.slice(32, 64)]
+		var derived := _pbkdf2(code.to_utf8_buffer(), SALT.to_utf8_buffer(), ROUNDS, 84)
+		_cache[code] = [derived.slice(0, 32), derived.slice(32, 64), derived.slice(64, 84)]
 	return _cache[code]
 
 

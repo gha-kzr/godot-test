@@ -362,3 +362,27 @@ func test_after_the_fight_everyone_goes_back_to_the_lobby_to_play_again() -> voi
 	rig.net.flush()
 	assert_true(rig.sessions[2].state.battle != null, "a second match")
 	assert_true(rig.in_step())
+
+
+func test_a_peer_that_is_not_the_host_cannot_push_entries() -> void:
+	var rig := _rig(3, 1)
+	var victim := rig.sessions[2]
+	var before := victim.state.entry_count()
+	var forged := {"k": "set", "id": 3, "f": "hero", "v": 2, "n": before + 1, "c": "x-1"}
+	victim._on_message(3, {"m": "entry", "e": forged})  # Player 3 isn't the host.
+	victim._on_message(3, {"m": "entries", "list": [forged]})  # Nor was it asked for entries.
+	assert_eq(victim.state.entry_count(), before, "nothing was applied")
+	assert_false(victim.halted_now())
+	assert_true(rig.in_step())
+
+
+func test_the_log_keeps_a_hash_of_a_players_token_not_the_token() -> void:
+	var rig := _rig(2, 1)
+	for id in [1, 2]:
+		var seat := rig.sessions[1].state.seats[id]
+		assert_eq(seat.token.length(), 64, "a SHA-256 hash")
+		assert_ne(seat.token, NetRig.token_of(id), "not the secret")
+		assert_true(rig.sessions[2].state.seat_for_token(NetRig.token_of(id)) != null, "the secret still finds the seat")
+		assert_true(rig.sessions[2].state.seat_for_token(seat.token) == null, "the hash in the log is no key")
+	for entry in rig.sessions[2].state.log:
+		assert_false(str(entry).contains(NetRig.token_of(1)), "no secret in what every player holds")

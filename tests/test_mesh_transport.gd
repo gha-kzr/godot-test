@@ -147,3 +147,71 @@ func test_garbage_on_the_wire_is_ignored() -> void:
 		players[2]._links[1].text_received.emit(bad)
 	assert_eq(received, [])
 	assert_eq(players[2].reachable_ids(), [1] as Array[int])
+
+
+func test_a_message_cannot_claim_to_come_from_someone_else_on_a_direct_link() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	_join(factory, players, 3, 1)
+	var received := []
+	players[2].message_received.connect(func(from: int, message: Dictionary) -> void: received.append([from, message["m"]]))
+	# Player 3 writes "from player 1" on its direct link to player 2: it is player 3's message, or nothing.
+	players[2]._links[3].text_received.emit(NetJson.stringify({"t": "g", "f": 1, "b": {"m": "entry"}}))
+	assert_eq(received, [], "a lie about the sender is dropped")
+	players[2]._links[3].text_received.emit(NetJson.stringify({"t": "g", "f": 3, "b": {"m": "hello"}}))
+	assert_eq(received, [[3, "hello"]], "the honest one goes through")
+
+
+func test_only_a_sender_can_hand_a_message_to_a_relay_and_a_relay_must_be_linked_to_the_origin() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	_join(factory, players, 3, 1)
+	var at_two := []
+	players[2].message_received.connect(func(from: int, message: Dictionary) -> void: at_two.append([from, message["m"]]))
+	# Player 3 asks player 1 to pass on a message "from player 9" to player 2: player 1 only relays what its sender wrote.
+	players[1]._links[3].text_received.emit(NetJson.stringify({"t": "fwd", "to": 2, "f": 9, "b": {"m": "forged"}}))
+	factory.flush()
+	assert_eq(at_two, [], "not forwarded")
+	# A message "from 9" arriving at player 2 through player 1, which isn't linked to a player 9, is dropped.
+	players[2]._links[1].text_received.emit(NetJson.stringify({"t": "fwd", "to": 2, "f": 9, "b": {"m": "forged"}}))
+	assert_eq(at_two, [], "the relay doesn't know a player 9")
+	players[3].send(2, {"m": "fine"})
+	factory.flush()
+	assert_eq(at_two, [[3, "fine"]], "normal traffic is untouched")
+
+
+func test_a_direct_link_that_fails_to_open_is_tried_again() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	factory.answers_left = 1  # Player 3's invite works; its first try at a link to player 2 gets no answer.
+	_join(factory, players, 3, 1)
+	assert_eq(players[3].direct_ids(), [1] as Array[int], "no direct link yet")
+	factory.answers_left = -1  # The network is fine now.
+	for second in 40:
+		for id in players:
+			players[id].poll(1.0)
+		factory.flush()
+	assert_eq(players[3].direct_ids(), [1, 2] as Array[int], "the retry built it")
+	assert_eq(players[2].direct_ids(), [1, 3] as Array[int])
+
+
+func test_it_does_not_try_for_ever() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	factory.answers_left = 1
+	_join(factory, players, 3, 1)
+	factory.answers_left = 0  # Never answered.
+	for second in 200:
+		for id in players:
+			players[id].poll(1.0)
+		factory.flush()
+	assert_eq(players[3].direct_ids(), [1] as Array[int], "still relayed through the first contact")
+	assert_eq(players[3]._attempts.get(2, 0), MeshTransport.MAX_BUILD_ATTEMPTS + 1, "it gave up after its attempts")
