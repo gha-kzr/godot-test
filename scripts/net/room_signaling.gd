@@ -80,6 +80,11 @@ func publish_offer(offer_id: String, text: String) -> void:
 			_announce(link)
 
 
+## Lets an offer that was not looked at (the host was busy) come in again at the joiner's next announcement.
+func forget_offer(offer_id: String, from: String) -> void:
+	_seen.erase("offer/%s/%s" % [offer_id, from])
+
+
 func retract_offer(offer_id: String) -> void:
 	_offers.erase(offer_id)
 

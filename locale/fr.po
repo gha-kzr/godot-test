@@ -433,6 +433,9 @@ msgstr "Relais connectés : %s"
 msgid "Connecting... the player appears in the list when it works."
 msgstr "Connexion en cours... le joueur apparaît dans la liste quand ça marche."
 
+msgid "Connection: %s."
+msgstr "Connexion : %s."
+
 msgid "Continue run"
 msgstr "Continuer l'ascension"
 
@@ -454,8 +457,8 @@ msgstr "Copier le lien de réponse"
 msgid "Copy the room code"
 msgstr "Copier le code de la salle"
 
-msgid "Copy the room link"
-msgstr "Copier le lien de la salle"
+msgid "Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."
+msgstr "Impossible d'ouvrir une connexion avec l'hôte. Certains réseaux (entreprise, école, certaines connexions mobiles) bloquent les connexions directes entre joueurs."
 
 msgid "Crater"
 msgstr "Cratère"
@@ -778,6 +781,9 @@ msgstr "Rejoindre"
 msgid "Join a match"
 msgstr "Rejoindre une partie"
 
+msgid "Joining by room code isn't available here: ask for an invite link instead."
+msgstr "Rejoindre par code de salle n'est pas disponible ici : demandez plutôt un lien d'invitation."
+
 msgid "Joining the match"
 msgstr "Connexion à la partie"
 
@@ -852,9 +858,6 @@ msgstr "Créer une invitation"
 msgid "Make an invite, send the link, then paste the reply they send back: each player needs their own invite."
 msgstr "Créez une invitation, envoyez le lien, puis collez la réponse qu'ils renvoient : chaque joueur a besoin de sa propre invitation."
 
-msgid "Manual invite (if the room code does not work for someone)"
-msgstr "Invitation manuelle (si le code de la salle ne marche pas pour quelqu'un)"
-
 msgid "Map and rules"
 msgstr "Carte et règles"
 
@@ -927,6 +930,9 @@ msgstr "Il faut %d (vous en avez %d)"
 msgid "Need %d essence"
 msgstr "Il faut %d essence"
 
+msgid "Network: %d local, %d public addresses found."
+msgstr "Réseau : %d adresses locales, %d adresses publiques trouvées."
+
 msgid "New map"
 msgstr "Nouvelle carte"
 
@@ -942,6 +948,9 @@ msgstr "Bien joué !"
 msgid "No"
 msgstr "Non"
 
+msgid "No public address: this network may block direct connections between players."
+msgstr "Aucune adresse publique : ce réseau bloque peut-être les connexions directes entre joueurs."
+
 msgid "No rune found."
 msgstr "Aucune rune trouvée."
 
@@ -956,6 +965,9 @@ msgstr "Ce héros n'existe pas."
 
 msgid "No such rune in the stash."
 msgstr "Cette rune n'est pas dans la réserve."
+
+msgid "Nobody else is connected: the others left, or your own connection broke."
+msgstr "Plus personne d'autre n'est connecté : les autres sont partis, ou votre connexion a coupé."
 
 msgid "Nobody yet."
 msgstr "Personne pour l'instant."
@@ -989,6 +1001,9 @@ msgstr "Une de chaque rune, au niveau %d, est dans la réserve."
 
 msgid "Oops!"
 msgstr "Oups !"
+
+msgid "Open a new lobby"
+msgstr "Ouvrir un nouveau salon"
 
 msgid "Open field"
 msgstr "Plaine"
@@ -1240,6 +1255,9 @@ msgstr "Code de salle, ou lien d'invitation"
 msgid "Room code: %s"
 msgstr "Code de la salle : %s"
 
+msgid "Room found. Connecting to the host..."
+msgstr "Salle trouvée. Connexion à l'hôte..."
+
 msgid "Round %d"
 msgstr "Round %d"
 
@@ -1369,6 +1387,9 @@ msgstr "Écrasement"
 msgid "Smite"
 msgstr "Châtiment"
 
+msgid "Someone cannot connect? Make a manual invite"
+msgstr "Quelqu'un n'arrive pas à se connecter ? Créer une invitation manuelle"
+
 msgid "Speed x1"
 msgstr "Vitesse x1"
 
@@ -1462,9 +1483,6 @@ msgstr "Poussée"
 msgid "Swift Stride"
 msgstr "Foulée rapide"
 
-msgid "Taking long? Ask the host for an invite link instead."
-msgstr "Ça prend du temps ? Demandez plutôt un lien d'invitation à l'hôte."
-
 msgid "Tank"
 msgstr "Tank"
 
@@ -1489,11 +1507,23 @@ msgstr "Merci !"
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."
 
+msgid "That invite is not valid."
+msgstr "Cette invitation n'est pas valide."
+
+msgid "That isn't a reply code."
+msgstr "Ce n'est pas un code de réponse."
+
+msgid "That isn't an invite code or link."
+msgstr "Ce n'est pas un code ou un lien d'invitation."
+
 msgid "That isn't possible right now."
 msgstr "Ce n'est pas possible pour le moment."
 
 msgid "That key can't be used."
 msgstr "Cette touche ne peut pas être utilisée."
+
+msgid "That reply is for another match."
+msgstr "Cette réponse est pour une autre partie."
 
 msgid "That rune is already at the highest level."
 msgstr "Cette rune est déjà au niveau maximum."
@@ -1540,17 +1570,26 @@ msgstr "l'état de la partie diffère de celui de l'hôte (désynchronisation)"
 msgid "The host removed you from the match."
 msgstr "L'hôte vous a retiré du match."
 
+msgid "The match has already started."
+msgstr "La partie a déjà commencé."
+
 msgid "the match has started"
 msgstr "la partie a déjà commencé"
 
 msgid "the match is full"
 msgstr "la partie est pleine"
 
+msgid "The match is full."
+msgstr "La partie est complète."
+
 msgid "The match is going on."
 msgstr "La partie est en cours."
 
 msgid "The match is over: waiting for the host to open a new lobby."
 msgstr "La partie est finie : en attente que l'hôte ouvre un nouveau salon."
+
+msgid "the match log is full"
+msgstr "le journal du match est plein"
 
 msgid "the match refused you"
 msgstr "la partie vous a refusé"
@@ -1581,6 +1620,9 @@ msgstr "Titre"
 
 msgid "Toggle top view"
 msgstr "Basculer la vue de dessus"
+
+msgid "too many requests"
+msgstr "trop de demandes"
 
 msgid "Top view"
 msgstr "Vue de dessus"
@@ -1650,6 +1692,9 @@ msgstr "En attente du lancement par l'hôte. Choisissez votre héros et votre é
 
 msgid "Warg"
 msgstr "Warg"
+
+msgid "WebRTC isn't available here."
+msgstr "WebRTC n'est pas disponible ici."
 
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
 msgstr "Quand vous avez fini, terminez votre tour ({end_turn}). Les ennemis jouent ensuite."

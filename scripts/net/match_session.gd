@@ -34,8 +34,17 @@ const DEFAULT_AI_DELAY := 0.6
 const ELECTION_WAIT := 1.0
 ## Entries that carry the state's fingerprint, so a peer that drifted is noticed at once.
 const HASHED: Array[String] = ["act", "go", "start", "lobby"]
-## No honest log is longer than this (a message with more is dropped).
+## No honest log is longer than this (a message with more is dropped); the host stops numbering near it.
 const MAX_ENTRIES := 20000
+## What a peer may ask for per second (a short burst, then a steady rate): far above what a player does.
+const PROPOSALS_BURST := 30.0
+const PROPOSALS_PER_SECOND := 10.0
+## The fields each kind of entry may carry (the host adds n, h and c itself): anything else a peer sends is dropped.
+const ENTRY_FIELDS := {
+	"join": ["id", "name", "token"], "set": ["id", "f", "v"], "ready": ["id", "v"], "ai": ["id", "v"], "cfg": ["f", "v"],
+	"start": [], "go": [], "lobby": [], "drop": ["id"], "kick": ["id"], "act": ["a", "by", "sys"],
+}
+const MAX_FIELD_TEXT := 80
 
 var transport: NetTransport
 var my_id := 0
@@ -67,6 +76,10 @@ var _held: Array = []
 ## Peers I asked for entries (a catch-up pull): their `entries` are accepted from them.
 var _pulling: Dictionary[int, bool] = {}
 var _last_emote: Dictionary[int, float] = {}
+var _budget: Dictionary[int, float] = {}
+var _last_rehello: Dictionary[int, float] = {}
+## Whether I lost every other player (my own connection is probably what broke): I wait instead of taking over.
+var connection_lost := false
 
 
 ## The player who opens the match: seat id = their transport id, host from the start.
@@ -209,6 +222,10 @@ func tick(delta: float) -> void:
 	_now += delta
 	if halted_now():
 		return
+	for id in _budget.keys():
+		_budget[id] = minf(PROPOSALS_BURST, _budget[id] + delta * PROPOSALS_PER_SECOND)
+	if state.battle != null and state.battle.state.started and not state.battle.state.is_over():
+		_turn_elapsed += delta  # Everyone counts the turn (the host's clock decides when it ends).
 	_ping_timer += delta
 	if _ping_timer >= PING_INTERVAL:
 		_ping_timer = 0.0
@@ -237,7 +254,13 @@ func _send_hello() -> void:
 
 func _on_message(from: int, message: Dictionary) -> void:
 	_last_heard[from] = _now
+	var was_dead := _dead.has(from)
 	_dead.erase(from)
+	if was_dead and is_host() and message.get("m") not in ["hello", "bye"]:
+		_ask_to_come_back(from)
+	if connection_lost:
+		connection_lost = false
+		changed.emit()
 	if halted_now():
 		return
 	match message.get("m"):
@@ -246,13 +269,32 @@ func _on_message(from: int, message: Dictionary) -> void:
 		"entries": _on_entries(from, message)
 		"submit": _on_submit(from, message.get("p"))
 		"reject": _on_reject(message)
-		"refused": _halt(str(message.get("why", TranslationServer.translate("the match refused you"))))
+		"refused": _on_refused(from, message.get("why"))
 		"redirect": _on_redirect(message)
+		"rehello": if from == host_id and not is_host(): _send_hello()
 		"pull": _on_pull(from, message.get("from"))
 		"elected": _on_elected(from, message.get("host"), message.get("have"))
 		"have": _on_have(from, message.get("n"))
 		"emote": _on_emote(from, message.get("e"))
 		"bye": _on_peer_lost(from)
+
+
+## A peer I had given up on speaks again. If its seat went away (or is marked absent), it is asked to say hello again:
+## its token gets it the seat back, and the entries it missed come with the answer.
+func _ask_to_come_back(from: int) -> void:
+	var seat := state.seats.get(from) as MatchState.Seat
+	if seat != null and seat.connected:
+		return
+	if _now - _last_rehello.get(from, -100.0) < 2.0:
+		return
+	_last_rehello[from] = _now
+	transport.send(from, {"m": "rehello"})
+
+
+## Only the host I asked to join can refuse me, and only while I am not in yet.
+func _on_refused(from: int, why: Variant) -> void:
+	if from == host_id and not is_synced:
+		_halt(str(why) if why is String and not (why as String).is_empty() else TranslationServer.translate("the match refused you"))
 
 
 func _on_emote(from: int, emote_id: Variant) -> void:
@@ -368,8 +410,10 @@ func _host_submit(from: int, proposal: Dictionary, internal := false) -> String:
 	var nonce := str(proposal.get("c", ""))
 	if not nonce.is_empty() and _seen.has(nonce):
 		return ""  # Already in the log (a resend after a host swap).
-	var error := _authorize(proposal, from, internal)
-	var entry: Dictionary = proposal.duplicate()
+	var error := _check_sender(proposal, from, internal)
+	if error.is_empty():
+		error = _authorize(proposal, from, internal)
+	var entry := _clean(proposal, from == my_id or from == host_id)
 	if error.is_empty():
 		entry["n"] = state.entry_count() + 1
 		error = state.apply(entry)
@@ -385,6 +429,45 @@ func _host_submit(from: int, proposal: Dictionary, internal := false) -> String:
 		transport.send(id, {"m": "entry", "e": entry})
 	_after_applied(entry)
 	return ""
+
+
+## Limits on who may propose and how much: the nonce is the sender's own, there is room in the log, and a peer
+## that floods the host is told to slow down.
+func _check_sender(proposal: Dictionary, from: int, internal: bool) -> String:
+	if internal or from == my_id:
+		return ""
+	var nonce: Variant = proposal.get("c")
+	if nonce is not String or not (nonce as String).begins_with("%d-" % from) or (nonce as String).length() > 24:
+		return "bad request"
+	if state.entry_count() >= MAX_ENTRIES - 50:
+		return TranslationServer.translate("the match log is full")
+	var left: float = _budget.get(from, PROPOSALS_BURST)
+	if left < 1.0:
+		return TranslationServer.translate("too many requests")
+	_budget[from] = left - 1.0
+	return ""
+
+
+## The entry the log keeps for a proposal: only the fields its kind has, scalars only, short texts. A peer's `h`, `n`
+## and the like never get through; `sys` (an action played by the host for the AI or the timer) only from the host.
+func _clean(proposal: Dictionary, from_host: bool) -> Dictionary:
+	var kind: Variant = proposal.get("k")
+	if kind is not String or not ENTRY_FIELDS.has(kind):
+		return proposal.duplicate()  # _authorize refuses it ("unknown request").
+	var entry := {"k": kind}
+	for field: String in ENTRY_FIELDS[kind]:
+		if not proposal.has(field) or (field == "sys" and not from_host):
+			continue
+		var value: Variant = proposal[field]
+		if field == "a":
+			if value is Dictionary and (value as Dictionary).size() <= 6:
+				entry[field] = value
+		elif value is bool or value is int or value is float or (value is String and (value as String).length() <= MAX_FIELD_TEXT):
+			entry[field] = value
+	var nonce: Variant = proposal.get("c")
+	if nonce is String and (nonce as String).length() <= 24:
+		entry["c"] = nonce
+	return entry
 
 
 ## Who may ask for what. Joins come from a hello, never from a proposal.
@@ -429,6 +512,8 @@ func _after_applied(entry: Dictionary) -> void:
 	if kind == "kick" and entry.get("id") == my_id:
 		_halt(TranslationServer.translate("The host removed you from the match."))
 		return
+	if kind == "drop" and entry.get("id") == my_id and not is_host():
+		_send_hello()  # The host thought I was gone while my link was fine: ask for my seat back with my token.
 	if kind == "drop" and state.phase == MatchState.Phase.BATTLE:
 		_absent_since[int(entry["id"])] = _now
 	if kind == "join" or (kind == "ai" and entry.get("v") == false):
@@ -462,13 +547,24 @@ func _on_peer_lost(id: int) -> void:
 		_elect()
 
 
-func _elect() -> void:
+## The seat that should be host now: the lowest one I can reach (me included), counting `extra` as reachable.
+func _expected_host(extra := -1) -> int:
 	var candidates: Array[int] = [my_id]
 	for id in peers():
 		if state.seats.has(id) and state.seats[id].connected:
 			candidates.append(id)
+	if extra != -1 and state.seats.has(extra) and extra not in candidates:
+		candidates.append(extra)
 	candidates.sort()
-	var chosen := candidates[0]
+	return candidates[0]
+
+
+func _elect() -> void:
+	if peers().is_empty() and state.seat_ids().size() > 1:
+		# Nobody left to talk to: the others went, or my own connection broke (the screens say so).
+		connection_lost = true
+		changed.emit()
+	var chosen := _expected_host()
 	if chosen == host_id:
 		return
 	host_id = chosen
@@ -481,14 +577,21 @@ func _elect() -> void:
 		for id in peers():
 			transport.send(id, {"m": "elected", "host": my_id, "have": state.entry_count()})
 	else:
+		transport.send(host_id, {"m": "have", "n": state.entry_count()})
 		for proposal in _pending:
 			transport.send(host_id, {"m": "submit", "p": proposal})
 
 
+## Someone says they are the host now. I believe it only if I would have chosen them too: they are the lowest seat I
+## can reach, and the host I knew is gone (or it already is them).
 func _on_elected(from: int, new_host: Variant, have: Variant) -> void:
-	if new_host is not int or new_host != from or have is not int:
+	if new_host is not int or new_host != from or have is not int or not state.seats.has(from):
 		return
 	if from != host_id:
+		if host_id not in _dead and host_id in peers():
+			return  # My host is still there for me.
+		if _expected_host(from) != from:
+			return
 		host_id = from
 		host_changed.emit(from)
 	transport.send(from, {"m": "have", "n": state.entry_count()})
@@ -557,7 +660,6 @@ func _host_tick(delta: float) -> void:
 		if state.everyone_placed():
 			_host_submit(my_id, {"k": "go"})
 		return
-	_turn_elapsed += delta
 	var current := state.current_seat()
 	if current == -1:
 		return

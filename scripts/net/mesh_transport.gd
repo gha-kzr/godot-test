@@ -17,6 +17,8 @@ const LINK_TIMEOUT := 15.0
 ## A link to a player the newcomer should reach directly is tried again this many times, after a growing pause.
 const MAX_BUILD_ATTEMPTS := 4
 const RETRY_PAUSE := 3.0
+## Long messages being put together, per link: a peer that starts many and never finishes them gets the oldest dropped.
+const MAX_OPEN_MESSAGES := 6
 
 var factory: LinkFactory
 var _id := 0
@@ -61,6 +63,13 @@ func direct_ids() -> Array[int]:
 			ids.append(id)
 	ids.sort()
 	return ids
+
+
+## How the link being built (or the first open one) is going, for the screen of a player who waits.
+func diagnostics() -> String:
+	for id in _building:
+		return (_building[id][0] as NetLink).diagnostics()
+	return ""
 
 
 # --- Invites (the first link to a newcomer) --------------------------------------------------
@@ -175,6 +184,9 @@ func _on_opened(link: NetLink) -> void:
 
 
 func _on_closed(link: NetLink) -> void:
+	for key: String in _pieces.keys():
+		if key.begins_with("%d:" % link.remote_id) and _links.get(link.remote_id) == link:
+			_pieces.erase(key)
 	if _links.get(link.remote_id) == link:
 		_links.erase(link.remote_id)
 		_peer_links.erase(link.remote_id)
@@ -255,15 +267,16 @@ func _deliver(from: Variant, body: Variant) -> void:
 
 
 ## A message passing through. A player relaying it must have received it from its sender; the receiver takes it
-## from a relay that says it is linked to the sender. (A relay on the path can still lie about who it came
-## from: players in a match trust each other that far.)
+## from a relay that says it is linked to the sender, and never when it has a direct link to that sender (a direct
+## link can't be spoken for). A relay on the path to someone I have no direct link to can still lie about who it
+## came from: that is the limit of a mesh without signatures.
 func _on_forward(link: NetLink, envelope: Dictionary) -> void:
 	var to: Variant = envelope.get("to")
 	var from: Variant = envelope.get("f")
 	if to is not int or from is not int:
 		return
 	if to == _id:
-		if from != _id and from in _peer_links.get(link.remote_id, []):
+		if from != _id and from in _peer_links.get(link.remote_id, []) and not (_links.has(from) and _links[from].is_open):
 			_deliver(from, envelope.get("b"))
 	elif from == link.remote_id and _links.has(to) and _links[to].is_open:
 		_links[to].send_text(NetJson.stringify(envelope))
@@ -348,8 +361,15 @@ func _on_part(link: NetLink, envelope: Dictionary) -> void:
 	var index: Variant = envelope.get("i")
 	if of is not int or index is not int or of < 1 or of > 400 or index < 0 or index >= of:
 		return
+	var data := str(envelope.get("d", ""))
+	if data.length() > MAX_PIECE:
+		return
+	if not _pieces.has(key):
+		var open_keys := _pieces.keys().filter(func(other: String) -> bool: return other.begins_with("%d:" % link.remote_id))
+		while open_keys.size() >= MAX_OPEN_MESSAGES:
+			_pieces.erase(open_keys.pop_front())  # Keys keep their insertion order: the oldest goes.
 	var entry: Dictionary = _pieces.get(key, {"of": of, "got": {}})
-	entry["got"][index] = str(envelope.get("d", ""))
+	entry["got"][index] = data
 	_pieces[key] = entry
 	if entry["got"].size() == of:
 		_pieces.erase(key)

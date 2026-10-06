@@ -215,3 +215,34 @@ func test_it_does_not_try_for_ever() -> void:
 		factory.flush()
 	assert_eq(players[3].direct_ids(), [1] as Array[int], "still relayed through the first contact")
 	assert_eq(players[3]._attempts.get(2, 0), MeshTransport.MAX_BUILD_ATTEMPTS + 1, "it gave up after its attempts")
+
+
+func test_a_relay_cannot_speak_for_a_player_I_am_linked_to_directly() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	_join(factory, players, 3, 1)
+	var received := []
+	players[2].message_received.connect(func(from: int, message: Dictionary) -> void: received.append([from, message]))
+	var forged := NetJson.stringify({"t": "fwd", "to": 2, "f": 1, "b": {"m": "elected", "host": 3, "have": 0}})
+	players[3]._links[2].send_text(forged)  # 3 claims to pass on a message from 1, to whom 2 has its own link.
+	factory.flush()
+	assert_eq(received, [], "refused")
+	players[1].send(2, {"m": "real"})
+	factory.flush()
+	assert_eq(received, [[1, {"m": "real"}]], "the real one comes through the direct link")
+
+
+func test_a_peer_that_never_finishes_long_messages_cannot_fill_memory() -> void:
+	var factory := FakeLinks.new()
+	var players := {}
+	_first(factory, players)
+	_join(factory, players, 2, 1)
+	for index in 50:
+		players[2]._links[1].send_text(NetJson.stringify({"t": "part", "id": "x%d" % index, "i": 0, "of": 5, "d": "y".repeat(1000)}))
+	factory.flush()
+	assert_true(players[1]._pieces.size() <= MeshTransport.MAX_OPEN_MESSAGES, "only the latest few are kept")
+	players[2]._links[1].send_text(NetJson.stringify({"t": "part", "id": "big", "i": 0, "of": 2, "d": "z".repeat(MeshTransport.MAX_PIECE + 1)}))
+	factory.flush()
+	assert_false(players[1]._pieces.has("2:big"), "a piece longer than a piece is dropped")

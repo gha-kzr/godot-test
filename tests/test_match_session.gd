@@ -437,3 +437,112 @@ func test_the_log_keeps_a_hash_of_a_players_token_not_the_token() -> void:
 		assert_true(rig.sessions[2].state.seat_for_token(seat.token) == null, "the hash in the log is no key")
 	for entry in rig.sessions[2].state.log:
 		assert_false(str(entry).contains(NetRig.token_of(1)), "no secret in what every player holds")
+
+
+func test_a_peer_that_stalled_and_wakes_up_gets_its_seat_back() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2, "Bob")
+	rig.net.flush()
+	for step in 120:  # Bob's tab was paused: the host heard nothing for 12 s.
+		rig.sessions[1].tick(0.1)
+		rig.net.flush()
+	assert_false(rig.sessions[1].state.seats.has(2), "removed while silent")
+	rig.run(3.0)  # Bob's tab wakes up: its pings reach the host, which asks it to say hello again.
+	assert_true(rig.sessions[1].state.seats.has(2) and rig.sessions[1].state.seats[2].connected, "back")
+	assert_eq(rig.sessions[1].state.seats[2].name, "Bob")
+	assert_true(rig.in_step())
+
+
+func test_only_the_host_I_joined_through_can_refuse_me_and_only_before_I_am_in() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.guest(3)
+	rig.net.flush()
+	rig.net.transport(3).broadcast({"m": "refused", "why": "forged"})
+	rig.net.flush()
+	assert_false(rig.sessions[1].halted_now() or rig.sessions[2].halted_now(), "a player can't send everyone away")
+	rig.net.transport(1).send(2, {"m": "refused", "why": "late"})
+	rig.net.flush()
+	assert_false(rig.sessions[2].halted_now(), "and not once I am in")
+
+
+func test_a_peer_cannot_make_itself_host_while_the_host_is_there() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.guest(3)
+	rig.net.flush()
+	rig.net.transport(3).broadcast({"m": "elected", "host": 3, "have": 0})
+	rig.net.flush()
+	assert_eq(rig.sessions[1].host_id, 1)
+	assert_eq(rig.sessions[2].host_id, 1, "nobody follows a host that nobody lost")
+	assert_true(rig.in_step())
+
+
+func test_a_proposal_carries_only_the_fields_of_its_kind() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.guest(3)
+	rig.net.flush()
+	var padding := "x".repeat(5000)
+	rig.sessions[2].propose({"k": "set", "id": 2, "f": "hero", "v": 1, "h": 12345, "pad": padding, "sys": true})
+	rig.net.flush()
+	var entry: Dictionary = rig.sessions[1].state.log[-1]
+	assert_eq(rig.sessions[1].state.seats[2].hero, 1)
+	assert_false(entry.has("h") or entry.has("pad") or entry.has("sys"), "only k, id, f, v, c and n")
+	assert_true(rig.in_step(), "no desync from a made-up hash")
+	assert_false(rig.sessions[3].halted_now())
+	rig.sessions[2].propose({"k": "set", "id": 2, "f": "name", "v": padding})
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[2].name.length() <= MatchState.MAX_NAME, true, "a long text is cut or refused")
+	assert_true(rig.in_step())
+
+
+func test_a_nonce_must_be_the_senders_and_a_flood_is_slowed_down() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.guest(3)
+	rig.net.flush()
+	var refusals := []
+	rig.sessions[3].rejected.connect(func(why: String) -> void: refusals.append(why))
+	rig.net.transport(3).send(1, {"m": "submit", "p": {"k": "set", "id": 3, "f": "hero", "v": 2, "c": "2-1"}})  # Bob's nonce.
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[3].hero, 0, "refused: not 3's nonce")
+	for i in 60:
+		rig.sessions[3].set_field("hero", i % 2)
+	rig.net.flush()
+	assert_true(refusals.size() >= 20, "most of a flood is refused (%d)" % refusals.size())
+	assert_true(rig.in_step())
+	rig.run(5.0)
+	rig.sessions[3].set_field("hero", 2)
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[3].hero, 2, "and a calm player is fine again")
+
+
+func test_guests_count_the_turn_down_too() -> void:
+	var rig := _rig(2, 1)
+	_go(rig)
+	rig.run(5.0)
+	var host_left := rig.sessions[1].turn_seconds_left()
+	var guest_left := rig.sessions[2].turn_seconds_left()
+	assert_true(absf(host_left - guest_left) < 1.5, "about the same clock (%f, %f)" % [host_left, guest_left])
+	assert_true(guest_left < float(rig.sessions[2].state.settings["turn"]) - 3.0, "it moves on the guest's screen")
+
+
+func test_a_player_left_alone_is_told_the_others_are_gone() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.net.flush()
+	rig.net.transport(1).close()
+	rig.run(1.0)
+	assert_true(rig.sessions[2].connection_lost, "nobody else is connected")
+	rig = NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.net.flush()
+	assert_false(rig.sessions[2].connection_lost)

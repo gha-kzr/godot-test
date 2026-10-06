@@ -37,7 +37,7 @@ func _write_token(room: String, seat: int, token: String) -> void:
 	file.set_value("seat", "room", room)
 	file.set_value("seat", "id", seat)
 	file.set_value("seat", "token", token)
-	file.save(MultiplayerHub.SESSION_FILE)
+	file.save(MultiplayerHub.session_file)
 
 
 func test_a_player_joins_with_the_room_code_and_lands_in_the_hosts_lobby() -> void:
@@ -100,9 +100,12 @@ func test_nobody_joins_a_full_lobby_or_a_match_that_started_unless_they_left_it(
 	_run([host, bob], 2)
 	assert_eq(host.session.state.phase, MatchState.Phase.BATTLE)
 	var late := _hub()
+	var told := []
+	late.failed.connect(func(why: String) -> void: told.append(why))
 	late.join("Late", host.room_code)
 	_run([host, bob, late], 15)
 	assert_true(late.session == null, "the fight has begun: no new players")
+	assert_eq(told, ["The match has already started."], "and the joiner is told, not left waiting")
 	assert_eq(host.session.state.seat_ids(), [1, 2] as Array[int])
 
 
@@ -170,3 +173,13 @@ func test_without_trackers_a_room_code_is_refused_with_a_hint() -> void:
 	var guest := _hub()
 	guest.use_trackers = false
 	assert_ne(guest.join("Bob", "abcdefghjkmn"), "")
+
+
+func test_a_join_request_that_never_gets_its_answer_frees_its_slot() -> void:
+	var host := _hub()
+	host.host_room("Alice")
+	host._on_room_offer("o1", NetJson.stringify({"v": 1, "offer": "not an offer", "token": "abcdefgh12345678"}), "peer-1")
+	assert_eq(host._answering, 1, "waiting for the answer")
+	host._process(MultiplayerHub.ANSWER_TIMEOUT + 1.0)
+	assert_eq(host._answering, 0, "given up")
+	assert_false(host._reserved.has(2), "the seat is free again")

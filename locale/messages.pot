@@ -567,6 +567,10 @@ msgstr ""
 msgid "Connecting... the player appears in the list when it works."
 msgstr ""
 
+#: scripts/net/rtc_link.gd
+msgid "Connection: %s."
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd
 msgid "Continue run"
 msgstr ""
@@ -595,8 +599,8 @@ msgstr ""
 msgid "Copy the room code"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Copy the room link"
+#: scripts/game/net/net_flow.gd
+msgid "Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -1027,6 +1031,10 @@ msgstr ""
 msgid "Join a match"
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "Joining by room code isn't available here: ask for an invite link instead."
+msgstr ""
+
 #: scripts/game/net/net_join_screen.gd
 msgid "Joining the match"
 msgstr ""
@@ -1126,10 +1134,6 @@ msgid "Make an invite, send the link, then paste the reply they send back: each 
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
-msgid "Manual invite (if the room code does not work for someone)"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
 msgid "Map and rules"
 msgstr ""
 
@@ -1225,6 +1229,10 @@ msgstr ""
 msgid "Need %d essence"
 msgstr ""
 
+#: scripts/net/rtc_link.gd
+msgid "Network: %d local, %d public addresses found."
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
 msgid "New map"
 msgstr ""
@@ -1245,6 +1253,10 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+#: scripts/net/rtc_link.gd
+msgid "No public address: this network may block direct connections between players."
+msgstr ""
+
 #: scripts/game/run_screen.gd
 msgid "No rune found."
 msgstr ""
@@ -1263,6 +1275,10 @@ msgstr ""
 
 #: scripts/progression/profile.gd
 msgid "No such rune in the stash."
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd scripts/net/net_status_panel.gd
+msgid "Nobody else is connected: the others left, or your own connection broke."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
@@ -1307,6 +1323,10 @@ msgstr ""
 
 #: scripts/net/emotes.gd
 msgid "Oops!"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Open a new lobby"
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -1641,6 +1661,10 @@ msgstr ""
 msgid "Room code: %s"
 msgstr ""
 
+#: scripts/game/net/net_join_screen.gd
+msgid "Room found. Connecting to the host..."
+msgstr ""
+
 #: scripts/view/hud.gd
 msgid "Round %d"
 msgstr ""
@@ -1813,6 +1837,10 @@ msgstr ""
 msgid "Smite"
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Someone cannot connect? Make a manual invite"
+msgstr ""
+
 #: scripts/view/hud.gd scenes/battle/hud.tscn
 msgid "Speed x1"
 msgstr ""
@@ -1937,10 +1965,6 @@ msgstr ""
 msgid "Swift Stride"
 msgstr ""
 
-#: scripts/game/net/net_join_screen.gd
-msgid "Taking long? Ask the host for an invite link instead."
-msgstr ""
-
 #: scripts/data/enemy_data.gd
 msgid "Tank"
 msgstr ""
@@ -1973,12 +1997,28 @@ msgstr ""
 msgid "That hero isn't available."
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "That invite is not valid."
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "That isn't a reply code."
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "That isn't an invite code or link."
+msgstr ""
+
 #: scripts/net/net_battle_controller.gd
 msgid "That isn't possible right now."
 msgstr ""
 
 #: scripts/progression/settings_applier.gd
 msgid "That key can't be used."
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "That reply is for another match."
 msgstr ""
 
 #: scripts/progression/profile.gd
@@ -2041,6 +2081,10 @@ msgstr ""
 msgid "The host removed you from the match."
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "The match has already started."
+msgstr ""
+
 #: scripts/net/match_state.gd
 msgid "the match has started"
 msgstr ""
@@ -2049,12 +2093,20 @@ msgstr ""
 msgid "the match is full"
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "The match is full."
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
 msgid "The match is going on."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "The match is over: waiting for the host to open a new lobby."
+msgstr ""
+
+#: scripts/net/match_session.gd
+msgid "the match log is full"
 msgstr ""
 
 #: scripts/net/match_session.gd
@@ -2095,6 +2147,10 @@ msgstr ""
 
 #: scripts/progression/settings.gd
 msgid "Toggle top view"
+msgstr ""
+
+#: scripts/net/match_session.gd
+msgid "too many requests"
 msgstr ""
 
 #: scenes/battle/hud.tscn
@@ -2187,6 +2243,10 @@ msgstr ""
 
 #: data/units/warg.tres
 msgid "Warg"
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "WebRTC isn't available here."
 msgstr ""
 
 #: scripts/progression/tutorial.gd

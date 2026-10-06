@@ -52,6 +52,8 @@ var _copy_code: Button
 var _reply: TextEdit
 var _connect: Button
 var _start: Button
+var _new_lobby: Button
+var _refusal := ""
 var _leave: Button
 var _code := ""
 var _link := ""
@@ -63,6 +65,7 @@ func bind(match_session: MatchSession) -> void:
 	_build()
 	session.changed.connect(refresh)
 	session.emote_received.connect(_on_emote)
+	session.rejected.connect(_on_rejected)
 	refresh()
 
 
@@ -121,6 +124,11 @@ func _build() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bottom.add_child(spacer)
+	_new_lobby = HubStyle.button("Open a new lobby", "NewLobbyButton")
+	_new_lobby.custom_minimum_size = Vector2(220, 48)
+	_new_lobby.pressed.connect(func() -> void: session.back_to_lobby())
+	_new_lobby.hide()
+	bottom.add_child(_new_lobby)
 	_start = HubStyle.button("Start the match", "StartButton")
 	_start.custom_minimum_size = Vector2(220, 48)
 	_start.pressed.connect(func() -> void: session.start_match())
@@ -257,15 +265,17 @@ func _build_invite(parent: Control) -> void:
 	var share := HBoxContainer.new()
 	share.add_theme_constant_override("separation", 8)
 	box.add_child(share)
-	_copy_room_code = HubStyle.button("Copy the room code", "CopyRoomCode")
-	_copy_room_code.pressed.connect(func() -> void: WebPage.copy(_room_code))
-	_copy_room_code.hide()
-	share.add_child(_copy_room_code)
-	_copy_room = HubStyle.button("Copy the room link", "CopyRoom")
+	_copy_room = HubStyle.button("Copy the invite link", "CopyRoom")
+	_copy_room.custom_minimum_size = Vector2(0, 44)
 	_copy_room.pressed.connect(func() -> void: WebPage.copy(_room_link))
 	_copy_room.hide()
 	share.add_child(_copy_room)
-	_manual_toggle = HubStyle.button("Manual invite (if the room code does not work for someone)", "ManualToggle")
+	_copy_room_code = HubStyle.button("Copy the room code", "CopyRoomCode")
+	_copy_room_code.custom_minimum_size = Vector2(0, 44)
+	_copy_room_code.pressed.connect(func() -> void: WebPage.copy(_room_code))
+	_copy_room_code.hide()
+	share.add_child(_copy_room_code)
+	_manual_toggle = HubStyle.button("Someone cannot connect? Make a manual invite", "ManualToggle")
 	_manual_toggle.toggle_mode = true
 	_manual_toggle.toggled.connect(func(on: bool) -> void: _manual_box.visible = on)
 	box.add_child(_manual_toggle)
@@ -351,16 +361,31 @@ func refresh() -> void:
 	_refresh_teams(in_lobby)
 	_refresh_settings(is_host and in_lobby)
 	_refresh_invite_options(in_lobby)
-	_start.visible = is_host
+	_start.visible = is_host and in_lobby
+	_new_lobby.visible = is_host and not in_lobby and state.is_over()
 	_start.disabled = not in_lobby or not state.start_problem().is_empty()
 	_start.tooltip_text = state.start_problem()
-	if not in_lobby:
+	if session.connection_lost:
+		_banner.text = tr("Nobody else is connected: the others left, or your own connection broke.")
+	elif not _refusal.is_empty():
+		_banner.text = _refusal
+	elif not in_lobby:
 		_banner.text = tr("The match is over: waiting for the host to open a new lobby.") if state.is_over() else tr("The match is going on.")
 	elif not is_host:
 		_banner.text = tr("Waiting for the host to start. Pick your hero and your team, then press Ready.")
 	else:
 		var problem := state.start_problem()
 		_banner.text = tr("You are the host: start when everyone is ready.") if problem.is_empty() else tr("You are the host. Not ready to start yet: %s.") % problem
+
+
+## A change the host refused (a full team, say): the screen goes back to what the match says and tells why.
+func _on_rejected(reason: String) -> void:
+	_refusal = reason.capitalize() if reason == reason.to_lower() else reason
+	_hero_shown = -1
+	refresh()
+	get_tree().create_timer(4.0).timeout.connect(func() -> void:
+		_refusal = ""
+		refresh())
 
 
 func _rename(text: String) -> void:

@@ -62,6 +62,9 @@ func _process(_delta: float) -> bool:
 
 
 func _run_all() -> void:
+	# Tests never touch the player's own files (their name, hero and the token that brings them back to a match).
+	NetUi.player_file = "user://test_net_player.cfg"
+	MultiplayerHub.session_file = "user://test_net_session.cfg"
 	# Headless windows start at 64x64, where the HUD covers everything; use the game's size.
 	root.size = Vector2i(ProjectSettings.get_setting("display/window/size/viewport_width"),
 			ProjectSettings.get_setting("display/window/size/viewport_height"))

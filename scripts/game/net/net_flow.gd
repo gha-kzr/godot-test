@@ -53,9 +53,26 @@ static func _join_code_in(fragment: String) -> String:
 	return ""
 
 
-func _process(_delta: float) -> void:
-	if _screen is NetJoinScreen and hub != null and hub.session == null and hub.signaling != null:
-		(_screen as NetJoinScreen).show_search(hub.status())
+## How long a joiner waits for the connection to the host to open once the host has answered.
+const CONNECT_TIMEOUT := 45.0
+
+var _connecting_for := 0.0
+
+
+func _process(delta: float) -> void:
+	if not (_screen is NetJoinScreen) or hub == null:
+		_connecting_for = 0.0
+		return
+	var join := _screen as NetJoinScreen
+	if hub.session == null:
+		if hub.signaling != null:
+			join.show_search(hub.status(), hub.join_details())
+	elif not hub.session.is_synced and hub.joined_by_room():
+		_connecting_for += delta
+		join.show_connecting(hub.join_details())
+		if _connecting_for > CONNECT_TIMEOUT:
+			_connecting_for = 0.0
+			_on_failed(TranslationServer.translate("Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."))
 
 
 # --- Screens --------------------------------------------------------------------------------

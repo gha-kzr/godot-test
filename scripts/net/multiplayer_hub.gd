@@ -12,10 +12,13 @@ signal reply_ready(code: String, link: String)
 signal failed(reason: String)
 signal status_changed
 
-const SESSION_FILE := "user://net_session.cfg"
+## Where the seat's token is kept (tests use another file: the real one is the player's way back into a match).
+static var session_file := "user://net_session.cfg"
 const CODE_VERSION := 1
 ## At most this many join requests are being answered at once.
 const MAX_PENDING_JOINS := 3
+## A join request that has no answer ready after this long is given up (a broken offer must not hold a slot).
+const ANSWER_TIMEOUT := 25.0
 
 var transport: MeshTransport
 var session: MatchSession
@@ -37,9 +40,14 @@ var _reserved: Dictionary[int, bool] = {}
 var _wait_link: NetLink
 var _wait_offer_id := ""
 var _answering := 0
+## Join requests being answered: offer id -> [seat, deadline]. A request that never gets its answer frees its slot.
+var _answers: Dictionary[String, Array] = {}
+var _clock := 0.0
 
 
 func _process(delta: float) -> void:
+	_clock += delta
+	_expire_answers()
 	if transport != null:
 		transport.poll(delta)
 	if session != null:
@@ -80,7 +88,7 @@ func join(name_: String, text: String) -> String:
 ## session starts when the answer comes (`session_started`); until then `status()` says what is going on.
 func join_room(name_: String, code: String) -> String:
 	if not use_trackers:
-		return "Joining by room code isn't available here: ask for an invite link instead."
+		return TranslationServer.translate("Joining by room code isn't available here: ask for an invite link instead.")
 	_reset()
 	player_name = name_
 	room_code = code
@@ -89,7 +97,7 @@ func join_room(name_: String, code: String) -> String:
 	_wait_offer_id = _random_text(20)
 	_wait_link = factory.offer(0, _on_own_offer_ready)
 	if _wait_link == null:
-		return "WebRTC isn't available here."
+		return TranslationServer.translate("WebRTC isn't available here.")
 	status_changed.emit()
 	return ""
 
@@ -106,6 +114,11 @@ func _on_room_answer(offer_id: String, text: String, _from: String) -> void:
 	if offer_id != _wait_offer_id or _wait_link == null:
 		return
 	var data: Variant = NetJson.parse(text)
+	if data is Dictionary and data.get("v") == CODE_VERSION and data.get("refused") is String:
+		var reason := str(data["refused"]).left(120)
+		_reset()
+		failed.emit(reason)  # The host can't take me (full, started...): say so instead of waiting for ever.
+		return
 	if data is not Dictionary or data.get("v") != CODE_VERSION or data.get("answer") is not String \
 			or data.get("for") is not int or data.get("host") is not int:
 		return
@@ -127,23 +140,48 @@ func _on_room_answer(offer_id: String, text: String, _from: String) -> void:
 
 ## A joiner's offer reached the host through the tracker: answer it. Anyone but the current host ignores it.
 func _on_room_offer(offer_id: String, text: String, from: String) -> void:
-	if session == null or not session.is_host() or _answering >= MAX_PENDING_JOINS:
+	if session == null or not session.is_host():
 		return
 	var data: Variant = NetJson.parse(text)
 	if data is not Dictionary or data.get("v") != CODE_VERSION or data.get("offer") is not String or data.get("token") is not String:
 		return
+	if _answering >= MAX_PENDING_JOINS:
+		signaling.forget_offer(offer_id, from)  # Busy for now: the joiner announces again, and it is looked at then.
+		return
 	var granted := _seat_for_request(data["token"])
 	var seat: int = granted["seat"]
 	if seat < 1:
-		return  # The match is full or has started and this isn't a player who left.
+		# The match is full or has started and this isn't a player who left: tell the joiner.
+		var why := TranslationServer.translate("The match has already started.") if session.state.phase != MatchState.Phase.LOBBY \
+				else TranslationServer.translate("The match is full.")
+		if signaling != null:
+			signaling.send_answer(from, offer_id, NetJson.stringify({"v": CODE_VERSION, "refused": why}))
+		return
 	_reserved[seat] = true
 	_answering += 1
+	_answers[offer_id] = [seat, _clock + ANSWER_TIMEOUT]
 	var host_id := session.my_id
 	transport.accept_invite(seat, data["offer"], func(answer_blob: String) -> void:
-		_answering = maxi(0, _answering - 1)
+		_finish_answer(offer_id, false)
 		var reply := {"v": CODE_VERSION, "host": host_id, "for": seat, "answer": answer_blob, "key": room_code, "token": granted["token"]}
 		if signaling != null:
 			signaling.send_answer(from, offer_id, NetJson.stringify(reply)), false)
+
+
+func _finish_answer(offer_id: String, gave_up: bool) -> void:
+	if not _answers.has(offer_id):
+		return
+	var seat: int = _answers[offer_id][0]
+	_answers.erase(offer_id)
+	_answering = maxi(0, _answering - 1)
+	if gave_up:
+		_reserved.erase(seat)
+
+
+func _expire_answers() -> void:
+	for offer_id in _answers.keys():
+		if _clock >= float(_answers[offer_id][1]):
+			_finish_answer(offer_id, true)
 
 
 ## The seat a join request gets, and the token its player must use: their own seat if the token is one of a
@@ -165,10 +203,10 @@ func join_invite(name_: String, text: String) -> String:
 	var data := InviteCodec.decode(text)
 	if data.is_empty() or data.get("v") != CODE_VERSION or data.get("offer") is not String \
 			or data.get("room") is not String or data.get("host") is not int or data.get("for") is not int:
-		return "That isn't an invite code or link."
+		return TranslationServer.translate("That isn't an invite code or link.")
 	var seat: int = data["for"]
 	if seat < 1 or seat > 99 or data["host"] < 1 or data["host"] == seat:
-		return "That invite is not valid."
+		return TranslationServer.translate("That invite is not valid.")
 	_reset()
 	player_name = name_
 	_room_tag = data["room"]
@@ -207,9 +245,9 @@ func create_invite(for_seat := -1) -> void:
 func accept_reply(text: String) -> String:
 	var data := InviteCodec.decode(text)
 	if data.is_empty() or data.get("v") != CODE_VERSION or data.get("answer") is not String or data.get("for") is not int:
-		return "That isn't a reply code."
+		return TranslationServer.translate("That isn't a reply code.")
 	if data.get("room") != _room_tag:
-		return "That reply is for another match."
+		return TranslationServer.translate("That reply is for another match.")
 	transport.complete_invite(data["for"], data["answer"])
 	return ""
 
@@ -222,6 +260,18 @@ func leave() -> void:
 
 func in_match() -> bool:
 	return session != null
+
+
+## Whether this player joined through the room code on the trackers (not by an invite).
+func joined_by_room() -> bool:
+	return not _wait_offer_id.is_empty()
+
+
+## How the connection is going while a joiner waits: my own offer before the answer, then the link being opened.
+func join_details() -> String:
+	if _wait_link != null:
+		return _wait_link.diagnostics()
+	return transport.diagnostics() if transport != null else ""
 
 
 ## What the trackers are doing, for the screen that waits: "" when there is nothing to say.
@@ -264,6 +314,7 @@ func _reset() -> void:
 	_wait_link = null
 	_wait_offer_id = ""
 	_answering = 0
+	_answers.clear()
 	room_code = ""
 	_reserved.clear()
 
@@ -280,7 +331,7 @@ func _free_seat() -> int:
 ## else a new one.
 func _stored_token(room_name: String, seat: int) -> String:
 	var file := ConfigFile.new()
-	if file.load(SESSION_FILE) == OK and file.get_value("seat", "room", "") == room_name \
+	if file.load(session_file) == OK and file.get_value("seat", "room", "") == room_name \
 			and (seat < 1 or file.get_value("seat", "id", 0) == seat):
 		var kept: Variant = file.get_value("seat", "token", "")
 		if kept is String and (kept as String).length() >= 8:
@@ -295,7 +346,7 @@ func _store_token() -> void:
 	file.set_value("seat", "room", room_code if not room_code.is_empty() else _room_tag)
 	file.set_value("seat", "id", session.my_id)
 	file.set_value("seat", "token", token)
-	file.save(SESSION_FILE)
+	file.save(session_file)
 
 
 static func _random_text(length: int) -> String:

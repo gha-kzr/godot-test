@@ -89,6 +89,24 @@ func poll() -> void:
 		close()
 
 
+## Where the connection stands, in words a player can read out: what the network found and how the handshake goes.
+func diagnostics() -> String:
+	if _connection == null:
+		return ""
+	var kinds := {"host": 0, "srflx": 0, "relay": 0}
+	for candidate: Array in _candidates:
+		for kind: String in kinds:
+			if " typ %s" % kind in str(candidate[2]):
+				kinds[kind] += 1
+	var text := TranslationServer.translate("Network: %d local, %d public addresses found.") % [kinds["host"], kinds["srflx"]]
+	if use_stun and kinds["srflx"] == 0 and _blob_sent:
+		text += " " + TranslationServer.translate("No public address: this network may block direct connections between players.")
+	var states := ["new", "checking", "connected", "completed", "failed", "disconnected", "closed"]
+	var connection_state := _connection.get_connection_state()
+	text += " " + TranslationServer.translate("Connection: %s.") % states[clampi(connection_state, 0, states.size() - 1)]
+	return text
+
+
 func _setup() -> bool:
 	_connection = WebRTCPeerConnection.new()
 	var servers: Array = [{"urls": STUN_URLS}] if use_stun else []

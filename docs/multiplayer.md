@@ -34,7 +34,10 @@ the AI; from then on the host plays that hero's turns (the AI's moves are entrie
 The players panel tags "(AI)" and "(away)". A player can also hand their own hero to the AI, or ask for it back.
 
 A player who comes back opens the room again with the same browser: a token kept in the browser (and sent sealed) gets
-their seat back. They replay the log, then the host returns the hero at a moment that is not its turn.
+their seat back. They replay the log, then the host returns the hero at a moment that is not its turn. A player whose
+tab was only paused (the host stopped hearing it) is asked by the host to say hello again as soon as it speaks, and gets
+the seat back the same way; the game also keeps its loop running while its tab is hidden, so a host looking at another
+tab still answers joiners. A player who is the last one connected is told so ("Nobody else is connected").
 
 ## Connecting without a server
 
@@ -84,11 +87,22 @@ random peer ids and message sizes. Players see names and hero choices.
 **What a player (or the host) can do to the others.** The match is only as trustworthy as the people in it:
 - The **host** is the authority: it numbers and checks the entries, but it could also write entries that favour it, and
   the other players would apply them as long as the rules allow them. Play with people you would trust as host.
-- A player cannot act for another player's hero (the host refuses it), cannot push entries to the others (only the host's
-  entries, or entries I asked for while catching up, are taken), cannot pose as someone else on a direct link, and
-  cannot read or use another player's rejoin token (the shared log keeps only a hash of it). A player who is a *relay*
-  between two others can still lie about who a relayed message came from; a forged entry only makes the victim stop with
-  a "desync" message (it fails the fingerprint check), it cannot make them play a different game unnoticed.
+- A player cannot act for another player's hero (the host refuses it), cannot push entries to the others (only the
+  host's entries, or entries I asked for while catching up, are taken), cannot refuse or evict anyone (a "refused"
+  message counts only from the host a joiner contacted, and an "elected" message only if the receiver would have chosen
+  that player too, with the old host gone), and cannot read or use another player's rejoin token (the shared log keeps
+  only a hash of it). What a player proposes is rebuilt by the host field by field for its kind (a peer's hash, padding
+  or flags never reach the log), with a limit on the rate of proposals per player.
+- A message on a **direct** link speaks only for the player at the other end. A message **relayed** by a third player
+  does not have that protection when the receiver has no direct link to the claimed sender: a relay can then lie about
+  who a message came from (there are no signatures). The worst it can do to a state-changing message is make the
+  victim stop with a "desync" message (the host's entries carry a fingerprint); it cannot make them play a different
+  game unnoticed, but it can spam them with fake emotes. Players who cannot link directly are the ones exposed.
+- The host's **Remove** bans the player's token for that match only: someone who removed browser storage or uses another
+  browser gets a new token and can come back with the room code. It is a courtesy tool, not access control.
+- Anyone who has the room code can also answer a joiner's offer on the trackers (an answer is sealed with the room
+  key, which every holder has): a holder who races the host can connect a joiner to a fake lobby. Share the code only
+  with people you would let into the room.
 - Any player can disrupt: send a lot of messages, leave at a bad moment, hand their hero to the AI. Anyone who knows
   the room code can join the lobby (an invite link carries the code too, so share links like passwords).
 - The room code is about 59 bits and its tracker name comes out of the same slow key derivation as the encryption keys
@@ -119,7 +133,9 @@ and settings live in the browser, separate from the original game's.
 
 ## Known limits
 
-- Up to 8 players (4 per side); no spectators; no chat.
+- Up to 8 players (4 per side); no spectators; no chat (quick emotes only).
+- Placement has no timer: a connected player who never presses Ready blocks the start of the fight (the host can hand
+  their hero to the AI only once the fight has started).
 - A match needs a human host in a visible tab (browsers slow down background tabs); if the host leaves, another player takes over.
 - Without TURN some networks cannot connect (use another player as host, or an invite from someone who can reach both).
 - If every human leaves, the match is over: the log only lives in the players' browsers.

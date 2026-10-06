@@ -10,6 +10,7 @@ var _copy_link: Button
 var _copy_code: Button
 var _code := ""
 var _link := ""
+var _details: Label
 
 
 func _ready() -> void:
@@ -43,6 +44,11 @@ func _ready() -> void:
 	_reply.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	_reply.custom_minimum_size = Vector2(0, 120)
 	box.add_child(_reply)
+	_details = Label.new()
+	_details.name = "Details"
+	_details.theme_type_variation = &"SmallLabel"
+	_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(_details)
 	var buttons := HBoxContainer.new()
 	box.add_child(buttons)
 	_copy_link = HubStyle.button("Copy the reply link", "CopyLink")
@@ -74,14 +80,23 @@ func show_reply(code: String, link: String) -> void:
 
 
 ## Waiting for a room found through the trackers ("2/2" connected, or "" before the first).
-func show_search(trackers: String) -> void:
+func show_search(trackers: String, details := "") -> void:
 	_reply.visible = false
 	_copy_link.visible = false
 	_copy_code.visible = false
 	_status.text = tr("Looking for the room... The host answers as soon as they see you.")
 	if not trackers.is_empty():
 		_status.text += "\n" + tr("Connected relays: %s") % trackers
-	_status.text += "\n" + tr("Taking long? Ask the host for an invite link instead.")
+	_details.text = details
+
+
+## The host answered: the two browsers are now opening a direct connection.
+func show_connecting(details: String) -> void:
+	_reply.visible = false
+	_copy_link.visible = false
+	_copy_code.visible = false
+	_status.text = tr("Room found. Connecting to the host...")
+	_details.text = details
 
 
 func show_message(text: String) -> void:

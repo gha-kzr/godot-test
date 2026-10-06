@@ -25,6 +25,11 @@ func close() -> void:
 	pass
 
 
+## A line about how the connection is going, for the screen of a player who waits ("" when there is nothing to say).
+func diagnostics() -> String:
+	return ""
+
+
 ## Called every frame by the transport (links that need polling do it here).
 func poll() -> void:
 	pass

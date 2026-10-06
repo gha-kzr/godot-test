@@ -79,6 +79,14 @@ func refresh() -> void:
 			row.text += "  “%s”" % Emotes.text(int(said[0]))
 		_rows.add_child(row)
 	var mine := _session.state.seats.get(_session.my_id) as MatchState.Seat
+	if _session.connection_lost:
+		var lost := Label.new()
+		lost.theme_type_variation = &"SmallLabel"
+		lost.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
+		lost.text = tr("Nobody else is connected: the others left, or your own connection broke.")
+		lost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lost.custom_minimum_size = Vector2(260, 0)
+		_rows.add_child(lost)
 	_toggle.visible = mine != null
 	if mine != null:
 		_toggle.text = tr("Play my hero again") if mine.ai else tr("Let the AI play my hero")

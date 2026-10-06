@@ -4,12 +4,12 @@
 
 ## Multiplayer quick start
 
-1. Open the web build (the title's **Play** opens multiplayer). On the front page pick your name and the hero you like (the lobby starts with it), then **Host a match**: you get a **room code** to read out or copy, and a link.
-2. A friend opens the page, types the room code (or opens the room link) and is in your lobby within seconds.
+1. Open the web build (the title's **Play** opens multiplayer) and press **Host a match**: you get an **invite link** to copy (and the room code it contains, to read out). Keep the tab open: a host who closes it hands over to another player.
+2. A friend opens the invite link (or types the room code on the front page) and is in your lobby within seconds.
 3. In the lobby each player picks **one hero** (cards show its role, stats and spells; the **i** button opens everything about it) and joins the **blue or the red team** (up to 4 per team; nobody is put in a team for them, so the players balance themselves). A player needs a team to press **Ready**, and the host can **Start** only when everyone is ready and both teams have a player. The host can **Remove** a player (they cannot come back to that match), and anyone can send a quick **emote** from a fixed list. The host picks the map shape, size and number (a preview shows the map from above), the seconds per turn and how long the AI waits before it replaces a player who left. Names start as a random one (kept by the browser; change it in the lobby).
 4. Each player places their hero in their side's start zone, presses Ready, and the fight begins. Heroes have the strength of a level-30 hero with a full kit and no runes; levels are not shown.
-5. If someone drops out, the AI plays their hero after the grace time (the players panel marks it "(AI)"); they can come back with the same room code and get their hero back at the start of its next turn. Any player can also hand their hero to the AI to let it finish the fight.
-6. If the room code does not work for someone (a strict network), the lobby's **Make an invite** gives a link to send; they send a reply back and the host pastes it. That path needs no third party at all.
+5. If someone drops out, the AI plays their hero after the grace time (the players panel marks it "(AI)"); they can come back with the same room code (or invite link) and get their hero back at the next moment that is not its turn. Any player can also hand their hero to the AI to let it finish the fight.
+6. If the link does not work for someone, the lobby's **Make a manual invite** gives a link to send; they send a reply back and the host pastes it. That path needs no third party at all. Connections are direct between browsers (no relay server), so a few strict networks (company, school, some phone connections) cannot connect at all; the join screen says when that seems to be the case.
 
 For development: `godot --headless --script res://tests/run_tests.gd` (the network is faked in tests), and `tools/e2e/run.sh` plays whole matches between real Chrome tabs.
 
