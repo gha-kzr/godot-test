@@ -79,7 +79,7 @@ static func spells() -> Dictionary:
 		# --- Rogue: appears and vanishes ---
 		"rogue_dagger": {"name": "Dagger Strike", "from": "slash", "ap": 2, "range": [1, 1], "fx": [["dmg", 11, 15, "physical"]]},
 		"rogue_ambush": {"name": "Ambush", "from": "piercing_thrust", "ap": 3, "range": [1, 1],
-				"fx": [["dmg", 18, 22, "physical", "all", {"ambush": 80}]]},
+				"fx": [["dmg", 18, 22, "physical", "enemies", {"ambush": 80}]]},
 		"rogue_vanish": {"name": "Vanish", "from": "guard", "ap": 2, "range": [0, 0], "los": false, "cd": 4, "fx": [["status", "stealth", "caster"]]},
 		"rogue_shadow_step": {"name": "Shadow Step", "from": "blink", "ap": 2, "range": [2, 4], "los": false, "cd": 2, "fx": [["move", "teleport", 1, "caster"]]},
 		"rogue_hamstring": {"name": "Hamstring", "from": "hamstring", "ap": 2, "range": [1, 1], "cd": 1,
@@ -125,7 +125,7 @@ static func spells() -> Dictionary:
 static func heroes() -> Dictionary:
 	return {
 		"knight": {"name": "Knight", "gender": "male", "hp": 180, "ap": 7, "mp": 4, "init": 100, "look": "knight", "color": [0.25, 0.45, 0.9],
-				"role": "Frontline bruiser", "desc": "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove.",
+				"role": "Frontline", "desc": "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove.",
 				"spells": ["knight_slash", "knight_charge", "knight_bash", "knight_guard", "knight_whirlwind"]},
 		"ranger": {"name": "Ranger", "gender": "neutral", "hp": 130, "ap": 7, "mp": 5, "init": 108, "look": "ranger", "color": [0.3, 0.75, 0.4],
 				"ai": "ranged", "role": "Mobile sharpshooter", "desc": "Shoots from far away, slows and marks targets, and leaps back out of reach. Weak when caught.",
@@ -146,7 +146,7 @@ static func heroes() -> Dictionary:
 				"ai": "ranged", "role": "Bomb thrower", "desc": "Fast, sneaky and reckless: bombs and dynamite hurt everyone around, friends included. Steals action points.",
 				"spells": ["goblin_sling", "goblin_bomb", "goblin_pickpocket", "goblin_scamper", "goblin_dynamite"]},
 		"wraith": {"name": "Wraith", "gender": "neutral", "hp": 115, "ap": 7, "mp": 5, "init": 112, "look": "ghost", "color": [0.55, 0.4, 0.8],
-				"role": "Spirit", "desc": "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies.",
+				"role": "Spirit", "desc": "Shrugs off most physical attacks, but holy light burns it. Drains life, chills and terrifies.",
 				"spells": ["wraith_touch", "wraith_wail", "wraith_phase", "wraith_siphon", "wraith_chill"],
 				"resist": [["physical", 70], ["holy", -50]]},
 		"monk": {"name": "Monk", "gender": "male", "hp": 140, "ap": 7, "mp": 6, "init": 108, "color": [0.9, 0.55, 0.2],

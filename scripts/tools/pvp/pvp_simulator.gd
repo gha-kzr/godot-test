@@ -4,7 +4,7 @@ extends RefCounted
 ## `tools/pvp_balance.gd`. The AI plays worse than a player (it never plans two turns ahead and does not know a
 ## class's tricks), so read the results as a lower bound and as a way to spot a class that is far off.
 
-const MAX_ACTIONS := 1500
+const MAX_ACTIONS := 3000
 const SUDDEN_DEATH_ROUND := 40
 const SUDDEN_DEATH_PERCENT := 10
 
@@ -18,8 +18,12 @@ class Result:
 
 
 ## One match: `side_a` and `side_b` are class indexes. `map_seed` also seeds the dice.
-static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 12, typology := "open_field") -> Result:
-	var map := PvpMap.generate(map_seed, load("res://data/maps/typologies/%s.tres" % typology) as MapTypology, size)
+static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 12, typology := "open_field", max_actions := MAX_ACTIONS) -> Result:
+	var typology_file := "res://data/maps/typologies/%s.tres" % typology
+	if not ResourceLoader.exists(typology_file):
+		push_error("PvpSimulator: no map typology %s" % typology)
+		return Result.new()
+	var map := PvpMap.generate(map_seed, load(typology_file) as MapTypology, size)
 	var entries_a: Array[Dictionary] = []
 	var entries_b: Array[Dictionary] = []
 	for hero in side_a:
@@ -29,6 +33,7 @@ static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 
 	var state := PvpBattle.create(map, entries_a, entries_b, map_seed)
 	var result := Result.new()
 	if state == null:
+		push_error("PvpSimulator: can't build the match (map size %d too small for %d players?)" % [size, side_a.size() + side_b.size()])
 		return result
 	state.use_average_rolls = false
 	var battle := Battle.new(state)
@@ -36,7 +41,7 @@ static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 
 	battle.sudden_death_percent = SUDDEN_DEATH_PERCENT
 	battle.start()
 	var actions := 0
-	while not state.is_over() and actions < MAX_ACTIONS:
+	while not state.is_over() and actions < max_actions:
 		var unit := state.current_unit()
 		var action := EnemyAI.choose_next(state, unit.id)
 		var performed := battle.perform(action)

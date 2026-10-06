@@ -45,7 +45,7 @@ func describe() -> String:
 		if modifier != null:
 			parts.append(modifier.describe())
 	if stealth:
-		parts.append(tr("hidden until it attacks or is hurt"))
+		parts.append(tr("hidden from enemies until it attacks or is hurt (unless one stands next to it)"))
 	return ", ".join(parts)
 
 

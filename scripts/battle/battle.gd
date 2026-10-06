@@ -15,6 +15,8 @@ var state: BattleState
 ## sudden_death_percent of its max HP at its turn start, so a stalled battle always ends.
 var sudden_death_round := 0
 var sudden_death_percent := 10
+## PvP only: extra percent of max HP per round since sudden death began.
+const SUDDEN_DEATH_GROWTH_PERCENT := 3
 var _started := false
 
 
@@ -129,9 +131,20 @@ func is_sudden_death() -> bool:
 func _sudden_death(unit: UnitState) -> Array[BattleEvents.Event]:
 	if (unit.team != UnitState.Team.PLAYER and not state.pvp) or not is_sudden_death() or not unit.is_alive():
 		return []
-	var amount := mini(maxi(1, roundi(unit.max_hp() * sudden_death_percent / 100.0)), unit.hp)
+	var amount := mini(maxi(1, roundi(unit.max_hp() * sudden_death_percent_now() / 100.0)), unit.hp)
 	unit.hp -= amount
-	return [BattleEvents.DamageDealt.new(unit.id, amount, unit.hp)]
+	var events: Array[BattleEvents.Event] = [BattleEvents.DamageDealt.new(unit.id, amount, unit.hp)]
+	for ended in unit.break_stealth():  # Hurt: no longer hidden.
+		events.append(BattleEvents.StatusExpired.new(unit.id, ended))
+	return events
+
+
+## The share of max HP lost at a turn start. In PvP it grows every round past the start of sudden death, so a team
+## that heals as much as it takes (two healers) is still worn down: a fight always ends.
+func sudden_death_percent_now() -> int:
+	if not state.pvp:
+		return sudden_death_percent
+	return sudden_death_percent + SUDDEN_DEATH_GROWTH_PERCENT * maxi(0, state.turn_order.round_number - sudden_death_round)
 
 
 ## Fires each status's tick effects on its carrier, in application order, as if cast by

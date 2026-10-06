@@ -122,3 +122,139 @@ func test_a_cleanse_removes_harmful_statuses_and_keeps_the_helpful_ones() -> voi
 	dispel.remove = CleanseEffect.Remove.HELPFUL
 	dispel.apply(state, 0, 1)
 	assert_eq(target.statuses.size(), 0)
+
+
+func test_an_area_spell_still_hits_a_hidden_unit_it_covers() -> void:
+	var state := _duel()
+	state.units[1].cell = Vector2i(2, 6)
+	var battle := Battle.new(state)
+	battle.start()
+	while state.current_unit().id != 1:
+		battle.perform(BattleActions.EndTurn.new(state.current_unit().id))
+	var whirl := -1
+	for index in state.units[1].data.spells.size():
+		if state.units[1].data.spells[index].display_name == "Whirlwind":
+			whirl = index
+	state.units[1].cell = Vector2i(2, 3)  # Next to the rogue: the whirlwind covers her.
+	state.units[0].break_stealth()
+	state.units[0].add_status(load(STEALTH) as StatusData, 0)
+	var hp := state.units[0].hp
+	var result := battle.perform(BattleActions.CastSpell.new(1, whirl, Vector2i(2, 3)))
+	assert_true(result.ok(), result.error)
+	assert_true(state.units[0].hp < hp, "the area hit her (she was next to him)")
+	assert_false(state.units[0].is_stealthed(), "and revealed her")
+
+
+func test_a_charge_cannot_be_aimed_at_a_hidden_unit() -> void:
+	var state := _duel()
+	state.units[1].cell = Vector2i(2, 8)  # In line with the rogue, hidden at (2, 2): 6 cells away.
+	state.units[0].cell = Vector2i(2, 6)
+	var charge := (PvpHeroes.build(0)["unit"] as UnitData).spells[1]
+	assert_false(Targeting.can_target(state, 1, charge, Vector2i(2, 6)), "a hidden unit can't be charged")
+	state.units[0].break_stealth()
+	assert_true(Targeting.can_target(state, 1, charge, Vector2i(2, 6)), "a visible one can")
+
+
+func test_the_ambush_bonus_applies_on_a_real_cast_and_only_to_enemies() -> void:
+	var state := _duel()
+	state.units[1].cell = Vector2i(2, 3)
+	state.use_average_rolls = true
+	var battle := Battle.new(state)
+	battle.start()
+	while state.current_unit().id != 0:
+		battle.perform(BattleActions.EndTurn.new(state.current_unit().id))
+	var hp := state.units[1].hp
+	var result := battle.perform(BattleActions.CastSpell.new(0, 1, Vector2i(2, 3)))
+	assert_true(result.ok(), result.error)
+	var lost := hp - state.units[1].hp
+	assert_true(lost >= 34 and lost <= 38, "20 x 1.8 = 36 from stealth (%d)" % lost)
+	var spell := (PvpHeroes.build(4)["unit"] as UnitData).spells[1]
+	assert_eq((spell.effects[0] as DamageEffect).target_filter, EffectData.TargetFilter.ENEMIES, "never her own team")
+
+
+func test_purify_cleanses_and_gives_back_the_action_points() -> void:
+	var state := _duel(false)
+	var priestess_spells := (PvpHeroes.build(5)["unit"] as UnitData).spells
+	var purify := priestess_spells[4]
+	var ally := state.units[0]
+	ally.add_status(load("res://data/pvp/statuses/drained.tres") as StatusData, 1)
+	var before := ally.ap
+	for effect in purify.effects:
+		effect.apply(state, 0, 0)
+	assert_eq(ally.statuses.size(), 0, "cleansed")
+	assert_true(ally.ap >= before + 1, "the lost action points are back (%d to %d)" % [before, ally.ap])
+
+
+func test_the_wraith_shrugs_off_physical_and_burns_in_holy_light() -> void:
+	var state := _duel(false)
+	var wraith := PvpHeroes.build(7)["unit"] as UnitData
+	state.units[0] = UnitState.new(0, wraith, UnitState.Team.PLAYER, Vector2i(2, 2))
+	var physical := DamageEffect.new()
+	physical.min_amount = 100
+	physical.max_amount = 100
+	physical.damage_type = load("res://data/damage_types/physical.tres") as DamageType
+	var holy := DamageEffect.new()
+	holy.min_amount = 100
+	holy.max_amount = 100
+	holy.damage_type = load("res://data/damage_types/holy.tres") as DamageType
+	assert_true(physical.scaled(state, 1, 0, 100.0) < 40.0, "70% less physical")
+	assert_true(holy.scaled(state, 1, 0, 100.0) > 140.0, "50% more holy")
+
+
+func test_healing_touch_cannot_be_aimed_at_the_priestess_herself() -> void:
+	var map := PvpMap.generate(7, load("res://data/maps/typologies/open_field.tres") as MapTypology, 12)
+	var side_a: Array[Dictionary] = [{"hero": 5, "name": "P"}, {"hero": 0, "name": "K"}]
+	var side_b: Array[Dictionary] = [{"hero": 0, "name": "E"}]
+	var state := PvpBattle.create(map, side_a, side_b, 5)
+	state.units[0].cell = Vector2i(2, 2)
+	state.units[1].cell = Vector2i(2, 4)
+	var heal := (PvpHeroes.build(5)["unit"] as UnitData).spells[1]
+	assert_false(Targeting.can_target(state, 0, heal, Vector2i(2, 2)), "not herself")
+	assert_true(Targeting.can_target(state, 0, heal, Vector2i(2, 4)), "an ally")
+
+
+func test_sudden_death_in_pvp_gets_heavier_and_reveals() -> void:
+	var state := _duel()
+	var battle := Battle.new(state)
+	battle.sudden_death_round = 10
+	battle.sudden_death_percent = 10
+	state.turn_order.round_number = 10
+	assert_eq(battle.sudden_death_percent_now(), 10)
+	state.turn_order.round_number = 15
+	assert_eq(battle.sudden_death_percent_now(), 10 + 3 * 5, "heavier every round")
+	battle.start()
+	var unit := state.current_unit()
+	if not unit.is_stealthed():
+		unit.add_status(load(STEALTH) as StatusData, unit.id)
+	var events := battle._sudden_death(unit)
+	assert_false(unit.is_stealthed(), "the damage revealed it")
+	assert_true(events.any(func(e: BattleEvents.Event) -> bool: return e is BattleEvents.StatusExpired))
+
+
+func test_two_healer_teams_cannot_stall_for_ever() -> void:
+	var result := PvpSimulator.play([5, 5], [5, 5], 3, 12, "open_field", 900)
+	assert_ne(result.winner, -1, "sudden death ends it (rounds %d)" % result.rounds)
+
+
+func test_every_class_plays_a_stretch_against_the_next_without_errors() -> void:
+	for hero in PvpHeroes.hero_count():
+		var other := (hero + 1) % PvpHeroes.hero_count()
+		var side_a: Array[int] = [hero]
+		var side_b: Array[int] = [other]
+		var result := PvpSimulator.play(side_a, side_b, 30 + hero, 12, "open_field", 60)
+		assert_true(result.hp_left.size() == 2, "%d vs %d played" % [hero, other])
+
+
+func test_a_start_with_another_class_signature_is_refused() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.sessions[1].set_field("side", 0)
+	rig.sessions[2].set_field("side", 1)
+	rig.net.flush()
+	rig.sessions[1].set_ready(true)
+	rig.sessions[2].set_ready(true)
+	rig.net.flush()
+	var error := rig.sessions[2].state.apply({"k": "start", "n": rig.sessions[2].state.entry_count() + 1, "sig": PvpHeroes.signature() + 1})
+	assert_ne(error, "", "another version of the classes")
+	assert_eq(rig.sessions[2].state.phase, MatchState.Phase.LOBBY)

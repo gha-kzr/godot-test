@@ -42,7 +42,7 @@ const PROPOSALS_PER_SECOND := 10.0
 ## The fields each kind of entry may carry (the host adds n, h and c itself): anything else a peer sends is dropped.
 const ENTRY_FIELDS := {
 	"join": ["id", "name", "token"], "set": ["id", "f", "v"], "ready": ["id", "v"], "ai": ["id", "v"], "cfg": ["f", "v"],
-	"start": [], "go": [], "lobby": [], "drop": ["id"], "kick": ["id"], "act": ["a", "by", "sys"],
+	"start": ["sig"], "go": [], "lobby": [], "drop": ["id"], "kick": ["id"], "act": ["a", "by", "sys"],
 }
 const MAX_FIELD_TEXT := 80
 ## Seconds each player has to place their hero before the fight starts (the host starts it when the time is up).
@@ -172,7 +172,7 @@ func set_ready(on: bool) -> void:
 
 
 func start_match() -> void:
-	propose({"k": "start"})
+	propose({"k": "start", "sig": PvpHeroes.signature()})
 
 
 func set_placed(on: bool) -> void:

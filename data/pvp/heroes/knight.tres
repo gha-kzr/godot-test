@@ -6,6 +6,6 @@
 [resource]
 script = ExtResource("1_px4gn")
 unit = ExtResource("2_6vygm")
-role_label = "Frontline bruiser"
+role_label = "Frontline"
 description = "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove."
 gender = 2

@@ -912,7 +912,7 @@ msgid "From floor %d"
 msgstr ""
 
 #: data/pvp/heroes/knight.tres
-msgid "Frontline bruiser"
+msgid "Frontline"
 msgstr ""
 
 #: data/damage_types/frost.tres
@@ -1076,7 +1076,7 @@ msgid "Hidden"
 msgstr ""
 
 #: scripts/data/status_data.gd
-msgid "hidden until it attacks or is hurt"
+msgid "hidden from enemies until it attacks or is hurt (unless one stands next to it)"
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -2026,7 +2026,7 @@ msgid "Show hints again"
 msgstr ""
 
 #: data/pvp/heroes/wraith.tres
-msgid "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies."
+msgid "Shrugs off most physical attacks, but holy light burns it. Drains life, chills and terrifies."
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -2611,6 +2611,10 @@ msgstr ""
 
 #: scripts/net/match_state.gd
 msgid "you were removed from this match"
+msgstr ""
+
+#: scripts/net/match_state.gd
+msgid "your game version differs from the host's: reload the page"
 msgstr ""
 
 #: scripts/progression/tutorial.gd

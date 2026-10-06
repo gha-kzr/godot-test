@@ -152,7 +152,7 @@ func _apply(entry: Dictionary) -> String:
 		"kick": return _kick(entry)
 		"set": return _set_seat(entry)
 		"cfg": return _cfg(entry)
-		"start": return _start()
+		"start": return _start(entry)
 		"ready": return _ready(entry)
 		"go": return _go()
 		"act": return _act(entry)
@@ -278,7 +278,11 @@ func _cfg(entry: Dictionary) -> String:
 	return ""
 
 
-func _start() -> String:
+## The host stamps the start with the signature of its classes: a player whose page holds other numbers (an old
+## cached version, say) is told to reload instead of drifting into a desync.
+func _start(entry: Dictionary) -> String:
+	if entry.get("sig") != PvpHeroes.signature():
+		return TranslationServer.translate("your game version differs from the host's: reload the page")
 	var problem := start_problem()
 	if not problem.is_empty():
 		return problem

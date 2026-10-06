@@ -524,6 +524,8 @@ func _on_chip_pressed(unit_id: int) -> void:
 func focus_unit(unit_id: int) -> void:
 	if battle == null or unit_id < 0 or unit_id >= battle.state.units.size():
 		return
+	if battle.state.is_hidden_from(battle.state.units[unit_id], units_view.viewer_team):
+		return  # Where a hidden unit is, is not the viewer's to know.
 	var view := units_view.find_view(unit_id)
 	var point := view.position if view != null else board_view.cell_to_world(battle.state.units[unit_id].cell)
 	camera_rig.focus_on(point)
@@ -537,6 +539,8 @@ func _focus_turn_start(unit_id: int) -> void:
 		return
 	if battle.state.units[unit_id].team == UnitState.Team.PLAYER:
 		focus_unit(unit_id)
+		return
+	if battle.state.is_hidden_from(battle.state.units[unit_id], units_view.viewer_team):
 		return
 	var view := units_view.find_view(unit_id)
 	var point := view.position if view != null else board_view.cell_to_world(battle.state.units[unit_id].cell)

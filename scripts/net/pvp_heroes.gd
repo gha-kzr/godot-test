@@ -54,3 +54,52 @@ static func details(hero_index: int) -> Dictionary:
 				"lines": SpellBar.detail_lines(spell)})
 	info["spells"] = spells
 	return info
+
+
+static var _signature := 0
+
+
+## A number that is the same for two games holding the same classes (stats, spells and what they do), whatever the
+## language: the host's start entry carries it, so players on different versions find out at once.
+static func signature() -> int:
+	if _signature == 0:
+		var parts: Array[String] = []
+		for entry in roster().heroes:
+			var unit := entry.unit
+			var line := "%s|%d|%d|%d|%d" % [unit.display_name, unit.max_hp, unit.ap, unit.mp, unit.initiative]
+			for modifier in unit.innate_modifiers:
+				line += "|%s" % _modifier_text(modifier)
+			for spell in unit.spells:
+				line += "|%s,%d,%d,%d-%d,%s,%s,%d,%d" % [spell.display_name, spell.ap_cost, spell.cooldown, spell.min_range,
+						spell.max_range, spell.needs_line_of_sight, spell.height_extends_range, spell.target_unit,
+						spell.area.kind * 10 + spell.area.size]
+				for effect in spell.effects:
+					line += ",{%s}" % _effect_text(effect)
+			parts.append(line)
+		_signature = maxi(1, "\n".join(parts).hash())
+	return _signature
+
+
+static func _modifier_text(modifier: StatModifier) -> String:
+	return "%d:%d:%s" % [modifier.stat, modifier.amount, modifier.damage_type.display_name if modifier.damage_type != null else ""]
+
+
+static func _effect_text(effect: EffectData) -> String:
+	var text := "%s:%d" % [effect.get_script().get_global_name(), effect.target_filter]
+	if effect is DamageEffect:
+		var damage := effect as DamageEffect
+		text += ":%d-%d:%s:%d:%d" % [damage.min_amount, damage.max_amount, damage.damage_type.display_name if damage.damage_type != null else "", damage.lifesteal_percent, damage.ambush_bonus_percent]
+	elif effect is HealEffect:
+		text += ":%d-%d" % [(effect as HealEffect).min_amount, (effect as HealEffect).max_amount]
+	elif effect is MoveEffect:
+		text += ":%d:%d" % [(effect as MoveEffect).kind, (effect as MoveEffect).distance]
+	elif effect is CleanseEffect:
+		text += ":%d" % (effect as CleanseEffect).remove
+	elif effect is ApplyStatusEffect:
+		var status := (effect as ApplyStatusEffect).status
+		text += ":%s:%d:%s:%s" % [status.display_name, status.duration, status.stealth, status.is_positive]
+		for modifier in status.modifiers:
+			text += ":" + _modifier_text(modifier)
+		for tick in status.tick_effects:
+			text += ":(%s)" % _effect_text(tick)
+	return text

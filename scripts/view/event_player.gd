@@ -218,7 +218,7 @@ func _play_move(view: UnitView, path: Array[Vector2i]) -> void:
 	var points: Array[Vector3] = [view.position]
 	for cell in path:
 		points.append(_board.cell_to_world(cell))
-	var follows := _camera != null and not _camera.is_on_screen(points)
+	var follows := _camera != null and view.visible and not _camera.is_on_screen(points)  # Not what is hidden.
 	var generation := _generation
 	if follows:
 		_camera.follow(view)

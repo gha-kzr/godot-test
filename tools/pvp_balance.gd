@@ -28,6 +28,14 @@ func _init() -> void:
 				"size": _size = int(parts[1])
 		else:
 			mode = arg
+	if _games < 1 or _size < PvpMap.MIN_SIZE or _size > PvpMap.MAX_SIZE:
+		print("games= must be at least 1 and size= between %d and %d" % [PvpMap.MIN_SIZE, PvpMap.MAX_SIZE])
+		quit(1)
+		return
+	if not ResourceLoader.exists("res://data/maps/typologies/%s.tres" % _map):
+		print("no map typology named %s (see data/maps/typologies)" % _map)
+		quit(1)
+		return
 	var started := Time.get_ticks_msec()
 	if mode == "duel":
 		_duel()
@@ -56,10 +64,11 @@ func _duel() -> void:
 			wins[i].append(0.0)
 	var rounds := 0.0
 	var played := 0
+	var draws := 0
 	for i in count:
 		for j in range(i + 1, count):
 			for game in _games:
-				var map_seed := _seed * 1000 + i * 100 + j * 10 + game
+				var map_seed := _seed * 100000 + i * 10000 + j * 1000 + game
 				var i_first := game % 2 == 0  # Sides swap, so neither class always gets the same start zone.
 				var side_a: Array[int] = [i if i_first else j]
 				var side_b: Array[int] = [j if i_first else i]
@@ -73,6 +82,7 @@ func _duel() -> void:
 				elif j_won:
 					wins[j][i] += 1.0
 				else:
+					draws += 1
 					wins[i][j] += 0.5  # A draw splits.
 					wins[j][i] += 0.5
 	print("1v1, %d games per pair on %s %dx%d. Row class's win rate against the column class (%%):" % [_games, _map, _size, _size])
@@ -93,7 +103,7 @@ func _duel() -> void:
 				line += "%6d" % roundi(rate)
 		line += "%6d" % roundi(total / (count - 1))
 		print(line)
-	print("average match length: %.1f rounds" % (rounds / maxi(1, played)))
+	print("average match length: %.1f rounds, %d draws in %d matches" % [rounds / maxi(1, played), draws, played])
 
 
 func _teams(size: int) -> void:

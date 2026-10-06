@@ -69,7 +69,8 @@ func allows_target(state: BattleState, caster_id: int, cell: Vector2i) -> bool:
 		Kind.TELEPORT, Kind.JUMP:
 			return _can_land(state, caster, cell)
 		Kind.CHARGE:
-			return state.is_occupied(cell) and _charge_reaches(state, caster, cell)
+			var occupant := state.unit_at(cell)
+			return occupant != null and not state.is_hidden_from(occupant, caster.team) and _charge_reaches(state, caster, cell)
 	return true
 
 

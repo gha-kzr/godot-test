@@ -16,6 +16,7 @@ min_amount = 18
 max_amount = 22
 damage_type = ExtResource("3_yoy88")
 ambush_bonus_percent = 80
+target_filter = 2
 
 [resource]
 script = ExtResource("6_ekokh")

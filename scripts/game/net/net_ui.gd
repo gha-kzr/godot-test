@@ -79,7 +79,7 @@ static func hero_card(hero_index: int, selected: bool, on_pick: Callable) -> But
 	role.theme_type_variation = &"SmallLabel"
 	role.text = info["role"]
 	role.clip_text = true
-	role.custom_minimum_size = Vector2(150, 0)
+	role.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	role.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(role)
 	var stats := Label.new()

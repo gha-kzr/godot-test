@@ -691,8 +691,8 @@ msgstr "Trouvé : %s."
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
 
-msgid "Frontline bruiser"
-msgstr "Combattant de première ligne"
+msgid "Frontline"
+msgstr "Première ligne"
 
 msgid "Frost"
 msgstr "Givre"
@@ -814,8 +814,8 @@ msgstr "Héros"
 msgid "Hidden"
 msgstr "Caché"
 
-msgid "hidden until it attacks or is hurt"
-msgstr "caché jusqu'à ce qu'il attaque ou soit blessé"
+msgid "hidden from enemies until it attacks or is hurt (unless one stands next to it)"
+msgstr "caché des ennemis jusqu'à ce qu'il attaque ou soit blessé (sauf si l'un d'eux se tient à côté)"
 
 msgid "Hints will show again."
 msgstr "Les astuces s'afficheront à nouveau."
@@ -1528,8 +1528,8 @@ msgstr "Tire de loin, ralentit et marque ses cibles, et bondit hors de portée. 
 msgid "Show hints again"
 msgstr "Réafficher les astuces"
 
-msgid "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies."
-msgstr "Ignore presque tous les coups physiques, mais le sacré et le feu le brûlent. Draine la vie, glace et terrifie."
+msgid "Shrugs off most physical attacks, but holy light burns it. Drains life, chills and terrifies."
+msgstr "Ignore presque tous les coups physiques, mais la lumière sacrée le brûle. Draine la vie, glace et terrifie."
 
 msgid "Side view (%s)"
 msgstr "Vue de côté (%s)"
@@ -1968,6 +1968,9 @@ msgstr "Vous avez quitté le combat QA."
 
 msgid "you were removed from this match"
 msgstr "vous avez été retiré de ce match"
+
+msgid "your game version differs from the host's: reload the page"
+msgstr "votre version du jeu diffère de celle de l'hôte : rechargez la page"
 
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr "Vos héros sont sur les cases turquoise. Appuyez sur Prêt ({end_turn}) pour lancer le combat."

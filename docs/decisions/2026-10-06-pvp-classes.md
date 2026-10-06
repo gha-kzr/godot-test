@@ -17,7 +17,7 @@ PvP gets its own roster, authored for 1v1 up to 4v4.
   Sorceress (glass cannon: the biggest numbers, 85 HP, Blink), Necromancer (poison and rot over time, root, slow,
   action-point drain, no healing), Rogue (Vanish, then an Ambush for +80 %), Priestess (healer and booster: heals allies
   only, Mending Rain, Blessing +1 AP, Purify; very low damage), Goblin (bombs and dynamite that hurt friends too,
-  Pickpocket steals an AP, Scamper), Wraith (70 % physical resistance and -50 % holy; frost and drain), Monk
+  Pickpocket steals an AP, Scamper), Wraith (70 % physical resistance and -50 % holy; frost and drain; fire is a normal hit), Monk
   (skirmisher: dash, push, pull, self-heal). Female classes: Sorceress, Rogue, Priestess.
 - **Placeholders:** Knight, Ranger, Sorceress (the Mage's model) and Wraith (the Ghost's) reuse single-player models;
   the other five are coloured capsules until their models are built (`UnitData.model_scene`).
@@ -31,6 +31,10 @@ PvP gets its own roster, authored for 1v1 up to 4v4.
   ranged classes at range and the healer near allies; it also drives the AI taking over a player who left).
 - **Support classes are weak alone, on purpose.** A healer that can heal itself fully stalls any 1v1; Healing Touch
   therefore targets allies only. The target is 40 to 60 % in team games; 1v1 may spread wider for kits made for teams.
+- **A fight always ends:** in PvP the sudden-death damage grows by 3 % of max HP every round after it starts (two
+  healers out-heal a flat 10 %). Sudden death also reveals a hidden unit, like any damage. The host stamps the start
+  of a match with a signature of the classes (stats, spells, effects); a player whose page holds other numbers is told
+  to reload.
 - **Duplicates are allowed** (two Knights in a team is fine); a stacking limit can come later if it proves a problem.
 
 ## Balance process
@@ -47,7 +51,7 @@ Necromancer, Ranger, Priestess) read lower than they play; the point is to catch
   lowest and the Sorceress, Priestess and Monk highest.
 - 1v1 matrix: classes between 42 and 60 % on average, except the Knight (about 85: it never has to chase a clumsy AI
   kiter) and the Priestess (13: a healer alone, by design), and the Wraith that beats every physical class and loses to
-  fire, poison and holy as designed.
+  the casters (fire, poison, frost) that it cannot shrug off, and to holy light.
 - Last changes after these runs: Knight 180 HP and Charge every third turn, Smite 12-15, Sorceress Firebolt 22-27,
   Necromancer 150 HP and heavier Rot, Rogue 110 HP.
 
