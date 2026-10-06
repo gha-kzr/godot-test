@@ -27,6 +27,7 @@ var _hero_preselected := false
 
 ## `fragment`: the page address's # part. An invite link in it joins at once.
 func start(fragment := "") -> void:
+	WebPage.keep_running_when_hidden()
 	hub = MultiplayerHub.new()
 	hub.name = "Hub"
 	if link_factory != null:
@@ -40,7 +41,7 @@ func start(fragment := "") -> void:
 	_show_menu()
 	if not code.is_empty():
 		(_screen as NetMenuScreen).prefill_code(code)
-		_on_join(_saved_name(), code)
+		_on_join(NetUi.saved_name(), code)
 
 
 ## The invite or room code in the page address's # part, or "".
@@ -55,15 +56,6 @@ static func _join_code_in(fragment: String) -> String:
 func _process(_delta: float) -> void:
 	if _screen is NetJoinScreen and hub != null and hub.session == null and hub.signaling != null:
 		(_screen as NetJoinScreen).show_search(hub.status())
-
-
-static func _saved_name() -> String:
-	var file := ConfigFile.new()
-	if file.load(NetUi.player_file) == OK:
-		var kept := str(file.get_value("player", "name", "")).strip_edges()
-		if not kept.is_empty():
-			return kept
-	return "Player"
 
 
 # --- Screens --------------------------------------------------------------------------------

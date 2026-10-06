@@ -60,6 +60,7 @@ try {
   await inStep([alice, bob, carol], 'lobby');
 
   // Lobby: sides, map, timers, ready, start.
+  await alice.cmd('set', 'side', 0);
   await bob.cmd('set', 'side', 1); await carol.cmd('set', 'side', 1);
   await bob.cmd('set', 'hero', 1); await carol.cmd('set', 'hero', 2);
   await alice.cmd('cfg', 'grace', 6); await alice.cmd('cfg', 'turn', 20);

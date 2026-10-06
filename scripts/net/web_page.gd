@@ -43,5 +43,38 @@ static func query(key: String) -> String:
 	return ""
 
 
+## Keeps the game running while its tab is hidden. A browser stops a hidden tab's animation frames, and the game's loop
+## with them: a host who looks at another tab would stop answering the players who join, and a player would look gone.
+## While the page is hidden the loop is driven by a timer instead (browsers run those about once a second, enough to
+## answer a joiner and to stay connected); a visible page uses the browser's frames as usual.
+static func keep_running_when_hidden() -> void:
+	if not is_web():
+		return
+	JavaScriptBridge.eval("""
+		(function () {
+			if (window.__runWhenHidden) { return; }
+			window.__runWhenHidden = true;
+			var native = window.requestAnimationFrame.bind(window);
+			var pending = null;
+			window.requestAnimationFrame = function (callback) {
+				var done = false;
+				var run = function (time) {
+					if (done) { return; }
+					done = true;
+					if (pending === run) { pending = null; }
+					callback(time === undefined ? performance.now() : time);
+				};
+				pending = run;
+				var id = native(run);
+				if (document.hidden) { setTimeout(run, 200); }
+				return id;
+			};
+			document.addEventListener('visibilitychange', function () {
+				if (document.hidden && pending) { setTimeout(pending, 0); }
+			});
+		})();
+	""", true)
+
+
 static func copy(text: String) -> void:
 	DisplayServer.clipboard_set(text)

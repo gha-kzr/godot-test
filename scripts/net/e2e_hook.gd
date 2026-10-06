@@ -21,6 +21,11 @@ func _ready() -> void:
 		RtcLink.use_stun = false
 
 
+## JSON numbers arrive as floats; the match wants whole numbers as ints (the screens send ints).
+static func _whole(value: Variant) -> Variant:
+	return int(value) if value is float and is_equal_approx(value, roundf(value)) else value
+
+
 func _flow() -> NetFlow:
 	return game.screen as NetFlow
 
@@ -60,9 +65,9 @@ func _run(command: String, args: Array) -> Variant:
 		"status":
 			return _status()
 		"set":
-			_hub().session.set_field(str(args[0]), args[1])
+			_hub().session.set_field(str(args[0]), _whole(args[1]))
 		"cfg":
-			_hub().session.configure(str(args[0]), args[1])
+			_hub().session.configure(str(args[0]), _whole(args[1]))
 		"ready":
 			_hub().session.set_ready(bool(args[0]))
 		"start":

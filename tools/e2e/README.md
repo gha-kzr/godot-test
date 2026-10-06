@@ -7,6 +7,8 @@ exists in a browser, so these scripts drive real Chrome tabs.
 - `basic.mjs`: two players meet through an invite and a reply.
 - `tracker.mjs`: two players meet by room code through the real public trackers (one short run: it talks to
   `tracker.openwebtorrent.com` and `tracker.webtorrent.dev`, so don't loop it).
+- `roomlink.mjs`: a guest opens the room link (`#room=`) and joins by itself (`WAIT=<seconds>` keeps the host idle first).
+- `hidden_host.mjs`: the host's tab is behind another tab when a guest joins (browsers pause hidden tabs; the game keeps its loop running with a timer).
 - `full.mjs`: three players, the mesh, a started match, turns, the host's tab closing (host swap), the AI taking over,
   the host coming back by invite link and getting the hero back.
 - The game exposes a small dev-only hook when the page address has `?e2e=1` (`scripts/net/e2e_hook.gd`); `&stun=0`
