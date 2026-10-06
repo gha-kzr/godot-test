@@ -44,6 +44,8 @@ func _process(_delta: float) -> void:
 	if over != null and over != _slots and not _slots.is_ancestor_of(over):
 		index = -1  # Something else is in front (a menu, a popup).
 	if index == _hovered_slot:
+		if index >= 0 and not _details.visible:
+			show_details(_spells[index])  # Hidden by something else (a mouse_exited from a popup).
 		return
 	if index >= 0:
 		_hovered_slot = index
@@ -218,6 +220,9 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 		key.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(key)
 		button.shortcut = _action_shortcut(action)
+		# Godot would add "(2 - Physical)" as a tooltip after a moment: its popup takes the mouse, the slot gets a
+		# mouse_exited and the details panel (the real description) disappears.
+		button.shortcut_in_tooltip = false
 	button.pressed.connect(spell_pressed.emit.bind(index))
 	button.mouse_entered.connect(show_details.bind(spell))
 	button.mouse_exited.connect(hide_details)

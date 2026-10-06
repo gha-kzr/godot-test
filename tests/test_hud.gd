@@ -394,6 +394,16 @@ func test_the_slot_under_the_mouse_is_found_even_when_disabled_and_after_a_rebui
 	hud.free()
 
 
+func test_a_spell_slot_has_no_automatic_shortcut_tooltip() -> void:
+	var hud := _hud()
+	hud.show_spells(_spells(), 10)
+	var slot := _spell_button(hud, 0)
+	assert_true(slot.shortcut != null, "the key still works")
+	assert_false(slot.shortcut_in_tooltip, "no \"(1 - Physical)\" popup over the slot: it hides the details")
+	assert_eq(slot.get_tooltip(Vector2.ZERO), "", "no tooltip text at all")
+	hud.free()
+
+
 func test_spell_slots_are_square_icons_with_cost_and_key() -> void:
 	var hud := _hud()
 	hud.show_spells(_spells(), 10)
