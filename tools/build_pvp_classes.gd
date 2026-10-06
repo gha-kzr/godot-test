@@ -152,8 +152,10 @@ func _build_hero(id: String, spec: Dictionary, spells: Dictionary) -> PvpHero:
 		unit.innate_modifiers.append(modifier)
 	var rgb: Array = spec["color"]
 	unit.color = Color(rgb[0], rgb[1], rgb[2])
-	unit.model_height = 1.5
-	if spec.has("look"):
+	unit.model_height = spec.get("height", 1.5)
+	if spec.has("model"):
+		unit.model_scene = load("res://assets/models/%s.tscn" % spec["model"]) as PackedScene
+	elif spec.has("look"):
 		var model := load("res://data/units/%s.tres" % spec["look"]) as UnitData
 		unit.model_scene = model.model_scene
 		unit.model_scale = model.model_scale

@@ -92,8 +92,12 @@ func test_the_animations_start_from_the_rest_pose_and_the_loops_close() -> void:
 
 
 func test_a_unit_is_about_as_tall_as_its_data_says() -> void:
-	for file in DirAccess.get_files_at("res://data/units"):
-		var data := load("res://data/units/" + file) as UnitData
+	var paths: Array[String] = []
+	for folder in ["res://data/units", "res://data/pvp/units"]:
+		for file in DirAccess.get_files_at(folder):
+			paths.append("%s/%s" % [folder, file])
+	for file in paths:
+		var data := load(file) as UnitData
 		if data == null or data.model_scene == null or not data.model_scene.resource_path.begins_with(MODELS_DIR):
 			continue
 		var model := data.model_scene.instantiate() as Node3D

@@ -121,7 +121,7 @@ static func spells() -> Dictionary:
 	}
 
 
-## Per class: unit stats, its spells in key order, and what the lobby shows. `look` borrows a single-player model.
+## Per class: unit stats, its spells in key order, and what the lobby shows. `look` borrows a single-player model, `model` names an own recipe in scripts/tools/modeling/recipes (and `height` is its top in meters).
 static func heroes() -> Dictionary:
 	return {
 		"knight": {"name": "Knight", "gender": "male", "hp": 180, "ap": 7, "mp": 4, "init": 100, "look": "knight", "color": [0.25, 0.45, 0.9],
@@ -130,26 +130,26 @@ static func heroes() -> Dictionary:
 		"ranger": {"name": "Ranger", "gender": "neutral", "hp": 130, "ap": 7, "mp": 5, "init": 108, "look": "ranger", "color": [0.3, 0.75, 0.4],
 				"ai": "ranged", "role": "Mobile sharpshooter", "desc": "Shoots from far away, slows and marks targets, and leaps back out of reach. Weak when caught.",
 				"spells": ["ranger_arrow", "ranger_volley", "ranger_mark", "ranger_pin", "ranger_backslash"]},
-		"sorceress": {"name": "Sorceress", "gender": "female", "hp": 85, "ap": 7, "mp": 4, "init": 105, "look": "mage", "color": [0.85, 0.4, 0.3],
+		"sorceress": {"name": "Sorceress", "gender": "female", "hp": 85, "ap": 7, "mp": 4, "init": 105, "model": "sorceress", "height": 1.6, "color": [0.85, 0.4, 0.3],
 				"ai": "ranged", "role": "Glass cannon", "desc": "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team.",
 				"spells": ["sorc_firebolt", "sorc_fireball", "sorc_frost_spike", "sorc_meteor", "sorc_blink"]},
-		"necromancer": {"name": "Necromancer", "gender": "male", "hp": 150, "ap": 7, "mp": 4, "init": 100, "color": [0.45, 0.25, 0.55],
+		"necromancer": {"name": "Necromancer", "gender": "male", "hp": 150, "ap": 7, "mp": 4, "init": 100, "model": "necromancer", "height": 1.5, "color": [0.45, 0.25, 0.55],
 				"ai": "ranged", "role": "Curses and poison", "desc": "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing.",
 				"spells": ["necro_plague_bolt", "necro_rot", "necro_miasma", "necro_grasp", "necro_drain"]},
-		"rogue": {"name": "Rogue", "gender": "female", "hp": 110, "ap": 7, "mp": 6, "init": 115, "color": [0.25, 0.3, 0.35],
+		"rogue": {"name": "Rogue", "gender": "female", "hp": 110, "ap": 7, "mp": 6, "init": 115, "model": "rogue", "height": 1.5, "color": [0.25, 0.3, 0.35],
 				"role": "Assassin", "desc": "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her.",
 				"spells": ["rogue_dagger", "rogue_ambush", "rogue_vanish", "rogue_shadow_step", "rogue_hamstring"]},
-		"priestess": {"name": "Priestess", "gender": "female", "hp": 150, "ap": 7, "mp": 4, "init": 100, "color": [0.95, 0.9, 0.6],
+		"priestess": {"name": "Priestess", "gender": "female", "hp": 150, "ap": 7, "mp": 4, "init": 100, "model": "priestess", "height": 1.55, "color": [0.95, 0.9, 0.6],
 				"ai": "support", "role": "Healer and support", "desc": "Heals, cleanses and blesses her team for extra action points. Her own damage is very low, and she cannot heal herself with Healing Touch.",
 				"spells": ["priest_smite", "priest_heal", "priest_rain", "priest_bless", "priest_purify"]},
-		"goblin": {"name": "Goblin", "gender": "male", "hp": 100, "ap": 7, "mp": 6, "init": 120, "color": [0.45, 0.7, 0.25],
+		"goblin": {"name": "Goblin", "gender": "male", "hp": 100, "ap": 7, "mp": 6, "init": 120, "model": "goblin", "height": 1.0, "color": [0.45, 0.7, 0.25],
 				"ai": "ranged", "role": "Bomb thrower", "desc": "Fast, sneaky and reckless: bombs and dynamite hurt everyone around, friends included. Steals action points.",
 				"spells": ["goblin_sling", "goblin_bomb", "goblin_pickpocket", "goblin_scamper", "goblin_dynamite"]},
 		"wraith": {"name": "Wraith", "gender": "neutral", "hp": 115, "ap": 7, "mp": 5, "init": 112, "look": "ghost", "color": [0.55, 0.4, 0.8],
 				"role": "Spirit", "desc": "Shrugs off most physical attacks, but holy light burns it. Drains life, chills and terrifies.",
 				"spells": ["wraith_touch", "wraith_wail", "wraith_phase", "wraith_siphon", "wraith_chill"],
 				"resist": [["physical", 70], ["holy", -50]]},
-		"monk": {"name": "Monk", "gender": "male", "hp": 140, "ap": 7, "mp": 6, "init": 108, "color": [0.9, 0.55, 0.2],
+		"monk": {"name": "Monk", "gender": "male", "hp": 140, "ap": 7, "mp": 6, "init": 108, "model": "monk", "height": 1.5, "color": [0.9, 0.55, 0.2],
 				"role": "Skirmisher", "desc": "Quick on its feet: kicks in, pulls enemies close, sweeps them away and recovers on the spot.",
 				"spells": ["monk_palm", "monk_dash", "monk_staff", "monk_hook", "monk_peace"]},
 	}
