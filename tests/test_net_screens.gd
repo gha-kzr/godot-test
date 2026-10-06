@@ -114,7 +114,7 @@ func test_hero_cards_show_what_the_hero_is_and_does() -> void:
 		assert_true(info["hp"] > 0 and info["ap"] > 0 and info["mp"] > 0)
 		assert_eq(info["spell_icons"].size(), 5, "its five spells")
 		assert_false(str(info["role"]).is_empty())
-	assert_eq(PvpHeroes.summary(0)["role"], "Melee fighter")
+	assert_false(str(PvpHeroes.summary(0)["description"]).is_empty())
 	var card := NetUi.hero_card(0, true, func(_i: int) -> void: pass)
 	assert_true(card.button_pressed and card.toggle_mode)
 	assert_true(card.find_children("*", "TextureRect", true, false).size() == 5)
@@ -325,7 +325,7 @@ func test_the_info_button_opens_the_hero_stats_and_spells_without_picking_it() -
 	assert_eq(info["spells"].size(), 5)
 	for spell: Dictionary in info["spells"]:
 		assert_false(spell["lines"].is_empty(), "each spell says what it does")
-	assert_true(info["power"] > 0)
+	assert_false(info.has("power") or info.has("resistances"), "Power and resistances mean nothing in PvP: hidden")
 	(popup.find_child("CloseInfo", true, false) as Button).pressed.emit()
 	await _frames()
 	assert_true(holder.find_child("HeroInfo", true, false) == null, "closed")

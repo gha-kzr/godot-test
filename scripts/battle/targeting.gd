@@ -41,6 +41,8 @@ static func can_target(state: BattleState, caster_id: int, spell: SpellData, cel
 			return false
 		if (unit.team == caster.team) != (spell.target_unit == SpellData.TargetUnit.ALLY):
 			return false
+		if state.is_hidden_from(unit, caster.team):
+			return false  # Can't pick what it can't see.
 	for effect in spell.effects:
 		if effect != null and not effect.allows_target(state, caster_id, cell):
 			return false

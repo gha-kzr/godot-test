@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://idcamdnudqdx"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_kj4fl"]
+[ext_resource type="PackedScene" uid="uid://d4dt4uufbdkv5" path="res://scenes/fx/cast_guard.tscn" id="2_iig3r"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_sjsbb"]
+[ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="4_bggf4"]
+[ext_resource type="Resource" uid="uid://d0c1dny467xp2" path="res://data/pvp/statuses/stealth.tres" id="5_87dap"]
+[ext_resource type="Texture2D" uid="uid://q42ohyvc1ly" path="res://ui/icons/guard.svg" id="6_8sji0"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_wspi3"]
+
+[sub_resource type="Resource" id="Resource_olqi3"]
+script = ExtResource("1_kj4fl")
+
+[sub_resource type="Resource" id="Resource_hy2cw"]
+script = ExtResource("4_bggf4")
+status = ExtResource("5_87dap")
+target_filter = 3
+
+[resource]
+script = ExtResource("7_wspi3")
+display_name = "Vanish"
+icon = ExtResource("6_8sji0")
+cast_effect = ExtResource("2_iig3r")
+ap_cost = 2
+cooldown = 4
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_olqi3")
+effects = Array[ExtResource("3_sjsbb")]([SubResource("Resource_hy2cw")])

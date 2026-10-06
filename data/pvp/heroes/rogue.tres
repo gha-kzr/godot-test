@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://dre2c7q4qyvxi"]
+
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="1_obm1i"]
+[ext_resource type="Resource" uid="uid://dsubydketjm6i" path="res://data/pvp/units/rogue.tres" id="2_muy1m"]
+
+[resource]
+script = ExtResource("1_obm1i")
+unit = ExtResource("2_muy1m")
+role_label = "Assassin"
+description = "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her."
+gender = 1

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://dwvci4ujxe20n"]
+
+[ext_resource type="Resource" uid="uid://chxf7dscbytpg" path="res://data/ai/positioning_support.tres" id="1_oxm4u"]
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="2_8pa7m"]
+[ext_resource type="Resource" uid="uid://bwh7j0uj5jnoo" path="res://data/pvp/units/priestess.tres" id="3_06ue1"]
+
+[resource]
+script = ExtResource("2_8pa7m")
+unit = ExtResource("3_06ue1")
+role_label = "Healer and support"
+description = "Heals, cleanses and blesses her team for extra action points. Her own damage is very low, and she cannot heal herself with Healing Touch."
+gender = 1
+ai_positioning = ExtResource("1_oxm4u")

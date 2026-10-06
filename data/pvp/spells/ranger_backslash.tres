@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://ccbqd07flp7ck"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_vt7ss"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_q754p"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_tg88y"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_yd6ra"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="5_ihocd"]
+[ext_resource type="Texture2D" uid="uid://bcav0k8v52pgc" path="res://ui/icons/backslash.svg" id="6_6gy5l"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_aamtx"]
+
+[sub_resource type="Resource" id="Resource_8hgip"]
+script = ExtResource("1_vt7ss")
+
+[sub_resource type="Resource" id="Resource_egb8j"]
+script = ExtResource("4_yd6ra")
+min_amount = 9
+max_amount = 11
+damage_type = ExtResource("3_tg88y")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_c8duf"]
+script = ExtResource("5_ihocd")
+kind = 5
+distance = 4
+target_filter = 3
+
+[resource]
+script = ExtResource("7_aamtx")
+display_name = "Backslash"
+icon = ExtResource("6_6gy5l")
+ap_cost = 2
+cooldown = 1
+needs_line_of_sight = false
+area = SubResource("Resource_8hgip")
+effects = Array[ExtResource("2_q754p")]([SubResource("Resource_egb8j"), SubResource("Resource_c8duf")])

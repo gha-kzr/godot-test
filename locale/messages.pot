@@ -53,6 +53,10 @@ msgstr ""
 msgid "%s (%d AP): %s"
 msgstr ""
 
+#: scripts/data/damage_effect.gd
+msgid "%s (+%d%% from stealth)"
+msgstr ""
+
 #: scripts/data/effect_data.gd
 msgid "%s (allies only)"
 msgstr ""
@@ -317,6 +321,10 @@ msgstr ""
 msgid "All (%s)"
 msgstr ""
 
+#: data/pvp/spells/rogue_ambush.tres
+msgid "Ambush"
+msgstr ""
+
 #: scripts/progression/qa_tools.gd
 msgid "ambush in the middle"
 msgstr ""
@@ -337,8 +345,12 @@ msgstr ""
 msgid "AP: action points. Each spell costs some; they refill every turn."
 msgstr ""
 
-#: data/spells/arrow.tres
+#: data/pvp/spells/ranger_arrow.tres data/spells/arrow.tres
 msgid "Arrow"
+msgstr ""
+
+#: data/pvp/heroes/rogue.tres
+msgid "Assassin"
 msgstr ""
 
 #: scenes/game/settings_screen.tscn
@@ -373,7 +385,7 @@ msgstr ""
 msgid "Back to the title"
 msgstr ""
 
-#: data/spells/backslash.tres
+#: data/pvp/spells/ranger_backslash.tres data/spells/backslash.tres
 msgid "Backslash"
 msgstr ""
 
@@ -397,7 +409,19 @@ msgstr ""
 msgid "Bite"
 msgstr ""
 
-#: data/spells/blink.tres
+#: data/pvp/statuses/bleeding.tres
+msgid "Bleeding"
+msgstr ""
+
+#: data/pvp/statuses/blessed.tres
+msgid "Blessed"
+msgstr ""
+
+#: data/pvp/spells/priest_bless.tres
+msgid "Blessing"
+msgstr ""
+
+#: data/pvp/spells/sorc_blink.tres data/spells/blink.tres
 msgid "Blink"
 msgstr ""
 
@@ -407,6 +431,14 @@ msgstr ""
 
 #: scripts/game/qa_screen.gd
 msgid "Board"
+msgstr ""
+
+#: data/pvp/spells/goblin_bomb.tres
+msgid "Bomb"
+msgstr ""
+
+#: data/pvp/heroes/goblin.tres
+msgid "Bomb thrower"
 msgstr ""
 
 #: data/spells/bone_arrow.tres
@@ -457,6 +489,10 @@ msgstr ""
 msgid "Brute"
 msgstr ""
 
+#: data/pvp/statuses/bulwark.tres
+msgid "Bulwark"
+msgstr ""
+
 #: scripts/game/net/net_join_screen.gd scripts/game/spells_screen.gd
 msgid "Cancel"
 msgstr ""
@@ -475,12 +511,16 @@ msgid_plural "Change spells (%d more known)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: data/spells/charge.tres
+#: data/pvp/spells/knight_charge.tres data/spells/charge.tres
 msgid "Charge"
 msgstr ""
 
 #: scripts/data/move_effect.gd
 msgid "Charges in a straight line next to the target"
+msgstr ""
+
+#: data/pvp/heroes/knight.tres
+msgid "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove."
 msgstr ""
 
 #: data/spells/chill_touch.tres
@@ -627,6 +667,14 @@ msgstr ""
 msgid "Cross"
 msgstr ""
 
+#: data/pvp/heroes/necromancer.tres
+msgid "Curses and poison"
+msgstr ""
+
+#: data/pvp/spells/rogue_dagger.tres
+msgid "Dagger Strike"
+msgstr ""
+
 #: scripts/data/glossary.gd
 msgid "Damage taken: percent more (or, below 0, less) damage the unit takes, from statuses and runes."
 msgstr ""
@@ -647,8 +695,20 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: data/statuses/dread.tres
+#: data/pvp/spells/necro_drain.tres
+msgid "Drain Will"
+msgstr ""
+
+#: data/pvp/statuses/drained.tres
+msgid "Drained"
+msgstr ""
+
+#: data/pvp/statuses/dread.tres data/statuses/dread.tres
 msgid "Dread"
+msgstr ""
+
+#: data/pvp/spells/goblin_dynamite.tres
+msgid "Dynamite"
 msgstr ""
 
 #: scripts/net/match_state.gd
@@ -731,6 +791,10 @@ msgstr ""
 msgid "Fast (x2)"
 msgstr ""
 
+#: data/pvp/heroes/goblin.tres
+msgid "Fast, sneaky and reckless: bombs and dynamite hurt everyone around, friends included. Steals action points."
+msgstr ""
+
 #: data/spells/feast.tres
 msgid "Feast"
 msgstr ""
@@ -755,11 +819,11 @@ msgstr ""
 msgid "Fire Ward Rune"
 msgstr ""
 
-#: data/spells/fireball.tres
+#: data/pvp/spells/sorc_fireball.tres data/spells/fireball.tres
 msgid "Fireball"
 msgstr ""
 
-#: data/spells/firebolt.tres
+#: data/pvp/spells/sorc_firebolt.tres data/spells/firebolt.tres
 msgid "Firebolt"
 msgstr ""
 
@@ -831,6 +895,10 @@ msgstr ""
 msgid "Floors"
 msgstr ""
 
+#: data/pvp/spells/monk_dash.tres
+msgid "Flying Kick"
+msgstr ""
+
 #: data/boons/focus_crown.tres
 msgid "Focus Crown"
 msgstr ""
@@ -843,12 +911,20 @@ msgstr ""
 msgid "From floor %d"
 msgstr ""
 
+#: data/pvp/heroes/knight.tres
+msgid "Frontline bruiser"
+msgstr ""
+
 #: data/damage_types/frost.tres
 msgid "Frost"
 msgstr ""
 
 #: data/spells/frost_lance.tres
 msgid "Frost Lance"
+msgstr ""
+
+#: data/pvp/spells/sorc_frost_spike.tres
+msgid "Frost Spike"
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -907,6 +983,14 @@ msgstr ""
 msgid "Give this much essence"
 msgstr ""
 
+#: data/pvp/heroes/sorceress.tres
+msgid "Glass cannon"
+msgstr ""
+
+#: data/pvp/units/goblin.tres
+msgid "Goblin"
+msgstr ""
+
 #: scripts/net/emotes.gd
 msgid "Good game!"
 msgstr ""
@@ -927,11 +1011,19 @@ msgstr ""
 msgid "Grapple Shot"
 msgstr ""
 
+#: data/pvp/spells/necro_grasp.tres
+msgid "Grasping Dead"
+msgstr ""
+
+#: data/pvp/spells/wraith_chill.tres
+msgid "Grave Chill"
+msgstr ""
+
 #: data/spells/ground_slam.tres
 msgid "Ground Slam"
 msgstr ""
 
-#: data/spells/guard.tres
+#: data/pvp/spells/knight_guard.tres data/spells/guard.tres
 msgid "Guard"
 msgstr ""
 
@@ -939,12 +1031,24 @@ msgstr ""
 msgid "Guarded"
 msgstr ""
 
-#: data/spells/hamstring.tres
+#: data/pvp/spells/rogue_hamstring.tres data/spells/hamstring.tres
 msgid "Hamstring"
+msgstr ""
+
+#: data/pvp/statuses/hasty.tres
+msgid "Hasty"
 msgstr ""
 
 #: scripts/view/hud.gd
 msgid "Heal the heroes"
+msgstr ""
+
+#: data/pvp/heroes/priestess.tres
+msgid "Healer and support"
+msgstr ""
+
+#: data/pvp/spells/priest_heal.tres
+msgid "Healing Touch"
 msgstr ""
 
 #: scripts/data/heal_effect.gd
@@ -955,12 +1059,24 @@ msgstr ""
 msgid "heals %s (%d%% Power)"
 msgstr ""
 
+#: data/pvp/heroes/priestess.tres
+msgid "Heals, cleanses and blesses her team for extra action points. Her own damage is very low, and she cannot heal herself with Healing Touch."
+msgstr ""
+
 #: scripts/net/emotes.gd
 msgid "Hello!"
 msgstr ""
 
 #: scenes/game/hub/hero_panel.tscn
 msgid "Hero"
+msgstr ""
+
+#: data/pvp/statuses/stealth.tres
+msgid "Hidden"
+msgstr ""
+
+#: scripts/data/status_data.gd
+msgid "hidden until it attacks or is hurt"
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -991,7 +1107,11 @@ msgstr ""
 msgid "HP: health. At 0 the unit falls."
 msgstr ""
 
-#: data/spells/hunters_mark.tres
+#: data/pvp/statuses/hunted.tres
+msgid "Hunted"
+msgstr ""
+
+#: data/pvp/spells/ranger_mark.tres data/spells/hunters_mark.tres
 msgid "Hunter's Mark"
 msgstr ""
 
@@ -1007,12 +1127,20 @@ msgstr ""
 msgid "Initiative: the higher it is, the earlier the unit plays."
 msgstr ""
 
+#: data/pvp/spells/monk_peace.tres
+msgid "Inner Peace"
+msgstr ""
+
 #: scripts/game/settings_screen.gd
 msgid "Instant (skip animations)"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Invite players"
+msgstr ""
+
+#: data/pvp/spells/monk_hook.tres
+msgid "Iron Grip"
 msgstr ""
 
 #: data/boons/iron_ward.tres
@@ -1055,7 +1183,7 @@ msgstr ""
 msgid "Kill pinned unit"
 msgstr ""
 
-#: data/units/knight.tres
+#: data/pvp/units/knight.tres data/units/knight.tres
 msgid "Knight"
 msgstr ""
 
@@ -1107,6 +1235,14 @@ msgstr ""
 
 #: scripts/game/run_screen.gd
 msgid "Level up! (+%d XP)"
+msgstr ""
+
+#: data/pvp/spells/wraith_siphon.tres
+msgid "Life Siphon"
+msgstr ""
+
+#: data/pvp/statuses/nimble.tres
+msgid "Light fingers"
 msgstr ""
 
 #: scripts/data/area_shape.gd
@@ -1165,16 +1301,32 @@ msgstr ""
 msgid "Match lobby"
 msgstr ""
 
-#: scripts/net/pvp_heroes.gd
-msgid "Melee fighter"
-msgstr ""
-
 #: data/spells/mend.tres
 msgid "Mend"
 msgstr ""
 
+#: data/pvp/spells/priest_rain.tres
+msgid "Mending Rain"
+msgstr ""
+
 #: scenes/battle/hud.tscn
 msgid "Menu"
+msgstr ""
+
+#: data/pvp/spells/sorc_meteor.tres
+msgid "Meteor"
+msgstr ""
+
+#: data/pvp/spells/necro_miasma.tres data/pvp/statuses/miasma.tres
+msgid "Miasma"
+msgstr ""
+
+#: data/pvp/heroes/ranger.tres
+msgid "Mobile sharpshooter"
+msgstr ""
+
+#: data/pvp/units/monk.tres
+msgid "Monk"
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -1223,6 +1375,10 @@ msgstr ""
 
 #: scripts/game/mute_button.gd
 msgid "Mute or unmute all sound"
+msgstr ""
+
+#: data/pvp/units/necromancer.tres
+msgid "Necromancer"
 msgstr ""
 
 #: scripts/game/hub/rune_stash.gd
@@ -1357,12 +1513,20 @@ msgstr ""
 msgid "out of step with the host"
 msgstr ""
 
+#: data/pvp/spells/monk_palm.tres
+msgid "Palm Strike"
+msgstr ""
+
 #: scripts/game/run_screen.gd scenes/game/party_screen.tscn
 msgid "Party"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Paste the reply link or code here"
+msgstr ""
+
+#: data/pvp/spells/wraith_phase.tres
+msgid "Phase Walk"
 msgstr ""
 
 #: data/damage_types/physical.tres
@@ -1385,6 +1549,10 @@ msgstr ""
 msgid "Pick at least one enemy."
 msgstr ""
 
+#: data/pvp/spells/goblin_pickpocket.tres
+msgid "Pickpocket"
+msgstr ""
+
 #: data/spells/piercing_thrust.tres
 msgid "Piercing Thrust"
 msgstr ""
@@ -1393,7 +1561,7 @@ msgstr ""
 msgid "Pinned"
 msgstr ""
 
-#: data/spells/pinning_shot.tres
+#: data/pvp/spells/ranger_pin.tres data/spells/pinning_shot.tres
 msgid "Pinning Shot"
 msgstr ""
 
@@ -1403,6 +1571,14 @@ msgstr ""
 
 #: scripts/net/net_status_panel.gd
 msgid "Placement: %d s"
+msgstr ""
+
+#: data/pvp/statuses/plague.tres
+msgid "Plague"
+msgstr ""
+
+#: data/pvp/spells/necro_plague_bolt.tres
+msgid "Plague Bolt"
 msgstr ""
 
 #: scenes/game/title_screen.tscn
@@ -1441,10 +1617,6 @@ msgstr ""
 msgid "Power %+d%%   Damage taken %+d%%"
 msgstr ""
 
-#: scripts/game/net/net_ui.gd
-msgid "Power %d"
-msgstr ""
-
 #: scripts/view/hud/unit_info.gd
 msgid "Power: All %+d%%\nResist: %s"
 msgstr ""
@@ -1477,6 +1649,10 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
+#: data/pvp/units/priestess.tres
+msgid "Priestess"
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "Profile"
 msgstr ""
@@ -1490,6 +1666,10 @@ msgid "Pulls %d cell closer"
 msgid_plural "Pulls up to %d cells closer"
 msgstr[0] ""
 msgstr[1] ""
+
+#: data/pvp/spells/priest_purify.tres
+msgid "Purify"
+msgstr ""
 
 #: scripts/data/move_effect.gd
 msgid "Pushes back %d cell"
@@ -1521,6 +1701,10 @@ msgstr ""
 msgid "QA: playground"
 msgstr ""
 
+#: data/pvp/heroes/monk.tres
+msgid "Quick on its feet: kicks in, pulls enemies close, sweeps them away and recovers on the spot."
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "Quick team (level 0: left out)"
 msgstr ""
@@ -1545,7 +1729,7 @@ msgstr ""
 msgid "Range %s, line of sight, +range from high ground"
 msgstr ""
 
-#: scripts/data/enemy_data.gd scripts/net/pvp_heroes.gd
+#: scripts/data/enemy_data.gd
 msgid "Ranged"
 msgstr ""
 
@@ -1553,7 +1737,7 @@ msgstr ""
 msgid "Ranged: attacks from afar and keeps its distance."
 msgstr ""
 
-#: data/units/ranger.tres
+#: data/pvp/units/ranger.tres data/units/ranger.tres
 msgid "Ranger"
 msgstr ""
 
@@ -1621,12 +1805,24 @@ msgstr ""
 msgid "Regeneration"
 msgstr ""
 
+#: data/pvp/statuses/regrowth.tres
+msgid "Regrowth"
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Remove"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Remove this player from the match: they cannot come back."
+msgstr ""
+
+#: scripts/data/cleanse_effect.gd
+msgid "Removes harmful effects"
+msgstr ""
+
+#: scripts/data/cleanse_effect.gd
+msgid "Removes helpful effects"
 msgstr ""
 
 #: data/spells/rend.tres
@@ -1653,8 +1849,12 @@ msgstr ""
 msgid "Resistance: percent less damage of one type (never more than three quarters for heroes; an enemy can be immune)."
 msgstr ""
 
-#: scripts/game/net/net_ui.gd
-msgid "Resistances: %s"
+#: data/pvp/statuses/robbed.tres
+msgid "Robbed"
+msgstr ""
+
+#: data/pvp/units/rogue.tres
+msgid "Rogue"
 msgstr ""
 
 #: scripts/view/hud/unit_card.gd
@@ -1671,6 +1871,18 @@ msgstr ""
 
 #: scripts/game/net/net_join_screen.gd
 msgid "Room found. Connecting to the host..."
+msgstr ""
+
+#: data/pvp/statuses/rooted.tres
+msgid "Rooted"
+msgstr ""
+
+#: data/pvp/statuses/rot.tres
+msgid "Rot"
+msgstr ""
+
+#: data/pvp/spells/necro_rot.tres
+msgid "Rot Curse"
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -1753,6 +1965,10 @@ msgstr ""
 msgid "Say something"
 msgstr ""
 
+#: data/pvp/spells/goblin_scamper.tres
+msgid "Scamper"
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Seconds before the AI replaces a player who left"
 msgstr ""
@@ -1785,7 +2001,11 @@ msgstr ""
 msgid "Settings couldn't be saved."
 msgstr ""
 
-#: data/spells/orc_shield_bash.tres data/spells/shield_bash.tres
+#: data/pvp/spells/rogue_shadow_step.tres
+msgid "Shadow Step"
+msgstr ""
+
+#: data/pvp/spells/knight_bash.tres data/spells/orc_shield_bash.tres data/spells/shield_bash.tres
 msgid "Shield Bash"
 msgstr ""
 
@@ -1797,8 +2017,16 @@ msgstr ""
 msgid "Shielded"
 msgstr ""
 
+#: data/pvp/heroes/ranger.tres
+msgid "Shoots from far away, slows and marks targets, and leaps back out of reach. Weak when caught."
+msgstr ""
+
 #: scenes/game/settings_screen.tscn
 msgid "Show hints again"
+msgstr ""
+
+#: data/pvp/heroes/wraith.tres
+msgid "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies."
 msgstr ""
 
 #: scripts/view/hud.gd
@@ -1821,7 +2049,7 @@ msgstr ""
 msgid "Skip tutorial"
 msgstr ""
 
-#: scripts/data/enemy_data.gd
+#: scripts/data/enemy_data.gd data/pvp/heroes/monk.tres
 msgid "Skirmisher"
 msgstr ""
 
@@ -1833,20 +2061,36 @@ msgstr ""
 msgid "Sky Bastion"
 msgstr ""
 
-#: data/spells/slash.tres
+#: data/pvp/spells/knight_slash.tres data/spells/slash.tres
 msgid "Slash"
+msgstr ""
+
+#: data/pvp/spells/goblin_sling.tres
+msgid "Slingshot"
+msgstr ""
+
+#: data/pvp/statuses/slowed.tres
+msgid "Slowed"
 msgstr ""
 
 #: data/spells/smash.tres
 msgid "Smash"
 msgstr ""
 
-#: data/spells/smite.tres
+#: data/pvp/spells/priest_smite.tres data/spells/smite.tres
 msgid "Smite"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Someone cannot connect? Make a manual invite"
+msgstr ""
+
+#: data/pvp/units/sorceress.tres
+msgid "Sorceress"
+msgstr ""
+
+#: data/pvp/spells/wraith_touch.tres
+msgid "Spectral Touch"
 msgstr ""
 
 #: scripts/view/hud.gd scenes/battle/hud.tscn
@@ -1895,6 +2139,10 @@ msgstr ""
 
 #: scripts/progression/tutorial.gd
 msgid "Spells cost AP. Pick one (or press its number) to see where it can reach."
+msgstr ""
+
+#: data/pvp/heroes/wraith.tres
+msgid "Spirit"
 msgstr ""
 
 #: data/spells/spore_bolt.tres
@@ -2069,6 +2317,10 @@ msgstr ""
 msgid "The best floor is now %d."
 msgstr ""
 
+#: data/pvp/heroes/sorceress.tres
+msgid "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "The essence is now %d."
 msgstr ""
@@ -2221,6 +2473,14 @@ msgstr ""
 msgid "Value (a level or a floor)"
 msgstr ""
 
+#: data/pvp/spells/rogue_vanish.tres
+msgid "Vanish"
+msgstr ""
+
+#: data/pvp/heroes/rogue.tres
+msgid "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her."
+msgstr ""
+
 #: data/runes/venom_ward.tres
 msgid "Venom Ward Rune"
 msgstr ""
@@ -2233,11 +2493,11 @@ msgstr ""
 msgid "Vigor"
 msgstr ""
 
-#: data/spells/volley.tres
+#: data/pvp/spells/ranger_volley.tres data/spells/volley.tres
 msgid "Volley"
 msgstr ""
 
-#: data/spells/wail.tres
+#: data/pvp/spells/wraith_wail.tres data/spells/wail.tres
 msgid "Wail"
 msgstr ""
 
@@ -2253,6 +2513,10 @@ msgstr ""
 msgid "Warg"
 msgstr ""
 
+#: data/pvp/heroes/necromancer.tres
+msgid "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing."
+msgstr ""
+
 #: scripts/net/multiplayer_hub.gd
 msgid "WebRTC isn't available here."
 msgstr ""
@@ -2265,7 +2529,11 @@ msgstr ""
 msgid "Where does %s go? Put here on a slot, or Cancel (Esc)."
 msgstr ""
 
-#: data/spells/whirlwind.tres
+#: data/pvp/spells/monk_staff.tres
+msgid "Whirling Staff"
+msgstr ""
+
+#: data/pvp/spells/knight_whirlwind.tres data/spells/whirlwind.tres
 msgid "Whirlwind"
 msgstr ""
 
@@ -2291,6 +2559,10 @@ msgstr ""
 
 #: scripts/game/settings_screen.gd
 msgid "Windowed"
+msgstr ""
+
+#: data/pvp/units/wraith.tres
+msgid "Wraith"
 msgstr ""
 
 #: scripts/progression/profile.gd

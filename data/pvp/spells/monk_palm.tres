@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://cbmqwvbc2fv2g"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_wn2kx"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_jag7q"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_eg0id"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_h7j6l"]
+[ext_resource type="Texture2D" uid="uid://m0e005r540hf" path="res://ui/icons/club.svg" id="5_7upm4"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_4jb37"]
+
+[sub_resource type="Resource" id="Resource_00ogi"]
+script = ExtResource("1_wn2kx")
+
+[sub_resource type="Resource" id="Resource_6dh53"]
+script = ExtResource("4_h7j6l")
+min_amount = 11
+max_amount = 15
+damage_type = ExtResource("3_eg0id")
+
+[resource]
+script = ExtResource("6_4jb37")
+display_name = "Palm Strike"
+icon = ExtResource("5_7upm4")
+ap_cost = 2
+area = SubResource("Resource_00ogi")
+effects = Array[ExtResource("2_jag7q")]([SubResource("Resource_6dh53")])

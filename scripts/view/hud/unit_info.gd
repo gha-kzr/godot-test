@@ -35,10 +35,13 @@ var xp_gain := 0
 var xp_text := ""
 ## Damage type name → resistance %, every damage type of the game, in display order.
 var resistances: Dictionary[String, int] = {}
+## PvP units have no Power and no resistance to talk about (classes are fixed): their lines are not shown.
+var hide_power_and_resistances := false
 
 
-static func from_unit(unit: UnitState, hero_level := 0) -> UnitInfo:
+static func from_unit(unit: UnitState, hero_level := 0, pvp := false) -> UnitInfo:
 	var info := UnitInfo.new()
+	info.hide_power_and_resistances = pvp
 	info.unit_id = unit.id
 	info.display_name = unit.label
 	info.color = unit.data.color
@@ -79,6 +82,8 @@ func title_text() -> String:
 ## Physical +0%, Fire +20%, …". Every stat and damage type is listed, zeros included, so
 ## nothing reads as missing. "All" leaves room for per-type power later.
 func combat_stats_text() -> String:
+	if hide_power_and_resistances:
+		return tr("Initiative %d, damage taken %+d%%") % [initiative, damage_taken]
 	var resist: Array[String] = []
 	for type_name in resistances:
 		if resistances[type_name] >= UnitState.MAX_ENEMY_RESISTANCE_PERCENT:

@@ -33,6 +33,13 @@ static func create(map: MapData, side_a: Array[Dictionary], side_b: Array[Dictio
 	if state == null:
 		return null
 	state.pvp = true
+	var heroes: Array[int] = []
+	for entry in side_a:
+		heroes.append(int(entry["hero"]))
+	for entry in side_b:
+		heroes.append(int(entry["hero"]))
+	for index in heroes.size():
+		state.units[index].positioning = PvpHeroes.hero(heroes[index]).ai_positioning
 	state.zone_enemy = parsed.enemy_spawns.duplicate()
 	for index in side_a.size():
 		state.units[index].label = str(side_a[index]["name"])

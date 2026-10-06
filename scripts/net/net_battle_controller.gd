@@ -64,6 +64,13 @@ func _zone_of(unit_id: int) -> Array[Vector2i]:
 	return battle.state.zone if battle.state.units[unit_id].team == UnitState.Team.PLAYER else battle.state.zone_enemy
 
 
+func _viewer_team() -> UnitState.Team:
+	var mine := _my_unit()
+	if mine >= 0 and battle != null and mine < battle.state.units.size():
+		return battle.state.units[mine].team
+	return UnitState.Team.PLAYER
+
+
 func _my_unit() -> int:
 	return session.unit_of(session.my_id)
 

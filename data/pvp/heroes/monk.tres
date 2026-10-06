@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://dxbotpbi03s6c"]
+
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="1_qvg6e"]
+[ext_resource type="Resource" uid="uid://bjpw2wkvp3jf7" path="res://data/pvp/units/monk.tres" id="2_bul3h"]
+
+[resource]
+script = ExtResource("1_qvg6e")
+unit = ExtResource("2_bul3h")
+role_label = "Skirmisher"
+description = "Quick on its feet: kicks in, pulls enemies close, sweeps them away and recovers on the spot."
+gender = 2

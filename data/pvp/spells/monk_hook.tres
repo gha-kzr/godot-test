@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://b6itf1cakq50g"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_6h1xg"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_h30e6"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_c44w3"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_8soj5"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="5_oswt6"]
+[ext_resource type="Texture2D" uid="uid://cffcusprbpnlt" path="res://ui/icons/grapple_shot.svg" id="6_qwjy1"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="7_mcv7b"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_u6q58"]
+
+[sub_resource type="Resource" id="Resource_6yg6f"]
+script = ExtResource("1_6h1xg")
+
+[sub_resource type="Resource" id="Resource_s7qyn"]
+script = ExtResource("4_8soj5")
+min_amount = 8
+max_amount = 10
+damage_type = ExtResource("3_c44w3")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_iiokw"]
+script = ExtResource("5_oswt6")
+kind = 4
+distance = 3
+target_filter = 2
+
+[resource]
+script = ExtResource("8_u6q58")
+display_name = "Iron Grip"
+icon = ExtResource("6_qwjy1")
+cast_animation = &"Shoot"
+projectile = ExtResource("7_mcv7b")
+projectile_speed = 20.0
+cooldown = 1
+min_range = 2
+max_range = 5
+area = SubResource("Resource_6yg6f")
+effects = Array[ExtResource("2_h30e6")]([SubResource("Resource_s7qyn"), SubResource("Resource_iiokw")])

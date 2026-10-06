@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://b0fqslfopc684"]
+
+[ext_resource type="Resource" uid="uid://ckwf0g3qsolwc" path="res://data/ai/positioning_ranged.tres" id="1_4ibq3"]
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="2_ts2ia"]
+[ext_resource type="Resource" uid="uid://w3y6fh12mfmv" path="res://data/pvp/units/ranger.tres" id="3_m6h5x"]
+
+[resource]
+script = ExtResource("2_ts2ia")
+unit = ExtResource("3_m6h5x")
+role_label = "Mobile sharpshooter"
+description = "Shoots from far away, slows and marks targets, and leaps back out of reach. Weak when caught."
+ai_positioning = ExtResource("1_4ibq3")

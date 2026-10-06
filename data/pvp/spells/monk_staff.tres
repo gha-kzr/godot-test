@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://do28d2dsyj3di"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_f0e34"]
+[ext_resource type="PackedScene" uid="uid://d3o27ox7cyl3j" path="res://scenes/fx/cast_whirl.tscn" id="2_pg5rk"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_fcvsl"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="4_j1ok6"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_1ecv1"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="6_ior72"]
+[ext_resource type="Texture2D" uid="uid://c2j77an3so0dn" path="res://ui/icons/whirlwind.svg" id="7_rw381"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_5ex5j"]
+
+[sub_resource type="Resource" id="Resource_v7ms6"]
+script = ExtResource("1_f0e34")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_aty8c"]
+script = ExtResource("5_1ecv1")
+min_amount = 7
+max_amount = 9
+damage_type = ExtResource("4_j1ok6")
+target_filter = 2
+
+[sub_resource type="Resource" id="Resource_jm81d"]
+script = ExtResource("6_ior72")
+target_filter = 2
+
+[resource]
+script = ExtResource("8_5ex5j")
+display_name = "Whirling Staff"
+icon = ExtResource("7_rw381")
+cast_effect = ExtResource("2_pg5rk")
+impact_delay = 0.3
+cooldown = 1
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_v7ms6")
+effects = Array[ExtResource("3_fcvsl")]([SubResource("Resource_aty8c"), SubResource("Resource_jm81d")])

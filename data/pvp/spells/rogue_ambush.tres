@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://qd0kchgqrf0e"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_3vwx3"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_fr5vi"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_yoy88"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_h621e"]
+[ext_resource type="Texture2D" uid="uid://bd6bd0kek3k60" path="res://ui/icons/piercing_thrust.svg" id="5_defat"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_ekokh"]
+
+[sub_resource type="Resource" id="Resource_14pj8"]
+script = ExtResource("1_3vwx3")
+
+[sub_resource type="Resource" id="Resource_p6otk"]
+script = ExtResource("4_h621e")
+min_amount = 18
+max_amount = 22
+damage_type = ExtResource("3_yoy88")
+ambush_bonus_percent = 80
+
+[resource]
+script = ExtResource("6_ekokh")
+display_name = "Ambush"
+icon = ExtResource("5_defat")
+impact_delay = 0.3
+area = SubResource("Resource_14pj8")
+effects = Array[ExtResource("2_fr5vi")]([SubResource("Resource_p6otk")])

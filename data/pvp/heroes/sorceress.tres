@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://bmv6qfyoa15s"]
+
+[ext_resource type="Resource" uid="uid://ckwf0g3qsolwc" path="res://data/ai/positioning_ranged.tres" id="1_ryiey"]
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="2_nskrt"]
+[ext_resource type="Resource" uid="uid://1yfybx7w8v0f" path="res://data/pvp/units/sorceress.tres" id="3_m0dgi"]
+
+[resource]
+script = ExtResource("2_nskrt")
+unit = ExtResource("3_m0dgi")
+role_label = "Glass cannon"
+description = "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team."
+gender = 1
+ai_positioning = ExtResource("1_ryiey")

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://kgak6xyyp1mc"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_31mme"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="2_8ghck"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_5yao0"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="4_uqco1"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_00x57"]
+[ext_resource type="Texture2D" uid="uid://dscb5nidv2xbs" path="res://ui/icons/firebolt.svg" id="6_kfls4"]
+[ext_resource type="PackedScene" uid="uid://op63ci0heu70" path="res://scenes/fx/projectile_fireball.tscn" id="7_e4yv5"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_s6gey"]
+
+[sub_resource type="Resource" id="Resource_vyyjx"]
+script = ExtResource("1_31mme")
+
+[sub_resource type="Resource" id="Resource_8bnkm"]
+script = ExtResource("5_00x57")
+min_amount = 24
+max_amount = 29
+damage_type = ExtResource("4_uqco1")
+
+[resource]
+script = ExtResource("8_s6gey")
+display_name = "Firebolt"
+icon = ExtResource("6_kfls4")
+cast_effect = ExtResource("2_8ghck")
+impact_delay = 0.25
+projectile = ExtResource("7_e4yv5")
+projectile_speed = 16.0
+min_range = 2
+max_range = 6
+height_extends_range = true
+area = SubResource("Resource_vyyjx")
+effects = Array[ExtResource("3_5yao0")]([SubResource("Resource_8bnkm")])

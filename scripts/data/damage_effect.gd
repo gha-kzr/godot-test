@@ -12,6 +12,8 @@ extends EffectData
 ## Life steal: the caster heals this percent of the damage actually dealt (after resistances
 ## and the target's remaining HP; so nothing from an immune target or an ally a filter spares).
 @export_range(0, 1000) var lifesteal_percent := 0
+## More damage (in percent) when the caster is hidden (stealth) as it strikes: an ambush.
+@export_range(0, 500) var ambush_bonus_percent := 0
 
 
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
@@ -19,6 +21,9 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 	var amount := mini(roundi(scaled(state, caster_id, target_id, state.roll(min_amount, max_amount))), target.hp)
 	target.hp -= amount
 	var events: Array[BattleEvents.Event] = [BattleEvents.DamageDealt.new(target_id, amount, target.hp, damage_type)]
+	if amount > 0:
+		for ended in target.break_stealth():  # Hurt: no longer hidden.
+			events.append(BattleEvents.StatusExpired.new(target_id, ended))
 	if lifesteal_percent > 0 and caster_id >= 0 and state.units[caster_id].is_alive():
 		var caster := state.units[caster_id]
 		var healed := mini(roundi(amount * lifesteal_percent / 100.0), caster.max_hp() - caster.hp)
@@ -32,7 +37,10 @@ func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEv
 func scaled(state: BattleState, caster_id: int, target_id: int, roll: float) -> float:
 	var target := state.units[target_id]
 	var power := state.units[caster_id].power() if caster_id >= 0 else 0
-	return roll * power_multiplier(power) * target.damage_taken_percent() / 100.0 \
+	var ambush := 1.0
+	if ambush_bonus_percent > 0 and caster_id >= 0 and state.units[caster_id].is_stealthed():
+		ambush += ambush_bonus_percent / 100.0
+	return roll * ambush * power_multiplier(power) * target.damage_taken_percent() / 100.0 \
 			* (100.0 - target.resistance_percent(damage_type)) / 100.0
 
 
@@ -48,7 +56,9 @@ func average_roll() -> float:
 func describe() -> String:
 	var text := _damage_text()
 	if lifesteal_percent > 0:
-		return tr("%s, the caster heals %d%% of it") % [text, lifesteal_percent]
+		text = tr("%s, the caster heals %d%% of it") % [text, lifesteal_percent]
+	if ambush_bonus_percent > 0:
+		text = tr("%s (+%d%% from stealth)") % [text, ambush_bonus_percent]
 	return text
 
 

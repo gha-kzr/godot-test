@@ -57,10 +57,8 @@ func test_pvp_heroes_have_their_full_kit_and_no_level_in_their_name() -> void:
 		var unit := built["unit"] as UnitData
 		assert_eq(unit.spells.size(), HeroRecord.LOADOUT_SLOTS, "%s brings five spells" % unit.display_name)
 		assert_false(unit.display_name.contains("Lv"), "no level in the name")
-	var knight := PvpHeroes.build(0)
-	assert_true((knight["modifiers"] as Array).size() > 0, "level rewards are in")
-	var runes := ProgressionConfig.new()
-	assert_true(runes != null)
+	assert_eq((PvpHeroes.build(0)["modifiers"] as Array).size(), 0, "no levels, no runes")
+
 
 
 func test_a_pvp_state_has_two_human_sides_with_the_players_names() -> void:
@@ -126,3 +124,23 @@ func test_pvp_maps_are_valid_symmetric_and_the_same_for_every_peer() -> void:
 			for cell in parsed.player_spawns:
 				assert_true(Vector2i(size.x - 1 - cell.x, size.y - 1 - cell.y) in parsed.enemy_spawns, "zone B mirrors zone A")
 	assert_ne(PvpMap.generate(1, _typology("ruins"), 14).layout, PvpMap.generate(2, _typology("ruins"), 14).layout, "other seeds, other maps")
+
+
+func test_the_pvp_roster_is_valid_and_varied() -> void:
+	var roster := PvpHeroes.roster()
+	assert_eq(roster.get_validation_errors(), PackedStringArray(), "every class, spell and status is valid")
+	assert_true(roster.heroes.size() >= 8, "a roster to choose from")
+	var women := roster.heroes.filter(func(hero: PvpHero) -> bool: return hero.gender == PvpHero.Gender.FEMALE)
+	assert_true(women.size() >= 2, "at least two female classes")
+	for hero in roster.heroes:
+		assert_eq(hero.unit.spells.size(), 5, hero.display_name())
+		for modifier in hero.unit.innate_modifiers:
+			assert_ne(modifier.stat, StatModifier.Stat.POWER)
+
+
+func test_every_class_can_play_every_class_in_a_pvp_state() -> void:
+	# A battle can be made from any pair, and the first living unit can always be given a turn.
+	for a in PvpHeroes.hero_count():
+		for b in PvpHeroes.hero_count():
+			var state := _state([a], [b])
+			assert_true(state != null and state.units.size() == 2, "%d vs %d" % [a, b])

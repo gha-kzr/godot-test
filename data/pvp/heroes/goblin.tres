@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://vyoryst87ii0"]
+
+[ext_resource type="Resource" uid="uid://ckwf0g3qsolwc" path="res://data/ai/positioning_ranged.tres" id="1_mmnag"]
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="2_yatb6"]
+[ext_resource type="Resource" uid="uid://bf2wnrwtlnslb" path="res://data/pvp/units/goblin.tres" id="3_wlisg"]
+
+[resource]
+script = ExtResource("2_yatb6")
+unit = ExtResource("3_wlisg")
+role_label = "Bomb thrower"
+description = "Fast, sneaky and reckless: bombs and dynamite hurt everyone around, friends included. Steals action points."
+gender = 2
+ai_positioning = ExtResource("1_mmnag")

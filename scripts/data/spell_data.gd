@@ -113,6 +113,21 @@ func cast_sound_event() -> StringName:
 	return &"cast"
 
 
+## Whether casting it counts as an attack (it hurts or hinders someone else): a hidden caster is revealed.
+func is_offensive() -> bool:
+	for effect in effects:
+		if effect is DamageEffect and effect.target_filter != EffectData.TargetFilter.CASTER:
+			return true
+		if effect is ApplyStatusEffect and effect.target_filter != EffectData.TargetFilter.CASTER \
+				and effect.target_filter != EffectData.TargetFilter.ALLIES and (effect as ApplyStatusEffect).status != null \
+				and not (effect as ApplyStatusEffect).status.is_positive:
+			return true
+		if effect is MoveEffect and (effect as MoveEffect).kind in [MoveEffect.Kind.PUSH, MoveEffect.Kind.PULL] \
+				and effect.target_filter != EffectData.TargetFilter.ALLIES:
+			return true
+	return false
+
+
 ## Whether the spell must be aimed at a free cell (a teleport or a jump lands there).
 func aims_at_free_cell() -> bool:
 	return effects.any(func(effect: EffectData) -> bool:

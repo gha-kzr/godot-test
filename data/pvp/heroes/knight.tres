@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://concumo2b3nly"]
+
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="1_px4gn"]
+[ext_resource type="Resource" uid="uid://nt5tutolr62s" path="res://data/pvp/units/knight.tres" id="2_6vygm"]
+
+[resource]
+script = ExtResource("1_px4gn")
+unit = ExtResource("2_6vygm")
+role_label = "Frontline bruiser"
+description = "Charges in, bashes enemies out of position and shrugs off blows with Guard. Slow to reach, hard to remove."
+gender = 2

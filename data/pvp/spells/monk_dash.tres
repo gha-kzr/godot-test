@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://gi8eu2kw217o"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_h855u"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_4vwxk"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="3_jqgi4"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="4_q8bhb"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_uw6i8"]
+[ext_resource type="Texture2D" uid="uid://cdgwssycoswvf" path="res://ui/icons/charge.svg" id="6_cseyf"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_5vd8s"]
+
+[sub_resource type="Resource" id="Resource_u2niv"]
+script = ExtResource("1_h855u")
+
+[sub_resource type="Resource" id="Resource_4hfx6"]
+script = ExtResource("3_jqgi4")
+kind = 2
+distance = 1
+target_filter = 3
+
+[sub_resource type="Resource" id="Resource_46v6h"]
+script = ExtResource("5_uw6i8")
+min_amount = 10
+max_amount = 14
+damage_type = ExtResource("4_q8bhb")
+target_filter = 2
+
+[resource]
+script = ExtResource("7_5vd8s")
+display_name = "Flying Kick"
+icon = ExtResource("6_cseyf")
+cast_animation = &"Attack"
+cooldown = 2
+min_range = 2
+max_range = 4
+needs_line_of_sight = false
+area = SubResource("Resource_u2niv")
+effects = Array[ExtResource("2_4vwxk")]([SubResource("Resource_4hfx6"), SubResource("Resource_46v6h")])

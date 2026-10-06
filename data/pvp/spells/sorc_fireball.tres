@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://b3my14abu362c"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_6le6c"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="2_8ukor"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_jn1wf"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="4_ii8qj"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_21kih"]
+[ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="6_61rkd"]
+[ext_resource type="PackedScene" uid="uid://gjrh212jw6ty" path="res://scenes/fx/impact_explosion.tscn" id="7_qlu75"]
+[ext_resource type="PackedScene" uid="uid://dibxvmjgtpu1f" path="res://scenes/fx/projectile_meteor.tscn" id="8_ftatj"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="9_1m5np"]
+
+[sub_resource type="Resource" id="Resource_v1eb3"]
+script = ExtResource("1_6le6c")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_ylxrt"]
+script = ExtResource("5_21kih")
+min_amount = 18
+max_amount = 22
+damage_type = ExtResource("4_ii8qj")
+target_filter = 2
+
+[resource]
+script = ExtResource("9_1m5np")
+display_name = "Fireball"
+icon = ExtResource("6_61rkd")
+cast_effect = ExtResource("2_8ukor")
+impact_effect = ExtResource("7_qlu75")
+cast_sound = &"cast_fireball"
+impact_delay = 0.3
+projectile = ExtResource("8_ftatj")
+projectile_speed = 9.0
+projectile_falls = true
+impact_shake = 0.14
+ap_cost = 4
+min_range = 3
+max_range = 6
+area = SubResource("Resource_v1eb3")
+effects = Array[ExtResource("3_jn1wf")]([SubResource("Resource_ylxrt")])

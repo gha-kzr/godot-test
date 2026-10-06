@@ -78,7 +78,7 @@ static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, 
 			if spell.ap_cost <= 0 or not BattleActions.CastSpell.can_afford(unit, spell_index):
 				continue
 			for target in Targeting.targetable_cells(moved, unit_id, spell):
-				if not _area_hits_a_unit(moved, spell, cell, target):
+				if not _area_hits_a_unit(moved, spell, cell, target, unit.team):
 					continue
 				var simulated := moved.clone()
 				simulated.rng.seed = dice_seed
@@ -106,9 +106,11 @@ static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, 
 	return best
 
 
-static func _area_hits_a_unit(state: BattleState, spell: SpellData, caster_cell: Vector2i, target: Vector2i) -> bool:
+## Whether the area covers a unit the caster's team can see (it doesn't aim at a hidden one: it can't know).
+static func _area_hits_a_unit(state: BattleState, spell: SpellData, caster_cell: Vector2i, target: Vector2i, team: UnitState.Team) -> bool:
 	for cell in Targeting.area_cells(state.grid, spell.area, caster_cell, target):
-		if state.is_occupied(cell):
+		var occupant := state.unit_at(cell)
+		if occupant != null and not state.is_hidden_from(occupant, team):
 			return true
 	return false
 
@@ -121,7 +123,7 @@ static func _score(before: BattleState, after: BattleState, team: UnitState.Team
 static func _hp_score(before: BattleState, after: BattleState, team: UnitState.Team, profile: AIProfile) -> float:
 	var score := 0.0
 	for unit in before.units:
-		if not unit.is_alive():
+		if not unit.is_alive() or before.is_hidden_from(unit, team):
 			continue
 		var lost := float(unit.hp - after.units[unit.id].hp)  # Negative when healed.
 		var killed := not after.units[unit.id].is_alive()
@@ -139,7 +141,7 @@ static func _hp_score(before: BattleState, after: BattleState, team: UnitState.T
 static func _status_score(before: BattleState, after: BattleState, team: UnitState.Team, profile: AIProfile) -> float:
 	var score := 0.0
 	for unit in after.units:
-		if not unit.is_alive():
+		if not unit.is_alive() or before.is_hidden_from(before.units[unit.id], team):
 			continue  # A kill is valued by the HP score; its statuses no longer matter.
 		var gained := _statuses_benefit(after, unit, profile) - _statuses_benefit(before, before.units[unit.id], profile)
 		if is_zero_approx(gained):
@@ -164,6 +166,8 @@ static func _statuses_benefit(state: BattleState, unit: UnitState, profile: AIPr
 		var turns := float(status.turns_left - (1 if status.counting else 0))
 		if turns <= 0.0:
 			continue
+		if status.data.stealth:
+			total += profile.stealth_value
 		for effect in status.data.tick_effects:
 			if effect is DamageEffect:
 				var damage := effect as DamageEffect
@@ -186,6 +190,8 @@ static func _statuses_benefit(state: BattleState, unit: UnitState, profile: AIPr
 					total += modifier.amount * turns * profile.mp_value
 				StatModifier.Stat.DAMAGE_TAKEN_PERCENT:
 					total -= modifier.amount / 100.0 * turns * profile.incoming_damage_per_turn
+				StatModifier.Stat.POWER:
+					total += modifier.amount / 100.0 * turns * profile.incoming_damage_per_turn
 				_:
 					push_warning("EnemyAI: can't value stat %s; counted as 0" % StatModifier.Stat.keys()[modifier.stat])
 	return total
@@ -200,7 +206,7 @@ static func _opponent_reach(state: BattleState, unit_id: int) -> Dictionary[Vect
 static func _opponent_cells(state: BattleState, team: UnitState.Team) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for other in state.units:
-		if other.is_alive() and other.team != team:
+		if other.is_alive() and other.team != team and not state.is_hidden_from(other, team):
 			cells.append(other.cell)
 	return cells
 

@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://mivvoff1mbod"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_1kh3t"]
+[ext_resource type="PackedScene" uid="uid://d3o27ox7cyl3j" path="res://scenes/fx/cast_whirl.tscn" id="2_wj7dl"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_mp72g"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="4_y0iqc"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_jayt8"]
+[ext_resource type="Texture2D" uid="uid://c2j77an3so0dn" path="res://ui/icons/whirlwind.svg" id="6_u4wkr"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_65yor"]
+
+[sub_resource type="Resource" id="Resource_auqhl"]
+script = ExtResource("1_1kh3t")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_aiayb"]
+script = ExtResource("5_jayt8")
+min_amount = 13
+max_amount = 17
+damage_type = ExtResource("4_y0iqc")
+target_filter = 2
+
+[resource]
+script = ExtResource("7_65yor")
+display_name = "Whirlwind"
+icon = ExtResource("6_u4wkr")
+cast_effect = ExtResource("2_wj7dl")
+impact_delay = 0.3
+ap_cost = 4
+min_range = 0
+max_range = 0
+needs_line_of_sight = false
+area = SubResource("Resource_auqhl")
+effects = Array[ExtResource("3_mp72g")]([SubResource("Resource_aiayb")])

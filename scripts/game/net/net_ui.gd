@@ -56,10 +56,10 @@ static func hero_card(hero_index: int, selected: bool, on_pick: Callable) -> But
 	button.name = "Hero%d" % hero_index
 	button.toggle_mode = true
 	button.button_pressed = selected
-	button.custom_minimum_size = Vector2(176, 150)
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.custom_minimum_size = Vector2(200, 150)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	button.focus_mode = Control.FOCUS_ALL
-	button.tooltip_text = ", ".join(info["spell_names"])
+	button.tooltip_text = info["description"]
 	button.pressed.connect(on_pick.bind(hero_index))
 	_style_choice(button, Color(1.0, 0.85, 0.4))
 	var box := VBoxContainer.new()
@@ -78,6 +78,8 @@ static func hero_card(hero_index: int, selected: bool, on_pick: Callable) -> But
 	var role := Label.new()
 	role.theme_type_variation = &"SmallLabel"
 	role.text = info["role"]
+	role.clip_text = true
+	role.custom_minimum_size = Vector2(150, 0)
 	role.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(role)
 	var stats := Label.new()
@@ -180,13 +182,8 @@ static func show_hero_info(from: Control, hero_index: int) -> void:
 	box.get_parent().custom_minimum_size = Vector2(minf(560.0, maxf(280.0, host.size.x - 40.0)), 0)
 	box.get_parent().mouse_filter = Control.MOUSE_FILTER_STOP
 	note(box, info["role"])
-	var lines: Array[String] = [TranslationServer.translate("HP %d · AP %d · MP %d") % [info["hp"], info["ap"], info["mp"]],
-			TranslationServer.translate("Power %d") % info["power"]]
-	for line in lines:
-		note(box, line)
-	var resistances: Array[String] = info["resistances"]
-	if not resistances.is_empty():
-		note(box, TranslationServer.translate("Resistances: %s") % ", ".join(resistances))
+	note(box, info["description"])
+	note(box, TranslationServer.translate("HP %d · AP %d · MP %d") % [info["hp"], info["ap"], info["mp"]])
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size = Vector2(0, minf(340.0, maxf(100.0, host.size.y - 330.0)))

@@ -21,13 +21,15 @@ extends Resource
 @export_range(0.0, 20.0) var mp_value := 2.0
 ## Damage a unit expects to take per turn, to value damage-taken modifiers.
 @export_range(0.0, 100.0) var incoming_damage_per_turn := 10.0
+## Worth of staying hidden (stealth), in HP.
+@export_range(0.0, 100.0) var stealth_value := 25.0
 
 
 func get_validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	# Export ranges only constrain the Inspector; hand-edited .tres files can go past them.
 	for weight in ["kill_bonus", "heal_weight", "friendly_fire_weight", "status_weight", "ap_value",
-			"mp_value", "incoming_damage_per_turn"]:
+			"mp_value", "incoming_damage_per_turn", "stealth_value"]:
 		if get(weight) < 0.0:
 			errors.append("AI profile: %s must be >= 0" % weight)
 	return errors

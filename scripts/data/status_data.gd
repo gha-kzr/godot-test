@@ -23,6 +23,10 @@ const MAX_SHORT_LABEL := 2
 @export var color := Color.WHITE
 ## Positive statuses help the unit carrying them (for a later dispel).
 @export var is_positive := false
+## Stealth: while the carrier has it, enemies can't pick it as the target of a spell (they can still hit the
+## cell it stands on by guessing, or hit it with an area), unless one of them stands next to it. It ends when the
+## carrier attacks (casts a spell that hurts or hinders) or takes damage. PvP classes only so far.
+@export var stealth := false
 ## In the affected unit's turns: it ticks at each of its turn starts and expires at the
 ## end of the last one.
 @export_range(1, 10) var duration := 2
@@ -40,6 +44,8 @@ func describe() -> String:
 	for modifier in modifiers:
 		if modifier != null:
 			parts.append(modifier.describe())
+	if stealth:
+		parts.append(tr("hidden until it attacks or is hurt"))
 	return ", ".join(parts)
 
 
@@ -53,7 +59,7 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("%s: short_label longer than %d characters" % [display_name, MAX_SHORT_LABEL])
 	if duration < 1:
 		errors.append("%s: duration must be >= 1" % display_name)
-	if tick_effects.is_empty() and modifiers.is_empty():
+	if tick_effects.is_empty() and modifiers.is_empty() and not stealth:
 		errors.append("%s: no tick effects and no modifiers" % display_name)
 	for effect in tick_effects:
 		if effect == null:

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bogttvkym365c"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_thpqv"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_ah1gu"]
+[ext_resource type="Resource" uid="uid://cgq03gsraslcu" path="res://data/damage_types/frost.tres" id="3_gdrmb"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_q1bd5"]
+[ext_resource type="Texture2D" uid="uid://depqno5d0k8pe" path="res://ui/icons/chill_touch.svg" id="5_r1ef2"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_jo1x4"]
+
+[sub_resource type="Resource" id="Resource_hax4s"]
+script = ExtResource("1_thpqv")
+
+[sub_resource type="Resource" id="Resource_tmaxk"]
+script = ExtResource("4_q1bd5")
+min_amount = 14
+max_amount = 18
+damage_type = ExtResource("3_gdrmb")
+
+[resource]
+script = ExtResource("6_jo1x4")
+display_name = "Spectral Touch"
+icon = ExtResource("5_r1ef2")
+max_range = 3
+area = SubResource("Resource_hax4s")
+effects = Array[ExtResource("2_ah1gu")]([SubResource("Resource_tmaxk")])

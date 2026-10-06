@@ -18,7 +18,7 @@ var session: MatchSession
 var _banner: Label
 var _seat_card: Control
 var _name_edit: LineEdit
-var _hero_row: HBoxContainer
+var _hero_row: HFlowContainer
 var _hero_shown := -1
 var _unassigned_card: Control
 var _unassigned_box: VBoxContainer
@@ -147,9 +147,10 @@ func _build_seat_card(parent: Control) -> void:
 	_name_edit.text_submitted.connect(func(text: String) -> void: _rename(text))
 	_name_edit.focus_exited.connect(func() -> void: _rename(_name_edit.text))
 	box.add_child(_name_edit)
-	_hero_row = HBoxContainer.new()
+	_hero_row = HFlowContainer.new()
 	_hero_row.name = "HeroPicker"
-	_hero_row.add_theme_constant_override("separation", 10)
+	_hero_row.add_theme_constant_override("h_separation", 10)
+	_hero_row.add_theme_constant_override("v_separation", 10)
 	box.add_child(_hero_row)
 	var line := HBoxContainer.new()
 	line.add_theme_constant_override("separation", 8)

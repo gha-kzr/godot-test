@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://bujex2wnqct0j"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_0ysdh"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_2k3ee"]
+[ext_resource type="Resource" uid="uid://b4jrpxctg8xvs" path="res://data/damage_types/holy.tres" id="3_3y0kt"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_ri1l4"]
+[ext_resource type="Texture2D" uid="uid://csf0v767cmhhu" path="res://ui/icons/smite.svg" id="5_5sb2q"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_3ytry"]
+
+[sub_resource type="Resource" id="Resource_bnrik"]
+script = ExtResource("1_0ysdh")
+
+[sub_resource type="Resource" id="Resource_dmbmh"]
+script = ExtResource("4_ri1l4")
+min_amount = 11
+max_amount = 14
+damage_type = ExtResource("3_3y0kt")
+
+[resource]
+script = ExtResource("6_3ytry")
+display_name = "Smite"
+icon = ExtResource("5_5sb2q")
+cast_animation = &"Attack"
+max_range = 4
+area = SubResource("Resource_bnrik")
+effects = Array[ExtResource("2_2k3ee")]([SubResource("Resource_dmbmh")])

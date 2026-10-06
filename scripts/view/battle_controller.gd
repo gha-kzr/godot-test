@@ -205,6 +205,8 @@ func start_battle() -> bool:
 	selected_spell = -1
 	board_view.build(battle_state.grid)
 	units_view.build(battle_state, board_view)
+	units_view.viewer_team = _viewer_team()
+	units_view.refresh_visibility(battle_state)
 	event_player.setup(units_view, board_view, camera_rig)
 	camera_rig.set_bounds(Rect2(Vector2.ZERO, Vector2(battle_state.grid.size - Vector2i.ONE) * BoardView.CELL_SIZE))
 	camera_rig.fit_board(battle_state.grid.size)
@@ -221,6 +223,12 @@ func start_battle() -> bool:
 	if not opening_tip.is_empty():
 		_show_tip(opening_tip, _unit_spotlight(_first_enemy_id()))  # The elite or boss opens the enemy list.
 	return true
+
+
+## The team of the player looking at the board: what its enemies hide in stealth is not drawn. The multiplayer
+## controller answers with the local player's side.
+func _viewer_team() -> UnitState.Team:
+	return UnitState.Team.PLAYER
 
 
 ## The state of the battle about to start, from the encounter and the players; null (with an error) if they
@@ -563,6 +571,7 @@ func _perform(action: BattleActions.Action) -> void:
 func _play(events: Array[BattleEvents.Event]) -> void:
 	var generation := _battle_generation
 	_set_state(State.ANIMATING)
+	units_view.refresh_visibility(battle.state)  # Who went into or out of stealth shows from the start of the action.
 	await event_player.play(events)
 	if generation != _battle_generation:
 		return  # This battle was abandoned while its events played.

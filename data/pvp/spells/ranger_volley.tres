@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://1ehonfiq4p3r"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_ilfvx"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_sjybm"]
+[ext_resource type="Resource" uid="uid://bdrr6ge5g7xv6" path="res://data/damage_types/physical.tres" id="3_61nyn"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_ptfrh"]
+[ext_resource type="Texture2D" uid="uid://cpx2flgjfw4p8" path="res://ui/icons/volley.svg" id="5_3gdya"]
+[ext_resource type="PackedScene" uid="uid://bhakvvqjmigx6" path="res://scenes/fx/projectile_arrow.tscn" id="6_gwvrx"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="7_7mhvq"]
+
+[sub_resource type="Resource" id="Resource_ewoy8"]
+script = ExtResource("1_ilfvx")
+kind = 2
+size = 1
+
+[sub_resource type="Resource" id="Resource_i8qbk"]
+script = ExtResource("4_ptfrh")
+min_amount = 11
+max_amount = 14
+damage_type = ExtResource("3_61nyn")
+target_filter = 2
+
+[resource]
+script = ExtResource("7_7mhvq")
+display_name = "Volley"
+icon = ExtResource("5_3gdya")
+cast_animation = &"Shoot"
+impact_delay = 0.35
+projectile = ExtResource("6_gwvrx")
+projectile_speed = 24.0
+projectile_count = 7
+projectile_interval = 0.05
+ap_cost = 4
+min_range = 3
+max_range = 6
+area = SubResource("Resource_ewoy8")
+effects = Array[ExtResource("2_sjybm")]([SubResource("Resource_i8qbk")])

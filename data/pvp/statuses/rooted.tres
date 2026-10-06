@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://yg8chhyftw31"]
+
+[ext_resource type="PackedScene" uid="uid://bm2hkklm1scwh" path="res://scenes/fx/aura_crippled.tscn" id="1_a55rr"]
+[ext_resource type="Texture2D" uid="uid://gdifivnfudwv" path="res://ui/icons/status_crippled.svg" id="2_ypqjq"]
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="3_33hp7"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="4_mtwa5"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="5_gr552"]
+
+[sub_resource type="Resource" id="Resource_6ipjg"]
+script = ExtResource("3_33hp7")
+amount = -9
+
+[resource]
+script = ExtResource("4_mtwa5")
+display_name = "Rooted"
+icon = ExtResource("2_ypqjq")
+aura_effect = ExtResource("1_a55rr")
+short_label = "Ro"
+color = Color(0.6, 0.45, 0.25, 1)
+duration = 1
+modifiers = Array[ExtResource("3_33hp7")]([SubResource("Resource_6ipjg")])

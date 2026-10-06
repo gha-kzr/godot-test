@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://dg8bvesd08aqy"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_qv7ip"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="2_ayhxb"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_0d07v"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="4_a6lki"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_0cdcc"]
+[ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="6_jmlvv"]
+[ext_resource type="PackedScene" uid="uid://gjrh212jw6ty" path="res://scenes/fx/impact_explosion.tscn" id="7_bu4hj"]
+[ext_resource type="PackedScene" uid="uid://dibxvmjgtpu1f" path="res://scenes/fx/projectile_meteor.tscn" id="8_hiu02"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="9_n5td8"]
+
+[sub_resource type="Resource" id="Resource_xq5fe"]
+script = ExtResource("1_qv7ip")
+kind = 2
+size = 2
+
+[sub_resource type="Resource" id="Resource_l5t3p"]
+script = ExtResource("5_0cdcc")
+min_amount = 40
+max_amount = 48
+damage_type = ExtResource("4_a6lki")
+target_filter = 2
+
+[resource]
+script = ExtResource("9_n5td8")
+display_name = "Meteor"
+icon = ExtResource("6_jmlvv")
+cast_effect = ExtResource("2_ayhxb")
+impact_effect = ExtResource("7_bu4hj")
+cast_sound = &"cast_fireball"
+impact_delay = 0.3
+projectile = ExtResource("8_hiu02")
+projectile_speed = 9.0
+projectile_falls = true
+impact_shake = 0.14
+ap_cost = 6
+cooldown = 4
+min_range = 4
+max_range = 7
+area = SubResource("Resource_xq5fe")
+effects = Array[ExtResource("3_0d07v")]([SubResource("Resource_l5t3p")])

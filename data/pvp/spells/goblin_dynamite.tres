@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="SpellData" format=3 uid="uid://k5n82o75jno2"]
+
+[ext_resource type="Script" uid="uid://c3ver5nvrb4u0" path="res://scripts/data/area_shape.gd" id="1_gan1e"]
+[ext_resource type="PackedScene" uid="uid://vqtohudefkvy" path="res://scenes/fx/cast_fire.tscn" id="2_bk4c6"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_jkyye"]
+[ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="4_kmrgi"]
+[ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_tsjn5"]
+[ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="6_dkg0b"]
+[ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="7_hjcaa"]
+[ext_resource type="PackedScene" uid="uid://gjrh212jw6ty" path="res://scenes/fx/impact_explosion.tscn" id="8_xnj33"]
+[ext_resource type="PackedScene" uid="uid://dibxvmjgtpu1f" path="res://scenes/fx/projectile_meteor.tscn" id="9_7qyb6"]
+[ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="10_lao0x"]
+
+[sub_resource type="Resource" id="Resource_w6iwf"]
+script = ExtResource("1_gan1e")
+kind = 2
+size = 2
+
+[sub_resource type="Resource" id="Resource_8g8vv"]
+script = ExtResource("5_tsjn5")
+min_amount = 24
+max_amount = 30
+damage_type = ExtResource("4_kmrgi")
+
+[sub_resource type="Resource" id="Resource_xfwdj"]
+script = ExtResource("6_dkg0b")
+distance = 1
+
+[resource]
+script = ExtResource("10_lao0x")
+display_name = "Dynamite"
+icon = ExtResource("7_hjcaa")
+cast_effect = ExtResource("2_bk4c6")
+impact_effect = ExtResource("8_xnj33")
+cast_sound = &"cast_fireball"
+impact_delay = 0.3
+projectile = ExtResource("9_7qyb6")
+projectile_speed = 9.0
+projectile_falls = true
+impact_shake = 0.14
+ap_cost = 4
+cooldown = 3
+min_range = 3
+max_range = 6
+area = SubResource("Resource_w6iwf")
+effects = Array[ExtResource("3_jkyye")]([SubResource("Resource_8g8vv"), SubResource("Resource_xfwdj")])

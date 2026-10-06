@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://ciej7gsknbgwj"]
+
+[ext_resource type="Resource" uid="uid://ckwf0g3qsolwc" path="res://data/ai/positioning_ranged.tres" id="1_yh757"]
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="2_cjo8u"]
+[ext_resource type="Resource" uid="uid://bg8lyi7pvlnp6" path="res://data/pvp/units/necromancer.tres" id="3_rn5vt"]
+
+[resource]
+script = ExtResource("2_cjo8u")
+unit = ExtResource("3_rn5vt")
+role_label = "Curses and poison"
+description = "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing."
+gender = 2
+ai_positioning = ExtResource("1_yh757")

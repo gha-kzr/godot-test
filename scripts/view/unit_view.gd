@@ -58,6 +58,8 @@ const STATUS_TICK_DURATION := 0.25
 const STATUS_EXPIRED_DURATION := 0.3
 
 var unit_id := -1
+var _hidden_from_viewer := false
+var _alive_for_pick := true
 var _board: BoardView
 var _max_hp := 1
 var _material: StandardMaterial3D  ## Placeholder only; models keep their own look.
@@ -120,6 +122,16 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	sync(unit)
 
 
+## Hides the unit from the player looking at the board (stealth: an enemy that can't be seen can't be clicked
+## or hovered either). Dead units stay as sync() leaves them.
+func set_hidden_from_viewer(hidden: bool) -> void:
+	if hidden == _hidden_from_viewer:
+		return
+	_hidden_from_viewer = hidden
+	visible = _alive_for_pick and not hidden
+	_pick_body.collision_layer = BoardView.UNITS_LAYER if _alive_for_pick and not hidden else 0
+
+
 ## How tall the unit is drawn, in world units (with its elite / boss scale).
 func world_height() -> float:
 	return _head_height * _visual_scale
@@ -142,14 +154,16 @@ func _layout_anchors(height: float) -> void:
 
 ## Snaps the view to the unit's state: cell, HP, alive or not. Called after every
 ## playback, so the views can never drift from the rules (and undo can reuse it).
-func sync(unit: UnitState) -> void:
+func sync(unit: UnitState, hidden_from_viewer := false) -> void:
 	position = _board.cell_to_world(unit.cell)
 	_pick_body.set_meta(BoardView.CELL_META, unit.cell)
 	_set_hp(unit.hp)
 	var alive := unit.is_alive()
-	visible = alive
+	_hidden_from_viewer = hidden_from_viewer
+	_alive_for_pick = alive
+	visible = alive and not hidden_from_viewer
 	_hp_label.visible = alive
-	_pick_body.collision_layer = BoardView.UNITS_LAYER if alive else 0
+	_pick_body.collision_layer = BoardView.UNITS_LAYER if alive and not hidden_from_viewer else 0
 	if alive:  # Undo a death squash (e.g. after undo or a desync).
 		_body.scale = Vector3.ONE * _visual_scale
 		_ring.scale = Vector3.ONE * _visual_scale

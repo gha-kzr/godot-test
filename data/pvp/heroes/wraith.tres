@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PvpHero" format=3 uid="uid://bsum0p2e4gpky"]
+
+[ext_resource type="Script" uid="uid://bkpmljkvekcmc" path="res://scripts/data/pvp_hero.gd" id="1_sw5c7"]
+[ext_resource type="Resource" uid="uid://djng77fkoha2d" path="res://data/pvp/units/wraith.tres" id="2_ujduh"]
+
+[resource]
+script = ExtResource("1_sw5c7")
+unit = ExtResource("2_ujduh")
+role_label = "Spirit"
+description = "Shrugs off most physical attacks, but holy and fire burn it. Drains life, chills and terrifies."

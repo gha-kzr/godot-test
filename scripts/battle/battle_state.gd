@@ -108,6 +108,17 @@ func is_occupied(cell: Vector2i) -> bool:
 	return unit_at(cell) != null
 
 
+## Whether `unit` can't be seen by `team`: it is stealthed, belongs to the other team and no living unit of `team`
+## stands next to it. (Everything stays in the shared state: hiding is a rule for targeting, the AI and the screens.)
+func is_hidden_from(unit: UnitState, team: UnitState.Team) -> bool:
+	if unit.team == team or not unit.is_alive() or not unit.is_stealthed():
+		return false
+	for other in units:
+		if other.is_alive() and other.team == team and Targeting.distance(other.cell, unit.cell) <= 1:
+			return false
+	return true
+
+
 func alive_units(team: UnitState.Team) -> Array[UnitState]:
 	return units.filter(func(unit: UnitState) -> bool: return unit.is_alive() and unit.team == team)
 

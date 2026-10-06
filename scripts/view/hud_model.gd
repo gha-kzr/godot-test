@@ -22,7 +22,7 @@ static func from_state(state: BattleState, levels: Array = []) -> HudModel:
 	var model := HudModel.new()
 	for unit in state.units:
 		var level := int(levels[unit.id]) if unit.team == UnitState.Team.PLAYER and unit.id < levels.size() else 0
-		model.infos[unit.id] = UnitInfo.from_unit(unit, level)
+		model.infos[unit.id] = UnitInfo.from_unit(unit, level, state.pvp)
 	model.round_number = state.turn_order.round_number
 	model._order.assign(state.turn_order.upcoming())
 	if state.started and not state.is_over():

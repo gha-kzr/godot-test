@@ -13,7 +13,7 @@ const EXCLUDED_SCRIPT_DIRS: Array[String] = ["res://scripts/tools"]
 const SCENE_DIR := "res://scenes"
 const DATA_DIR := "res://data"
 const SCENE_PROPERTIES: Array[String] = ["text", "tooltip_text", "title", "placeholder_text"]
-const DATA_PROPERTIES: Array[String] = ["display_name", "tag", "description"]
+const DATA_PROPERTIES: Array[String] = ["display_name", "tag", "description", "role_label"]
 
 ## Functions that put a text argument on a Control: name → the index of that argument.
 const TEXT_HELPERS: Dictionary[String, int] = {

@@ -184,6 +184,24 @@ func add_status(status: StatusData, caster_id: int) -> StatusInstance:
 	return instance
 
 
+## Whether the unit carries a stealth status.
+func is_stealthed() -> bool:
+	for status in statuses:
+		if status.data.stealth:
+			return true
+	return false
+
+
+## Ends every stealth status (the unit attacked or was hurt). Returns the ones that ended.
+func break_stealth() -> Array[StatusData]:
+	var ended: Array[StatusData] = []
+	for status in statuses.duplicate():
+		if status.data.stealth:
+			statuses.erase(status)
+			ended.append(status.data)
+	return ended
+
+
 func clone() -> UnitState:
 	var copy := UnitState.new(id, data, team, cell)
 	copy.hp = hp

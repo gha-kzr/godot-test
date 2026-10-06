@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusData" format=3 uid="uid://d0c1dny467xp2"]
+
+[ext_resource type="Script" uid="uid://dii783ukv1xnv" path="res://scripts/data/stat_modifier.gd" id="1_pdynl"]
+[ext_resource type="Script" uid="uid://b4oqln4wfshla" path="res://scripts/data/status_data.gd" id="2_8u8c2"]
+[ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="3_jcij3"]
+
+[resource]
+script = ExtResource("2_8u8c2")
+display_name = "Hidden"
+short_label = "H"
+color = Color(0.7, 0.7, 0.9, 1)
+is_positive = true
+stealth = true
+duration = 6
