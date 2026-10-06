@@ -580,6 +580,10 @@ msgid "Copy the reply link"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
+msgid "Copy the room code"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
 msgid "Copy the room link"
 msgstr ""
 
@@ -816,7 +820,7 @@ msgid "Found: %s."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
-msgid "Friends can join with the room code. If that doesn't work for them (a strict network), make an invite, send the link, then paste the reply they send back: each player needs their own invite."
+msgid "Friends can join with the room code, or by opening the room link."
 msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
@@ -949,6 +953,10 @@ msgstr ""
 
 #: scripts/game/hub/hero_panel.gd scripts/game/hub/hero_tabs.gd
 msgid "HP %d / %d"
+msgstr ""
+
+#: scripts/game/net/net_ui.gd
+msgid "HP %d · AP %d · MP %d"
 msgstr ""
 
 #: scripts/data/glossary.gd
@@ -1094,6 +1102,14 @@ msgid "Make an invite"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
+msgid "Make an invite, send the link, then paste the reply they send back: each player needs their own invite."
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Manual invite (if the room code does not work for someone)"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
 msgid "Map and rules"
 msgstr ""
 
@@ -1119,6 +1135,10 @@ msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Match lobby"
+msgstr ""
+
+#: scripts/net/pvp_heroes.gd
+msgid "Melee fighter"
 msgstr ""
 
 #: data/spells/mend.tres
@@ -1221,6 +1241,10 @@ msgstr ""
 msgid "No such rune in the stash."
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Nobody yet."
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "None"
 msgstr ""
@@ -1321,7 +1345,7 @@ msgstr ""
 msgid "Play my hero again"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd scripts/net/net_status_panel.gd
+#: scripts/net/net_status_panel.gd
 msgid "Players"
 msgstr ""
 
@@ -1445,7 +1469,7 @@ msgstr ""
 msgid "Range %s, line of sight, +range from high ground"
 msgstr ""
 
-#: scripts/data/enemy_data.gd
+#: scripts/data/enemy_data.gd scripts/net/pvp_heroes.gd
 msgid "Ranged"
 msgstr ""
 
@@ -1801,6 +1825,10 @@ msgstr ""
 msgid "Stages"
 msgstr ""
 
+#: scripts/game/net/net_menu_screen.gd
+msgid "Start a match and get a room code to give to your friends. You choose the map and the rules."
+msgstr ""
+
 #: scripts/game/qa_screen.gd
 msgid "Start a tower run at this floor"
 msgstr ""
@@ -2149,6 +2177,10 @@ msgstr ""
 msgid "Yeti"
 msgstr ""
 
+#: scripts/game/net/net_menu_screen.gd
+msgid "You"
+msgstr ""
+
 #: scripts/game/net/net_lobby_screen.gd
 msgid "You are the host. Not ready to start yet: %s."
 msgstr ""
@@ -2173,11 +2205,15 @@ msgstr ""
 msgid "You left the QA battle."
 msgstr ""
 
+#: scripts/game/net/net_menu_screen.gd
+msgid "Your hero (the lobby starts with it; you can change it there)"
+msgstr ""
+
 #: scripts/progression/tutorial.gd
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
+#: scripts/game/net/net_lobby_screen.gd scripts/game/net/net_menu_screen.gd
 msgid "Your name"
 msgstr ""
 
@@ -2187,4 +2223,8 @@ msgstr ""
 
 #: scripts/data/apply_status_effect.gd
 msgid "your next turn"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Your seat"
 msgstr ""

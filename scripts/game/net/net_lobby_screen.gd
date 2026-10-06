@@ -1,8 +1,9 @@
 class_name NetLobbyScreen
 extends Screen
-## Before the fight: who is here, which hero and side each player picks, the map (the host's choice, shown
-## from above), the turn timer and the grace time, a way to invite more players, and the host's Start.
-## Everything a player changes goes through the match session, so every screen shows the same lobby.
+## Before the fight, in cards: your seat (name, hero cards, side, ready), the two teams side by side, the invite card (the
+## room code to copy or read out, and a manual invite for players who can't use the code), and the map and rules (the
+## host's choices, with the map drawn from above). Everything a player changes goes through the match session, so every
+## screen shows the same lobby.
 
 signal invite_requested(for_seat: int)
 signal reply_pasted(text: String)
@@ -11,12 +12,22 @@ signal leave_requested
 var session: MatchSession
 
 var _banner: Label
+var _seat_card: Control
 var _name_edit: LineEdit
+var _hero_row: HBoxContainer
+var _hero_shown := -1
+var _side_a: Button
+var _side_b: Button
+var _ready: CheckBox
+var _team_boxes: Array[VBoxContainer] = []
+var _team_titles: Array[Label] = []
 var _room_label: Label
 var _room_link := ""
 var _room_code := ""
+var _copy_room_code: Button
 var _copy_room: Button
-var _players: VBoxContainer
+var _manual_toggle: Button
+var _manual_box: VBoxContainer
 var _typology: OptionButton
 var _size: SpinBox
 var _seed: LineEdit
@@ -79,28 +90,17 @@ func _build() -> void:
 	rows.add_child(scroll)
 	var main := HBoxContainer.new()
 	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	main.add_theme_constant_override("separation", 24)
+	main.add_theme_constant_override("separation", 14)
 	scroll.add_child(main)
 	var left := VBoxContainer.new()
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.add_theme_constant_override("separation", 12)
 	main.add_child(left)
-	_name_edit = LineEdit.new()
-	_name_edit.name = "NameEdit"
-	_name_edit.placeholder_text = "Your name"
-	_name_edit.max_length = MatchState.MAX_NAME
-	_name_edit.text_submitted.connect(func(text: String) -> void: _rename(text))
-	_name_edit.focus_exited.connect(func() -> void: _rename(_name_edit.text))
-	left.add_child(_name_edit)
-	var players_title := Label.new()
-	players_title.theme_type_variation = &"PromptLabel"
-	players_title.text = "Players"
-	left.add_child(players_title)
-	_players = VBoxContainer.new()
-	_players.name = "Players"
-	left.add_child(_players)
+	_build_seat_card(left)
+	_build_teams(left)
 	_build_invite(left)
 	var right := VBoxContainer.new()
-	right.custom_minimum_size = Vector2(340, 0)
+	right.custom_minimum_size = Vector2(350, 0)
 	main.add_child(right)
 	_build_settings(right)
 	var bottom := HBoxContainer.new()
@@ -117,23 +117,80 @@ func _build() -> void:
 	bottom.add_child(_start)
 
 
+## Your seat: name, hero, side, ready.
+func _build_seat_card(parent: Control) -> void:
+	var box := NetUi.card(parent, tr("Your seat"))
+	_seat_card = box.get_parent()
+	_name_edit = LineEdit.new()
+	_name_edit.name = "NameEdit"
+	_name_edit.placeholder_text = "Your name"
+	_name_edit.max_length = MatchState.MAX_NAME
+	_name_edit.custom_minimum_size = Vector2(0, 40)
+	_name_edit.text_submitted.connect(func(text: String) -> void: _rename(text))
+	_name_edit.focus_exited.connect(func() -> void: _rename(_name_edit.text))
+	box.add_child(_name_edit)
+	_hero_row = HBoxContainer.new()
+	_hero_row.name = "HeroPicker"
+	_hero_row.add_theme_constant_override("separation", 10)
+	box.add_child(_hero_row)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	box.add_child(line)
+	var sides := ButtonGroup.new()
+	_side_a = _side_button(0, sides)
+	_side_b = _side_button(1, sides)
+	line.add_child(_side_a)
+	line.add_child(_side_b)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(spacer)
+	_ready = CheckBox.new()
+	_ready.name = "Ready"
+	_ready.text = "Ready"
+	_ready.toggled.connect(func(on: bool) -> void: session.set_ready(on))
+	line.add_child(_ready)
+
+
+func _side_button(side: int, group: ButtonGroup) -> Button:
+	var button := Button.new()
+	button.name = "Side%s" % ("A" if side == 0 else "B")
+	button.text = tr("Side A") if side == 0 else tr("Side B")
+	button.toggle_mode = true
+	button.button_group = group
+	button.custom_minimum_size = Vector2(110, 40)
+	button.pressed.connect(func() -> void: session.set_field("side", side))
+	return button
+
+
+func _build_teams(parent: Control) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	parent.add_child(row)
+	for side in 2:
+		var box := NetUi.card(row, tr("Side A") if side == 0 else tr("Side B"), NetUi.SIDE_COLORS[side])
+		box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		box.get_parent().name = "Team%s" % ("A" if side == 0 else "B")
+		_team_titles.append(box.get_child(0) as Label)
+		var list := VBoxContainer.new()
+		list.add_theme_constant_override("separation", 4)
+		box.add_child(list)
+		_team_boxes.append(list)
+
+
 func _build_settings(parent: Control) -> void:
-	var title := Label.new()
-	title.theme_type_variation = &"PromptLabel"
-	title.text = "Map and rules"
-	parent.add_child(title)
+	var box := NetUi.card(parent, tr("Map and rules"))
 	_preview = MapPreview.new()
-	_preview.custom_minimum_size = Vector2(320, 320)
-	parent.add_child(_preview)
+	_preview.custom_minimum_size = Vector2(300, 300)
+	box.add_child(_preview)
 	_typology = OptionButton.new()
 	_typology.name = "Typology"
 	for index in MatchState.TYPOLOGIES.size():
 		_typology.add_item(_typology_name(MatchState.TYPOLOGIES[index]), index)
 	_typology.item_selected.connect(func(index: int) -> void: session.configure("typology", MatchState.TYPOLOGIES[index]))
-	_labelled(tr("Map shape"), _typology, parent)
+	_labelled(tr("Map shape"), _typology, box)
 	_size = _spin(PvpMap.MIN_SIZE, PvpMap.MAX_SIZE, "Size")
 	_size.value_changed.connect(func(value: float) -> void: session.configure("size", int(value)))
-	_labelled(tr("Map size"), _size, parent)
+	_labelled(tr("Map size"), _size, box)
 	_seed = LineEdit.new()
 	_seed.name = "Seed"
 	_seed.custom_minimum_size = Vector2(120, 0)
@@ -144,38 +201,47 @@ func _build_settings(parent: Control) -> void:
 	var seed_row := HBoxContainer.new()
 	seed_row.add_child(_seed)
 	seed_row.add_child(new_seed)
-	_labelled(tr("Map number"), seed_row, parent)
+	_labelled(tr("Map number"), seed_row, box)
 	_turn = _spin(10, 120, "Turn")
 	_turn.value_changed.connect(func(value: float) -> void: session.configure("turn", int(value)))
-	_labelled(tr("Seconds per turn"), _turn, parent)
+	_labelled(tr("Seconds per turn"), _turn, box)
 	_grace = _spin(0, 120, "Grace")
 	_grace.value_changed.connect(func(value: float) -> void: session.configure("grace", int(value)))
-	_labelled(tr("Seconds before the AI replaces a player who left"), _grace, parent)
+	_labelled(tr("Seconds before the AI replaces a player who left"), _grace, box)
 	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace]
 
 
+## Invite players: the room code, and a manual invite for those who can't use it.
 func _build_invite(parent: Control) -> void:
-	var title := Label.new()
-	title.theme_type_variation = &"PromptLabel"
-	title.text = "Invite players"
-	parent.add_child(title)
+	var box := NetUi.card(parent, tr("Invite players"))
 	_room_label = Label.new()
 	_room_label.name = "RoomCode"
-	_room_label.theme_type_variation = &"PromptLabel"
-	_room_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_room_label.theme_type_variation = &"HeaderLabel"
 	_room_label.hide()
-	parent.add_child(_room_label)
+	box.add_child(_room_label)
+	var share := HBoxContainer.new()
+	share.add_theme_constant_override("separation", 8)
+	box.add_child(share)
+	_copy_room_code = HubStyle.button("Copy the room code", "CopyRoomCode")
+	_copy_room_code.pressed.connect(func() -> void: WebPage.copy(_room_code))
+	_copy_room_code.hide()
+	share.add_child(_copy_room_code)
 	_copy_room = HubStyle.button("Copy the room link", "CopyRoom")
 	_copy_room.pressed.connect(func() -> void: WebPage.copy(_room_link))
 	_copy_room.hide()
-	parent.add_child(_copy_room)
-	var how := Label.new()
-	how.theme_type_variation = &"SmallLabel"
-	how.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	how.text = "Friends can join with the room code. If that doesn't work for them (a strict network), make an invite, send the link, then paste the reply they send back: each player needs their own invite."
-	parent.add_child(how)
+	share.add_child(_copy_room)
+	NetUi.note(box, tr("Friends can join with the room code, or by opening the room link."))
+	_manual_toggle = HubStyle.button("Manual invite (if the room code does not work for someone)", "ManualToggle")
+	_manual_toggle.toggle_mode = true
+	_manual_toggle.toggled.connect(func(on: bool) -> void: _manual_box.visible = on)
+	box.add_child(_manual_toggle)
+	_manual_box = VBoxContainer.new()
+	_manual_box.name = "ManualInvite"
+	_manual_box.hide()
+	box.add_child(_manual_box)
+	NetUi.note(_manual_box, tr("Make an invite, send the link, then paste the reply they send back: each player needs their own invite."))
 	var row := HBoxContainer.new()
-	parent.add_child(row)
+	_manual_box.add_child(row)
 	_invite_for = OptionButton.new()
 	_invite_for.name = "InviteFor"
 	row.add_child(_invite_for)
@@ -186,16 +252,16 @@ func _build_invite(parent: Control) -> void:
 	_invite_status.name = "InviteStatus"
 	_invite_status.theme_type_variation = &"SmallLabel"
 	_invite_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	parent.add_child(_invite_status)
+	_manual_box.add_child(_invite_status)
 	_invite_link = TextEdit.new()
 	_invite_link.name = "InviteLink"
 	_invite_link.editable = false
 	_invite_link.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	_invite_link.custom_minimum_size = Vector2(0, 90)
 	_invite_link.hide()
-	parent.add_child(_invite_link)
+	_manual_box.add_child(_invite_link)
 	var copy_row := HBoxContainer.new()
-	parent.add_child(copy_row)
+	_manual_box.add_child(copy_row)
 	_copy_link = HubStyle.button("Copy the invite link", "CopyInviteLink")
 	_copy_link.pressed.connect(func() -> void: WebPage.copy(_link))
 	_copy_link.hide()
@@ -210,11 +276,11 @@ func _build_invite(parent: Control) -> void:
 	_reply.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	_reply.custom_minimum_size = Vector2(0, 70)
 	_reply.hide()
-	parent.add_child(_reply)
+	_manual_box.add_child(_reply)
 	_connect = HubStyle.button("Connect the player", "ConnectButton")
 	_connect.pressed.connect(func() -> void: reply_pasted.emit(_reply.text))
 	_connect.hide()
-	parent.add_child(_connect)
+	_manual_box.add_child(_connect)
 
 
 func _spin(low: int, high: int, node_name: String) -> SpinBox:
@@ -247,7 +313,8 @@ func refresh() -> void:
 	var state := session.state
 	var is_host := session.is_host()
 	var in_lobby := state.phase == MatchState.Phase.LOBBY
-	_refresh_players(in_lobby)
+	_refresh_seat(in_lobby)
+	_refresh_teams(in_lobby)
 	_refresh_settings(is_host and in_lobby)
 	_refresh_invite_options(in_lobby)
 	_start.visible = is_host
@@ -269,72 +336,59 @@ func _rename(text: String) -> void:
 		session.set_field("name", clean)
 
 
-func _refresh_players(in_lobby: bool) -> void:
+func _refresh_seat(in_lobby: bool) -> void:
 	var me := session.state.seats.get(session.my_id) as MatchState.Seat
-	_name_edit.visible = in_lobby and me != null
-	if me != null and not _name_edit.has_focus():
+	_seat_card.visible = in_lobby and me != null
+	if me == null:
+		return
+	if not _name_edit.has_focus():
 		_name_edit.text = me.name
-	HubStyle.clear_children(_players)
-	for id in session.state.seat_ids():
-		var seat := session.state.seats[id]
-		var mine := id == session.my_id
-		var row := HBoxContainer.new()
-		row.name = "Seat%d" % id
-		var name_label := Label.new()
-		name_label.custom_minimum_size = Vector2(190, 0)
-		name_label.clip_text = true
-		name_label.text = _seat_text(seat, mine, id == session.host_id)
-		name_label.add_theme_color_override("font_color", NetStatusPanel.SIDE_COLORS[seat.side])
-		row.add_child(name_label)
-		if mine and in_lobby:
-			row.add_child(_hero_picker(seat))
-			row.add_child(_side_buttons(seat))
-			var ready := CheckBox.new()
-			ready.name = "Ready"
-			ready.text = "Ready"
-			ready.button_pressed = seat.ready
-			ready.toggled.connect(func(on: bool) -> void: session.set_ready(on))
-			row.add_child(ready)
-		else:
-			var info := Label.new()
-			info.text = "%s · %s%s" % [PvpHeroes.hero_name(seat.hero), tr("Side A") if seat.side == 0 else tr("Side B"), " · " + tr("ready") if seat.ready and in_lobby else ""]
-			row.add_child(info)
-		_players.add_child(row)
+	if _hero_shown != me.hero or _hero_row.get_child_count() == 0:
+		_hero_shown = me.hero
+		HubStyle.clear_children(_hero_row)
+		var group := ButtonGroup.new()
+		for index in PvpHeroes.hero_count():
+			var card := NetUi.hero_card(index, index == me.hero, _on_hero_picked)
+			card.button_group = group
+			_hero_row.add_child(card)
+	_side_a.set_pressed_no_signal(me.side == 0)
+	_side_b.set_pressed_no_signal(me.side == 1)
+	_ready.set_pressed_no_signal(me.ready)
 
 
-func _seat_text(seat: MatchState.Seat, mine: bool, host: bool) -> String:
-	var text := seat.name
-	if mine:
+func _on_hero_picked(index: int) -> void:
+	NetUi.save_hero(index)
+	session.set_field("hero", index)
+
+
+## The two teams, side by side: who is on each, with their hero and what they are doing.
+func _refresh_teams(in_lobby: bool) -> void:
+	for side in 2:
+		HubStyle.clear_children(_team_boxes[side])
+		var seats := session.state.seats_on(side)
+		_team_titles[side].text = "%s  (%d/%d)" % [tr("Side A") if side == 0 else tr("Side B"), seats.size(), MatchState.MAX_PER_SIDE]
+		if seats.is_empty():
+			NetUi.note(_team_boxes[side], tr("Nobody yet."))
+		for seat in seats:
+			var row := Label.new()
+			row.name = "Seat%d" % seat.id
+			row.text = _seat_text(seat, in_lobby)
+			row.add_theme_color_override("font_color", NetUi.SIDE_COLORS[side])
+			row.clip_text = true
+			_team_boxes[side].add_child(row)
+
+
+func _seat_text(seat: MatchState.Seat, in_lobby: bool) -> String:
+	var text := "%s: %s" % [seat.name, PvpHeroes.hero_name(seat.hero)]
+	if seat.id == session.my_id:
 		text += " " + tr("(you)")
-	if host:
+	if seat.id == session.host_id:
 		text += " " + tr("(host)")
 	if not seat.connected:
 		text += " " + tr("(away)")
+	if seat.ready and in_lobby:
+		text += " · " + tr("ready")
 	return text
-
-
-func _hero_picker(seat: MatchState.Seat) -> OptionButton:
-	var picker := OptionButton.new()
-	picker.name = "Hero"
-	for index in PvpHeroes.hero_count():
-		picker.add_item(PvpHeroes.hero_name(index), index)
-	picker.select(seat.hero)
-	picker.item_selected.connect(func(index: int) -> void: session.set_field("hero", index))
-	return picker
-
-
-func _side_buttons(seat: MatchState.Seat) -> HBoxContainer:
-	var box := HBoxContainer.new()
-	box.name = "Side"
-	for side in 2:
-		var button := Button.new()
-		button.name = "Side%s" % ("A" if side == 0 else "B")
-		button.text = tr("Side A") if side == 0 else tr("Side B")
-		button.toggle_mode = true
-		button.button_pressed = seat.side == side
-		button.pressed.connect(func() -> void: session.set_field("side", side))
-		box.add_child(button)
-	return box
 
 
 func _refresh_settings(editable: bool) -> void:
@@ -391,10 +445,21 @@ func _on_invite() -> void:
 	invite_requested.emit(_invite_for.get_selected_id())
 
 
+## The room code, to read out or copy (anyone who has it can join).
+func show_room(code: String, link: String) -> void:
+	_room_code = code
+	_room_link = link
+	_room_label.text = tr("Room code: %s") % RoomCode.pretty(code)
+	_room_label.show()
+	_copy_room_code.show()
+	_copy_room.show()
+
+
 ## The invite is ready: show its link and the box for the reply.
 func show_invite(code: String, link: String) -> void:
 	_code = code
 	_link = link
+	_manual_toggle.button_pressed = true
 	_invite_status.text = tr("Send this link to the player. When they send a reply back, paste it below.")
 	_invite_link.text = link
 	_invite_link.show()
@@ -403,15 +468,6 @@ func show_invite(code: String, link: String) -> void:
 	_reply.text = ""
 	_reply.show()
 	_connect.show()
-
-
-## The room code, to read out or share as a link (anyone who has it can join).
-func show_room(code: String, link: String) -> void:
-	_room_code = code
-	_room_link = link
-	_room_label.text = tr("Room code: %s") % RoomCode.pretty(code)
-	_room_label.show()
-	_copy_room.show()
 
 
 func show_invite_message(text: String) -> void:

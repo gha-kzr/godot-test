@@ -4,9 +4,9 @@
 
 ## Multiplayer quick start
 
-1. Open the web build (the title's **Play** opens multiplayer). **Host a match**: you get a **room code** (and a link) to share.
+1. Open the web build (the title's **Play** opens multiplayer). On the front page pick your name and the hero you like (the lobby starts with it), then **Host a match**: you get a **room code** to read out or copy, and a link.
 2. A friend opens the page, types the room code (or opens the room link) and is in your lobby within seconds.
-3. In the lobby each player picks **one hero** (Knight, Mage or Ranger) and a **side** (up to 4 per side), the host picks the map shape, size and number (a preview shows the map from above), the seconds per turn and how long the AI waits before it replaces a player who left. Everyone presses **Ready**, the host presses **Start**.
+3. In the lobby each player picks **one hero** (cards show its role, stats and spells) and a **side** (up to 4 per side, the two teams shown side by side), the host picks the map shape, size and number (a preview shows the map from above), the seconds per turn and how long the AI waits before it replaces a player who left. Everyone presses **Ready**, the host presses **Start**.
 4. Each player places their hero in their side's start zone, presses Ready, and the fight begins. Heroes have the strength of a level-30 hero with a full kit and no runes; levels are not shown.
 5. If someone drops out, the AI plays their hero after the grace time (the players panel marks it "(AI)"); they can come back with the same room code and get their hero back at the start of its next turn. Any player can also hand their hero to the AI to let it finish the fight.
 6. If the room code does not work for someone (a strict network), the lobby's **Make an invite** gives a link to send; they send a reply back and the host pastes it. That path needs no third party at all.

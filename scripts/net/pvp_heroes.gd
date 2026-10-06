@@ -28,3 +28,19 @@ static func build(hero_index: int) -> Dictionary:
 	record.level = LEVEL
 	record.settle_loadout()
 	return {"unit": record.battle_unit_data(), "modifiers": record.modifiers()}
+
+
+## What the lobby shows of a hero: name, role, stats at the PvP strength and its spells.
+static func summary(hero_index: int) -> Dictionary:
+	var built := build(hero_index)
+	var unit: UnitData = built["unit"]
+	var state := UnitState.new(0, unit, UnitState.Team.PLAYER, Vector2i.ZERO)
+	state.permanent_modifiers.assign(built["modifiers"])
+	var icons: Array[Texture2D] = []
+	var names: Array[String] = []
+	for spell in unit.spells:
+		icons.append(spell.display_icon())
+		names.append(TranslationServer.translate(spell.display_name))
+	var role := TranslationServer.translate("Melee fighter") if Placement.reach_score(unit) < 3.0 else TranslationServer.translate("Ranged")
+	return {"name": hero_name(hero_index), "role": role, "hp": state.max_hp(), "ap": state.max_ap(), "mp": state.max_mp(),
+			"spell_icons": icons, "spell_names": names}

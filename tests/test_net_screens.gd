@@ -3,6 +3,19 @@ extends TestCase
 ## flow from an invite to a lobby to a fight, with fake links standing in for WebRTC.
 
 
+const TEST_FILE := "user://test_net_player.cfg"
+
+
+func _sandbox() -> void:
+	NetUi.player_file = TEST_FILE
+	DirAccess.remove_absolute(TEST_FILE)
+
+
+func after_each_clean() -> void:
+	NetUi.player_file = "user://net_player.cfg"
+	DirAccess.remove_absolute(TEST_FILE)
+
+
 func _root() -> Node:
 	return (Engine.get_main_loop() as SceneTree).root
 
@@ -13,6 +26,7 @@ func _frames(count := 2) -> void:
 
 
 func test_the_front_page_hosts_or_joins_with_a_name() -> void:
+	_sandbox()
 	var menu := NetMenuScreen.new()
 	_root().add_child(menu)
 	var hosted := []
@@ -32,6 +46,7 @@ func test_the_front_page_hosts_or_joins_with_a_name() -> void:
 
 
 func test_the_lobby_lets_each_player_change_only_their_own_seat_and_the_host_the_rules() -> void:
+	_sandbox()
 	var rig := NetRig.new()
 	rig.host(1, "Alice")
 	rig.guest(2, "Bob")
@@ -42,20 +57,53 @@ func test_the_lobby_lets_each_player_change_only_their_own_seat_and_the_host_the
 	host_lobby.bind(rig.sessions[1])
 	guest_lobby.bind(rig.sessions[2])
 	await _frames()
-	assert_true(host_lobby.find_child("Seat1", true, false).find_child("Hero", true, false) != null, "the host picks their own hero")
-	assert_true(host_lobby.find_child("Seat2", true, false).find_child("Hero", true, false) == null, "not Bob's")
+	assert_eq(host_lobby.find_child("HeroPicker", true, false).get_child_count(), PvpHeroes.hero_count(), "a card for each hero, for my own seat")
+	assert_true(host_lobby.find_child("Seat1", true, false) != null and host_lobby.find_child("Seat2", true, false) != null, "both players are in the teams")
 	assert_true((host_lobby.find_child("Typology", true, false) as OptionButton).disabled == false, "the host edits the rules")
 	assert_true((guest_lobby.find_child("Typology", true, false) as OptionButton).disabled, "a guest only reads them")
 	assert_true((guest_lobby.find_child("Size", true, false) as SpinBox).editable == false)
 	assert_true(guest_lobby.find_child("StartButton", true, false).visible == false, "only the host starts")
 	# Bob picks the Mage on side B: everyone sees it.
-	(guest_lobby.find_child("Hero", true, false) as OptionButton).item_selected.emit(1)
+	(guest_lobby.find_child("Hero1", true, false) as Button).pressed.emit()
 	(guest_lobby.find_child("SideB", true, false) as Button).pressed.emit()
 	rig.net.flush()
 	assert_eq(rig.sessions[1].state.seats[2].hero, 1)
 	assert_eq(rig.sessions[1].state.seats[2].side, 1)
+	assert_eq(NetUi.saved_hero(), 1, "and the lobby will start with that hero next time")
 	host_lobby.free()
 	guest_lobby.free()
+
+
+func test_each_team_card_lists_its_players_with_their_hero() -> void:
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	rig.guest(2, "Bob")
+	rig.sessions[2].set_field("side", 1)
+	rig.sessions[2].set_field("hero", 1)
+	rig.net.flush()
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	var team_a := lobby.find_child("TeamA", true, false)
+	var team_b := lobby.find_child("TeamB", true, false)
+	assert_true(team_a.find_child("Seat1", true, false) != null and team_a.find_child("Seat2", true, false) == null, "Alice on side A")
+	assert_true(team_b.find_child("Seat2", true, false) != null and team_b.find_child("Seat1", true, false) == null, "Bob on side B")
+	assert_true((team_a.find_child("Seat1", true, false) as Label).text.contains(PvpHeroes.hero_name(0)))
+	assert_true((team_b.find_child("Seat2", true, false) as Label).text.contains(PvpHeroes.hero_name(1)))
+	lobby.free()
+
+
+func test_hero_cards_show_what_the_hero_is_and_does() -> void:
+	for index in PvpHeroes.hero_count():
+		var info := PvpHeroes.summary(index)
+		assert_true(info["hp"] > 0 and info["ap"] > 0 and info["mp"] > 0)
+		assert_eq(info["spell_icons"].size(), 5, "its five spells")
+		assert_false(str(info["role"]).is_empty())
+	assert_eq(PvpHeroes.summary(0)["role"], "Melee fighter")
+	var card := NetUi.hero_card(0, true, func(_i: int) -> void: pass)
+	assert_true(card.button_pressed and card.toggle_mode)
+	assert_true(card.find_children("*", "TextureRect", true, false).size() == 5)
+	card.free()
 
 
 func test_the_start_button_waits_until_everyone_is_ready() -> void:
@@ -72,7 +120,7 @@ func test_the_start_button_waits_until_everyone_is_ready() -> void:
 	rig.sessions[2].set_ready(true)
 	rig.net.flush()
 	assert_true(start.disabled, "the host is not ready yet")
-	((lobby.find_child("Seat1", true, false)).find_child("Ready", true, false) as CheckBox).toggled.emit(true)
+	(lobby.find_child("Ready", true, false) as CheckBox).toggled.emit(true)
 	rig.net.flush()
 	assert_false(start.disabled, "ready: the host can start")
 	start.pressed.emit()
@@ -221,3 +269,64 @@ func test_the_fight_opens_on_both_screens_and_leads_back_to_the_lobby() -> void:
 	assert_true(guest._screen is NetBattleController, "and the guest's")
 	host.free()
 	guest.free()
+
+
+func test_the_front_page_offers_the_heroes_and_remembers_the_pick() -> void:
+	_sandbox()
+	var menu := NetMenuScreen.new()
+	_root().add_child(menu)
+	var heroes := menu.find_child("Heroes", true, false)
+	assert_eq(heroes.get_child_count(), PvpHeroes.hero_count())
+	assert_true((heroes.get_child(0) as Button).button_pressed, "the first time, the first hero")
+	(menu.find_child("Hero2", true, false) as Button).pressed.emit()
+	assert_eq(NetUi.saved_hero(), 2)
+	var again := NetMenuScreen.new()
+	_root().add_child(again)
+	assert_true((again.find_child("Hero2", true, false) as Button).button_pressed, "next time it is already picked")
+	menu.free()
+	again.free()
+
+
+func test_the_lobby_opens_with_the_hero_the_player_likes() -> void:
+	_sandbox()
+	var fakes := FakeLinks.new()
+	NetUi.save_hero(2)
+	var host := _flow(fakes)
+	host.start("")
+	host._on_host("Alice")
+	assert_eq(host.hub.session.state.seats[1].hero, 2, "the host's seat starts with it")
+	var invite := {}
+	host.hub.invite_ready.connect(func(code: String, _link: String, _seat: int) -> void: invite.merge({"code": code}, true))
+	host.hub.create_invite()
+	NetUi.save_hero(1)  # Another player, another browser: their own favourite.
+	var guest := _flow(fakes)
+	guest.start("")
+	var reply := {}
+	guest.hub.reply_ready.connect(func(code: String, _link: String) -> void: reply.merge({"code": code}, true))
+	guest._on_join("Bob", invite["code"])
+	host._on_reply_pasted(reply["code"])
+	fakes.flush()
+	await _frames()
+	assert_eq(guest.hub.session.state.seats[2].hero, 1, "and so does the guest's")
+	assert_eq(host.hub.session.state.seats[2].hero, 1, "everyone sees it")
+	host.free()
+	guest.free()
+
+
+func test_the_lobby_can_copy_the_room_code_and_the_room_link() -> void:
+	_sandbox()
+	var fakes := FakeLinks.new()
+	var host := _flow(fakes)
+	host.start("")
+	host._on_host("Alice")
+	var lobby := host._screen as NetLobbyScreen
+	var label := lobby.find_child("RoomCode", true, false) as Label
+	assert_true(label.visible and label.text.contains(RoomCode.pretty(host.hub.room_code)), "the code is shown")
+	for button_name in ["CopyRoomCode", "CopyRoom"]:
+		var button := lobby.find_child(button_name, true, false) as Button
+		assert_true(button != null and button.visible, button_name)
+		button.pressed.emit()
+	assert_false(lobby.find_child("ManualInvite", true, false).visible, "the manual invite waits behind its button")
+	(lobby.find_child("ManualToggle", true, false) as Button).button_pressed = true
+	assert_true(lobby.find_child("ManualInvite", true, false).visible)
+	host.free()

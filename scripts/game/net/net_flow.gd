@@ -21,6 +21,8 @@ var _screen: Node
 var _battle: NetBattleController
 ## The player left the results for the lobby while the match's state still says "battle".
 var _after_battle := false
+## The hero the player likes was put on their seat (once per match joined).
+var _hero_preselected := false
 
 
 ## `fragment`: the page address's # part. An invite link in it joins at once.
@@ -57,7 +59,7 @@ func _process(_delta: float) -> void:
 
 static func _saved_name() -> String:
 	var file := ConfigFile.new()
-	if file.load(NetMenuScreen.NAME_FILE) == OK:
+	if file.load(NetUi.player_file) == OK:
 		var kept := str(file.get_value("player", "name", "")).strip_edges()
 		if not kept.is_empty():
 			return kept
@@ -112,6 +114,7 @@ func _wire_session() -> void:
 
 
 func _show_lobby() -> void:
+	_preselect_hero()
 	_battle = null
 	music_requested.emit(&"hub")
 	var lobby := NetLobbyScreen.new()
@@ -122,6 +125,19 @@ func _show_lobby() -> void:
 	lobby.invite_requested.connect(hub.create_invite)
 	lobby.reply_pasted.connect(_on_reply_pasted)
 	lobby.leave_requested.connect(_leave)
+
+
+## The lobby opens with the hero this player likes (chosen on the front page or last time).
+func _preselect_hero() -> void:
+	if _hero_preselected or hub.session == null:
+		return
+	var seat := hub.session.state.seats.get(hub.session.my_id) as MatchState.Seat
+	if seat == null:
+		return  # Not synced yet: the lobby is shown again when it is.
+	_hero_preselected = true
+	var wanted := NetUi.saved_hero()
+	if seat.hero != wanted and hub.session.state.phase == MatchState.Phase.LOBBY:
+		hub.session.set_field("hero", wanted)
 
 
 func _show_battle() -> void:
@@ -141,6 +157,7 @@ func _show_battle() -> void:
 func _leave() -> void:
 	hub.leave()
 	_after_battle = false
+	_hero_preselected = false
 	_show_menu()
 
 

@@ -442,6 +442,9 @@ msgstr "Copier le lien d'invitation"
 msgid "Copy the reply link"
 msgstr "Copier le lien de réponse"
 
+msgid "Copy the room code"
+msgstr "Copier le code de la salle"
+
 msgid "Copy the room link"
 msgstr "Copier le lien de la salle"
 
@@ -619,8 +622,8 @@ msgstr "Couronne de concentration"
 msgid "Found: %s."
 msgstr "Trouvé : %s."
 
-msgid "Friends can join with the room code. If that doesn't work for them (a strict network), make an invite, send the link, then paste the reply they send back: each player needs their own invite."
-msgstr "Vos amis peuvent rejoindre avec le code de la salle. Si cela ne marche pas pour eux (réseau strict), créez une invitation, envoyez le lien, puis collez la réponse qu'ils renvoient : chaque joueur a besoin de sa propre invitation."
+msgid "Friends can join with the room code, or by opening the room link."
+msgstr "Vos amis peuvent rejoindre avec le code de la salle, ou en ouvrant le lien de la salle."
 
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
@@ -720,6 +723,9 @@ msgstr "PV %d   PA %d   PM %d   Initiative %d"
 
 msgid "HP %d / %d"
 msgstr "PV %d / %d"
+
+msgid "HP %d · AP %d · MP %d"
+msgstr "PV %d · PA %d · PM %d"
 
 msgid "HP: health. At 0 the unit falls."
 msgstr "PV : points de vie. À 0, l'unité tombe."
@@ -828,6 +834,12 @@ msgstr "Mage"
 msgid "Make an invite"
 msgstr "Créer une invitation"
 
+msgid "Make an invite, send the link, then paste the reply they send back: each player needs their own invite."
+msgstr "Créez une invitation, envoyez le lien, puis collez la réponse qu'ils renvoient : chaque joueur a besoin de sa propre invitation."
+
+msgid "Manual invite (if the room code does not work for someone)"
+msgstr "Invitation manuelle (si le code de la salle ne marche pas pour quelqu'un)"
+
 msgid "Map and rules"
 msgstr "Carte et règles"
 
@@ -848,6 +860,9 @@ msgstr "Volume général"
 
 msgid "Match lobby"
 msgstr "Salon de la partie"
+
+msgid "Melee fighter"
+msgstr "Combattant de mêlée"
 
 msgid "Mend"
 msgstr "Soin"
@@ -923,6 +938,9 @@ msgstr "Ce héros n'existe pas."
 
 msgid "No such rune in the stash."
 msgstr "Cette rune n'est pas dans la réserve."
+
+msgid "Nobody yet."
+msgstr "Personne pour l'instant."
 
 msgid "None"
 msgstr "Aucune"
@@ -1360,6 +1378,9 @@ msgstr "Maître des épreuves"
 msgid "Stages"
 msgstr "Épreuves"
 
+msgid "Start a match and get a room code to give to your friends. You choose the map and the rules."
+msgstr "Lancez une partie et obtenez un code de salle à donner à vos amis. Vous choisissez la carte et les règles."
+
 msgid "Start a tower run at this floor"
 msgstr "Commencer une ascension à cet étage"
 
@@ -1621,6 +1642,9 @@ msgstr "Oui, réinitialiser"
 msgid "Yeti"
 msgstr "Yéti"
 
+msgid "You"
+msgstr "Vous"
+
 msgid "You are the host. Not ready to start yet: %s."
 msgstr "Vous êtes l'hôte. Pas encore prêt à lancer : %s."
 
@@ -1639,6 +1663,9 @@ msgstr "Vous avez quitté le combat. Il recommence quand vous poursuivez l'ascen
 msgid "You left the QA battle."
 msgstr "Vous avez quitté le combat QA."
 
+msgid "Your hero (the lobby starts with it; you can change it there)"
+msgstr "Votre héros (le salon commence avec lui ; vous pouvez le changer là-bas)"
+
 msgid "Your heroes stand on the teal cells. Press Ready ({end_turn}) to start the fight."
 msgstr "Vos héros sont sur les cases turquoise. Appuyez sur Prêt ({end_turn}) pour lancer le combat."
 
@@ -1650,3 +1677,6 @@ msgstr "vos %d prochains tours"
 
 msgid "your next turn"
 msgstr "votre prochain tour"
+
+msgid "Your seat"
+msgstr "Votre place"
