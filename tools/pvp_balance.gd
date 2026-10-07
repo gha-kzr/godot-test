@@ -5,7 +5,7 @@ extends SceneTree
 ##   godot --headless --script res://tools/pvp_balance.gd -- teams4 games=60 map=ruins size=14
 ## Modes: duel (every class against every class, 1v1: a win-rate matrix), teams2 / teams3 / teams4 (random teams of
 ## that size, duplicates allowed: each class's win rate in the matches it was in). Options: games= (per pair for
-## duel, in total for teams), seed=, map= (a typology file name), size=. The AI plays worse than a player does and
+## duel, in total for teams), seed=, map= (a typology file name), size=, cards=1 (card combat). The AI plays worse than a player does and
 ## knows no class tricks (it never holds a stealth for an ambush on purpose), so read it as a lower bound and look for
 ## classes that are far from the others: a win rate between 40 % and 60 % in teams, and a matrix without a class
 ## that loses to (or beats) nearly everything.
@@ -14,6 +14,7 @@ var _games := 6
 var _seed := 1
 var _map := "open_field"
 var _size := 12
+var _cards := false
 
 
 func _init() -> void:
@@ -26,6 +27,7 @@ func _init() -> void:
 				"seed": _seed = int(parts[1])
 				"map": _map = parts[1]
 				"size": _size = int(parts[1])
+				"cards": _cards = parts[1] == "1"
 		else:
 			mode = arg
 	if _games < 1 or _size < PvpMap.MIN_SIZE or _size > PvpMap.MAX_SIZE:
@@ -72,7 +74,7 @@ func _duel() -> void:
 				var i_first := game % 2 == 0  # Sides swap, so neither class always gets the same start zone.
 				var side_a: Array[int] = [i if i_first else j]
 				var side_b: Array[int] = [j if i_first else i]
-				var result := PvpSimulator.play(side_a, side_b, map_seed, _size, _map)
+				var result := PvpSimulator.play(side_a, side_b, map_seed, _size, _map, PvpSimulator.MAX_ACTIONS, _cards)
 				rounds += result.rounds
 				played += 1
 				var i_won := result.winner == (0 if i_first else 1)
@@ -124,7 +126,7 @@ func _teams(size: int) -> void:
 		for slot in size:
 			side_a.append(rng.randi_range(0, count - 1))
 			side_b.append(rng.randi_range(0, count - 1))
-		var result := PvpSimulator.play(side_a, side_b, _seed * 1000 + game, _size + (size - 1), _map)
+		var result := PvpSimulator.play(side_a, side_b, _seed * 1000 + game, _size + (size - 1), _map, PvpSimulator.MAX_ACTIONS, _cards)
 		rounds += result.rounds
 		if result.winner == 0:
 			a_wins += 1

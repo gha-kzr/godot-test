@@ -9,6 +9,8 @@ extends CanvasLayer
 ## End turn have keyboard shortcuts (1-9, the end_turn action) that respect disabled state.
 
 signal spell_selected(index: int)
+## Card combat: the player throws the card at this hand position away.
+signal card_discarded(position: int)
 signal end_turn_pressed
 signal view_toggle_pressed
 ## The speed button was pressed: the controller cycles the battle speed.
@@ -79,6 +81,7 @@ func _ready() -> void:
 	$Root.add_child(_tutorial)  # Last: above the rest of the HUD.
 	_restart_button.pressed.connect(restart_pressed.emit)
 	_spell_bar.spell_pressed.connect(spell_selected.emit)
+	_spell_bar.discard_pressed.connect(card_discarded.emit)
 	_timeline.chip_hovered.connect(chip_hovered.emit)
 	_timeline.chip_unhovered.connect(chip_unhovered.emit)
 	_timeline.chip_pressed.connect(chip_pressed.emit)
@@ -208,6 +211,11 @@ func close_order_overlay() -> bool:
 ## One slot per spell; spells costing more than `ap`, or waiting for their cooldown, are disabled.
 func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
 	_spell_bar.show_spells(spells, ap, cooldowns)
+
+
+## Card combat: the hand as cards (one per card in hand, in hand order); a card needs a play (AP) to be cast.
+func show_cards(info: UnitInfo) -> void:
+	_spell_bar.show_cards(info.hand_spells, info.ap, info.deck_size, info.draw_count, info.discard_count)
 
 
 ## The active unit's AP changed (spells it can't afford are disabled).

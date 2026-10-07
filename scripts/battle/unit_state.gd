@@ -36,6 +36,13 @@ var moved_from: Vector2i
 var moved_cost := 0
 ## Spells waiting to be cast again: spell → turns left (counted down at turn start).
 var cooldowns: Dictionary[SpellData, int] = {}
+## Card mode (see CardRules): the spells are a deck of slot numbers. A play costs one AP, whatever the spell.
+var card_mode := false
+var hand: Array[int] = []
+var draw_pile: Array[int] = []
+var discard_pile: Array[int] = []
+## Shuffles and draws: its own dice, so a hand never depends on the damage rolls.
+var card_rng := RandomNumberGenerator.new()
 ## What it does in its team (enemies; NONE for heroes).
 var role := EnemyData.Role.NONE
 ## Where the AI likes this unit to stand (null: straight at its opponents). Shared, read-only.
@@ -65,10 +72,73 @@ func start_turn() -> void:
 	ap = max_ap()
 	mp = max_mp()
 	commit_position()
+	if card_mode:
+		draw_hand()
 	for spell: SpellData in cooldowns.keys():
 		cooldowns[spell] -= 1
 		if cooldowns[spell] <= 0:
 			cooldowns.erase(spell)
+
+
+## Switches to card mode: the spells become a shuffled deck and the first hand is drawn. `seed` makes the
+## shuffles the same on every peer.
+func enable_cards(seed: int) -> void:
+	card_mode = true
+	card_rng.seed = seed
+	hand.clear()
+	discard_pile.clear()
+	draw_pile = CardRules.deck_for(data)
+	_shuffle(draw_pile)
+	ap = max_ap()
+	draw_hand()
+
+
+## Draws until the hand is full or there is nothing left to draw (the discard pile is shuffled back in when the
+## draw pile runs out).
+func draw_hand() -> void:
+	while hand.size() < CardRules.HAND_SIZE:
+		if draw_pile.is_empty():
+			if discard_pile.is_empty():
+				return
+			draw_pile = discard_pile
+			discard_pile = []
+			_shuffle(draw_pile)
+		hand.append(draw_pile.pop_back())
+
+
+## Fisher-Yates with the unit's own dice (Array.shuffle() uses the global generator: not the same on every peer).
+func _shuffle(cards: Array[int]) -> void:
+	for index in range(cards.size() - 1, 0, -1):
+		var other := card_rng.randi_range(0, index)
+		var kept := cards[index]
+		cards[index] = cards[other]
+		cards[other] = kept
+
+
+## Whether the hand holds a card of that spell.
+func has_card(slot: int) -> bool:
+	return hand.has(slot)
+
+
+## The card leaves the hand for the discard pile (played or thrown away).
+func spend_card(slot: int) -> void:
+	hand.erase(slot)  # erase() removes only the first copy.
+	discard_pile.append(slot)
+
+
+## What casting `spell` costs in AP: a play in card mode, the spell's own cost otherwise.
+func cast_cost(spell: SpellData) -> int:
+	return 1 if card_mode else spell.ap_cost
+
+
+## Whether the unit can cast that spell now (range aside): the AP, and either a card in hand or no cooldown.
+func can_cast(slot: int) -> bool:
+	if slot < 0 or slot >= data.spells.size():
+		return false
+	var spell := data.spells[slot]
+	if ap < cast_cost(spell):
+		return false
+	return has_card(slot) if card_mode else cooldown_left(spell) == 0
 
 
 ## Turns before `spell` can be cast again (0: now).
@@ -135,7 +205,7 @@ func max_resistance_percent() -> int:
 
 
 func max_ap() -> int:
-	return maxi(0, data.ap + stat_bonus(StatModifier.Stat.AP))
+	return maxi(0, (CardRules.PLAYS_PER_TURN if card_mode else data.ap) + stat_bonus(StatModifier.Stat.AP))
 
 
 func max_mp() -> int:
@@ -211,6 +281,12 @@ func clone() -> UnitState:
 	copy.moved_from = moved_from
 	copy.moved_cost = moved_cost
 	copy.cooldowns = cooldowns.duplicate()
+	copy.card_mode = card_mode
+	copy.hand = hand.duplicate()
+	copy.draw_pile = draw_pile.duplicate()
+	copy.discard_pile = discard_pile.duplicate()
+	copy.card_rng.seed = card_rng.seed
+	copy.card_rng.state = card_rng.state
 	for status in statuses:
 		copy.statuses.append(status.clone())
 	copy.permanent_modifiers = permanent_modifiers.duplicate()

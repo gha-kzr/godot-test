@@ -18,7 +18,7 @@ class Result:
 
 
 ## One match: `side_a` and `side_b` are class indexes. `map_seed` also seeds the dice.
-static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 12, typology := "open_field", max_actions := MAX_ACTIONS) -> Result:
+static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 12, typology := "open_field", max_actions := MAX_ACTIONS, cards := false) -> Result:
 	var typology_file := "res://data/maps/typologies/%s.tres" % typology
 	if not ResourceLoader.exists(typology_file):
 		push_error("PvpSimulator: no map typology %s" % typology)
@@ -36,6 +36,8 @@ static func play(side_a: Array[int], side_b: Array[int], map_seed: int, size := 
 		push_error("PvpSimulator: can't build the match (map size %d too small for %d players?)" % [size, side_a.size() + side_b.size()])
 		return result
 	state.use_average_rolls = false
+	if cards:
+		state.enable_cards(map_seed)
 	var battle := Battle.new(state)
 	battle.sudden_death_round = SUDDEN_DEATH_ROUND
 	battle.sudden_death_percent = SUDDEN_DEATH_PERCENT

@@ -25,6 +25,8 @@ var started := false
 ## A fight between two sets of human-controlled heroes (multiplayer): the ENEMY team places in
 ## `zone_enemy` too, and sudden death hits every unit, not only the PLAYER team.
 var pvp := false
+## Card combat (CardRules): every unit's spells are a deck, see enable_cards().
+var cards := false
 var zone_enemy: Array[Vector2i] = []
 
 
@@ -78,6 +80,14 @@ static func create(map: MapData.ParseResult, players: Array[UnitData], enemies: 
 	state.turn_order = TurnOrder.from_units(state.units)
 	state.rng.seed = rng_seed
 	return state
+
+
+## Switches the whole battle to card combat: every unit gets its deck and first hand. The shuffles come from
+## `card_seed` and the unit's id, so every peer deals the same cards.
+func enable_cards(card_seed: int) -> void:
+	cards = true
+	for unit in units:
+		unit.enable_cards(hash([card_seed, unit.id, "cards"]))
 
 
 ## Rolls an amount in [low, high] for an effect. With use_average_rolls, returns the
@@ -151,6 +161,7 @@ func clone() -> BattleState:
 	copy.roll_bound = roll_bound
 	copy.zone = zone.duplicate()
 	copy.pvp = pvp
+	copy.cards = cards
 	copy.zone_enemy = zone_enemy.duplicate()
 	copy.started = started
 	return copy

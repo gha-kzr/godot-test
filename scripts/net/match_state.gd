@@ -8,7 +8,7 @@ extends RefCounted
 ##   drop {id}                a player left (lobby: gone; battle: disconnected)
 ##   kick {id}                the host removed a player from the lobby (they can't come back)
 ##   set {id, f, v}           a player's hero, side, ready flag or name (lobby)
-##   cfg {f, v}               a setting: typology, size, seed, turn, grace (lobby)
+##   cfg {f, v}               a setting: typology, size, seed, turn, grace, cards (lobby)
 ##   start {}                 builds the map and the battle (lobby, everyone ready)
 ##   ready {id, v}            a player is happy with their placement (battle, not started)
 ##   go {}                    placement is over, the first turn begins
@@ -43,7 +43,7 @@ class Seat extends RefCounted:
 
 var phase := Phase.LOBBY
 var seats: Dictionary[int, Seat] = {}
-var settings: Dictionary = {"typology": "open_field", "size": 14, "seed": 1, "turn": 30, "grace": 20}
+var settings: Dictionary = {"typology": "open_field", "size": 14, "seed": 1, "turn": 30, "grace": 20, "cards": false}
 ## Every entry applied so far; entry n is log[n - 1].
 var log: Array[Dictionary] = []
 var battle: Battle
@@ -270,6 +270,9 @@ func _cfg(entry: Dictionary) -> String:
 		"grace":
 			if value is not int or value < 0 or value > 120:
 				return "bad grace time"
+		"cards":
+			if value is not bool:
+				return "bad flag"
 		_:
 			return "unknown setting"
 	settings[entry["f"]] = value
@@ -324,6 +327,8 @@ func make_battle() -> Battle:
 	var state := PvpBattle.create(map, side_a, side_b, hash([int(settings["seed"]), "battle"]))
 	if state == null:
 		return null
+	if settings.get("cards", false):
+		state.enable_cards(int(settings["seed"]))
 	var fresh := Battle.new(state)
 	fresh.sudden_death_round = SUDDEN_DEATH_ROUND
 	fresh.sudden_death_percent = SUDDEN_DEATH_PERCENT

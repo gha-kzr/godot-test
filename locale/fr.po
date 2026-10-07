@@ -77,6 +77,9 @@ msgstr "%s PA"
 msgid "%s area %d"
 msgstr "Zone %s %d"
 
+msgid "%s card: %d of %d in the deck"
+msgstr "%s carte : %d sur %d dans le paquet"
+
 msgid "%s cleared"
 msgstr "%s terminé"
 
@@ -211,6 +214,9 @@ msgstr "0 / 0 PV"
 
 msgid "0 AP"
 msgstr "0 PA"
+
+msgid "1 play"
+msgstr "1 action"
 
 msgid "A boss floor! The boss is much stronger. Winning offers a boon (a bonus for the whole run) or a full heal."
 msgstr "Un étage de boss ! Le boss est bien plus fort. Le vaincre offre un bienfait (un bonus pour toute l'ascension) ou un soin complet."
@@ -383,6 +389,9 @@ msgstr "Annuler"
 msgid "Canyon"
 msgstr "Canyon"
 
+msgid "Card combat"
+msgstr "Combat par cartes"
+
 msgid "Change spells"
 msgstr "Changer les sorts"
 
@@ -534,6 +543,9 @@ msgstr "Drain de volonté"
 
 msgid "Drained"
 msgstr "Drainé"
+
+msgid "Draw pile %d · Discard pile %d"
+msgstr "Pioche %d · Défausse %d"
 
 msgid "Dread"
 msgstr "Effroi"
@@ -858,6 +870,9 @@ msgstr "Paix intérieure"
 
 msgid "Instant (skip animations)"
 msgstr "Instantané (sans animations)"
+
+msgid "Instead of action points, each turn draws a hand of four cards from the hero's spells and plays at most two of them. Rare spells come up less often."
+msgstr "Au lieu des points d'action, chaque tour pioche une main de quatre cartes parmi les sorts du héros et en joue deux au plus. Les sorts rares sortent moins souvent."
 
 msgid "Invite players"
 msgstr "Inviter des joueurs"
@@ -1208,6 +1223,9 @@ msgstr "Joueurs"
 
 msgid "Playground"
 msgstr "Bac à sable"
+
+msgid "Plays %d / %d"
+msgstr "Actions %d / %d"
 
 msgid "Poison"
 msgstr "Poison"
@@ -1854,6 +1872,9 @@ msgstr "Tour : %d s"
 
 msgid "UI scale"
 msgstr "Échelle de l'interface"
+
+msgid "Uncommon"
+msgstr "Peu commun"
 
 msgid "Unit"
 msgstr "Unité"

@@ -93,6 +93,15 @@ class SpellCast extends Event:
 		return caster_id
 
 
+## Card mode: a card was thrown away (nothing to play: the hand is what the screen shows).
+class CardDiscarded extends UnitEvent:
+	var spell: SpellData
+
+	func _init(unit: int, thrown: SpellData) -> void:
+		unit_id = unit
+		spell = thrown
+
+
 class DamageDealt extends UnitEvent:
 	var amount: int
 	var hp_after: int

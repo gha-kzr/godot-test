@@ -22,6 +22,14 @@ var statuses: Array[StatusInfo] = []
 var spells: Array[SpellData] = []
 ## Per spell slot: turns before it can be cast again (0: ready).
 var cooldowns: Array[int] = []
+## Card combat (CardRules): the hand as spells in hand order (the bar shows these), as spell slots (what an action
+## names), and the piles' sizes. AP are plays then.
+var card_mode := false
+var hand_spells: Array[SpellData] = []
+var hand_slots: Array[int] = []
+var deck_size := 0
+var draw_count := 0
+var discard_count := 0
 var power := 0
 var role := EnemyData.Role.NONE
 var initiative := 0
@@ -51,7 +59,7 @@ static func from_unit(unit: UnitState, hero_level := 0, pvp := false) -> UnitInf
 	info.max_hp = unit.max_hp()
 	info.ap = unit.ap
 	info.max_ap = unit.max_ap()
-	info.base_ap = unit.data.ap
+	info.base_ap = CardRules.PLAYS_PER_TURN if unit.card_mode else unit.data.ap
 	info.mp = unit.mp
 	info.max_mp = unit.max_mp()
 	info.base_mp = unit.data.mp
@@ -60,6 +68,14 @@ static func from_unit(unit: UnitState, hero_level := 0, pvp := false) -> UnitInf
 	info.spells = unit.data.spells
 	for spell in unit.data.spells:
 		info.cooldowns.append(unit.cooldown_left(spell))
+	info.card_mode = unit.card_mode
+	if unit.card_mode:
+		info.hand_slots.assign(unit.hand)
+		for slot in unit.hand:
+			info.hand_spells.append(unit.data.spells[slot])
+		info.deck_size = CardRules.deck_for(unit.data).size()
+		info.draw_count = unit.draw_pile.size()
+		info.discard_count = unit.discard_pile.size()
 	info.power = unit.power()
 	info.role = unit.role
 	info.initiative = unit.initiative()

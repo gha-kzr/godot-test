@@ -78,6 +78,8 @@ var battle: Battle
 var battle_seed := 0
 var input_state := State.ENDED
 var selected_spell := -1
+## Card combat: the hand position of the card being aimed (selected_spell is its spell slot); -1 otherwise.
+var selected_card := -1
 
 var _hovered_cell := BoardView.NO_CELL
 var _reach: Movement.Reach
@@ -167,6 +169,7 @@ func _ready() -> void:
 	# side (a fixed light made them look different, even broken, as the camera turned).
 	$DirectionalLight3D.reparent(camera_rig)
 	hud.spell_selected.connect(select_spell)
+	hud.card_discarded.connect(discard_card)
 	hud.end_turn_pressed.connect(end_turn)
 	hud.view_toggle_pressed.connect(func() -> void: camera_rig.set_overhead(not camera_rig.overhead))
 	hud.restart_pressed.connect(_on_result_action)
@@ -203,6 +206,7 @@ func start_battle() -> bool:
 	battle.sudden_death_percent = sudden_death_percent
 	_sudden_death_announced = false
 	selected_spell = -1
+	selected_card = -1
 	board_view.build(battle_state.grid)
 	units_view.build(battle_state, board_view)
 	units_view.viewer_team = _viewer_team()
@@ -268,6 +272,7 @@ func set_auto_play(on: bool) -> void:
 	hud.set_auto(on)
 	if on and input_state in [State.IDLE, State.TARGETING] and battle.state.current_unit().team == UnitState.Team.PLAYER:
 		selected_spell = -1
+		selected_card = -1
 		_set_state(State.ENEMY_TURN)
 		_run_enemy_action()
 
@@ -322,19 +327,39 @@ func _on_result_action() -> void:
 
 # --- Player commands (from the HUD and board clicks) ---
 
-## Selects a spell to aim, or unselects it if it's already selected.
+## Selects a spell to aim, or unselects it if it's already selected. In card combat `index` is a hand position.
 func select_spell(index: int) -> void:
 	if input_state != State.IDLE and input_state != State.TARGETING:
 		return
 	var unit := battle.state.current_unit()
-	if index == selected_spell or not BattleActions.CastSpell.can_afford(unit, index):
+	var slot := index
+	if battle.state.cards:
+		if index < 0 or index >= unit.hand.size():
+			_enter_idle()
+			return
+		slot = unit.hand[index]
+	var again := index == selected_card if battle.state.cards else index == selected_spell
+	if again or not BattleActions.CastSpell.can_afford(unit, slot):
 		_enter_idle()
 		return
 	if not Tutorial.allows(_step, Tutorial.Action.SELECT_SPELL):
 		return
-	selected_spell = index
+	selected_spell = slot
+	selected_card = index if battle.state.cards else -1
 	_tutorial_done(Tutorial.Action.SELECT_SPELL)
 	_set_state(State.TARGETING)
+
+
+## Card combat: throws the card at that hand position away (free).
+func discard_card(position: int) -> void:
+	if input_state != State.IDLE and input_state != State.TARGETING:
+		return
+	var unit := battle.state.current_unit()
+	if not battle.state.cards or position < 0 or position >= unit.hand.size():
+		return
+	selected_spell = -1
+	selected_card = -1
+	_perform(BattleActions.DiscardCard.new(unit.id, unit.hand[position]))
 
 
 ## Esc / right click: closes the leave confirmation or the order overlay, else stops aiming, else deselects the hero
@@ -717,6 +742,7 @@ func _turn_banner_name(unit: UnitState) -> String:
 
 func _enter_idle() -> void:
 	selected_spell = -1
+	selected_card = -1
 	_set_state(State.IDLE)
 
 
@@ -727,7 +753,7 @@ func _set_state(new_state: State) -> void:
 	hud.set_placing(new_state == State.PLACING)
 	hud.show_qa_controls(_auto_available(), qa_battle and new_state != State.ENDED,
 			new_state == State.IDLE or new_state == State.TARGETING)
-	hud.set_selected_spell(selected_spell if new_state == State.TARGETING else -1)
+	hud.set_selected_spell((selected_card if selected_card >= 0 else selected_spell) if new_state == State.TARGETING else -1)
 	board_view.clear_highlights()
 	units_view.clear_previews()
 	_reach = null
@@ -871,7 +897,7 @@ func _prompt_text() -> String:
 		State.IDLE:
 			if _nothing_left_to_do():
 				return tr("Nothing left to do: end your turn (%s)") % SettingsApplier.key_text(&"end_turn")
-			return tr("Move to a blue cell or pick a spell (%s)") % _spell_keys_text(battle.state.current_unit().data.spells.size())
+			return tr("Move to a blue cell or pick a spell (%s)") % _spell_keys_text(_spell_slot_count())
 		State.TARGETING:
 			var spell_name := tr(battle.state.current_unit().data.spells[selected_spell].display_name)
 			if _targetable.is_empty():
@@ -880,6 +906,12 @@ func _prompt_text() -> String:
 		State.ENEMY_TURN:
 			return tr("%s is acting...") % tr(battle.state.current_unit().label)
 	return ""
+
+
+## How many slots the spell bar has now: the spells, or the cards of the hand.
+func _spell_slot_count() -> int:
+	var unit := battle.state.current_unit()
+	return unit.hand.size() if battle.state.cards else unit.data.spells.size()
 
 
 ## The keys of the spell slots, e.g. "1-3", or "1" for one spell.
@@ -989,7 +1021,10 @@ func _refresh_hud() -> void:
 	_show_turn()
 	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
 	if active != null:
-		hud.show_spells(active.spells, active.ap, active.cooldowns)
+		if active.card_mode:
+			hud.show_cards(active)
+		else:
+			hud.show_spells(active.spells, active.ap, active.cooldowns)
 
 
 ## Shows the model's turn in the HUD: order, active card, AP for the spell bar, inspect

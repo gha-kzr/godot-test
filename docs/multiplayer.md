@@ -144,3 +144,13 @@ and settings live in the browser, separate from the original game's.
 - A match needs a human host in a visible tab (browsers slow down background tabs); if the host leaves, another player takes over.
 - Without TURN some networks cannot connect (use another player as host, or an invite from someone who can reach both).
 - If every human leaves, the match is over: the log only lives in the players' browsers.
+
+
+## Card combat
+
+A lobby setting (`cfg cards`, a boolean, host only, resets everyone's Ready like any setting). When on, `MatchState.make_battle()` calls `BattleState.enable_cards(seed)`: every unit gets a deck (`CardRules.deck_for`: each spell's slot number, once per copy; copies by rarity), a private dice (`UnitState.card_rng`, seeded from the match seed and the unit id: a hand never depends on the damage rolls) and its first hand. Everything stays in the replicated state, so nothing new travels: a peer replaying the log deals the same cards. Two details matter for the log:
+
+- a **cast** names its spell slot as before, and is valid only while a card of that spell is in the hand (it costs one AP, the card goes to the discard pile, cooldowns are not used);
+- a new action, `discard` (`{t: "discard", a: unit, s: spell slot}`), throws a card away for free (`BattleActions.DiscardCard`, event `CardDiscarded`).
+
+The state hash includes each unit's hand, piles and dice state, and the class signature includes the card constants, so two versions that deal differently are told apart at the start. `UnitState.max_ap()` is `CardRules.PLAYS_PER_TURN` plus the AP modifiers: statuses that give or take AP give or take plays.

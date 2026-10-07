@@ -75,7 +75,7 @@ static func _best_cast(state: BattleState, unit_id: int, reach: Movement.Reach, 
 		for spell_index in unit.data.spells.size():
 			var spell := unit.data.spells[spell_index]
 			# A free spell could be cast forever; skipping it guarantees the turn ends.
-			if spell.ap_cost <= 0 or not BattleActions.CastSpell.can_afford(unit, spell_index):
+			if unit.cast_cost(spell) <= 0 or not BattleActions.CastSpell.can_afford(unit, spell_index):
 				continue
 			for target in Targeting.targetable_cells(moved, unit_id, spell):
 				if not _area_hits_a_unit(moved, spell, cell, target, unit.team):

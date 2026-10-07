@@ -152,3 +152,39 @@ func test_the_players_panel_tags_the_ai_and_the_ones_who_left() -> void:
 		texts.append((row as Label).text)
 	assert_true(texts.any(func(t: String) -> bool: return t.contains("(AI)")), "then the AI plays for them")
 	host.free()
+
+
+func test_in_card_combat_the_hand_is_shown_a_card_is_played_or_thrown_through_the_host_and_both_views_agree() -> void:
+	var rig := NetRig.new()
+	rig.start_match(2, 1, true)
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	await _both_ready(rig, host, guest)
+	assert_true(host.battle.state.cards and guest.battle.state.cards, "the lobby's card setting reached the battle")
+	var mine := host if host.battle.state.current_unit().id == 0 else guest
+	var theirs := guest if mine == host else host
+	var unit := mine.battle.state.current_unit()
+	var bar := mine.hud.get_node("%SpellBar") as SpellBar
+	assert_true(bar.is_card_mode(), "the bar shows cards")
+	assert_eq(bar.slot_count(), CardRules.HAND_SIZE, "a hand of four")
+	for position in unit.hand.size():
+		assert_eq(bar.slot(position).get_node("CardName").text, mine.tr(unit.data.spells[unit.hand[position]].display_name), "card %d is the hand's" % position)
+	# Throw the first card away: it goes through the host, and both views drop it.
+	var thrown := unit.hand[0]
+	mine.discard_card(0)
+	rig.net.flush()
+	await _frames(4)
+	assert_eq(theirs.battle.state.units[unit.id].hand.size(), CardRules.HAND_SIZE - 1, "the other view saw the card go")
+	assert_eq(theirs.battle.state.units[unit.id].discard_pile, [thrown] as Array[int])
+	assert_eq(bar.slot_count(), CardRules.HAND_SIZE - 1, "my hand shows three cards now")
+	# Pick a card: it is aimed with its spell slot, whatever its place in the hand.
+	mine.select_spell(0)
+	assert_eq(mine.selected_spell, unit.hand[0])
+	assert_eq(mine.selected_card, 0)
+	mine.select_spell(0)
+	assert_eq(mine.selected_card, -1, "picking it again lets go")
+	assert_eq(StateHash.of(host.battle.state), StateHash.of(guest.battle.state), "the two views hold the same cards")
+	assert_eq(StateHash.of(host.battle.state), StateHash.of(rig.sessions[1].state.battle.state))
+	host.free()
+	guest.free()

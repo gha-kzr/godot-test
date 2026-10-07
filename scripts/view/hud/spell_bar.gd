@@ -13,15 +13,22 @@ extends VBoxContainer
 ## actions (keys 1-9 by default) are shortcuts that respect the disabled state.
 
 signal spell_pressed(index: int)
+## Card combat: the player threw the card at this position away (its ✕, or a right click on it).
+signal discard_pressed(index: int)
 
 ## Spell slot i is pressed by the InputMap action "spell_<i+1>" (rebindable in the settings).
 const MAX_KEYED_SLOTS := 9
 const SLOT_SIZE := Vector2(64, 64)
+const CARD_SIZE := Vector2(104, 150)
 const HEAL_TINT := Color(0.55, 1.0, 0.6)
 
 var _spells: Array[SpellData] = []
 var _spell_costs: Array[int] = []
 var _hovered: SpellData
+## Card combat: the slots are the cards of a hand (see CardRules).
+var _card_mode := false
+var _deck_total := 0
+var _counts: Label
 var _extra_targets: Callable
 var _cooldowns: Array[int] = []
 var _ap := 0
@@ -40,6 +47,13 @@ func _ready() -> void:
 	_details.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_details.custom_minimum_size = Vector2(380, 0)
 	_details.hide()
+	_counts = Label.new()
+	_counts.name = "CardCounts"
+	_counts.theme_type_variation = &"SmallLabel"
+	_counts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_counts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_counts.visible = false
+	add_child(_counts)
 
 
 ## Where else spells are listed: returns `[[control, spell], ...]` (the rows of the inspect card).
@@ -105,6 +119,26 @@ func _place_details(anchor: Control) -> void:
 ## One slot per spell; spells costing more than `ap`, or with turns of cooldown left
 ## (`cooldowns`, per slot; empty: none), are disabled.
 func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
+	_card_mode = false
+	_counts.hide()
+	_build(spells, ap, cooldowns)
+
+
+## Card combat: one card per spell in the hand, each worth one play (AP). `deck_total` is the size of the whole deck,
+## `draw_count` and `discard_count` the piles.
+func show_cards(hand: Array[SpellData], ap: int, deck_total: int, draw_count: int, discard_count: int) -> void:
+	_card_mode = true
+	_deck_total = deck_total
+	_counts.text = tr("Draw pile %d · Discard pile %d") % [draw_count, discard_count]
+	_counts.show()
+	_build(hand, ap, [])
+
+
+func is_card_mode() -> bool:
+	return _card_mode
+
+
+func _build(spells: Array[SpellData], ap: int, cooldowns: Array[int]) -> void:
 	hide_details()
 	_hovered = null
 	_spells.assign(spells)
@@ -115,7 +149,7 @@ func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) 
 	_spell_costs.clear()
 	_ap = ap
 	for i in spells.size():
-		_spell_costs.append(spells[i].ap_cost)
+		_spell_costs.append(1 if _card_mode else spells[i].ap_cost)
 		_slots.add_child(_make_slot(spells[i], i))
 	set_cooldowns(cooldowns)
 
@@ -161,8 +195,14 @@ func slot(index: int) -> Button:
 
 func show_details(spell: SpellData) -> void:
 	_details_name.text = spell.display_name
-	_details_cost.text = tr("%d AP") % spell.ap_cost
-	_details_body.text = "\n".join(detail_lines(spell))
+	var lines := detail_lines(spell)
+	if _card_mode:
+		_details_cost.text = tr("1 play")
+		lines = lines.filter(func(line: String) -> bool: return not (line == tr("Once per turn") or line.begins_with(tr("Every %d turns").split("%")[0])))
+		lines.append(tr("%s card: %d of %d in the deck") % [CardRules.rarity_name(spell), CardRules.copies(spell), _deck_total])
+	else:
+		_details_cost.text = tr("%d AP") % spell.ap_cost
+	_details_body.text = "\n".join(lines)
 	_details.reset_size()  # Shrinks back to the new text.
 	_details.show()
 
@@ -224,13 +264,13 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	button.theme_type_variation = &"SlotButton"
 	button.toggle_mode = true
 	button.focus_mode = Control.FOCUS_NONE
-	button.custom_minimum_size = SLOT_SIZE
+	button.custom_minimum_size = CARD_SIZE if _card_mode else SLOT_SIZE
 	var icon := TextureRect.new()
 	icon.name = "Icon"
 	icon.texture = spell.display_icon()
 	icon.modulate = spell_tint(spell)
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 10)
-	icon.offset_bottom = -18.0  # Room for the AP cost under the icon.
+	icon.offset_bottom = -58.0 if _card_mode else -18.0  # Room for the AP cost (a card: its name) under the icon.
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -241,6 +281,9 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	cost.text = tr("%d AP") % spell.ap_cost
 	cost.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 	cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _card_mode:
+		_add_card_face(button, spell, index)
+		cost.hide()  # A card costs one play, whatever the spell: the hand says it once.
 	button.add_child(cost)
 	var cooldown := Label.new()
 	cooldown.name = "Cooldown"
@@ -267,6 +310,44 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 	return button
 
 
+## A card's name, its rarity stripe and the ✕ that throws it away (a right click does too).
+func _add_card_face(button: Button, spell: SpellData, index: int) -> void:
+	var title := Label.new()
+	title.name = "CardName"
+	title.theme_type_variation = &"SmallLabel"
+	title.text = tr(spell.display_name)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 6)
+	title.offset_top = -60.0
+	title.offset_bottom = -12.0
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(title)
+	var stripe := ColorRect.new()
+	stripe.name = "Rarity"
+	stripe.color = CardRules.rarity_color(spell)
+	stripe.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 8)
+	stripe.offset_top = -10.0
+	stripe.offset_bottom = -6.0
+	stripe.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(stripe)
+	var discard := Button.new()
+	discard.name = "Discard"
+	discard.text = "X"
+	discard.theme_type_variation = &"CloseButton"
+	discard.focus_mode = Control.FOCUS_NONE
+	discard.tooltip_text = ""
+	discard.custom_minimum_size = Vector2(26, 26)
+	discard.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT, Control.PRESET_MODE_MINSIZE, 2)
+	discard.pressed.connect(discard_pressed.emit.bind(index))
+	button.add_child(discard)
+	button.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT and not _locked:
+			discard_pressed.emit(index)
+			button.accept_event())
+
+
 func _refresh() -> void:
 	for i in _slots.get_child_count():
 		var slot_button := _slots.get_child(i) as Button
@@ -274,6 +355,8 @@ func _refresh() -> void:
 		slot_button.disabled = _locked or _spell_costs[i] > _ap or waiting > 0
 		(slot_button.get_node("Icon") as TextureRect).self_modulate.a = 0.4 if slot_button.disabled else 1.0
 		(slot_button.get_node("Cooldown") as Label).text = str(waiting) if waiting > 0 else ""
+		if _card_mode:
+			(slot_button.get_node("Discard") as Button).disabled = _locked  # Throwing a card away is free: no play needed.
 
 
 static func _action_shortcut(action: StringName) -> Shortcut:

@@ -83,6 +83,7 @@ static func signature() -> int:
 				for effect in spell.effects:
 					line += ",{%s}" % _effect_text(effect)
 			parts.append(line)
+		parts.append("cards|%d|%d|%s" % [CardRules.HAND_SIZE, CardRules.PLAYS_PER_TURN, CardRules.COPIES])
 		_signature = maxi(1, "\n".join(parts).hash())
 	return _signature
 

@@ -53,7 +53,7 @@ func in_step() -> bool:
 
 
 ## Everyone ready and the match started, with `a_count` players on side A and the rest on side B (ids 1..n).
-func start_match(total: int, a_count: int) -> void:
+func start_match(total: int, a_count: int, cards := false) -> void:
 	for id in range(1, total + 1):
 		if id == 1:
 			host(1, "Host")
@@ -63,6 +63,9 @@ func start_match(total: int, a_count: int) -> void:
 		sessions[id].set_field("side", 0 if id <= a_count else 1)
 		sessions[id].set_field("hero", (id - 1) % PvpHeroes.hero_count())
 	net.flush()
+	if cards:
+		sessions[1].configure("cards", true)
+		net.flush()
 	for id in range(1, total + 1):
 		sessions[id].set_ready(true)
 	net.flush()

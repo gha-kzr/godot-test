@@ -41,6 +41,7 @@ var _size: SpinBox
 var _seed: LineEdit
 var _turn: SpinBox
 var _grace: SpinBox
+var _cards: CheckButton
 var _preview: MapPreview
 var _preview_key := ""
 var _invite_for: OptionButton
@@ -252,7 +253,13 @@ func _build_settings(parent: Control) -> void:
 	_grace = _spin(0, 120, "Grace")
 	_grace.value_changed.connect(func(value: float) -> void: session.configure("grace", int(value)))
 	_labelled(tr("Seconds before the AI replaces a player who left"), _grace, box)
-	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace]
+	_cards = CheckButton.new()
+	_cards.name = "Cards"
+	_cards.text = tr("Card combat")
+	_cards.tooltip_text = tr("Instead of action points, each turn draws a hand of four cards from the hero's spells and plays at most two of them. Rare spells come up less often.")
+	_cards.toggled.connect(func(on: bool) -> void: session.configure("cards", on))
+	box.add_child(_cards)
+	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace, _cards]
 
 
 ## Invite players: the room code, and a manual invite for those who can't use it.
@@ -490,6 +497,7 @@ func _refresh_settings(editable: bool) -> void:
 		_seed.text = str(settings["seed"])
 	_turn.set_value_no_signal(settings["turn"])
 	_grace.set_value_no_signal(settings["grace"])
+	_cards.set_pressed_no_signal(bool(settings.get("cards", false)))
 	for field in _settings_fields:
 		if field is OptionButton:
 			(field as OptionButton).disabled = not editable

@@ -39,7 +39,7 @@ func show_unit(info: UnitInfo) -> void:
 	_hp_bar.max_value = info.max_hp
 	_hp_bar.value = info.hp
 	_hp_label.text = tr("%d / %d HP") % [info.hp, info.max_hp]
-	_ap_label.text = tr("AP %d / %d") % [info.ap, info.max_ap]
+	_ap_label.text = (tr("Plays %d / %d") if info.card_mode else tr("AP %d / %d")) % [info.ap, info.max_ap]
 	_mp_label.text = tr("MP %d / %d") % [info.mp, info.max_mp]
 	_ap_label.modulate = _modifier_tint(info.max_ap, info.base_ap)
 	_mp_label.modulate = _modifier_tint(info.max_mp, info.base_mp)

@@ -93,6 +93,10 @@ msgstr ""
 msgid "%s area %d"
 msgstr ""
 
+#: scripts/view/hud/spell_bar.gd
+msgid "%s card: %d of %d in the deck"
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "%s cleared"
 msgstr ""
@@ -271,6 +275,10 @@ msgstr ""
 
 #: scenes/battle/hud/spell_bar.tscn
 msgid "0 AP"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "1 play"
 msgstr ""
 
 #: scripts/progression/hints.gd
@@ -501,6 +509,10 @@ msgstr ""
 msgid "Canyon"
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Card combat"
+msgstr ""
+
 #: scripts/game/hub/hero_panel.gd scenes/game/hub/hero_panel.tscn
 msgid "Change spells"
 msgstr ""
@@ -595,7 +607,7 @@ msgstr ""
 msgid "Club"
 msgstr ""
 
-#: scripts/data/rune_data.gd
+#: scripts/battle/card_rules.gd scripts/data/rune_data.gd
 msgid "Common"
 msgstr ""
 
@@ -701,6 +713,10 @@ msgstr ""
 
 #: data/pvp/statuses/drained.tres
 msgid "Drained"
+msgstr ""
+
+#: scripts/view/hud/spell_bar.gd
+msgid "Draw pile %d · Discard pile %d"
 msgstr ""
 
 #: data/pvp/statuses/dread.tres data/statuses/dread.tres
@@ -1133,6 +1149,10 @@ msgstr ""
 
 #: scripts/game/settings_screen.gd
 msgid "Instant (skip animations)"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Instead of action points, each turn draws a hand of four cards from the hero's spells and plays at most two of them. Rare spells come up less often."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
@@ -1601,6 +1621,10 @@ msgstr ""
 msgid "Playground"
 msgstr ""
 
+#: scripts/view/hud/unit_card.gd
+msgid "Plays %d / %d"
+msgstr ""
+
 #: data/damage_types/poison.tres data/statuses/poison.tres
 msgid "Poison"
 msgstr ""
@@ -1741,7 +1765,7 @@ msgstr ""
 msgid "Ranger"
 msgstr ""
 
-#: scripts/data/rune_data.gd
+#: scripts/battle/card_rules.gd scripts/data/rune_data.gd
 msgid "Rare"
 msgstr ""
 
@@ -2459,6 +2483,10 @@ msgstr ""
 
 #: scenes/game/settings_screen.tscn
 msgid "UI scale"
+msgstr ""
+
+#: scripts/battle/card_rules.gd
+msgid "Uncommon"
 msgstr ""
 
 #: scenes/battle/hud/unit_card.tscn

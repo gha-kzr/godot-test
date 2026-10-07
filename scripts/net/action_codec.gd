@@ -2,7 +2,7 @@ class_name ActionCodec
 extends RefCounted
 ## Battle actions as plain dictionaries (JSON-safe), so they can travel between peers. Decoding is
 ## strict: whatever a peer sends is untrusted, a malformed action is null, never a crash.
-## Kinds: move (a, x, y), cast (a, s, x, y), place (a, x, y), end (a).
+## Kinds: move (a, x, y), cast (a, s, x, y), discard (a, s), place (a, x, y), end (a).
 
 
 static func encode(action: BattleActions.Action) -> Dictionary:
@@ -12,6 +12,9 @@ static func encode(action: BattleActions.Action) -> Dictionary:
 	if action is BattleActions.CastSpell:
 		var cast := action as BattleActions.CastSpell
 		return {"t": "cast", "a": cast.actor_id, "s": cast.spell_index, "x": cast.target.x, "y": cast.target.y}
+	if action is BattleActions.DiscardCard:
+		var discard := action as BattleActions.DiscardCard
+		return {"t": "discard", "a": discard.actor_id, "s": discard.spell_index}
 	if action is BattleActions.Place:
 		var place := action as BattleActions.Place
 		return {"t": "place", "a": place.actor_id, "x": place.cell.x, "y": place.cell.y}
@@ -37,6 +40,9 @@ static func decode(data: Variant) -> BattleActions.Action:
 			var slot: Variant = _int(fields.get("s"))
 			var target: Variant = _cell(fields)
 			return BattleActions.CastSpell.new(actor, slot, target) if slot != null and target != null else null
+		"discard":
+			var thrown: Variant = _int(fields.get("s"))
+			return BattleActions.DiscardCard.new(actor, thrown) if thrown != null else null
 		"place":
 			var cell: Variant = _cell(fields)
 			return BattleActions.Place.new(actor, cell) if cell != null else null
