@@ -367,7 +367,7 @@ func test_hovering_a_spell_shows_its_details_in_a_panel_above_the_bar() -> void:
 	hud.show_spells([fireball, BattleFixtures.damage_spell(3)] as Array[SpellData], 10)
 	var details := bar.get_node("%Details") as Control
 	assert_false(details.visible, "hidden until hovered")
-	bar.slot(0).mouse_entered.emit()
+	bar.hover_at(bar.slot(0).get_global_rect().get_center())
 	await (Engine.get_main_loop() as SceneTree).process_frame
 	assert_true(details.visible)
 	assert_eq((bar.get_node("%DetailsName") as Label).text, fireball.display_name)
@@ -375,8 +375,37 @@ func test_hovering_a_spell_shows_its_details_in_a_panel_above_the_bar() -> void:
 	var body := (bar.get_node("%DetailsBody") as Label).text
 	assert_true(body.contains("Range 3-5, line of sight") and body.contains("Circle area 1") and body.contains("fire damage"), body)
 	assert_true(details.get_global_rect().end.y <= bar.slot(0).get_global_rect().position.y + 1.0, "above the slots")
-	bar.slot(0).mouse_exited.emit()
-	assert_false(details.visible)
+	bar.hover_at(Vector2(-500, -500))
+	assert_false(details.visible, "hidden again when the mouse leaves")
+	bar.hover_at(bar.slot(0).get_global_rect().get_center())
+	hud.show_spells([fireball] as Array[SpellData], 10)  # Rebuilt under a mouse that does not move: no event, still found.
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	bar.hover_at(bar.slot(0).get_global_rect().get_center())
+	assert_true(details.visible, "details follow a rebuilt slot")
+	hud.free()
+
+
+func test_hovering_a_spell_on_the_inspect_card_shows_its_details() -> void:
+	var hud := _hud()
+	var bar := hud.get_node("%SpellBar") as SpellBar
+	var info := _info("Enemy", false)
+	var fireball := load("res://data/spells/fireball.tres") as SpellData
+	info.spells = [fireball] as Array[SpellData]
+	hud.show_spells(_spells(), 10)
+	hud.show_inspected(info, true)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	var card := hud.get_node("%InspectCard") as UnitCard
+	card.show_spells = true
+	card.show_unit(info)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	var rows := card.spell_rows()
+	assert_eq(rows.size(), 1, "the card lists its spell")
+	var row := rows[0][0] as Control
+	bar.hover_at(row.get_global_rect().get_center())
+	assert_true(bar.is_details_visible(), "the row's spell is described")
+	assert_eq((bar.get_node("%DetailsName") as Label).text, fireball.display_name)
+	bar.hover_at(Vector2(-500, -500))
+	assert_false(bar.is_details_visible())
 	hud.free()
 
 

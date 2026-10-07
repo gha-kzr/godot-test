@@ -1,8 +1,13 @@
 class_name SpellBar
 extends VBoxContainer
 ## The active unit's spells as square icon slots (AP cost, key number), and a details panel
-## at a fixed place above them that shows the spell under the mouse (name, AP, range, area,
-## effects). Slots are toggle buttons; selecting is reported as a signal up.
+## that shows the spell under the mouse (name, AP, range, area, effects) just above it. Slots are toggle
+## buttons; selecting is reported as a signal up.
+##
+## The hover is looked up from the mouse position every frame (hover_at), never from mouse_entered /
+## mouse_exited: the slots are rebuilt after every action, Godot's tooltip popups steal the mouse, and a
+## disabled button reports nothing useful. Other places that list spells (the inspect card) hand their rows
+## over with set_extra_targets().
 ##
 ## Buttons never take keyboard focus, so Space can't press a focused button; the spell
 ## actions (keys 1-9 by default) are shortcuts that respect the disabled state.
@@ -16,8 +21,8 @@ const HEAL_TINT := Color(0.55, 1.0, 0.6)
 
 var _spells: Array[SpellData] = []
 var _spell_costs: Array[int] = []
-## The slot whose details are shown because the mouse is over it (-1: none); see _process().
-var _hovered_slot := -1
+var _hovered: SpellData
+var _extra_targets: Callable
 var _cooldowns: Array[int] = []
 var _ap := 0
 var _locked := false
@@ -30,29 +35,36 @@ var _locked := false
 
 
 func _ready() -> void:
+	# Floating: placed above whatever is hovered (hover_at), not by the bar's layout.
+	_details.top_level = true
+	_details.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_details.custom_minimum_size = Vector2(380, 0)
 	_details.hide()
 
 
-## The slots are rebuilt after every action, and a slot created under a mouse that does not move never gets
-## mouse_entered: its details would stay hidden until the mouse left and came back. So the slot under the mouse is also
-## looked up every frame (a disabled slot too: a spell that costs too much is the one a player reads).
+## Where else spells are listed: returns `[[control, spell], ...]` (the rows of the inspect card).
+func set_extra_targets(source: Callable) -> void:
+	_extra_targets = source
+
+
 func _process(_delta: float) -> void:
-	if not is_visible_in_tree():
+	if is_visible_in_tree():
+		hover_at(get_global_mouse_position())
+
+
+## Shows the details of the spell under `point` (global coordinates), above it; hides them when there is none.
+func hover_at(point: Vector2) -> void:
+	var target := _target_at(point)
+	if target.is_empty():
+		_hovered = null
+		if _details.visible:
+			hide_details()
 		return
-	var index := slot_at(get_global_mouse_position())
-	var over := get_viewport().gui_get_hovered_control()
-	if over != null and over != _slots and not _slots.is_ancestor_of(over):
-		index = -1  # Something else is in front (a menu, a popup).
-	if index == _hovered_slot:
-		if index >= 0 and not _details.visible:
-			show_details(_spells[index])  # Hidden by something else (a mouse_exited from a popup).
-		return
-	if index >= 0:
-		_hovered_slot = index
-		show_details(_spells[index])
-	else:
-		_hovered_slot = -1
-		hide_details()
+	var spell := target[1] as SpellData
+	if spell != _hovered or not _details.visible:
+		_hovered = spell
+		show_details(spell)
+	_place_details(target[0] as Control)
 
 
 ## The slot under `point` (global coordinates), -1 for none.
@@ -63,11 +75,38 @@ func slot_at(point: Vector2) -> int:
 	return -1
 
 
+## `[control, spell]` for the first listed spell under `point`, or `[]`.
+func _target_at(point: Vector2) -> Array:
+	var index := slot_at(point)
+	if index >= 0:
+		return [_slots.get_child(index), _spells[index]]
+	if _extra_targets.is_valid():
+		for pair: Array in _extra_targets.call():
+			var control := pair[0] as Control
+			if control.is_visible_in_tree() and control.get_global_rect().has_point(point):
+				return pair
+	return []
+
+
+## The panel floats above `anchor` (below it when there is no room), inside the screen.
+func _place_details(anchor: Control) -> void:
+	var rect := anchor.get_global_rect()
+	var size := _details.size
+	var view := get_viewport_rect().size
+	var x := rect.get_center().x - size.x * 0.5
+	if view.x > size.x + 8.0:
+		x = clampf(x, 4.0, view.x - size.x - 4.0)
+	var y := rect.position.y - size.y - 8.0
+	if y < 4.0 and rect.end.y + 8.0 + size.y < view.y:
+		y = rect.end.y + 8.0
+	_details.global_position = Vector2(x, y)
+
+
 ## One slot per spell; spells costing more than `ap`, or with turns of cooldown left
 ## (`cooldowns`, per slot; empty: none), are disabled.
 func show_spells(spells: Array[SpellData], ap: int, cooldowns: Array[int] = []) -> void:
 	hide_details()
-	_hovered_slot = -1
+	_hovered = null
 	_spells.assign(spells)
 	# Removed at once, freed at the end of the frame: a slot may be rebuilt from inside its own `pressed`.
 	for child in _slots.get_children():
@@ -124,6 +163,7 @@ func show_details(spell: SpellData) -> void:
 	_details_name.text = spell.display_name
 	_details_cost.text = tr("%d AP") % spell.ap_cost
 	_details_body.text = "\n".join(detail_lines(spell))
+	_details.reset_size()  # Shrinks back to the new text.
 	_details.show()
 
 
@@ -224,8 +264,6 @@ func _make_slot(spell: SpellData, index: int) -> Button:
 		# mouse_exited and the details panel (the real description) disappears.
 		button.shortcut_in_tooltip = false
 	button.pressed.connect(spell_pressed.emit.bind(index))
-	button.mouse_entered.connect(show_details.bind(spell))
-	button.mouse_exited.connect(hide_details)
 	return button
 
 

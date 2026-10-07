@@ -2,11 +2,9 @@ class_name UnitCard
 extends PanelContainer
 ## A unit's card: name and level, HP, AP / MP, power and resistances, statuses and (when
 ## `show_spells`) its spells. Used for the active unit and, pinnable, for the inspected one.
-## Takes a UnitInfo; reports the ✕ and spell hovers as signals.
+## Takes a UnitInfo; reports the ✕ as a signal and hands its spell rows to the spell bar (spell_rows).
 
 signal closed
-signal spell_hovered(spell: SpellData)
-signal spell_unhovered
 
 const BUFFED_COLOR := Color(0.5, 1.0, 0.5)
 const DEBUFFED_COLOR := Color(1.0, 0.5, 0.45)
@@ -97,6 +95,15 @@ func _fill_statuses(statuses: Array[StatusInfo]) -> void:
 		_status_list.add_child(row)
 
 
+## The listed spells' rows, `[[row, spell], ...]`: the spell bar shows the details of the one under the mouse.
+func spell_rows() -> Array:
+	var rows := []
+	for row in _spell_list.get_children():
+		if row.has_meta(&"spell") and not row.is_queued_for_deletion():
+			rows.append([row, row.get_meta(&"spell")])
+	return rows
+
+
 func _fill_spells(spells: Array[SpellData]) -> void:
 	_clear_children(_spell_list)
 	for spell in spells:
@@ -115,8 +122,7 @@ func _fill_spells(spells: Array[SpellData]) -> void:
 		label.text = tr("%s (%d AP)") % [tr(spell.display_name), spell.ap_cost]
 		label.mouse_filter = Control.MOUSE_FILTER_PASS
 		row.add_child(label)
-		row.mouse_entered.connect(spell_hovered.emit.bind(spell))
-		row.mouse_exited.connect(spell_unhovered.emit)
+		row.set_meta(&"spell", spell)
 		_spell_list.add_child(row)
 
 

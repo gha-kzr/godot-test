@@ -100,8 +100,7 @@ func _ready() -> void:
 	_leave_panel.hide()
 	(_hint_card.get_node("%DismissButton") as Button).focus_mode = Control.FOCUS_NONE  # Space ends the turn here.
 	# Spells listed on the inspect card show their details above the spell bar.
-	_inspect_card.spell_hovered.connect(_spell_bar.show_details)
-	_inspect_card.spell_unhovered.connect(_spell_bar.hide_details)
+	_spell_bar.set_extra_targets(_inspect_card.spell_rows)
 	var end_turn_shortcut := Shortcut.new()
 	var end_turn_event := InputEventAction.new()
 	end_turn_event.action = &"end_turn"
