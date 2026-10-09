@@ -20,13 +20,12 @@ func _game() -> Game:
 
 func _open() -> Game:
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
 	game.rng_seed = 5
 	game.require_click_to_start = false  # Straight to the title.
 	_tree().root.add_child(game)
-	_press(game.screen, "PlayButton")  # Title → hub.
+	_press(game.screen, "SoloButton")  # Title → hub.
 	return game
 
 
@@ -269,7 +268,6 @@ func test_the_game_opens_on_the_title_and_play_opens_the_hub() -> void:
 	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
 	SaveStore.new(SAVE).delete()
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	game.require_click_to_start = false  # Straight to the title.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
@@ -277,7 +275,7 @@ func test_the_game_opens_on_the_title_and_play_opens_the_hub() -> void:
 	assert_true(game.screen is TitleScreen, "the title first")
 	assert_eq((game.screen.get_node("%TitleLabel") as Label).text, Game.TITLE)
 	assert_true((game.screen.get_node("%QuitButton") as Button).visible or OS.has_feature("web"))
-	_press(game.screen, "PlayButton")
+	_press(game.screen, "SoloButton")
 	assert_true(game.screen is PartyScreen, "Play opens the hub")
 	game.free()
 
@@ -341,7 +339,7 @@ func test_the_selected_hero_is_kept_across_screens() -> void:
 	var game := _game()
 	(game.screen.find_child("Hero1", true, false) as Button).pressed.emit()
 	(game.screen as Screen).back_pressed.emit()  # Title.
-	_press(game.screen, "PlayButton")
+	_press(game.screen, "SoloButton")
 	assert_eq((game.screen as PartyScreen).selected_hero, 1)
 	game.free()
 
@@ -577,7 +575,6 @@ func test_a_web_build_asks_for_a_click_before_the_title_and_the_music_waits_for_
 	SaveStore.new(SAVE).delete()
 	SettingsStore.new(SETTINGS).delete()
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
 	_tree().root.add_child(game)
@@ -591,7 +588,6 @@ func test_a_web_build_asks_for_a_click_before_the_title_and_the_music_waits_for_
 
 func test_the_start_screen_is_on_by_default_everywhere() -> void:
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	assert_true(game.require_click_to_start, "web and desktop open the same way")
 	game.free()
 

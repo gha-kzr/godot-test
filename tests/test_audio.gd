@@ -194,7 +194,6 @@ func test_the_event_player_announces_what_to_hear() -> void:
 func _game() -> Game:
 	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	game.require_click_to_start = false  # Straight to the title.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
@@ -206,7 +205,7 @@ func _game() -> Game:
 func test_the_game_plays_the_hub_music_on_menus_and_the_battle_music_in_a_fight() -> void:
 	var game := _game()
 	assert_eq(game.audio.current_music, &"hub", "the title")
-	(game.screen.find_child("PlayButton", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SoloButton", true, false) as Button).pressed.emit()
 	assert_eq(game.audio.current_music, &"hub", "the hub")
 	game.start_tower(1)
 	assert_eq(game.audio.current_music, &"battle", "a fight")
@@ -324,7 +323,7 @@ func test_the_mute_button_is_on_every_screen_and_stays_in_step_with_the_settings
 	assert_true(AudioServer.is_bus_mute(AudioServer.get_bus_index(AudioService.MASTER_BUS)), "master is muted")
 	assert_eq(button.icon, MuteButton.SOUND_OFF, "the crossed speaker")
 	assert_true(SettingsStore.new(SETTINGS).load_or_default().muted, "and it is saved")
-	(game.screen.find_child("PlayButton", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SoloButton", true, false) as Button).pressed.emit()
 	assert_true(button.is_visible_in_tree() and button.button_pressed, "still there on the hub, still muted")
 	game.start_tower(1)
 	assert_true(button.is_visible_in_tree(), "and in a fight")

@@ -89,7 +89,6 @@ func test_what_a_battle_was_unlocks_elite_boss_and_flawless() -> void:
 func _game() -> Game:
 	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
 	var game := GAME_SCENE.instantiate() as Game
-	game.play_opens_multiplayer = false  # These tests use the single-player hub.
 	game.require_click_to_start = false  # Straight to the title.
 	game.save_path = SAVE
 	game.settings_path = SETTINGS
@@ -126,7 +125,7 @@ func test_a_won_battle_unlocks_toasts_and_saves() -> void:
 
 func test_the_hub_opens_the_achievements_screen_and_back_returns() -> void:
 	var game := _game()
-	(game.screen.find_child("PlayButton", true, false) as Button).pressed.emit()
+	(game.screen.find_child("SoloButton", true, false) as Button).pressed.emit()
 	game.profile.achievements = ["floor_10"] as Array[String]
 	(game.screen.find_child("AchievementsButton", true, false) as Button).pressed.emit()
 	assert_true(game.screen is AchievementsScreen)

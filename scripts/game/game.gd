@@ -62,8 +62,6 @@ var _battle_title := ""
 var _battle_music: StringName = &"battle"
 ## The hero whose tab the player picked last (kept when the hub is rebuilt).
 var _selected_hero := 0
-## The title's Play opens multiplayer; false opens the single-player hub that this fork keeps (tests use it).
-var play_opens_multiplayer := true
 ## The QA screen's choices, kept between its visits.
 var _qa_state := QaScreen.State.new()
 
@@ -132,14 +130,15 @@ func show_multiplayer() -> void:
 		WebPage.clear_fragment()
 
 
-## The first screen. Play opens the hub, where a saved run waits as Continue / Abandon.
+## The first screen. Solo opens the hub, where a saved run waits as Continue / Abandon; Multiplayer the PvP front page.
 func show_title() -> void:
 	var title := TITLE_SCENE.instantiate() as TitleScreen
 	_replace_screen(title)
 	title.show_title(TITLE)
 	title.apply_branding(Branding.logo(), Branding.title_image())
 	title.show_best_floor(profile.best_depth)
-	title.play_pressed.connect(show_multiplayer if play_opens_multiplayer else show_party)
+	title.solo_pressed.connect(show_party)
+	title.multiplayer_pressed.connect(show_multiplayer)
 	title.settings_pressed.connect(show_settings)
 	title.quit_pressed.connect(get_tree().quit)
 	title.show_qa(settings.qa_tools)

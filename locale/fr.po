@@ -1170,9 +1170,6 @@ msgstr "Peste"
 msgid "Plague Bolt"
 msgstr "Trait de peste"
 
-msgid "Play"
-msgstr "Jouer"
-
 msgid "Play again"
 msgstr "Rejouer"
 
@@ -1527,6 +1524,9 @@ msgstr "Écrasement"
 
 msgid "Smite"
 msgstr "Châtiment"
+
+msgid "Solo"
+msgstr "Solo"
 
 msgid "Sorceress"
 msgstr "Sorcière"

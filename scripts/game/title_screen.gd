@@ -1,12 +1,13 @@
 class_name TitleScreen
 extends Screen
-## The game's first screen: its name, Play (the hub), Settings and Quit (not on web, where
+## The game's first screen: its name, Solo (the hub), Multiplayer, Settings and Quit (not on web, where
 ## the page is the game). Choices go up as signals; the Game root switches screens.
 
 ## Where the menu starts (share of the height) when a title picture fills the screen: under its name.
 const PICTURE_MENU_TOP := 0.68
 
-signal play_pressed
+signal solo_pressed
+signal multiplayer_pressed
 signal settings_pressed
 signal quit_pressed
 ## The QA screen (shown with the QA tools setting).
@@ -18,7 +19,8 @@ signal qa_pressed
 @onready var _center: CenterContainer = %Center
 @onready var _spacer: Control = %Spacer
 @onready var _picture: TextureRect = %Picture
-@onready var _play: Button = %PlayButton
+@onready var _solo: Button = %SoloButton
+@onready var _multiplayer: Button = %MultiplayerButton
 @onready var _settings: Button = %SettingsButton
 @onready var _quit: Button = %QuitButton
 @onready var _qa: Button = %QaButton
@@ -26,7 +28,8 @@ signal qa_pressed
 
 func _ready() -> void:
 	back_enabled = false  # The root screen: nowhere to go back to.
-	_play.pressed.connect(play_pressed.emit)
+	_solo.pressed.connect(solo_pressed.emit)
+	_multiplayer.pressed.connect(multiplayer_pressed.emit)
 	_settings.pressed.connect(settings_pressed.emit)
 	_quit.pressed.connect(quit_pressed.emit)
 	_qa.pressed.connect(qa_pressed.emit)

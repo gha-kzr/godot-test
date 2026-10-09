@@ -1329,7 +1329,7 @@ msgstr ""
 msgid "MP: movement points. Walking costs 1 per cell (and 1 more per step up); they refill every turn."
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
+#: scripts/game/net/net_menu_screen.gd scenes/game/title_screen.tscn
 msgid "Multiplayer"
 msgstr ""
 
@@ -1547,10 +1547,6 @@ msgstr ""
 
 #: data/pvp/spells/necro_plague_bolt.tres
 msgid "Plague Bolt"
-msgstr ""
-
-#: scenes/game/title_screen.tscn
-msgid "Play"
 msgstr ""
 
 #: scripts/view/battle_controller.gd scenes/battle/hud.tscn
@@ -2023,6 +2019,10 @@ msgstr ""
 
 #: data/pvp/spells/priest_smite.tres data/spells/smite.tres
 msgid "Smite"
+msgstr ""
+
+#: scenes/game/title_screen.tscn
+msgid "Solo"
 msgstr ""
 
 #: data/pvp/units/sorceress.tres
