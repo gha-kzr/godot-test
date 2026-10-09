@@ -91,3 +91,12 @@ The final pass when content stops moving: a balance pass with the balance lab, a
 | [Better animations](backlog.md#better-animations) (or any milestone) | Animation | clip sets, model workshop |
 | [Sound and animation leftovers](backlog.md#sound-and-animation-leftovers) (or any milestone: it is small) | Audio / animation | audio set, unit model |
 
+### 15. One game: solo and multiplayer together
+
+The fork's multiplayer now lives in the same game (the title has **Solo** and **Multiplayer**), but the two keep their own classes: the solo heroes (Knight, Mage, Ranger, with levels, runes and a loadout) and the nine fixed-stat PvP classes. This milestone merges them and keeps solo and multiplayer code paths separate. Needs a full grill and a re-balance of both modes.
+
+| Feature | Category | Pairs with |
+|---|---|---|
+| [Merge the solo and PvP classes](backlog.md#merge-the-solo-and-pvp-classes) | Content / balance | heroes, runes, balance lab, `PvpHeroes` |
+| [Hide the enemy's spell bar in solo](backlog.md#hide-the-enemys-spell-bar-in-solo) | UX / battle readability | spell bar, multiplayer controller |
+| [Co-op PvE (idea)](backlog.md#co-op-pve-idea) | Multiplayer | match session, AI takeover, run state |
