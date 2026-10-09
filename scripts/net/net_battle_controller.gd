@@ -301,18 +301,11 @@ func _begin_next() -> void:
 
 
 func _finish() -> void:
-	_set_state(State.ENDED)
 	var mine := session.state.seats.get(session.my_id) as MatchState.Seat
 	var my_team := UnitState.Team.PLAYER if mine == null or mine.side == 0 else UnitState.Team.ENEMY
 	var outcome := battle.state.outcome()
-	var winners := UnitState.Team.PLAYER if outcome == BattleState.Outcome.PLAYER_WON else UnitState.Team.ENEMY
-	var won := (outcome == BattleState.Outcome.PLAYER_WON and my_team == UnitState.Team.PLAYER) \
-			or (outcome == BattleState.Outcome.ENEMY_WON and my_team == UnitState.Team.ENEMY)
-	sound.emit(&"victory" if won else &"defeat")
-	if outcome != BattleState.Outcome.DRAW:
-		_cheer(winners, battle.state)
-	hud.show_result(won, battle_seed)
-	battle_ended.emit(battle.state)
+	_finish_battle((outcome == BattleState.Outcome.PLAYER_WON and my_team == UnitState.Team.PLAYER) \
+			or (outcome == BattleState.Outcome.ENEMY_WON and my_team == UnitState.Team.ENEMY))
 
 
 func _set_state(new_state: State) -> void:
@@ -349,34 +342,20 @@ func _perform(action: BattleActions.Action) -> void:
 		_set_state(State.ANIMATING)
 
 
-func end_turn() -> void:
-	if input_state == State.PLACING:
-		if _placed_pressed:
-			return
-		_placed_pressed = true
-		session.set_placed(true)
-		_set_state(State.PLACING)
-	elif input_state == State.IDLE or input_state == State.TARGETING:
-		_perform(BattleActions.EndTurn.new(battle.state.current_unit().id))
-
-
-func click_cell(cell: Vector2i) -> void:
-	if battle == null:
+## Ready: tell the host my hero is placed, then wait for the others.
+func _press_ready() -> void:
+	if _placed_pressed:
 		return
-	var clicked := battle.state.unit_at(cell)
-	var acted := false
-	match input_state:
-		State.PLACING:
-			if not _placed_pressed and cell in _zone_of(_my_unit()):
-				acted = true
-				_perform(BattleActions.Place.new(_my_unit(), cell))
-		State.IDLE:
-			if _reach != null and _reach.can_reach(cell):
-				acted = true
-				_perform(BattleActions.Move.new(battle.state.current_unit().id, cell))
-		State.TARGETING:
-			if _targetable.has(cell):
-				acted = true
-				_perform(BattleActions.CastSpell.new(battle.state.current_unit().id, selected_spell, cell))
-	if clicked != null and not acted and clicked.id != _active_card_unit_id():
-		pin(clicked.id)
+	_placed_pressed = true
+	session.set_placed(true)
+	_set_state(State.PLACING)
+
+
+## Placement is my own hero only: a click in my side's zone puts it there.
+func _click_placing(cell: Vector2i) -> void:
+	if not _placed_pressed and cell in _zone_of(_my_unit()):
+		_perform(BattleActions.Place.new(_my_unit(), cell))
+
+
+func _placing_click_action(cell: Vector2i, _clicked: UnitState) -> int:
+	return Tutorial.Action.PLACE if not _placed_pressed and cell in _zone_of(_my_unit()) else -1

@@ -393,21 +393,28 @@ func unpin() -> void:
 ## Ends the turn, or ends placement and starts the fight.
 func end_turn() -> void:
 	if input_state == State.PLACING:
-		if not Tutorial.allows(_step, Tutorial.Action.READY):
-			return
-		_placing_hero = -1
-		_tutorial_done(Tutorial.Action.READY)
-		_play(battle.start())
+		_press_ready()
 	elif input_state == State.IDLE or input_state == State.TARGETING:
 		if not Tutorial.allows(_step, Tutorial.Action.END_TURN):
 			return
 		_perform(BattleActions.EndTurn.new(battle.state.current_unit().id))
 
 
+## Ready (during placement): the fight starts. The multiplayer controller tells the host instead.
+func _press_ready() -> void:
+	if not Tutorial.allows(_step, Tutorial.Action.READY):
+		return
+	_placing_hero = -1
+	_tutorial_done(Tutorial.Action.READY)
+	_play(battle.start())
+
+
 ## A click on a board cell (or on a unit standing there).
 func click_cell(cell: Vector2i) -> void:
-	var unit_id := battle.state.current_unit().id if battle != null else -1
-	var clicked := battle.state.unit_at(cell) if battle != null else null
+	if battle == null:
+		return
+	var unit_id := battle.state.current_unit().id
+	var clicked := battle.state.unit_at(cell)
 	# A click that casts, moves or places is that action only; one that does nothing else pins the
 	# unit under it (to look at it).
 	var action := _click_action(cell, clicked)
@@ -417,19 +424,7 @@ func click_cell(cell: Vector2i) -> void:
 		return  # The tutorial lets only the step's own action through.
 	match input_state:
 		State.PLACING:
-			# Select a hero, then a zone cell (a hero there swaps); the selected hero again deselects.
-			var unit := battle.state.unit_at(cell)
-			if _placing_hero == -1:
-				if unit != null and unit.team == UnitState.Team.PLAYER:
-					_placing_hero = unit.id
-					_refresh_hud()
-					_set_state(State.PLACING)
-			elif unit != null and unit.id == _placing_hero:
-				cancel()
-			elif cell in battle.state.zone:
-				var hero := _placing_hero
-				_placing_hero = -1
-				_perform(BattleActions.Place.new(hero, cell))
+			_click_placing(cell)
 		State.IDLE:
 			if _reach != null and _reach.can_reach(cell):
 				_perform(BattleActions.Move.new(unit_id, cell))
@@ -438,14 +433,36 @@ func click_cell(cell: Vector2i) -> void:
 				_perform(BattleActions.CastSpell.new(unit_id, selected_spell, cell))
 
 
+## A click during placement: select a hero, then a zone cell (a hero there swaps); the selected hero again
+## deselects. The multiplayer controller places the player's only hero straight away.
+func _click_placing(cell: Vector2i) -> void:
+	var unit := battle.state.unit_at(cell)
+	if _placing_hero == -1:
+		if unit != null and unit.team == UnitState.Team.PLAYER:
+			_placing_hero = unit.id
+			_refresh_hud()
+			_set_state(State.PLACING)
+	elif unit != null and unit.id == _placing_hero:
+		cancel()
+	elif cell in battle.state.zone:
+		var hero := _placing_hero
+		_placing_hero = -1
+		_perform(BattleActions.Place.new(hero, cell))
+
+
+## What a click during placement does, as a Tutorial.Action (-1: nothing).
+func _placing_click_action(cell: Vector2i, clicked: UnitState) -> int:
+	if _placing_hero == -1:
+		return Tutorial.Action.PLACE if clicked != null and clicked.team == UnitState.Team.PLAYER else -1
+	return Tutorial.Action.PLACE if cell in battle.state.zone or (clicked != null and clicked.id == _placing_hero) else -1
+
+
 ## What a click on `cell` (with `clicked` on it) does in the current state, as a Tutorial.Action:
 ## picks or places a hero, moves, or casts; -1 when it does nothing.
 func _click_action(cell: Vector2i, clicked: UnitState) -> int:
 	match input_state:
 		State.PLACING:
-			if _placing_hero == -1:
-				return Tutorial.Action.PLACE if clicked != null and clicked.team == UnitState.Team.PLAYER else -1
-			return Tutorial.Action.PLACE if cell in battle.state.zone or (clicked != null and clicked.id == _placing_hero) else -1
+			return _placing_click_action(cell, clicked)
 		State.IDLE:
 			return Tutorial.Action.MOVE if _reach != null and _reach.can_reach(cell) else -1
 		State.TARGETING:
@@ -617,19 +634,25 @@ func _begin_next() -> void:
 		return
 	units_view.set_active(battle_state.current_unit().id if not battle_state.is_over() else -1)
 	if battle_state.is_over():
-		_set_state(State.ENDED)
 		# A mutual wipe (DRAW) is shown as a defeat (decision record).
-		var won := battle_state.outcome() == BattleState.Outcome.PLAYER_WON
-		sound.emit(&"victory" if won else &"defeat")
-		_cheer(UnitState.Team.PLAYER if won else UnitState.Team.ENEMY, battle_state)
-		hud.show_result(won, battle_seed)
-		battle_ended.emit(battle_state)
+		_finish_battle(battle_state.outcome() == BattleState.Outcome.PLAYER_WON)
 		return
 	if battle_state.current_unit().team == UnitState.Team.PLAYER and not auto_play:
 		_enter_idle()
 	else:
 		_set_state(State.ENEMY_TURN)
 		_run_enemy_action()
+
+
+## The battle is over: the result screen, the fanfare and the winners' cheer. `won` is for the local player (the
+## multiplayer controller works it out from their side).
+func _finish_battle(won: bool) -> void:
+	var state := battle.state
+	_set_state(State.ENDED)
+	sound.emit(&"victory" if won else &"defeat")
+	_cheer(UnitState.Team.PLAYER if state.outcome() == BattleState.Outcome.PLAYER_WON else UnitState.Team.ENEMY, state)
+	hud.show_result(won, battle_seed)
+	battle_ended.emit(state)
 
 
 func _run_enemy_action() -> void:
