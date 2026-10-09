@@ -62,6 +62,9 @@ var ai_delay := DEFAULT_AI_DELAY
 var _now := 0.0
 var _ping_timer := 0.0
 var _counter := 0
+## Makes this session's request ids its own: a player who comes back (a new session, the counter at zero again) must not
+## reuse the ids of its earlier requests, which the host would take for resends and drop.
+var _salt := "%x" % (randi() % 0xFFFFF)
 var _pending: Array[Dictionary] = []
 var _seen: Dictionary[String, bool] = {}
 var _last_heard: Dictionary[int, float] = {}
@@ -158,7 +161,7 @@ func propose(entry: Dictionary) -> void:
 		rejected.emit(TranslationServer.translate("not connected"))
 		return
 	_counter += 1
-	entry["c"] = "%d-%d" % [my_id, _counter]
+	entry["c"] = "%d-%s-%d" % [my_id, _salt, _counter]
 	if is_host():
 		_host_submit(my_id, entry)
 	else:

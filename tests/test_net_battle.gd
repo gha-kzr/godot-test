@@ -352,3 +352,39 @@ func test_a_hero_in_stealth_is_see_through_to_its_own_team_and_gone_for_the_othe
 		assert_true(restored != null and restored.albedo_color.a >= 0.99 and restored.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED, "and its own materials are back")
 	host.free()
 	guest.free()
+
+
+func test_a_player_who_comes_back_to_the_ai_played_hero_can_act_on_their_turn() -> void:
+	var rig := _fight()
+	for id in rig.sessions:
+		rig.sessions[id].ai_delay = 0.0
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	await _both_ready(rig, host, guest)
+	guest.free()
+	rig.net.kill(2)
+	rig.run(float(rig.sessions[1].state.settings["grace"]) + 3.0)
+	assert_true(rig.sessions[1].state.seats[2].ai)
+	rig.net.transport(2).closed = false
+	rig.net.connect_peers(2, 1)
+	rig.sessions[2] = MatchSession.open_as_guest(rig.net.transport(2), "Bob", NetRig.token_of(2), 1)
+	rig.net.flush()
+	var back := _controller(rig, 2)
+	await _frames()
+	var acted := false
+	for step in 400:
+		rig.run(0.2)
+		await _frames(2)
+		var mine := rig.sessions[1].unit_of(2)
+		if not rig.sessions[1].state.seats[2].ai and back.battle.state.current_unit().id == mine:
+			assert_eq(back.input_state, BattleController.State.IDLE, "my turn: I can play")
+			back.end_turn()
+			rig.net.flush()
+			await _frames(3)
+			assert_ne(back.battle.state.current_unit().id, mine, "and pass it")
+			acted = true
+			break
+	assert_true(acted, "my turn came back")
+	host.free()
+	back.free()
