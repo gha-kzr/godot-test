@@ -13,7 +13,7 @@ func _frames(count := 3) -> void:
 func _controller(rig: NetRig, seat: int) -> NetBattleController:
 	var controller := SCENE.instantiate() as NetBattleController
 	controller.setup_net(rig.sessions[seat])
-	controller.settings.battle_speed = Settings.BattleSpeed.INSTANT
+	controller.play_speed = Settings.BattleSpeed.INSTANT
 	(Engine.get_main_loop() as SceneTree).root.add_child(controller)
 	return controller
 
@@ -135,22 +135,85 @@ func test_a_view_opened_late_replays_the_log_and_shows_where_things_stand() -> v
 	late.free()
 
 
-func test_the_players_panel_tags_the_ai_and_the_ones_who_left() -> void:
+func test_the_turn_order_tags_the_ai_and_the_ones_who_left() -> void:
 	var rig := _fight(3, 1)
 	var host := _controller(rig, 1)
 	await _frames()
 	rig.net.kill(3)
 	rig.run(3.0)
-	var texts := []
-	for row in host._status._rows.get_children():
-		texts.append((row as Label).text)
-	assert_true(texts.any(func(t: String) -> bool: return t.contains("(you)")), "me")
-	assert_true(texts.any(func(t: String) -> bool: return t.contains("(away)")), "the one who left")
+	var unit_of_three := rig.sessions[1].unit_of(3)
+	assert_true(host.battle.state.units[unit_of_three].label.contains("(away)"), "the one who left")
 	rig.run(float(rig.sessions[1].state.settings["grace"]) + 1.0)
-	texts.clear()
-	for row in host._status._rows.get_children():
-		texts.append((row as Label).text)
-	assert_true(texts.any(func(t: String) -> bool: return t.contains("(AI)")), "then the AI plays for them")
+	assert_true(host.battle.state.units[unit_of_three].label.contains("(AI)"), "then the AI plays for them")
+	host.free()
+
+
+func test_there_is_one_turn_order_and_the_countdown_is_next_to_the_round() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	assert_true(host.find_child("NetStatusPanel", true, false) == null, "no second list of players")
+	var round_label := host.hud.get_node("%RoundLabel") as Label
+	assert_true(round_label.text.contains(" s"), "the placement countdown shows after the round")
+	await _both_ready(rig, host, guest)
+	rig.run(5.0)
+	await _frames()
+	var left := ceili(rig.sessions[1].turn_seconds_left())
+	assert_true(round_label.text.ends_with("%d s" % left) or round_label.text.ends_with("%d s" % (left + 1)), "the turn's seconds: %s" % round_label.text)
+	rig.run(float(rig.sessions[1].state.settings["turn"]) - 8.0)
+	await _frames()
+	assert_true(round_label.has_theme_color_override("font_color"), "red for the last ten seconds")
+	host.free()
+	guest.free()
+
+
+func test_the_spell_bar_always_shows_my_own_hero_not_the_one_whose_turn_it_is() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	await _both_ready(rig, host, guest)
+	var mine := host if host.battle.state.current_unit().id == 0 else guest
+	var theirs := guest if mine == host else host
+	assert_eq(theirs._spells_unit_id(), theirs._my_unit(), "the bar's unit is my own, on someone else's turn too")
+	assert_ne(theirs._spells_unit_id(), theirs.battle.state.current_unit().id, "although it isn't the acting unit")
+	mine.end_turn()
+	rig.net.flush()
+	await _frames(5)
+	assert_eq(theirs._spells_unit_id(), theirs._my_unit(), "and still after the turn passed to me")
+	assert_eq(mine._spells_unit_id(), mine._my_unit())
+	host.free()
+	guest.free()
+
+
+func test_everyone_plays_at_normal_speed_and_the_settings_speed_is_left_alone() -> void:
+	var rig := _fight()
+	var controller := SCENE.instantiate() as NetBattleController
+	controller.setup_net(rig.sessions[1])
+	controller.settings.battle_speed = Settings.BattleSpeed.INSTANT  # This player's solo setting.
+	(Engine.get_main_loop() as SceneTree).root.add_child(controller)
+	await _frames()
+	assert_false(controller.event_player.instant, "the multiplayer fight does not skip animations whatever the setting says")
+	assert_eq(controller.settings.battle_speed, Settings.BattleSpeed.INSTANT, "and the setting is as the player left it")
+	assert_false((controller.hud.get_node("%SpeedButton") as Control).visible, "no speed button")
+	controller.cycle_battle_speed()
+	assert_eq(controller.settings.battle_speed, Settings.BattleSpeed.INSTANT, "nothing cycles it")
+	controller.free()
+
+
+func test_a_quick_message_is_a_comic_bubble_with_a_tail() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	await _frames()
+	var unit_view := host.units_view.find_view(rig.sessions[1].unit_of(1))
+	unit_view.say("Hello!")
+	await _frames(2)
+	var bubble := unit_view.get_node("Speech") as SpeechBubble
+	assert_eq(bubble.text, "Hello!")
+	var sprite := bubble.find_children("*", "Sprite3D", true, false)[0] as Sprite3D
+	assert_true(sprite.texture != null and sprite.texture.get_size().x > 60.0, "a picture sized to its text")
+	assert_true(bubble.find_children("*", "PanelContainer", true, false).size() == 1 and bubble.find_children("*", "Control", true, false).any(func(c: Control) -> bool: return c is SpeechBubble.Tail), "a rounded panel and a tail")
 	host.free()
 
 
@@ -186,5 +249,106 @@ func test_in_card_combat_the_hand_is_shown_a_card_is_played_or_thrown_through_th
 	assert_eq(mine.selected_card, -1, "picking it again lets go")
 	assert_eq(StateHash.of(host.battle.state), StateHash.of(guest.battle.state), "the two views hold the same cards")
 	assert_eq(StateHash.of(host.battle.state), StateHash.of(rig.sessions[1].state.battle.state))
+	host.free()
+	guest.free()
+
+
+func test_a_quick_message_floats_above_the_players_hero_and_is_replaced_by_the_next() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	var bob_unit := rig.sessions[1].unit_of(2)
+	rig.sessions[2].send_emote(1)
+	rig.net.flush()
+	assert_eq(host.units_view.find_view(bob_unit).speech_text(), Emotes.text(1), "above Bob's hero on Alice's screen")
+	assert_eq(guest.units_view.find_view(bob_unit).speech_text(), Emotes.text(1), "and on Bob's own")
+	assert_eq(host.units_view.find_view(rig.sessions[1].unit_of(1)).speech_text(), "", "not above anyone else")
+	rig.run(MatchSession.EMOTE_COOLDOWN + 0.1)
+	rig.sessions[2].send_emote(3)
+	rig.net.flush()
+	assert_eq(host.units_view.find_view(bob_unit).speech_text(), Emotes.text(3), "a new message replaces the old one")
+	host.free()
+	guest.free()
+
+
+func test_quick_messages_are_a_popup_in_the_middle_opened_by_a_button_above_end_turn() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	var guest := _controller(rig, 2)
+	await _frames()
+	var say := host.find_child("SayButton", true, false) as Button
+	var end_turn := host.find_child("EndTurnButton", true, false) as Button
+	assert_eq(say.get_parent(), end_turn.get_parent(), "in the same column")
+	assert_eq(say.get_index() + 1, end_turn.get_index(), "right above End turn")
+	var popup := host.find_child("SayPopup", true, false) as Control
+	assert_false(popup.visible)
+	say.pressed.emit()
+	assert_true(popup.visible)
+	var panel := popup.get_node("SayPanel") as Control
+	var middle := panel.position + panel.size / 2.0
+	assert_true(absf(middle.x - popup.size.x / 2.0) <= 1.0 and absf(middle.y - popup.size.y / 2.0) <= 1.0, "the list opens in the middle of the screen")
+	for index in Emotes.count():
+		assert_true(popup.find_child("Emote%d" % index, true, false) != null)
+	(popup.find_child("Emote2", true, false) as Button).pressed.emit()
+	rig.net.flush()
+	assert_false(popup.visible, "it closes once a message is picked")
+	var mine := rig.sessions[1].unit_of(1)
+	assert_eq(guest.units_view.find_view(mine).speech_text(), Emotes.text(2), "and the other screen shows it above the hero")
+	say.pressed.emit()
+	say.pressed.emit()
+	assert_false(popup.visible, "the button closes it again")
+	say.pressed.emit()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	popup.gui_input.emit(click)
+	assert_false(popup.visible, "so does a click around it")
+	host.free()
+	guest.free()
+
+
+func test_the_menu_is_a_button_in_the_top_bar_not_in_the_actions_column() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)
+	await _frames()
+	assert_false((host.find_child("MenuButton", true, false) as Button).visible, "no Menu button in the column any more")
+	host.open_menu()
+	assert_true(host.hud.is_modal_open(), "the leave question opens")
+	host.hud.close_leave_panel()
+	host.free()
+
+
+func test_a_hero_in_stealth_is_see_through_to_its_own_team_and_gone_for_the_other() -> void:
+	var rig := _fight()
+	var host := _controller(rig, 1)  # Side A: its hero is unit 0
+	var guest := _controller(rig, 2)
+	await _frames()
+	var stealth := load("res://data/pvp/statuses/stealth.tres") as StatusData
+	for controller in [host, guest]:
+		controller.battle.state.units[0].add_status(stealth, 0)
+		controller.units_view.refresh_visibility(controller.battle.state)
+	var own_view := host.units_view.find_view(0)
+	var enemy_view := guest.units_view.find_view(0)
+	assert_true(own_view.visible and own_view.is_ghost(), "its own team sees it, see-through")
+	assert_false(enemy_view.visible, "the other team doesn't see it at all")
+	assert_false(enemy_view.is_ghost())
+	assert_false(host.units_view.find_view(1).is_ghost(), "other heroes stay solid")
+	var model := own_view.model()
+	if model != null:
+		assert_true(model.is_ghost())
+		var mesh := model.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
+		var material := (mesh.material_override if mesh.material_override != null else mesh.get_active_material(0)) as BaseMaterial3D
+		assert_true(material != null and material.albedo_color.a < 0.6 and material.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED, "its surfaces are drawn with transparency")
+	# Found (or the status ends): solid again, and visible to everyone.
+	for controller in [host, guest]:
+		controller.battle.state.units[0].break_stealth()
+		controller.units_view.refresh_visibility(controller.battle.state)
+	assert_false(own_view.is_ghost())
+	assert_true(enemy_view.visible, "found")
+	if model != null:
+		var restored_mesh := model.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
+		var restored := (restored_mesh.material_override if restored_mesh.material_override != null else restored_mesh.get_active_material(0)) as BaseMaterial3D
+		assert_true(restored != null and restored.albedo_color.a >= 0.99 and restored.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED, "and its own materials are back")
 	host.free()
 	guest.free()

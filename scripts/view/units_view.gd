@@ -5,7 +5,8 @@ extends Node3D
 const UNIT_VIEW_SCENE := preload("res://scenes/battle/unit_view.tscn")
 
 var _views: Dictionary[int, UnitView] = {}
-## The team of the player looking at the board: a unit in stealth is not drawn for the other team.
+## The team of the player looking at the board: a unit in stealth is not drawn for the other team, and is see-through for
+## its own.
 var viewer_team := UnitState.Team.PLAYER
 
 
@@ -36,11 +37,14 @@ func sync(state: BattleState) -> void:
 			_views[unit.id].sync(unit, state.is_hidden_from(unit, viewer_team))
 
 
-## Shows or hides units that went into or out of stealth (or were met by an enemy), without moving anything.
+## Shows or hides units that went into or out of stealth (or were found), without moving anything; a hero in stealth
+## that the viewer can see (its own team's) is drawn see-through.
 func refresh_visibility(state: BattleState) -> void:
 	for unit in state.units:
 		if _views.has(unit.id):
-			_views[unit.id].set_hidden_from_viewer(state.is_hidden_from(unit, viewer_team))
+			var hidden := state.is_hidden_from(unit, viewer_team)
+			_views[unit.id].set_hidden_from_viewer(hidden)
+			_views[unit.id].set_ghost(unit.is_alive() and unit.is_stealthed() and not hidden)
 
 
 ## Marks the unit whose turn it is (-1 for none).

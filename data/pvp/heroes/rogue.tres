@@ -7,5 +7,5 @@
 script = ExtResource("1_obm1i")
 unit = ExtResource("2_muy1m")
 role_label = "Assassin"
-description = "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her."
+description = "Vanishes until her next attack, then strikes for extra damage. Enemies can't see her, even next to her, until she attacks, is hurt, or one of them walks into her (which hurts them)."
 gender = 1

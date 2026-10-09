@@ -86,9 +86,6 @@ msgstr "%s terminé"
 msgid "%s cleared! The tower now goes up to floor %d, and you can start at floor %d."
 msgstr "%s terminé ! La tour monte maintenant jusqu'à l'étage %d, et vous pouvez commencer à l'étage %d."
 
-msgid "%s coming back"
-msgstr "%s qui revient"
-
 msgid "%s damage"
 msgstr "%s dégâts"
 
@@ -197,9 +194,6 @@ msgstr "(vide)"
 msgid "(host)"
 msgstr "(hôte)"
 
-msgid "(nobody to invite)"
-msgstr "(personne à inviter)"
-
 msgid "(none)"
 msgstr "(aucun)"
 
@@ -223,9 +217,6 @@ msgstr "Un étage de boss ! Le boss est bien plus fort. Le vaincre offre un bien
 
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
 msgstr "Un héros a gagné un niveau : ses stats augmentent, et certains niveaux enseignent un nouveau sort."
-
-msgid "A new player"
-msgstr "Un nouveau joueur"
 
 msgid "A run waits at floor %d: Continue run on the hub."
 msgstr "Une ascension attend à l'étage %d : Continuer l'ascension depuis l'équipe."
@@ -359,9 +350,6 @@ msgstr "Boss"
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr "Boss vaincu ! Choisissez un bienfait, ou soignez l'équipe à la place."
 
-msgid "Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox."
-msgstr "Brave limite WebRTC : dans les réglages de Brave (Confidentialité et sécurité), réglez \"Politique de gestion des IP WebRTC\" sur \"Interface publique et privée par défaut\", ou essayez Chrome ou Firefox."
-
 msgid "Break this rune for %d essence"
 msgstr "Briser cette rune pour %d essence"
 
@@ -445,6 +433,9 @@ msgstr "Cliquez sur une case turquoise pour placer %s (Échap pour désélection
 msgid "Click a teal cell to place your hero, then press Ready (%s)"
 msgstr "Cliquez sur une case turquoise pour placer votre héros, puis appuyez sur Prêt (%s)"
 
+msgid "Click to join this team"
+msgstr "Cliquez pour rejoindre cette équipe"
+
 msgid "Click to look at this unit"
 msgstr "Cliquez pour regarder cette unité"
 
@@ -466,17 +457,11 @@ msgstr "Gourdin"
 msgid "Common"
 msgstr "Commun"
 
-msgid "Connect the player"
-msgstr "Connecter le joueur"
+msgid "Connecting to the game server..."
+msgstr "Connexion au serveur de jeu..."
 
-msgid "Connected relays: %s"
-msgstr "Relais connectés : %s"
-
-msgid "Connecting... the player appears in the list when it works."
-msgstr "Connexion en cours... le joueur apparaît dans la liste quand ça marche."
-
-msgid "Connection: %s."
-msgstr "Connexion : %s."
+msgid "Connection lost: trying to come back..."
+msgstr "Connexion perdue : tentative de reconnexion..."
 
 msgid "Continue run"
 msgstr "Continuer l'ascension"
@@ -487,20 +472,14 @@ msgstr "Poursuivre l'ascension"
 msgid "Controls"
 msgstr "Commandes"
 
-msgid "Copy the code"
-msgstr "Copier le code"
-
 msgid "Copy the invite link"
 msgstr "Copier le lien d'invitation"
-
-msgid "Copy the reply link"
-msgstr "Copier le lien de réponse"
 
 msgid "Copy the room code"
 msgstr "Copier le code de la salle"
 
-msgid "Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."
-msgstr "Impossible d'ouvrir une connexion avec l'hôte. Certains réseaux (entreprise, école, certaines connexions mobiles) bloquent les connexions directes entre joueurs."
+msgid "Could not reach the game server."
+msgstr "Impossible de joindre le serveur de jeu."
 
 msgid "Crater"
 msgstr "Cratère"
@@ -580,8 +559,8 @@ msgstr "Termine votre tour tout seul quand un héros ne peut ni se déplacer ni 
 msgid "Enemies (they take the board's spawns)"
 msgstr "Ennemis (ils prennent les apparitions du plateau)"
 
-msgid "Enter a room code or paste an invite first."
-msgstr "Saisissez d'abord un code de salle ou collez une invitation."
+msgid "Enter a room code or paste a room link first."
+msgstr "Saisissez d'abord un code de salle ou collez un lien de salle."
 
 msgid "Epic"
 msgstr "Épique"
@@ -859,6 +838,9 @@ msgstr "Marque du chasseur"
 msgid "Icy Grasp"
 msgstr "Étreinte glacée"
 
+msgid "In the room. Waiting for the host to take you in..."
+msgstr "Dans la salle. En attente que l'hôte vous accepte..."
+
 msgid "Initiative %d, damage taken %+d%%"
 msgstr "Initiative %d, dégâts subis %+d%%"
 
@@ -894,9 +876,6 @@ msgstr "Rejoindre"
 
 msgid "Join a match"
 msgstr "Rejoindre une partie"
-
-msgid "Joining by room code isn't available here: ask for an invite link instead."
-msgstr "Rejoindre par code de salle n'est pas disponible ici : demandez plutôt un lien d'invitation."
 
 msgid "Joining the match"
 msgstr "Connexion à la partie"
@@ -939,9 +918,6 @@ msgstr "Quitter la tour"
 msgid "Legendary"
 msgstr "Légendaire"
 
-msgid "Let the AI play my hero"
-msgstr "Laisser l'IA jouer mon héros"
-
 msgid "Level 10"
 msgstr "Niveau 10"
 
@@ -963,20 +939,11 @@ msgstr "Ligne"
 msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
 msgstr "Sélection : les sorts emmenés au combat (l'emplacement 1 est la touche 1)"
 
-msgid "Looking for the room... The host answers as soon as they see you."
-msgstr "Recherche de la salle... L'hôte répond dès qu'il vous voit."
-
 msgid "Lose now"
 msgstr "Perdre"
 
 msgid "Mage"
 msgstr "Mage"
-
-msgid "Make an invite"
-msgstr "Créer une invitation"
-
-msgid "Make an invite, send the link, then paste the reply they send back: each player needs their own invite."
-msgstr "Créez une invitation, envoyez le lien, puis collez la réponse qu'ils renvoient : chaque joueur a besoin de sa propre invitation."
 
 msgid "Map and rules"
 msgstr "Carte et règles"
@@ -1041,9 +1008,6 @@ msgstr "PM : points de mouvement. Marcher coûte 1 par case (et 1 de plus en mon
 msgid "Multiplayer"
 msgstr "Multijoueur"
 
-msgid "Multiplayer needs the web version of the game (it uses the browser's WebRTC)."
-msgstr "Le multijoueur demande la version web du jeu (il utilise le WebRTC du navigateur)."
-
 msgid "Mushroom Sage"
 msgstr "Sage champignon"
 
@@ -1065,9 +1029,6 @@ msgstr "Il faut %d (vous en avez %d)"
 msgid "Need %d essence"
 msgstr "Il faut %d essence"
 
-msgid "Network: %d local, %d public addresses found."
-msgstr "Réseau : %d adresses locales, %d adresses publiques trouvées."
-
 msgid "New map"
 msgstr "Nouvelle carte"
 
@@ -1083,8 +1044,8 @@ msgstr "Bien joué !"
 msgid "No"
 msgstr "Non"
 
-msgid "No public address: this network may block direct connections between players."
-msgstr "Aucune adresse publique : ce réseau bloque peut-être les connexions directes entre joueurs."
+msgid "No match has that code. Check it: the host may have left."
+msgstr "Aucune partie n'a ce code. Vérifiez-le : l'hôte est peut-être parti."
 
 msgid "No rune found."
 msgstr "Aucune rune trouvée."
@@ -1116,6 +1077,9 @@ msgstr "aucune"
 msgid "Normal"
 msgstr "Normal"
 
+msgid "not connected"
+msgstr "non connecté"
+
 msgid "Not in a team yet"
 msgstr "Pas encore dans une équipe"
 
@@ -1143,6 +1107,9 @@ msgstr "Ouvrir un nouveau salon"
 msgid "Open field"
 msgstr "Plaine"
 
+msgid "Opening the match"
+msgstr "Ouverture de la partie"
+
 msgid "opposite corners"
 msgstr "coins opposés"
 
@@ -1163,9 +1130,6 @@ msgstr "Frappe de paume"
 
 msgid "Party"
 msgstr "Équipe"
-
-msgid "Paste the reply link or code here"
-msgstr "Collez ici le lien ou le code de réponse"
 
 msgid "Phase Walk"
 msgstr "Marche spectrale"
@@ -1200,9 +1164,6 @@ msgstr "Tir clouant"
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr "Placez vos héros : cliquez sur l'un, puis sur une case turquoise. Prêt (%s) pour combattre"
 
-msgid "Placement: %d s"
-msgstr "Placement : %d s"
-
 msgid "Plague"
 msgstr "Peste"
 
@@ -1214,12 +1175,6 @@ msgstr "Jouer"
 
 msgid "Play again"
 msgstr "Rejouer"
-
-msgid "Play my hero again"
-msgstr "Rejouer mon héros"
-
-msgid "Players"
-msgstr "Joueurs"
 
 msgid "Playground"
 msgstr "Bac à sable"
@@ -1244,12 +1199,6 @@ msgstr "Puissance : tous %+d%%\nRésist. : %s"
 
 msgid "Power: percent added to the damage and heals of the unit's spells."
 msgstr "Puissance : pourcentage ajouté aux dégâts et aux soins des sorts de l'unité."
-
-msgid "Preparing the invite... (a few seconds)"
-msgstr "Préparation de l'invitation... (quelques secondes)"
-
-msgid "Preparing your reply... (a few seconds)"
-msgstr "Préparation de votre réponse... (quelques secondes)"
 
 msgid "Press a key for %s (Esc to cancel)."
 msgstr "Appuyez sur une touche pour %s (Échap pour annuler)."
@@ -1423,14 +1372,11 @@ msgstr "Voleuse"
 msgid "Role: %s"
 msgstr "Rôle : %s"
 
-msgid "Room code, or invite link"
-msgstr "Code de salle, ou lien d'invitation"
+msgid "Room code, or room link"
+msgstr "Code de salle, ou lien de salle"
 
 msgid "Room code: %s"
 msgstr "Code de la salle : %s"
-
-msgid "Room found. Connecting to the host..."
-msgstr "Salle trouvée. Connexion à l'hôte..."
 
 msgid "Rooted"
 msgstr "Enraciné"
@@ -1510,12 +1456,6 @@ msgstr "Secondes avant que l'IA remplace un joueur parti"
 msgid "Seconds per turn"
 msgstr "Secondes par tour"
 
-msgid "Send this link to the player. When they send a reply back, paste it below."
-msgstr "Envoyez ce lien au joueur. Quand il vous renvoie une réponse, collez-la ci-dessous."
-
-msgid "Send this reply to the host. You are connected as soon as they paste it."
-msgstr "Envoyez cette réponse à l'hôte. Vous serez connecté dès qu'il la collera."
-
 msgid "Set every hero to this level"
 msgstr "Mettre tous les héros à ce niveau"
 
@@ -1587,9 +1527,6 @@ msgstr "Écrasement"
 
 msgid "Smite"
 msgstr "Châtiment"
-
-msgid "Someone cannot connect? Make a manual invite"
-msgstr "Quelqu'un n'arrive pas à se connecter ? Créer une invitation manuelle"
 
 msgid "Sorceress"
 msgstr "Sorcière"
@@ -1717,23 +1654,14 @@ msgstr "Merci !"
 msgid "That hero isn't available."
 msgstr "Ce héros n'est pas disponible."
 
-msgid "That invite is not valid."
-msgstr "Cette invitation n'est pas valide."
-
-msgid "That isn't a reply code."
-msgstr "Ce n'est pas un code de réponse."
-
-msgid "That isn't an invite code or link."
-msgstr "Ce n'est pas un code ou un lien d'invitation."
+msgid "That isn't a room code (6 letters and numbers)."
+msgstr "Ce n'est pas un code de salle (6 lettres et chiffres)."
 
 msgid "That isn't possible right now."
 msgstr "Ce n'est pas possible pour le moment."
 
 msgid "That key can't be used."
 msgstr "Cette touche ne peut pas être utilisée."
-
-msgid "That reply is for another match."
-msgstr "Cette réponse est pour une autre partie."
 
 msgid "That rune is already at the highest level."
 msgstr "Cette rune est déjà au niveau maximum."
@@ -1768,6 +1696,9 @@ msgstr "Le meilleur étage est maintenant %d."
 msgid "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team."
 msgstr "Les plus gros dégâts du jeu, et rien d'autre. Un pas de travers et elle tombe : gardez-la derrière votre équipe."
 
+msgid "The connection to the game server was lost."
+msgstr "La connexion au serveur de jeu a été perdue."
+
 msgid "The essence is now %d."
 msgstr "L'essence est maintenant de %d."
 
@@ -1777,14 +1708,20 @@ msgstr "La rencontre de l'étage est invalide : %s"
 msgid "The floor's own"
 msgstr "Celui de l'étage"
 
+msgid "The game server is full: try again in a few minutes."
+msgstr "Le serveur de jeu est plein : réessayez dans quelques minutes."
+
+msgid "The game server refused the request."
+msgstr "Le serveur de jeu a refusé la demande."
+
 msgid "the game state differs from the host's (desync)"
 msgstr "l'état de la partie diffère de celui de l'hôte (désynchronisation)"
 
+msgid "The host did not answer."
+msgstr "L'hôte n'a pas répondu."
+
 msgid "The host removed you from the match."
 msgstr "L'hôte vous a retiré du match."
-
-msgid "The match has already started."
-msgstr "La partie a déjà commencé."
 
 msgid "the match has started"
 msgstr "la partie a déjà commencé"
@@ -1822,6 +1759,9 @@ msgstr "La tour est invalide : %s"
 msgid "These change your save (press twice to confirm)."
 msgstr "Ces outils modifient votre sauvegarde (appuyez deux fois pour confirmer)."
 
+msgid "This player joined from another window or tab."
+msgstr "Ce joueur s'est connecté depuis une autre fenêtre ou un autre onglet."
+
 msgid "Tip"
 msgstr "Astuce"
 
@@ -1836,6 +1776,9 @@ msgstr "Basculer la vue de dessus"
 
 msgid "too many requests"
 msgstr "trop de demandes"
+
+msgid "Too many wrong codes: wait a minute and try again."
+msgstr "Trop de codes erronés : attendez une minute et réessayez."
 
 msgid "Top view"
 msgstr "Vue de dessus"
@@ -1867,9 +1810,6 @@ msgstr "Tourner la caméra à droite"
 msgid "Turn order"
 msgstr "Ordre de jeu"
 
-msgid "Turn: %d s"
-msgstr "Tour : %d s"
-
 msgid "UI scale"
 msgstr "Échelle de l'interface"
 
@@ -1888,8 +1828,8 @@ msgstr "Valeur (un niveau ou un étage)"
 msgid "Vanish"
 msgstr "Disparition"
 
-msgid "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her."
-msgstr "Disparaît jusqu'à sa prochaine attaque, puis frappe plus fort. Visible de quiconque est à côté d'elle, et tout coup la révèle."
+msgid "Vanishes until her next attack, then strikes for extra damage. Enemies can't see her, even next to her, until she attacks, is hurt, or one of them walks into her (which hurts them)."
+msgstr "Disparaît jusqu'à sa prochaine attaque, puis frappe plus fort. Les ennemis ne la voient pas, même à côté d'elle, tant qu'elle n'attaque pas, n'est pas blessée, ou que l'un d'eux ne lui rentre pas dedans (ce qui le blesse)."
 
 msgid "Venom Ward Rune"
 msgstr "Rune de protection du venin"
@@ -1912,14 +1852,14 @@ msgstr "Attendez-moi"
 msgid "Waiting for the host to start. Pick your hero and your team, then press Ready."
 msgstr "En attente du lancement par l'hôte. Choisissez votre héros et votre équipe, puis appuyez sur Prêt."
 
+msgid "Waking the game server up... (it sleeps when nobody plays, so the first game of the day takes up to a minute)"
+msgstr "Réveil du serveur de jeu... (il dort quand personne ne joue : la première partie de la journée peut prendre jusqu'à une minute)"
+
 msgid "Warg"
 msgstr "Warg"
 
 msgid "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing."
 msgstr "Use ses ennemis par le poison et la pourriture, les enracine, les ralentit et leur vole des points d'action. Peu de dégâts d'un coup, aucun soin."
-
-msgid "WebRTC isn't available here."
-msgstr "WebRTC n'est pas disponible ici."
 
 msgid "When you are done, end your turn ({end_turn}). The enemies play next."
 msgstr "Quand vous avez fini, terminez votre tour ({end_turn}). Les ennemis jouent ensuite."
@@ -2004,3 +1944,6 @@ msgstr "votre prochain tour"
 
 msgid "Your player"
 msgstr "Votre joueur"
+
+msgid "your team"
+msgstr "votre équipe"

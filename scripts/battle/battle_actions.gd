@@ -31,6 +31,9 @@ extends RefCounted
 
 
 class Move extends Action:
+	## What walking into a hidden enemy costs the walker, in percent of its max HP.
+	const BUMP_DAMAGE_PERCENT := 10
+
 	var destination: Vector2i
 
 	func _init(actor: int, cell: Vector2i) -> void:
@@ -38,27 +41,64 @@ class Move extends Action:
 		destination = cell
 
 	func _validate(state: BattleState) -> String:
-		if not Movement.reach(state, actor_id).can_reach(destination):
+		# As the player sees the board: a hidden enemy doesn't stop the move from being asked for (it is found by walking into it).
+		if not Movement.reach(state, actor_id, true).can_reach(destination):
 			return "can't reach %s" % destination
 		return ""
 
 	## Repositioning (see UnitState): the cost counts from where the move segment started,
 	## so moving again re-spends from the segment's MP; the drawn path is the walk from
 	## where the unit stands (a straight slide when no walk leads there).
+	##
+	## Bumping: the walk is the cheapest one *as the player sees the board* (see Movement.reach), so it may cross the cell
+	## of an enemy hidden by stealth. Then the unit stops on the cell before it (or doesn't move, if it is the first step),
+	## pays only for the steps it took, takes BUMP_DAMAGE_PERCENT of its max HP in damage, and the hidden unit is found: its
+	## stealth ends. Walking into a hidden unit is how it is found, so its place is never given away for free.
 	func apply(state: BattleState) -> Array[BattleEvents.Event]:
-		var reach := Movement.reach(state, actor_id)
 		var unit := state.units[actor_id]
-		var path := reach.path_to(destination) if not unit.moved else Movement.walk_path(state, actor_id, destination)
+		var reach := Movement.reach(state, actor_id, true)
+		var route := reach.path_to(destination)
+		var bumped: UnitState = null
+		var stop := route.size()
+		for index in route.size():
+			var other := state.unit_at(route[index])
+			if other != null and other.id != actor_id and other.team != unit.team:
+				bumped = other
+				stop = index
+				break
+		if bumped == null:
+			return _walk(state, unit, reach, destination, route if not unit.moved else Movement.walk_path(state, actor_id, destination))
+		while stop > 0 and state.unit_at(route[stop - 1]) != null:
+			stop -= 1  # A unit can't stop on an ally's cell: it halts before the allies it was walking through.
+		var halt := route[stop - 1] if stop > 0 else reach.origin
+		var events: Array[BattleEvents.Event] = []
+		if halt != unit.cell:
+			events.append_array(_walk(state, unit, reach, halt, reach.path_to(halt) if not unit.moved else Movement.walk_path(state, actor_id, halt)))
+		events.append_array(_bump(state, unit, bumped))
+		return events
+
+	## Moves the unit to `to` (its MP counted from the segment's origin) along `path`.
+	func _walk(state: BattleState, unit: UnitState, reach: Movement.Reach, to: Vector2i, path: Array[Vector2i]) -> Array[BattleEvents.Event]:
 		if path.is_empty():
-			path = [destination]
+			path = [to]
 		var mp_before := unit.mp
 		if not unit.moved:
 			unit.moved = true
 			unit.moved_from = unit.cell
-		unit.moved_cost = reach.cost_to(destination)
+		unit.moved_cost = reach.walk_cost(to)
 		unit.mp = reach.origin_budget - unit.moved_cost
-		unit.cell = destination
+		unit.cell = to
 		return [BattleEvents.UnitMoved.new(actor_id, path, mp_before - unit.mp)]
+
+	func _bump(state: BattleState, unit: UnitState, hidden: UnitState) -> Array[BattleEvents.Event]:
+		var amount := mini(maxi(1, roundi(unit.max_hp() * BUMP_DAMAGE_PERCENT / 100.0)), unit.hp)
+		unit.hp -= amount
+		var events: Array[BattleEvents.Event] = [BattleEvents.DamageDealt.new(unit.id, amount, unit.hp)]
+		for ended in unit.break_stealth():  # Hurt: no longer hidden.
+			events.append(BattleEvents.StatusExpired.new(unit.id, ended))
+		for ended in hidden.break_stealth():  # Found.
+			events.append(BattleEvents.StatusExpired.new(hidden.id, ended))
+		return events
 
 
 class CastSpell extends Action:

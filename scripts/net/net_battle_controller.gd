@@ -18,7 +18,16 @@ var _awaiting := false
 var _busy := false
 ## The player pressed Ready for their placement.
 var _placed_pressed := false
-var _status: NetStatusPanel
+## What the multiplayer fight plays at, for everyone: normal speed (the player's own battle speed setting is for solo
+## battles; two players at different speeds would see the same match at different paces). Tests make it instant.
+var play_speed := Settings.BattleSpeed.NORMAL
+## The line about my own connection is shown once per loss.
+var _lost_shown := false
+## The button above End turn and the popup of quick messages it opens (a catcher for the clicks around, with the list).
+var _say_button: Button
+var _say_popup: Control
+
+const SAY_ICON: Texture2D = preload("res://ui/icons/speech.svg")
 
 
 ## Call before the controller enters the tree.
@@ -35,10 +44,46 @@ func _ready() -> void:
 	hud.set_result_action_text("Back to the lobby")
 	session.entry_applied.connect(_on_entry)
 	session.rejected.connect(_on_rejected)
-	_status = NetStatusPanel.new()
-	hud.get_node("Root").add_child(_status)
-	_status.bind(session)
+	session.emote_received.connect(_on_emote)
+	session.changed.connect(_on_session_changed)
+	hud.set_leave_available(false)  # The menu is a button in the top bar (NetTopBar), next to the settings.
+	(hud.get_node("%SpeedButton") as Control).hide()  # Everyone plays at x1 here.
+	_build_say_popup()
 	_catch_up()
+
+
+func apply_battle_speed() -> void:
+	var kept := settings.battle_speed  # The setting stays as the player chose it (it is for solo battles).
+	settings.battle_speed = play_speed
+	super.apply_battle_speed()
+	settings.battle_speed = kept
+
+
+func cycle_battle_speed() -> void:
+	pass  # No speed to choose in a multiplayer fight.
+
+
+## The spell bar (or the hand) shows my own hero, whoever's turn it is: other players' spells aren't mine to look at.
+func _spells_unit_id() -> int:
+	var mine := _my_unit()
+	return mine if mine >= 0 and mine < battle.state.units.size() else super._spells_unit_id()
+
+
+## The seconds left on the turn (or on the placement), after the round at the top.
+func _process(delta: float) -> void:
+	super._process(delta)
+	var left := session.placement_seconds_left()
+	if left < 0.0:
+		left = session.turn_seconds_left()
+	hud.set_countdown(ceili(left) if left >= 0.0 else -1)
+
+
+func _on_session_changed() -> void:
+	if session.connection_lost and not _lost_shown:
+		_lost_shown = true
+		hud.show_banner(tr("Nobody else is connected: the others left, or your own connection broke."))
+	elif not session.connection_lost:
+		_lost_shown = false
 
 
 func _create_battle_state() -> BattleState:
@@ -156,7 +201,72 @@ func _sync_labels() -> void:
 		if unit_id < 0 or unit_id >= battle.state.units.size():
 			continue
 		var seat := session.state.seats[seat_id]
-		battle.state.units[unit_id].label = seat.name + (" " + tr("(AI)") if seat.ai else "")
+		var tag := ""
+		if seat.ai:
+			tag = " " + tr("(AI)")
+		elif not seat.connected:
+			tag = " " + tr("(away)")
+		battle.state.units[unit_id].label = seat.name + tag
+
+
+## A quick message from a player: it floats above their hero's head.
+func _on_emote(seat_id: int, emote_id: int) -> void:
+	var unit_view := units_view.find_view(session.unit_of(seat_id))
+	if unit_view != null:
+		unit_view.say(Emotes.text(emote_id))
+
+
+## The menu (leaving the fight): the top bar's hamburger button asks for it.
+func open_menu() -> void:
+	if input_state != State.ENDED:
+		hud.open_leave_panel()
+
+
+## A button above End turn opens the list of quick messages, in the middle of the screen.
+func _build_say_popup() -> void:
+	var actions := hud.get_node("Root/Actions") as Control
+	_say_button = Button.new()
+	_say_button.name = "SayButton"
+	_say_button.text = tr("Say something")
+	_say_button.icon = SAY_ICON
+	_say_button.expand_icon = true
+	_say_button.focus_mode = Control.FOCUS_NONE
+	_say_button.pressed.connect(_toggle_say_popup)
+	actions.add_child(_say_button)
+	actions.move_child(_say_button, hud.get_node("%EndTurnButton").get_index())
+	_say_popup = Control.new()
+	_say_popup.name = "SayPopup"
+	_say_popup.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_say_popup.visible = false
+	_say_popup.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			_say_popup.hide())  # A click anywhere else closes it.
+	var panel := PanelContainer.new()
+	panel.name = "SayPanel"
+	panel.theme_type_variation = &"Chip"
+	_say_popup.add_child(panel)
+	var list := VBoxContainer.new()
+	panel.add_child(list)
+	for index in Emotes.count():
+		var emote := Button.new()
+		emote.name = "Emote%d" % index
+		emote.text = Emotes.text(index)
+		emote.focus_mode = Control.FOCUS_NONE
+		emote.pressed.connect(func() -> void:
+			session.send_emote(index)
+			_say_popup.hide())
+		list.add_child(emote)
+	hud.get_node("Root").add_child(_say_popup)
+
+
+func _toggle_say_popup() -> void:
+	if _say_popup.visible:
+		_say_popup.hide()
+		return
+	_say_popup.show()
+	var panel := _say_popup.get_node("SayPanel") as Control
+	panel.size = panel.get_combined_minimum_size()
+	panel.position = ((_say_popup.size - panel.size) / 2.0).floor()  # In the middle of the screen.
 
 
 func _on_rejected(reason: String) -> void:

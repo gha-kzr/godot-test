@@ -23,12 +23,18 @@ const ANIMATIONS := {
 ## Animations that loop.
 const LOOPING: Array[StringName] = [&"Idle", &"Walk"]
 const BLEND := 0.1
+## How a hero in stealth looks to its own team: this opaque (of 1), a little towards this colour.
+const GHOST_ALPHA := 0.45
+const GHOST_TINT := Color(0.7, 0.85, 1.0)
 
 var _player: AnimationPlayer
 var _resolved: Dictionary[StringName, String] = {}
 var _meshes: Array[MeshInstance3D] = []
 var _overlay: StandardMaterial3D
 var _flash_tween: Tween
+## Whether the model is drawn see-through (see set_ghost), and the surface overrides it replaced: mesh → one per surface.
+var _ghost := false
+var _ghost_saved: Dictionary[MeshInstance3D, Array] = {}
 ## Borrowed animations already added to the player: "scene path|name" → its name there.
 var _borrowed: Dictionary[String, String] = {}
 ## Bumped by every clip; a trimmed clip's timer that finds it changed gives up.
@@ -211,6 +217,50 @@ func flash(color: Color, duration: float) -> void:
 	_flash_tween.tween_callback(func() -> void:
 		for mesh in _meshes:
 			mesh.material_overlay = null)
+
+
+## Draws the model see-through (a hero in stealth, as its own team sees it) or opaque again: every mesh gets a copy of
+## its material with some transparency and a faint cool tint. (A depth pre-pass keeps the parts of one model from
+## showing through each other.) The models set one material on each mesh (`material_override`); a mesh that has only
+## surface materials is handled too.
+func set_ghost(on: bool) -> void:
+	if on == _ghost:
+		return
+	_ghost = on
+	var made: Dictionary[Material, Material] = {}
+	for mesh in _meshes:
+		if on:
+			var saved: Array = [mesh.material_override]
+			var whole := mesh.material_override as BaseMaterial3D
+			if whole != null:
+				mesh.material_override = _ghost_copy(whole, made)
+			elif mesh.mesh != null:
+				for surface in mesh.mesh.get_surface_count():
+					saved.append(mesh.get_surface_override_material(surface))
+					var base := mesh.get_active_material(surface) as BaseMaterial3D
+					if base != null:
+						mesh.set_surface_override_material(surface, _ghost_copy(base, made))
+			_ghost_saved[mesh] = saved
+		else:
+			var saved: Array = _ghost_saved.get(mesh, [null])
+			mesh.material_override = saved[0]
+			for surface in range(1, saved.size()):
+				mesh.set_surface_override_material(surface - 1, saved[surface])
+	if not on:
+		_ghost_saved.clear()
+
+
+func _ghost_copy(base: BaseMaterial3D, made: Dictionary[Material, Material]) -> Material:
+	if not made.has(base):
+		var copy := base.duplicate() as BaseMaterial3D
+		copy.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
+		copy.albedo_color = Color(base.albedo_color.lerp(GHOST_TINT, 0.2), GHOST_ALPHA)
+		made[base] = copy
+	return made[base]
+
+
+func is_ghost() -> bool:
+	return _ghost
 
 
 ## An action that ends (an attack, a hit, a cheer) drops back to Idle on its own; a death stays.

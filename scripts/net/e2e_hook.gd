@@ -1,9 +1,9 @@
 class_name E2eHook
 extends Node
 ## Dev-only: lets a script drive the game from the browser's JavaScript, for end-to-end tests of the real
-## WebRTC network in two tabs (`?e2e=1` in the page address turns it on; `&stun=0` keeps the test off the public
-## STUN servers). JS calls `window.e2e_cmd(JSON.stringify({id, name, args}))`; the answer appears in
-## `window.e2e_out[id]`, and the invite / reply codes in `window.e2e_out.invite` / `.reply`.
+## network in several tabs (`?e2e=1` in the page address turns it on; `&relay=ws://127.0.0.1:8787` points the game at a
+## relay server on this machine). JS calls `window.e2e_cmd(JSON.stringify({id, name, args}))`; the answer appears in
+## `window.e2e_out[id]`, and a refusal in `window.e2e_out.failed`.
 
 var game: Game
 var _callback: JavaScriptObject
@@ -17,8 +17,6 @@ func _ready() -> void:
 	_callback = JavaScriptBridge.create_callback(_on_command)
 	window.e2e_cmd = _callback
 	JavaScriptBridge.eval("window.e2e_out = {}; window.e2e_ready = true;", true)
-	if WebPage.query("stun") == "0":
-		RtcLink.use_stun = false
 
 
 ## JSON numbers arrive as floats; the match wants whole numbers as ints (the screens send ints).
@@ -45,23 +43,18 @@ func _on_command(args: Array) -> void:
 func _run(command: String, args: Array) -> Variant:
 	match command:
 		"open":
-			game.show_multiplayer()  # An invite in the page's address joins from here.
+			game.show_multiplayer()  # A room link in the page's address joins from here.
 			_listen()
 			return true
 		"host":
 			_flow()._on_host(str(args[0]))
 			_listen()
 			return true
-		"invite":
-			_hub().create_invite(int(args[0]) if args.size() > 0 else -1)
-			return true
 		"join":
 			var flow := _flow()
 			flow._on_join(str(args[0]), str(args[1]))
 			_listen()
-			return _hub().session != null
-		"reply":
-			return _hub().accept_reply(str(args[0]))
+			return _hub().transport != null
 		"status":
 			return _status()
 		"set":
@@ -86,19 +79,37 @@ func _run(command: String, args: Array) -> Variant:
 			_hub().session.back_to_lobby()
 		"leave":
 			_flow()._leave()
+		"center":
+			# Where a control of the current screen is on the page (to click it with a real mouse event).
+			var found := _flow()._screen.find_child(str(args[0]), true, false) as Control
+			if found == null or not found.is_visible_in_tree():
+				return null
+			# From the game's own units to the page's pixels (the canvas is scaled to the window).
+			var to_page := found.get_viewport().get_screen_transform() * found.get_global_transform_with_canvas()
+			var origin := to_page * Vector2.ZERO
+			var size := to_page.basis_xform(found.size)
+			return [origin.x, origin.y, size.x, size.y]
+		"ghost":
+			# For a screenshot: puts the stealth status on my hero in this screen's own copy of the battle (nothing is sent).
+			var fight := _flow()._battle as NetBattleController
+			var mine := fight.battle.state.units[_hub().session.unit_of(_hub().session.my_id)]
+			mine.add_status(load("res://data/pvp/statuses/stealth.tres") as StatusData, 0)
+			fight.units_view.refresh_visibility(fight.battle.state)
+		"emote":
+			_hub().session.send_emote(int(args[0]))
+		"settings":
+			_flow()._open_settings()
+		"blink":
+			_hub().transport._socket.close()  # The connection to the server breaks (the transport reconnects).
 	return true
 
 
-## Hands the invite and reply codes to JS when they are ready.
+## Hands a refusal to JS.
 func _listen() -> void:
 	var hub := _hub()
 	if hub == null or hub == _wired:
 		return
 	_wired = hub
-	hub.invite_ready.connect(func(code: String, link: String, seat: int) -> void:
-		JavaScriptBridge.eval("window.e2e_out.invite = %s;" % JSON.stringify({"code": code, "link": link, "seat": seat}), true))
-	hub.reply_ready.connect(func(code: String, link: String) -> void:
-		JavaScriptBridge.eval("window.e2e_out.reply = %s;" % JSON.stringify({"code": code, "link": link}), true))
 	hub.failed.connect(func(reason: String) -> void:
 		JavaScriptBridge.eval("window.e2e_out.failed = %s;" % JSON.stringify(reason), true))
 
@@ -106,16 +117,16 @@ func _listen() -> void:
 func _status() -> Dictionary:
 	var hub := _hub()
 	if hub == null or hub.session == null:
-		return {"in_match": false, "room": hub.room_code if hub != null else "", "relays": hub.status() if hub != null else "",
+		return {"in_match": false, "room": hub.room_code if hub != null else "", "connection": hub.status() if hub != null else "",
 				"screen": game.screen.get_class() if game.screen != null else ""}
 	var session := hub.session
 	var seats := []
 	for id in session.state.seat_ids():
 		var seat := session.state.seats[id]
 		seats.append({"id": id, "name": seat.name, "connected": seat.connected, "ai": seat.ai, "side": seat.side, "hero": seat.hero, "ready": seat.ready})
-	return {"in_match": true, "room": hub.room_code, "relays": hub.status(), "my_id": session.my_id, "host_id": session.host_id, "synced": session.is_synced, "halted": session.halt_reason,
-			"phase": session.state.phase, "entries": session.state.entry_count(), "fingerprint": session.state.fingerprint(),
-			"peers": session.peers(), "direct": hub.transport.direct_ids(), "seats": seats, "my_turn": session.is_my_turn(),
+	return {"in_match": true, "room": hub.room_code, "connection": hub.status(), "my_id": session.my_id, "host_id": session.host_id, "synced": session.is_synced, "halted": session.halt_reason,
+			"phase": session.state.phase, "entries": session.state.entry_count(), "settings": session.state.settings, "fingerprint": session.state.fingerprint(),
+			"peers": session.peers(), "seats": seats, "my_turn": session.is_my_turn(),
 			"started": session.state.battle != null and session.state.battle.state.started,
 			"over": session.state.is_over(), "screen": game.screen.get_class() if game.screen != null else "",
 			"current_seat": session.state.current_seat()}

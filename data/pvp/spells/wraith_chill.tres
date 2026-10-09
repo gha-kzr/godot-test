@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="4_7bbom"]
 [ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="5_f7mi6"]
 [ext_resource type="Resource" uid="uid://b0g2531mgq62q" path="res://data/pvp/statuses/slowed.tres" id="6_f2ord"]
-[ext_resource type="Texture2D" uid="uid://depqno5d0k8pe" path="res://ui/icons/chill_touch.svg" id="7_wi7h1"]
+[ext_resource type="Texture2D" uid="uid://cdtjkbbmblme1" path="res://ui/icons/grave_chill.svg" id="7_wi7h1"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="8_fti2x"]
 
 [sub_resource type="Resource" id="Resource_rjws7"]

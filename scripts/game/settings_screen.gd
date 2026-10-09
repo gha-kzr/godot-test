@@ -17,6 +17,9 @@ var _capturing: StringName = &""
 ## An audio slider's knob is being dragged.
 var _dragging := false
 var _key_buttons: Dictionary[StringName, Button] = {}
+## Opened from inside a multiplayer match: only what concerns this player's device (no QA tools, hints, save reset, credits,
+## battle speed).
+var in_match := false
 
 @onready var _language: OptionButton = %Language
 @onready var _master: HSlider = %MasterVolume
@@ -112,6 +115,10 @@ func show_settings(settings: Settings) -> void:
 	_ui_scale.select(Settings.UI_SCALES.find(settings.ui_scale))
 	_build_bindings()
 	_hide_confirm()
+	if in_match:
+		# (The battle speed is a solo choice: a multiplayer fight plays at x1 for everyone.)
+		for node in [_qa_tools, _show_hints, _reset_save, _confirm_row, _credits_button, find_child("GameTitle", true, false), find_child("SpeedRow", true, false)]:
+			(node as Control).hide()
 	_link_focus()
 
 
@@ -172,6 +179,7 @@ func _link_focus() -> void:
 	for action in Settings.REBINDABLE:
 		chain.append(_key_buttons[action])
 	chain.append_array([_reset_keys, _show_hints, _reset_save, _credits_button])
+	chain = chain.filter(func(control: Control) -> bool: return control.visible)
 	for i in chain.size():
 		var control := chain[i]
 		var above := chain[maxi(i - 1, 0)]

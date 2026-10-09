@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cjmipqynhkat1" path="res://scripts/data/effect_data.gd" id="2_glvj5"]
 [ext_resource type="Script" uid="uid://pofmbja20q67" path="res://scripts/data/apply_status_effect.gd" id="3_s02cp"]
 [ext_resource type="Resource" uid="uid://b2jdlqhrigtxv" path="res://data/pvp/statuses/miasma.tres" id="4_887c6"]
-[ext_resource type="Texture2D" uid="uid://gqy8wnixtjqa" path="res://ui/icons/spore_hex.svg" id="5_8jtb5"]
+[ext_resource type="Texture2D" uid="uid://br27kuhpflve5" path="res://ui/icons/miasma.svg" id="5_8jtb5"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="6_6etn8"]
 
 [sub_resource type="Resource" id="Resource_km86e"]

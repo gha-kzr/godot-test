@@ -144,3 +144,15 @@ func test_every_class_can_play_every_class_in_a_pvp_state() -> void:
 		for b in PvpHeroes.hero_count():
 			var state := _state([a], [b])
 			assert_true(state != null and state.units.size() == 2, "%d vs %d" % [a, b])
+
+
+func test_the_spells_of_a_class_all_have_a_different_icon() -> void:
+	for index in PvpHeroes.hero_count():
+		var info := PvpHeroes.summary(index)
+		var seen := {}
+		for position in info["spell_icons"].size():
+			var texture: Texture2D = info["spell_icons"][position]
+			var path := texture.resource_path if texture != null else ""
+			assert_false(path.is_empty() or path.ends_with("spell_default.svg"), "%s: %s has an icon of its own" % [info["name"], info["spell_names"][position]])
+			assert_false(seen.has(path), "%s: %s and %s share %s" % [info["name"], info["spell_names"][position], seen.get(path, ""), path.get_file()])
+			seen[path] = info["spell_names"][position]

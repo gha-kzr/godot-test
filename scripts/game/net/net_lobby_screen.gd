@@ -1,18 +1,14 @@
 class_name NetLobbyScreen
 extends Screen
 ## Before the fight, in cards: your player (name, hero cards, team, ready), the two teams side by side (blue and red,
-## with whoever has not chosen yet under them, and a Remove button for the host), the invite card (the
-## room code to copy or read out, and a manual invite for players who can't use the code), and the map and rules (the
+## with whoever has not chosen yet under them, and a Remove button for the host; a click on a team joins it), the invite card (the
+## room code and link to copy or read out), and the map and rules (the
 ## host's choices, with the map drawn from above). Everything a player changes goes through the match session, so every
 ## screen shows the same lobby.
 
-signal invite_requested(for_seat: int)
-signal reply_pasted(text: String)
 signal leave_requested
 
-## How long what a player said stays on their row.
-const EMOTE_SECONDS := 5.0
-
+const RESET_ICON: Texture2D = preload("res://ui/icons/reset.svg")
 var session: MatchSession
 
 var _banner: Label
@@ -22,20 +18,15 @@ var _hero_row: HFlowContainer
 var _hero_shown := -1
 var _unassigned_card: Control
 var _unassigned_box: VBoxContainer
-var _emote_bar: HFlowContainer
-var _emotes_seen: Dictionary[int, Array] = {}
-var _side_a: Button
-var _side_b: Button
 var _ready: CheckBox
 var _team_boxes: Array[VBoxContainer] = []
-var _team_titles: Array[Label] = []
+var _team_titles: Array[Button] = []
+var _team_cards: Array[Control] = []
 var _room_label: Label
 var _room_link := ""
 var _room_code := ""
 var _copy_room_code: Button
 var _copy_room: Button
-var _manual_toggle: Button
-var _manual_box: VBoxContainer
 var _typology: OptionButton
 var _size: SpinBox
 var _seed: LineEdit
@@ -44,20 +35,10 @@ var _grace: SpinBox
 var _cards: CheckButton
 var _preview: MapPreview
 var _preview_key := ""
-var _invite_for: OptionButton
-var _invite_button: Button
-var _invite_status: Label
-var _invite_link: TextEdit
-var _copy_link: Button
-var _copy_code: Button
-var _reply: TextEdit
-var _connect: Button
 var _start: Button
 var _new_lobby: Button
 var _refusal := ""
 var _leave: Button
-var _code := ""
-var _link := ""
 var _settings_fields: Array[Control] = []
 
 
@@ -65,7 +46,6 @@ func bind(match_session: MatchSession) -> void:
 	session = match_session
 	_build()
 	session.changed.connect(refresh)
-	session.emote_received.connect(_on_emote)
 	session.rejected.connect(_on_rejected)
 	refresh()
 
@@ -111,7 +91,6 @@ func _build() -> void:
 	main.add_child(left)
 	_build_seat_card(left)
 	_build_teams(left)
-	_build_emotes(left)
 	_build_invite(left)
 	var right := VBoxContainer.new()
 	right.custom_minimum_size = Vector2(350, 0)
@@ -156,11 +135,6 @@ func _build_seat_card(parent: Control) -> void:
 	var line := HBoxContainer.new()
 	line.add_theme_constant_override("separation", 8)
 	box.add_child(line)
-	var sides := ButtonGroup.new()
-	_side_a = _side_button(0, sides)
-	_side_b = _side_button(1, sides)
-	line.add_child(_side_a)
-	line.add_child(_side_b)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	line.add_child(spacer)
@@ -172,29 +146,42 @@ func _build_seat_card(parent: Control) -> void:
 	line.add_child(_ready)
 
 
-func _side_button(side: int, group: ButtonGroup) -> Button:
-	var button := Button.new()
-	button.name = "Side%s" % ("A" if side == 0 else "B")
-	button.text = NetUi.side_name(side)
-	NetUi.side_button(button, side)
-	button.toggle_mode = true
-	button.button_group = group
-	button.custom_minimum_size = Vector2(110, 40)
-	button.pressed.connect(func() -> void: session.set_field("side", side))
-	return button
-
-
 func _build_teams(parent: Control) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	parent.add_child(row)
 	for side in 2:
-		var box := NetUi.card(row, NetUi.side_name(side), NetUi.SIDE_COLORS[side])
-		box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		box.get_parent().name = "Team%s" % ("A" if side == 0 else "B")
-		_team_titles.append(box.get_child(0) as Label)
+		var box := NetUi.card(row, "", NetUi.SIDE_COLORS[side])
+		var panel := box.get_parent() as Control
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		panel.name = "Team%s" % ("A" if side == 0 else "B")
+		# The team's name is a button (so it works with the keyboard too), and the whole card answers a click: joining a
+		# team is done by clicking it.
+		var title := Button.new()
+		title.name = "Join%s" % ("A" if side == 0 else "B")
+		title.flat = true
+		title.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		title.theme_type_variation = &"PromptLabel"
+		title.add_theme_color_override("font_color", NetUi.SIDE_COLORS[side])
+		title.add_theme_color_override("font_hover_color", NetUi.SIDE_COLORS[side].lightened(0.3))
+		title.add_theme_color_override("font_focus_color", NetUi.SIDE_COLORS[side].lightened(0.3))
+		title.pressed.connect(func() -> void: session.set_field("side", side))
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE  # The card takes the mouse (hover, hand cursor, click); the button is for the keyboard.
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(title)
+		box.move_child(title, 0)
+		_team_titles.append(title)
+		_team_cards.append(panel)
+		panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		panel.mouse_entered.connect(func() -> void: panel.modulate = Color(1.12, 1.12, 1.12))
+		panel.mouse_exited.connect(func() -> void: panel.modulate = Color.WHITE)
+		panel.gui_input.connect(func(event: InputEvent) -> void:
+			var click := event as InputEventMouseButton
+			if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+				session.set_field("side", side))
 		var list := VBoxContainer.new()
 		list.add_theme_constant_override("separation", 4)
+		list.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(list)
 		_team_boxes.append(list)
 	var waiting := NetUi.card(parent, tr("Not in a team yet"))
@@ -203,20 +190,6 @@ func _build_teams(parent: Control) -> void:
 	_unassigned_box = VBoxContainer.new()
 	_unassigned_box.add_theme_constant_override("separation", 4)
 	waiting.add_child(_unassigned_box)
-
-
-## Quick messages: a button each, and what the others said shows on their row for a few seconds.
-func _build_emotes(parent: Control) -> void:
-	var box := NetUi.card(parent, tr("Say something"))
-	_emote_bar = HFlowContainer.new()
-	_emote_bar.name = "Emotes"
-	_emote_bar.add_theme_constant_override("h_separation", 6)
-	_emote_bar.add_theme_constant_override("v_separation", 6)
-	box.add_child(_emote_bar)
-	for index in Emotes.count():
-		var button := HubStyle.button(Emotes.TEXTS[index], "Emote%d" % index)
-		button.pressed.connect(func() -> void: session.send_emote(index))
-		_emote_bar.add_child(button)
 
 
 func _build_settings(parent: Control) -> void:
@@ -241,7 +214,12 @@ func _build_settings(parent: Control) -> void:
 	_seed.custom_minimum_size = Vector2(120, 0)
 	_seed.text_submitted.connect(_on_seed_text)
 	_seed.focus_exited.connect(func() -> void: _on_seed_text(_seed.text))
-	var new_seed := HubStyle.button("New map", "NewSeed")
+	var new_seed := HubStyle.button("", "NewSeed")
+	new_seed.icon = RESET_ICON
+	new_seed.expand_icon = true
+	new_seed.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	new_seed.custom_minimum_size = Vector2(44, 40)
+	new_seed.tooltip_text = tr("New map")
 	new_seed.pressed.connect(func() -> void: session.configure("seed", randi_range(1, 999999)))
 	var seed_row := HBoxContainer.new()
 	seed_row.add_child(_seed)
@@ -262,7 +240,7 @@ func _build_settings(parent: Control) -> void:
 	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace, _cards]
 
 
-## Invite players: the room code, and a manual invite for those who can't use it.
+## Invite players: the room code and the link to it.
 func _build_invite(parent: Control) -> void:
 	var box := NetUi.card(parent, tr("Invite players"))
 	_room_label = Label.new()
@@ -283,56 +261,6 @@ func _build_invite(parent: Control) -> void:
 	_copy_room_code.pressed.connect(func() -> void: WebPage.copy(_room_code))
 	_copy_room_code.hide()
 	share.add_child(_copy_room_code)
-	_manual_toggle = HubStyle.button("Someone cannot connect? Make a manual invite", "ManualToggle")
-	_manual_toggle.toggle_mode = true
-	_manual_toggle.toggled.connect(func(on: bool) -> void: _manual_box.visible = on)
-	box.add_child(_manual_toggle)
-	_manual_box = VBoxContainer.new()
-	_manual_box.name = "ManualInvite"
-	_manual_box.hide()
-	box.add_child(_manual_box)
-	NetUi.note(_manual_box, tr("Make an invite, send the link, then paste the reply they send back: each player needs their own invite."))
-	var row := HBoxContainer.new()
-	_manual_box.add_child(row)
-	_invite_for = OptionButton.new()
-	_invite_for.name = "InviteFor"
-	row.add_child(_invite_for)
-	_invite_button = HubStyle.button("Make an invite", "InviteButton")
-	_invite_button.pressed.connect(_on_invite)
-	row.add_child(_invite_button)
-	_invite_status = Label.new()
-	_invite_status.name = "InviteStatus"
-	_invite_status.theme_type_variation = &"SmallLabel"
-	_invite_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_manual_box.add_child(_invite_status)
-	_invite_link = TextEdit.new()
-	_invite_link.name = "InviteLink"
-	_invite_link.editable = false
-	_invite_link.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-	_invite_link.custom_minimum_size = Vector2(0, 90)
-	_invite_link.hide()
-	_manual_box.add_child(_invite_link)
-	var copy_row := HBoxContainer.new()
-	_manual_box.add_child(copy_row)
-	_copy_link = HubStyle.button("Copy the invite link", "CopyInviteLink")
-	_copy_link.pressed.connect(func() -> void: WebPage.copy(_link))
-	_copy_link.hide()
-	copy_row.add_child(_copy_link)
-	_copy_code = HubStyle.button("Copy the code", "CopyInviteCode")
-	_copy_code.pressed.connect(func() -> void: WebPage.copy(_code))
-	_copy_code.hide()
-	copy_row.add_child(_copy_code)
-	_reply = TextEdit.new()
-	_reply.name = "ReplyEdit"
-	_reply.placeholder_text = "Paste the reply link or code here"
-	_reply.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-	_reply.custom_minimum_size = Vector2(0, 70)
-	_reply.hide()
-	_manual_box.add_child(_reply)
-	_connect = HubStyle.button("Connect the player", "ConnectButton")
-	_connect.pressed.connect(func() -> void: reply_pasted.emit(_reply.text))
-	_connect.hide()
-	_manual_box.add_child(_connect)
 
 
 func _spin(low: int, high: int, node_name: String) -> SpinBox:
@@ -368,7 +296,6 @@ func refresh() -> void:
 	_refresh_seat(in_lobby)
 	_refresh_teams(in_lobby)
 	_refresh_settings(is_host and in_lobby)
-	_refresh_invite_options(in_lobby)
 	_start.visible = is_host and in_lobby
 	_new_lobby.visible = is_host and not in_lobby and state.is_over()
 	_start.disabled = not in_lobby or not state.start_problem().is_empty()
@@ -419,8 +346,6 @@ func _refresh_seat(in_lobby: bool) -> void:
 			var card := NetUi.hero_card(index, index == me.hero, _on_hero_picked)
 			card.button_group = group
 			_hero_row.add_child(card)
-	_side_a.set_pressed_no_signal(me.side == 0)
-	_side_b.set_pressed_no_signal(me.side == 1)
 	_ready.set_pressed_no_signal(me.ready)
 	_ready.disabled = me.side < 0
 	_ready.tooltip_text = tr("Pick a team first") if me.side < 0 else ""
@@ -437,7 +362,14 @@ func _refresh_teams(in_lobby: bool) -> void:
 	for side in 2:
 		HubStyle.clear_children(_team_boxes[side])
 		var seats := session.state.seats_on(side)
-		_team_titles[side].text = "%s  (%d/%d)" % [NetUi.side_name(side), seats.size(), MatchState.MAX_PER_SIDE]
+		var mine := session.state.seats.get(session.my_id) as MatchState.Seat
+		var title := "%s  (%d/%d)" % [NetUi.side_name(side), seats.size(), MatchState.MAX_PER_SIDE]
+		if mine != null and mine.side == side:
+			title += "  ·  " + tr("your team")
+		_team_titles[side].text = title
+		_team_titles[side].tooltip_text = tr("Click to join this team") if in_lobby else ""
+		_team_titles[side].disabled = not in_lobby
+		_team_cards[side].mouse_filter = Control.MOUSE_FILTER_STOP if in_lobby else Control.MOUSE_FILTER_PASS
 		if seats.is_empty():
 			NetUi.note(_team_boxes[side], tr("Nobody yet."))
 		for seat in seats:
@@ -451,6 +383,7 @@ func _refresh_teams(in_lobby: bool) -> void:
 
 func _add_seat_row(parent: Control, seat: MatchState.Seat, in_lobby: bool, color: Color) -> void:
 	var line := HBoxContainer.new()
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE  # (a team card is hovered and clicked as a whole)
 	parent.add_child(line)
 	var row := Label.new()
 	row.name = "Seat%d" % seat.id
@@ -466,13 +399,6 @@ func _add_seat_row(parent: Control, seat: MatchState.Seat, in_lobby: bool, color
 		line.add_child(kick)
 
 
-## What a player said: shown on their row for a few seconds.
-func _on_emote(seat_id: int, emote_id: int) -> void:
-	_emotes_seen[seat_id] = [emote_id, Time.get_ticks_msec()]
-	refresh()
-	get_tree().create_timer(EMOTE_SECONDS).timeout.connect(refresh)
-
-
 func _seat_text(seat: MatchState.Seat, in_lobby: bool) -> String:
 	var text := "%s: %s" % [seat.name, PvpHeroes.hero_name(seat.hero)]
 	if seat.id == session.my_id:
@@ -483,9 +409,6 @@ func _seat_text(seat: MatchState.Seat, in_lobby: bool) -> String:
 		text += " " + tr("(away)")
 	if seat.ready and in_lobby:
 		text += " · " + tr("ready")
-	var said: Array = _emotes_seen.get(seat.id, [])
-	if not said.is_empty() and Time.get_ticks_msec() - int(said[1]) < EMOTE_SECONDS * 1000.0:
-		text += "  “%s”" % Emotes.text(int(said[0]))
 	return text
 
 
@@ -519,55 +442,11 @@ func _on_seed_text(text: String) -> void:
 		session.configure("seed", int(text))
 
 
-## The invite choices: a new player (while in the lobby) or each player who is away.
-func _refresh_invite_options(in_lobby: bool) -> void:
-	var previous := _invite_for.get_selected_id() if _invite_for.item_count > 0 else -1
-	_invite_for.clear()
-	if in_lobby:
-		_invite_for.add_item(tr("A new player"), -1)
-	for id in session.state.seat_ids():
-		var seat := session.state.seats[id]
-		if not seat.connected:
-			_invite_for.add_item(tr("%s coming back") % seat.name, id)
-	if _invite_for.item_count == 0:
-		_invite_for.add_item(tr("(nobody to invite)"), -2)
-	var index := _invite_for.get_item_index(previous)
-	_invite_for.select(index if index >= 0 else 0)
-	_invite_button.disabled = _invite_for.get_selected_id() == -2
-
-
-func _on_invite() -> void:
-	_invite_status.text = tr("Preparing the invite... (a few seconds)")
-	_invite_link.hide()
-	_copy_link.hide()
-	_copy_code.hide()
-	invite_requested.emit(_invite_for.get_selected_id())
-
-
 ## The room code, to read out or copy (anyone who has it can join).
 func show_room(code: String, link: String) -> void:
-	_room_code = code
+	_room_code = RoomCode.pretty(code)
 	_room_link = link
 	_room_label.text = tr("Room code: %s") % RoomCode.pretty(code)
 	_room_label.show()
 	_copy_room_code.show()
 	_copy_room.show()
-
-
-## The invite is ready: show its link and the box for the reply.
-func show_invite(code: String, link: String) -> void:
-	_code = code
-	_link = link
-	_manual_toggle.button_pressed = true
-	_invite_status.text = tr("Send this link to the player. When they send a reply back, paste it below.")
-	_invite_link.text = link
-	_invite_link.show()
-	_copy_link.show()
-	_copy_code.show()
-	_reply.text = ""
-	_reply.show()
-	_connect.show()
-
-
-func show_invite_message(text: String) -> void:
-	_invite_status.text = text

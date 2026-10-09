@@ -144,16 +144,6 @@ static func _style_choice(button: Button, tint: Color) -> void:
 	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
 
-## A team button in the team's colour: it fills with it when it is the player's team.
-static func side_button(button: Button, side: int) -> void:
-	var tint: Color = SIDE_COLORS[side]
-	_style_choice(button, tint)
-	button.add_theme_color_override("font_color", tint)
-	button.add_theme_color_override("font_hover_color", tint.lightened(0.2))
-	button.add_theme_color_override("font_pressed_color", Color.WHITE)
-	button.add_theme_color_override("font_hover_pressed_color", Color.WHITE)
-
-
 ## The (i) popup: the hero's stats, then each spell with what it does. Closes with its button, Esc or a click outside.
 static func show_hero_info(from: Control, hero_index: int) -> void:
 	var host := from

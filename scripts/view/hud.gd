@@ -46,6 +46,8 @@ var _banner_tween: Tween
 var _pulse_tween: Tween
 
 @onready var _round_label: Label = %RoundLabel
+var _round_text := ""
+var _countdown := -1
 @onready var _menu_button: Button = %MenuButton
 @onready var _recenter_button: Button = %RecenterButton
 @onready var _leave_panel: Control = %LeavePanel
@@ -134,9 +136,26 @@ func _unhandled_input(event: InputEvent) -> void:
 ## shows the next few, the overlay all of them); `title` (e.g. "Floor 3") goes before the
 ## round number.
 func show_turn_order(units: Array[UnitInfo], round_number: int, title := "") -> void:
-	_round_label.text = (tr("%s · Round %d") % [title, round_number]) if not title.is_empty() else tr("Round %d") % round_number
+	_round_text = (tr("%s · Round %d") % [title, round_number]) if not title.is_empty() else tr("Round %d") % round_number
+	_update_round_label()
 	_timeline.show_order(units)
 	_order_overlay.show_order(units)
+
+
+## The seconds left on the turn (or the placement), shown after the round; -1 shows none. Red for the last ten.
+func set_countdown(seconds: int) -> void:
+	if seconds == _countdown:
+		return
+	_countdown = seconds
+	_update_round_label()
+
+
+func _update_round_label() -> void:
+	_round_label.text = _round_text if _countdown < 0 else "%s  ·  %s" % [_round_text, tr("%d s") % _countdown]
+	if _countdown >= 0 and _countdown <= 10:
+		_round_label.add_theme_color_override("font_color", Color(1.0, 0.55, 0.5))
+	else:
+		_round_label.remove_theme_color_override("font_color")
 
 
 ## The active unit's card.
@@ -184,6 +203,11 @@ func set_leave_available(available: bool) -> void:
 func _open_leave_panel() -> void:
 	_leave_panel.show()
 	_refresh_buttons()
+
+
+## The leave question, opened from outside (a menu button elsewhere on the screen).
+func open_leave_panel() -> void:
+	_open_leave_panel()
 
 
 ## Whether a full-screen panel (order, leave question, result) is over the board.

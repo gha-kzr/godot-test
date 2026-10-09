@@ -1,16 +1,12 @@
 class_name NetJoinScreen
 extends Screen
-## While joining: the reply to send back to whoever invited, then waiting to be connected.
+## While the connection to the game server opens (a host waits for its room, a joiner for its seat): what is going on,
+## and a way out. A sleeping free server takes about a minute to wake, which the text says.
 
 signal cancelled
 
+var _title: Label
 var _status: Label
-var _reply: TextEdit
-var _copy_link: Button
-var _copy_code: Button
-var _code := ""
-var _link := ""
-var _details: Label
 
 
 func _ready() -> void:
@@ -28,77 +24,28 @@ func _ready() -> void:
 	box.custom_minimum_size = Vector2(560, 0)
 	box.add_theme_constant_override("separation", 12)
 	center.add_child(box)
-	var title := Label.new()
-	title.theme_type_variation = &"HeaderLabel"
-	title.text = "Joining the match"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
+	_title = Label.new()
+	_title.theme_type_variation = &"HeaderLabel"
+	_title.text = "Joining the match"
+	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(_title)
 	_status = Label.new()
 	_status.name = "Status"
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.theme_type_variation = &"PromptLabel"
 	box.add_child(_status)
-	_reply = TextEdit.new()
-	_reply.name = "Reply"
-	_reply.editable = false
-	_reply.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-	_reply.custom_minimum_size = Vector2(0, 120)
-	box.add_child(_reply)
-	_details = Label.new()
-	_details.name = "Details"
-	_details.theme_type_variation = &"SmallLabel"
-	_details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_details)
-	var buttons := HBoxContainer.new()
-	box.add_child(buttons)
-	_copy_link = HubStyle.button("Copy the reply link", "CopyLink")
-	_copy_link.pressed.connect(func() -> void: WebPage.copy(_link))
-	buttons.add_child(_copy_link)
-	_copy_code = HubStyle.button("Copy the code", "CopyCode")
-	_copy_code.pressed.connect(func() -> void: WebPage.copy(_code))
-	buttons.add_child(_copy_code)
 	var cancel := HubStyle.button("Cancel", "CancelButton")
 	cancel.pressed.connect(cancelled.emit)
 	box.add_child(cancel)
-	show_preparing()
 
 
-func show_preparing() -> void:
-	_status.text = "Preparing your reply... (a few seconds)"
-	_reply.text = ""
-	_copy_link.disabled = true
-	_copy_code.disabled = true
+## The screen of a host: the room is being made.
+func show_opening() -> void:
+	_title.text = tr("Opening the match")
 
 
-func show_reply(code: String, link: String) -> void:
-	_code = code
-	_link = link
-	_status.text = "Send this reply to the host. You are connected as soon as they paste it."
-	_reply.text = link
-	_copy_link.disabled = false
-	_copy_code.disabled = false
-
-
-## Waiting for a room found through the trackers ("2/2" connected, or "" before the first).
-func show_search(trackers: String, details := "") -> void:
-	_reply.visible = false
-	_copy_link.visible = false
-	_copy_code.visible = false
-	_status.text = tr("Looking for the room... The host answers as soon as they see you.")
-	if not trackers.is_empty():
-		_status.text += "\n" + tr("Connected relays: %s") % trackers
-	_details.text = details
-
-
-## The host answered: the two browsers are now opening a direct connection.
-func show_connecting(details: String) -> void:
-	if WebPage.is_brave() and not details.is_empty():
-		details += "\n" + tr("Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox.")
-	_reply.visible = false
-	_copy_link.visible = false
-	_copy_code.visible = false
-	_status.text = tr("Room found. Connecting to the host...")
-	_details.text = details
+func show_status(text: String) -> void:
+	_status.text = text
 
 
 func show_message(text: String) -> void:

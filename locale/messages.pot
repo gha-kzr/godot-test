@@ -105,10 +105,6 @@ msgstr ""
 msgid "%s cleared! The tower now goes up to floor %d, and you can start at floor %d."
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
-msgid "%s coming back"
-msgstr ""
-
 #: scripts/data/damage_effect.gd
 msgid "%s damage"
 msgstr ""
@@ -237,11 +233,11 @@ msgstr ""
 msgid "%s: %s.\n%s rune. Click to equip on the selected hero."
 msgstr ""
 
-#: scripts/net/net_battle_controller.gd scripts/net/net_status_panel.gd
+#: scripts/net/net_battle_controller.gd
 msgid "(AI)"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd scripts/net/net_status_panel.gd
+#: scripts/game/net/net_lobby_screen.gd scripts/net/net_battle_controller.gd
 msgid "(away)"
 msgstr ""
 
@@ -253,15 +249,11 @@ msgstr ""
 msgid "(host)"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
-msgid "(nobody to invite)"
-msgstr ""
-
 #: scripts/game/qa_screen.gd
 msgid "(none)"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd scripts/net/net_status_panel.gd
+#: scripts/game/net/net_lobby_screen.gd
 msgid "(you)"
 msgstr ""
 
@@ -287,10 +279,6 @@ msgstr ""
 
 #: scripts/progression/hints.gd
 msgid "A hero gained a level: its stats grow, and some levels teach a new spell."
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "A new player"
 msgstr ""
 
 #: scripts/game/game.gd
@@ -469,10 +457,6 @@ msgstr ""
 msgid "Boss defeated! Pick a boon, or heal the party instead."
 msgstr ""
 
-#: scripts/game/net/net_flow.gd scripts/game/net/net_join_screen.gd
-msgid "Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox."
-msgstr ""
-
 #: scripts/game/hub/rune_stash.gd
 msgid "Break this rune for %d essence"
 msgstr ""
@@ -583,6 +567,10 @@ msgstr ""
 msgid "Click a teal cell to place your hero, then press Ready (%s)"
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Click to join this team"
+msgstr ""
+
 #: scripts/view/hud/order_overlay.gd
 msgid "Click to look at this unit"
 msgstr ""
@@ -611,20 +599,12 @@ msgstr ""
 msgid "Common"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Connect the player"
+#: scripts/net/multiplayer_hub.gd
+msgid "Connecting to the game server..."
 msgstr ""
 
-#: scripts/game/net/net_join_screen.gd
-msgid "Connected relays: %s"
-msgstr ""
-
-#: scripts/game/net/net_flow.gd
-msgid "Connecting... the player appears in the list when it works."
-msgstr ""
-
-#: scripts/net/rtc_link.gd
-msgid "Connection: %s."
+#: scripts/net/multiplayer_hub.gd
+msgid "Connection lost: trying to come back..."
 msgstr ""
 
 #: scripts/game/hub/destination_bar.gd
@@ -639,24 +619,16 @@ msgstr ""
 msgid "Controls"
 msgstr ""
 
-#: scripts/game/net/net_join_screen.gd scripts/game/net/net_lobby_screen.gd
-msgid "Copy the code"
-msgstr ""
-
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Copy the invite link"
-msgstr ""
-
-#: scripts/game/net/net_join_screen.gd
-msgid "Copy the reply link"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Copy the room code"
 msgstr ""
 
-#: scripts/game/net/net_flow.gd
-msgid "Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players."
+#: scripts/net/relay_transport.gd
+msgid "Could not reach the game server."
 msgstr ""
 
 #: scripts/progression/qa_tools.gd
@@ -764,7 +736,7 @@ msgid "Enemies (they take the board's spawns)"
 msgstr ""
 
 #: scripts/game/net/net_menu_screen.gd
-msgid "Enter a room code or paste an invite first."
+msgid "Enter a room code or paste a room link first."
 msgstr ""
 
 #: scripts/data/rune_data.gd
@@ -1135,6 +1107,10 @@ msgstr ""
 msgid "Icy Grasp"
 msgstr ""
 
+#: scripts/game/net/net_flow.gd
+msgid "In the room. Waiting for the host to take you in..."
+msgstr ""
+
 #: scripts/view/hud/unit_info.gd
 msgid "Initiative %d, damage taken %+d%%"
 msgstr ""
@@ -1181,10 +1157,6 @@ msgstr ""
 
 #: scripts/game/net/net_menu_screen.gd
 msgid "Join a match"
-msgstr ""
-
-#: scripts/net/multiplayer_hub.gd
-msgid "Joining by room code isn't available here: ask for an invite link instead."
 msgstr ""
 
 #: scripts/game/net/net_join_screen.gd
@@ -1241,10 +1213,6 @@ msgstr ""
 msgid "Legendary"
 msgstr ""
 
-#: scripts/net/net_status_panel.gd
-msgid "Let the AI play my hero"
-msgstr ""
-
 #: data/achievements/level_10.tres
 msgid "Level 10"
 msgstr ""
@@ -1273,24 +1241,12 @@ msgstr ""
 msgid "Loadout: the spells brought to a fight (slot 1 is key 1)"
 msgstr ""
 
-#: scripts/game/net/net_join_screen.gd
-msgid "Looking for the room... The host answers as soon as they see you."
-msgstr ""
-
 #: scripts/view/hud.gd
 msgid "Lose now"
 msgstr ""
 
 #: data/units/mage.tres
 msgid "Mage"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Make an invite"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Make an invite, send the link, then paste the reply they send back: each player needs their own invite."
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
@@ -1329,7 +1285,7 @@ msgstr ""
 msgid "Mending Rain"
 msgstr ""
 
-#: scenes/battle/hud.tscn
+#: scripts/game/net/net_top_bar.gd scenes/battle/hud.tscn
 msgid "Menu"
 msgstr ""
 
@@ -1377,10 +1333,6 @@ msgstr ""
 msgid "Multiplayer"
 msgstr ""
 
-#: scripts/game/net/net_menu_screen.gd
-msgid "Multiplayer needs the web version of the game (it uses the browser's WebRTC)."
-msgstr ""
-
 #: data/units/mushroom_sage.tres
 msgid "Mushroom Sage"
 msgstr ""
@@ -1409,10 +1361,6 @@ msgstr ""
 msgid "Need %d essence"
 msgstr ""
 
-#: scripts/net/rtc_link.gd
-msgid "Network: %d local, %d public addresses found."
-msgstr ""
-
 #: scripts/game/net/net_lobby_screen.gd
 msgid "New map"
 msgstr ""
@@ -1433,8 +1381,8 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: scripts/net/rtc_link.gd
-msgid "No public address: this network may block direct connections between players."
+#: scripts/net/multiplayer_hub.gd
+msgid "No match has that code. Check it: the host may have left."
 msgstr ""
 
 #: scripts/game/run_screen.gd
@@ -1457,7 +1405,7 @@ msgstr ""
 msgid "No such rune in the stash."
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd scripts/net/net_status_panel.gd
+#: scripts/game/net/net_lobby_screen.gd scripts/net/net_battle_controller.gd
 msgid "Nobody else is connected: the others left, or your own connection broke."
 msgstr ""
 
@@ -1475,6 +1423,10 @@ msgstr ""
 
 #: scripts/game/settings_screen.gd
 msgid "Normal"
+msgstr ""
+
+#: scripts/net/match_session.gd
+msgid "not connected"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
@@ -1513,6 +1465,10 @@ msgstr ""
 msgid "Open field"
 msgstr ""
 
+#: scripts/game/net/net_join_screen.gd
+msgid "Opening the match"
+msgstr ""
+
 #: scripts/progression/qa_tools.gd
 msgid "opposite corners"
 msgstr ""
@@ -1539,10 +1495,6 @@ msgstr ""
 
 #: scripts/game/run_screen.gd scenes/game/party_screen.tscn
 msgid "Party"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Paste the reply link or code here"
 msgstr ""
 
 #: data/pvp/spells/wraith_phase.tres
@@ -1589,10 +1541,6 @@ msgstr ""
 msgid "Place your heroes: click one, then a teal cell. Ready (%s) to fight"
 msgstr ""
 
-#: scripts/net/net_status_panel.gd
-msgid "Placement: %d s"
-msgstr ""
-
 #: data/pvp/statuses/plague.tres
 msgid "Plague"
 msgstr ""
@@ -1607,14 +1555,6 @@ msgstr ""
 
 #: scripts/view/battle_controller.gd scenes/battle/hud.tscn
 msgid "Play again"
-msgstr ""
-
-#: scripts/net/net_status_panel.gd
-msgid "Play my hero again"
-msgstr ""
-
-#: scripts/net/net_status_panel.gd
-msgid "Players"
 msgstr ""
 
 #: scripts/game/qa_screen.gd
@@ -1647,14 +1587,6 @@ msgstr ""
 
 #: scripts/data/glossary.gd
 msgid "Power: percent added to the damage and heals of the unit's spells."
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Preparing the invite... (a few seconds)"
-msgstr ""
-
-#: scripts/game/net/net_join_screen.gd
-msgid "Preparing your reply... (a few seconds)"
 msgstr ""
 
 #: scripts/game/settings_screen.gd
@@ -1886,15 +1818,11 @@ msgid "Role: %s"
 msgstr ""
 
 #: scripts/game/net/net_menu_screen.gd
-msgid "Room code, or invite link"
+msgid "Room code, or room link"
 msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Room code: %s"
-msgstr ""
-
-#: scripts/game/net/net_join_screen.gd
-msgid "Room found. Connecting to the host..."
 msgstr ""
 
 #: data/pvp/statuses/rooted.tres
@@ -1985,7 +1913,7 @@ msgstr ""
 msgid "Save reset."
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
+#: scripts/net/net_battle_controller.gd
 msgid "Say something"
 msgstr ""
 
@@ -2001,14 +1929,6 @@ msgstr ""
 msgid "Seconds per turn"
 msgstr ""
 
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Send this link to the player. When they send a reply back, paste it below."
-msgstr ""
-
-#: scripts/game/net/net_join_screen.gd
-msgid "Send this reply to the host. You are connected as soon as they paste it."
-msgstr ""
-
 #: scripts/game/qa_screen.gd
 msgid "Set every hero to this level"
 msgstr ""
@@ -2017,7 +1937,7 @@ msgstr ""
 msgid "Set the best floor to this value"
 msgstr ""
 
-#: scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
+#: scripts/game/net/net_top_bar.gd scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
 msgid "Settings"
 msgstr ""
 
@@ -2103,10 +2023,6 @@ msgstr ""
 
 #: data/pvp/spells/priest_smite.tres data/spells/smite.tres
 msgid "Smite"
-msgstr ""
-
-#: scripts/game/net/net_lobby_screen.gd
-msgid "Someone cannot connect? Make a manual invite"
 msgstr ""
 
 #: data/pvp/units/sorceress.tres
@@ -2278,15 +2194,7 @@ msgid "That hero isn't available."
 msgstr ""
 
 #: scripts/net/multiplayer_hub.gd
-msgid "That invite is not valid."
-msgstr ""
-
-#: scripts/net/multiplayer_hub.gd
-msgid "That isn't a reply code."
-msgstr ""
-
-#: scripts/net/multiplayer_hub.gd
-msgid "That isn't an invite code or link."
+msgid "That isn't a room code (6 letters and numbers)."
 msgstr ""
 
 #: scripts/net/net_battle_controller.gd
@@ -2295,10 +2203,6 @@ msgstr ""
 
 #: scripts/progression/settings_applier.gd
 msgid "That key can't be used."
-msgstr ""
-
-#: scripts/net/multiplayer_hub.gd
-msgid "That reply is for another match."
 msgstr ""
 
 #: scripts/progression/profile.gd
@@ -2345,6 +2249,10 @@ msgstr ""
 msgid "The biggest damage in the game and nothing else. One careless step and she is gone: keep her behind your team."
 msgstr ""
 
+#: scripts/net/relay_transport.gd
+msgid "The connection to the game server was lost."
+msgstr ""
+
 #: scripts/game/game.gd
 msgid "The essence is now %d."
 msgstr ""
@@ -2357,16 +2265,24 @@ msgstr ""
 msgid "The floor's own"
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "The game server is full: try again in a few minutes."
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "The game server refused the request."
+msgstr ""
+
 #: scripts/net/match_session.gd
 msgid "the game state differs from the host's (desync)"
 msgstr ""
 
-#: scripts/net/match_session.gd
-msgid "The host removed you from the match."
+#: scripts/game/net/net_flow.gd
+msgid "The host did not answer."
 msgstr ""
 
-#: scripts/net/multiplayer_hub.gd
-msgid "The match has already started."
+#: scripts/net/match_session.gd
+msgid "The host removed you from the match."
 msgstr ""
 
 #: scripts/net/match_state.gd
@@ -2417,6 +2333,10 @@ msgstr ""
 msgid "These change your save (press twice to confirm)."
 msgstr ""
 
+#: scripts/net/relay_transport.gd
+msgid "This player joined from another window or tab."
+msgstr ""
+
 #: scenes/game/hint_card.tscn
 msgid "Tip"
 msgstr ""
@@ -2435,6 +2355,10 @@ msgstr ""
 
 #: scripts/net/match_session.gd
 msgid "too many requests"
+msgstr ""
+
+#: scripts/net/multiplayer_hub.gd
+msgid "Too many wrong codes: wait a minute and try again."
 msgstr ""
 
 #: scenes/battle/hud.tscn
@@ -2477,10 +2401,6 @@ msgstr ""
 msgid "Turn order"
 msgstr ""
 
-#: scripts/net/net_status_panel.gd
-msgid "Turn: %d s"
-msgstr ""
-
 #: scenes/game/settings_screen.tscn
 msgid "UI scale"
 msgstr ""
@@ -2506,7 +2426,7 @@ msgid "Vanish"
 msgstr ""
 
 #: data/pvp/heroes/rogue.tres
-msgid "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her."
+msgid "Vanishes until her next attack, then strikes for extra damage. Enemies can't see her, even next to her, until she attacks, is hurt, or one of them walks into her (which hurts them)."
 msgstr ""
 
 #: data/runes/venom_ward.tres
@@ -2537,16 +2457,16 @@ msgstr ""
 msgid "Waiting for the host to start. Pick your hero and your team, then press Ready."
 msgstr ""
 
+#: scripts/net/multiplayer_hub.gd
+msgid "Waking the game server up... (it sleeps when nobody plays, so the first game of the day takes up to a minute)"
+msgstr ""
+
 #: data/units/warg.tres
 msgid "Warg"
 msgstr ""
 
 #: data/pvp/heroes/necromancer.tres
 msgid "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing."
-msgstr ""
-
-#: scripts/net/multiplayer_hub.gd
-msgid "WebRTC isn't available here."
 msgstr ""
 
 #: scripts/progression/tutorial.gd
@@ -2659,4 +2579,8 @@ msgstr ""
 
 #: scripts/game/net/net_lobby_screen.gd
 msgid "Your player"
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "your team"
 msgstr ""

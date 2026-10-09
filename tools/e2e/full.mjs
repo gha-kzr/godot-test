@@ -1,22 +1,14 @@
-import { launch, Player, sleep } from './cdp.mjs';
+import { pageUrl, launch, Player, sleep } from './cdp.mjs';
 
-const BASE = '' + (process.env.GAME_URL || 'http://127.0.0.1:8061/index.html') + '?e2e=1' + (process.env.E2E_STUN === '1' ? '' : '&stun=0');
+const BASE = pageUrl();
 const chrome = await launch();
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 const fail = (m) => { throw new Error(m); };
 const check = (cond, m) => { if (!cond) fail('CHECK FAILED: ' + m); log('ok:', m); };
 
-async function connect(inviter, newcomer, name, seat) {
-  inviter.browser.logs.length = 0;
-  await inviter.eval('delete window.e2e_out.invite');
-  await inviter.cmd('invite', ...(seat ? [seat] : []));
-  const invite = await inviter.out('invite', 40000);
-  await newcomer.eval('delete window.e2e_out.reply');
-  await newcomer.cmd('join', name, invite.link);
-  const reply = await newcomer.out('reply', 40000);
-  const error = await inviter.cmd('reply', reply.link);
-  check(error === '', `${name} reply accepted`);
-  await newcomer.until((s) => s.synced, `${name} synced`);
+async function connect(room, newcomer, name) {
+  await newcomer.cmd('join', name, room);
+  await newcomer.until((s) => s.synced, `${name} synced`, 40000);
 }
 
 async function inStep(players, what, timeoutMs = 15000) {
@@ -51,12 +43,12 @@ try {
   await Promise.all([alice, bob, carol].map((p) => p.waitReady()));
   for (const p of [alice, bob, carol]) await p.cmd('open');
   await alice.cmd('host', 'Alice');
-  await connect(alice, bob, 'Bob');
-  await connect(alice, carol, 'Carol');
-  // The mesh builds itself through Alice: Carol ends up linked to Bob directly.
-  await carol.until((s) => s.direct.length === 2, 'carol linked to both', 40000);
-  await bob.until((s) => s.direct.length === 2, 'bob linked to both', 40000);
-  check(true, 'full mesh of three');
+  const room = (await alice.until((s) => s.in_match && s.room, 'alice has a room', 90000)).room;
+  log('alice hosts room', room);
+  await connect(room, bob, 'Bob');
+  await connect(room, carol, 'Carol');
+  await alice.until((s) => s.peers.length === 2, 'alice reaches both');
+  check(true, 'three players in one room');
   await inStep([alice, bob, carol], 'lobby');
 
   // Lobby: sides, map, timers, ready, start.
@@ -81,6 +73,13 @@ try {
   const s1 = await inStep([alice, bob, carol], 'after six turns');
   check(s1.entries > s0.entries, 'the log grew');
 
+  // Bob's connection to the server breaks: it comes back by itself, to the same seat, and the match goes on.
+  await bob.cmd('blink');
+  await bob.until((s) => s.synced && s.peers.length === 2 && !s.connection, 'bob reconnected', 30000);
+  await alice.until((s) => s.seats.find((x) => x.id === 2).connected && s.peers.length === 2, 'alice sees bob back', 30000);
+  check((await bob.status()).my_id === 2 && (await bob.status()).host_id === 1, 'bob is back in seat 2 and alice is still the host');
+  await inStep([alice, bob, carol], 'after the blink');
+
   // Host swap: Alice's tab closes.
   await alice.closeTab();
   log('alice closed her tab');
@@ -96,15 +95,10 @@ try {
   const s2 = await inStep([bob, carol], 'after the swap');
   check(s2.entries > before, 'the log keeps growing under the new host');
 
-  // Alice comes back: Bob (the host now) makes an invite for her seat, she opens its link.
-  await bob.eval('delete window.e2e_out.invite');
-  await bob.cmd('invite', 1);
-  const invite = await bob.out('invite', 40000);
-  await alice.openTab(BASE + '#join=' + invite.code);
+  // Alice comes back: she opens the room link in the browser she left (it kept her token).
+  await alice.openTab(BASE + '#room=' + room);
   await alice.waitReady();
-  await alice.cmd('open');  // The page's address holds the invite: it joins by itself.
-  const reply = await alice.out('reply', 40000);
-  check((await bob.cmd('reply', reply.link)) === '', 'alice\'s reply accepted');
+  await alice.cmd('open');  // The page's address holds the room code: it joins by itself.
   const a2 = await alice.until((s) => s.synced, 'alice synced again', 40000);
   check(a2.my_id === 1 && a2.phase === 1, 'alice is back in seat 1, in the fight');
   await alice.until((s) => !s.seats.find((x) => x.id === 1).ai, 'alice gets her hero back', 60000);

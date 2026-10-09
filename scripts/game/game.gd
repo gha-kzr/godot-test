@@ -101,7 +101,7 @@ func show_start() -> void:
 	start.started.connect(_open_first_screen)
 
 
-## After the first click: an invite link in the page's address goes straight to joining, anything else to the title.
+## After the first click: a room link in the page's address goes straight to joining, anything else to the title.
 func _open_first_screen() -> void:
 	if _fragment_joins():
 		show_multiplayer()
@@ -109,10 +109,9 @@ func _open_first_screen() -> void:
 		show_title()
 
 
-## The page address carries an invite or a room code to join.
+## The page address carries a room code to join.
 func _fragment_joins() -> bool:
-	var fragment := WebPage.fragment()
-	return fragment.begins_with(InviteCodec.JOIN_KEY + "=") or fragment.begins_with(RoomCode.LINK_KEY + "=")
+	return WebPage.fragment().begins_with(RoomCode.LINK_KEY + "=")
 
 
 ## Multiplayer: the front page, joining, the lobby and the fight (NetFlow). Back leaves for the title.
@@ -122,6 +121,9 @@ func show_multiplayer() -> void:
 	flow.exit_requested.connect(show_title)
 	flow.sound.connect(audio.play_sfx)
 	flow.speed_changed.connect(_on_settings_changed)
+	flow.settings_changed.connect(_on_settings_changed)
+	flow.top_bar_changed.connect(_shift_mute_button)
+	flow.audio_live.connect(func() -> void: SettingsApplier.apply_audio(settings))
 	flow.music_requested.connect(audio.play_music)
 	_replace_screen(flow)
 	var fragment := WebPage.fragment()
@@ -215,6 +217,15 @@ func show_settings() -> void:
 	settings_screen.audio_live.connect(func() -> void: SettingsApplier.apply_audio(settings))
 	settings_screen.changed.connect(_on_settings_changed)
 	settings_screen.reset_save_confirmed.connect(_on_reset_save_confirmed)
+
+
+## Makes room at the right of the sound button: a multiplayer screen puts its own round buttons in the corner and the
+## sound button sits to their left.
+func _shift_mute_button(room: float) -> void:
+	if _mute_button == null:
+		return
+	_mute_button.offset_right = -OVERLAY_MARGIN_X - room
+	_mute_button.offset_left = _mute_button.offset_right - 48.0
 
 
 ## What stays on top of every screen: the mute button, in the top right corner.
@@ -577,6 +588,7 @@ func _save() -> bool:
 ## Swaps the current screen for `next`. The old one leaves the tree now and is freed at
 ## the end of the frame: it may be the one whose signal led here (a battle's Continue).
 func _replace_screen(next: Node) -> void:
+	_shift_mute_button(0.0)
 	if screen != null:
 		remove_child(screen)
 		screen.queue_free()

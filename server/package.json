@@ -1,0 +1,14 @@
+{
+  "name": "rune-ascent-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Message relay for Rune Ascent multiplayer: rooms of players that send each other messages through one WebSocket server",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": { "ws": "^8.18.0" }
+}

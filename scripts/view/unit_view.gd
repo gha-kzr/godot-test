@@ -41,6 +41,8 @@ const PLACEHOLDER_HEIGHT := 0.9
 const HP_LABEL_ABOVE := 0.35
 const STATUS_ROW_ABOVE := 1.0
 const PREVIEW_ABOVE := 1.6
+## The tail of a player's quick message (a speech bubble) points this far above the status icons.
+const SAY_ABOVE := 0.3
 ## A dying model gets this long to fall before it shrinks away (seconds). Other actions don't
 ## hold the event queue at all: an animation plays out on its own (the model returns to Idle
 ## when it ends, or the next action replaces it), so the turn isn't slowed and the player can
@@ -59,6 +61,7 @@ const STATUS_EXPIRED_DURATION := 0.3
 
 var unit_id := -1
 var _hidden_from_viewer := false
+var _ghost := false
 var _alive_for_pick := true
 var _board: BoardView
 var _max_hp := 1
@@ -78,6 +81,8 @@ var _head_height := PLACEHOLDER_HEIGHT
 var _auras: Dictionary[StatusData, Node3D] = {}
 ## Where the damage preview floats (above the head, set by _layout_anchors).
 var _preview_y := PLACEHOLDER_HEIGHT + PREVIEW_ABOVE
+## The speech bubble above the head (a player's quick message), or null.
+var _speech: SpeechBubble
 
 @onready var _body: Node3D = $Body
 @onready var _placeholder: MeshInstance3D = $Body/Placeholder
@@ -122,6 +127,20 @@ func setup(unit: UnitState, board: BoardView) -> void:
 	sync(unit)
 
 
+## A hero in stealth, seen by its own team (the other team doesn't see it at all): drawn see-through.
+func set_ghost(on: bool) -> void:
+	_ghost = on
+	if _model != null:
+		_model.set_ghost(on)
+	elif _material != null:
+		_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS if on else BaseMaterial3D.TRANSPARENCY_DISABLED
+		_material.albedo_color.a = UnitModel.GHOST_ALPHA if on else 1.0
+
+
+func is_ghost() -> bool:
+	return _ghost
+
+
 ## Hides the unit from the player looking at the board (stealth: an enemy that can't be seen can't be clicked
 ## or hovered either). Dead units stay as sync() leaves them.
 func set_hidden_from_viewer(hidden: bool) -> void:
@@ -160,6 +179,7 @@ func sync(unit: UnitState, hidden_from_viewer := false) -> void:
 	_set_hp(unit.hp)
 	var alive := unit.is_alive()
 	_hidden_from_viewer = hidden_from_viewer
+	set_ghost(alive and unit.is_stealthed() and not hidden_from_viewer)
 	_alive_for_pick = alive
 	visible = alive and not hidden_from_viewer
 	_hp_label.visible = alive
@@ -473,6 +493,19 @@ func _spawn_floating_number(text: String, color: Color, lift := 0.0) -> void:
 	tween.tween_property(label, "position:y", label.position.y + 0.8, FLOAT_DURATION)
 	tween.tween_property(label, "modulate:a", 0.0, FLOAT_DURATION).set_delay(FLOAT_DURATION * 0.4)
 	tween.chain().tween_callback(label.queue_free)
+
+
+## A speech bubble above the unit's head for a few seconds (a player's quick message); a new one replaces the old.
+func say(text: String) -> void:
+	if _speech != null and is_instance_valid(_speech):
+		_speech.queue_free()
+	_speech = SpeechBubble.new(text)
+	_speech.position.y = _status_row.position.y + SAY_ABOVE
+	add_child(_speech)
+
+
+func speech_text() -> String:
+	return _speech.text if _speech != null and is_instance_valid(_speech) and not _speech.is_queued_for_deletion() else ""
 
 
 ## Keeps the tag row and the preview badge facing the camera; runs only while there are any.

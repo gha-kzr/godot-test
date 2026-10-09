@@ -1,6 +1,6 @@
 extends TestCase
 ## The multiplayer screens: the front page, the lobby (what each player may change), and the whole
-## flow from an invite to a lobby to a fight, with fake links standing in for WebRTC.
+## flow from a room code to a lobby to a fight, with a relay in memory standing in for the server.
 
 
 const TEST_FILE := "user://test_net_player.cfg"
@@ -43,7 +43,7 @@ func test_the_front_page_hosts_or_joins_with_a_name() -> void:
 	(menu.find_child("HostButton", true, false) as Button).pressed.emit()
 	assert_eq(hosted, ["Alice"])
 	(menu.find_child("JoinButton", true, false) as Button).pressed.emit()
-	assert_eq(joined, [], "no invite pasted yet")
+	assert_eq(joined, [], "no code typed yet")
 	assert_ne((menu.find_child("Status", true, false) as Label).text, "")
 	(menu.find_child("CodeEdit", true, false) as LineEdit).text = " R1abc "
 	(menu.find_child("JoinButton", true, false) as Button).pressed.emit()
@@ -75,7 +75,7 @@ func test_the_lobby_lets_each_player_change_only_their_own_seat_and_the_host_the
 	assert_true(guest_lobby.find_child("StartButton", true, false).visible == false, "only the host starts")
 	# Bob picks the Mage on side B: everyone sees it.
 	(guest_lobby.find_child("Hero1", true, false) as Button).pressed.emit()
-	(guest_lobby.find_child("SideB", true, false) as Button).pressed.emit()
+	(guest_lobby.find_child("TeamB", true, false) as Control).gui_input.emit(_left_click())  # A click on the team joins it.
 	rig.net.flush()
 	assert_eq(rig.sessions[1].state.seats[2].hero, 1)
 	assert_eq(rig.sessions[1].state.seats[2].side, 1)
@@ -158,48 +158,50 @@ func test_a_player_changes_their_name_in_the_lobby() -> void:
 	lobby.free()
 
 
-func test_the_invite_choices_offer_a_new_player_and_each_player_who_is_away() -> void:
-	var rig := NetRig.new()
-	rig.start_match(3, 1)
-	var lobby := NetLobbyScreen.new()
-	_root().add_child(lobby)
-	lobby.bind(rig.sessions[1])
-	var picker := lobby.find_child("InviteFor", true, false) as OptionButton
-	assert_eq(picker.item_count, 1, "in a fight only players who left can be invited back, and nobody has")
-	rig.net.kill(3)
-	rig.run(3.0)
-	assert_eq(picker.item_count, 1)
-	assert_eq(picker.get_item_id(0), 3, "the player who left")
-	lobby.free()
-
-
-func _flow(fakes: FakeLinks) -> NetFlow:
+func _flow(relay: FakeRelay) -> NetFlow:
 	var flow := NetFlow.new()
-	flow.link_factory = fakes
+	flow.make_socket = relay.make_socket
 	_root().add_child(flow)
 	return flow
 
 
-func test_an_invite_a_reply_and_two_players_are_in_the_same_lobby() -> void:
-	var fakes := FakeLinks.new()
-	var host := _flow(fakes)
+## The relay and every flow's hub run for `seconds` (the hubs are polled by hand, the relay delivers between steps).
+func _pump(relay: FakeRelay, flows: Array, seconds := 2.0) -> void:
+	var elapsed := 0.0
+	relay.flush()
+	while elapsed < seconds - 0.00001:
+		for flow: NetFlow in flows:
+			flow.hub._process(0.25)
+		relay.flush()
+		elapsed += 0.25
+
+
+## A host in its lobby and a guest in the same one, both with the screens they would see.
+func _two_players(relay: FakeRelay) -> Array:
+	var host := _flow(relay)
 	host.start("")
 	host._on_host("Alice")
-	assert_true(host._screen is NetLobbyScreen)
-	var invite := {}
-	host.hub.invite_ready.connect(func(code: String, link: String, seat: int) -> void: invite.merge({"code": code, "link": link, "seat": seat}, true))
-	host.hub.create_invite()
-	assert_eq(invite["seat"], 2)
-	assert_true(str(invite["link"]).contains("#join="))
-	var guest := _flow(fakes)
+	_pump(relay, [host])
+	var guest := _flow(relay)
 	guest.start("")
-	var reply := {}
-	guest.hub.reply_ready.connect(func(code: String, link: String) -> void: reply.merge({"code": code, "link": link}, true))
-	guest._on_join("Bob", invite["link"])
-	assert_true(guest._screen is NetJoinScreen, "waiting for the host")
-	assert_true(str(reply["link"]).contains("#reply="))
-	host._on_reply_pasted(reply["link"])
-	fakes.flush()
+	guest._on_join("Bob", host.hub.room_code)
+	_pump(relay, [host, guest])
+	return [host, guest]
+
+
+func test_a_room_code_puts_two_players_in_the_same_lobby() -> void:
+	var relay := FakeRelay.new()
+	var host := _flow(relay)
+	host.start("")
+	host._on_host("Alice")
+	assert_true(host._screen is NetJoinScreen, "waiting for the server to make the room")
+	_pump(relay, [host])
+	assert_true(host._screen is NetLobbyScreen, "the room is made: the lobby")
+	var guest := _flow(relay)
+	guest.start("")
+	guest._on_join("Bob", RoomCode.pretty(host.hub.room_code))
+	assert_true(guest._screen is NetJoinScreen, "waiting for the server")
+	_pump(relay, [host, guest])
 	await _frames()
 	assert_true(guest._screen is NetLobbyScreen, "caught up: the lobby")
 	assert_eq(host.hub.session.state.seat_ids(), [1, 2] as Array[int])
@@ -210,77 +212,57 @@ func test_an_invite_a_reply_and_two_players_are_in_the_same_lobby() -> void:
 
 
 func test_a_link_opened_in_the_browser_joins_by_itself() -> void:
-	var fakes := FakeLinks.new()
-	var host := _flow(fakes)
+	var relay := FakeRelay.new()
+	var host := _flow(relay)
 	host.start("")
 	host._on_host("Alice")
-	var invite := {}
-	host.hub.invite_ready.connect(func(code: String, _link: String, _seat: int) -> void: invite.merge({"code": code}, true))
-	host.hub.create_invite()
-	var guest := _flow(fakes)
-	guest.start("join=" + invite["code"])
+	_pump(relay, [host])
+	var guest := _flow(relay)
+	guest.start("room=" + host.hub.room_code)
 	assert_true(guest._screen is NetJoinScreen, "no click needed")
-	assert_true(guest.hub.session != null)
+	assert_true(guest.hub.transport != null)
+	_pump(relay, [host, guest])
+	assert_true(guest._screen is NetLobbyScreen)
 	host.free()
 	guest.free()
 
 
-func test_a_bad_invite_stays_on_the_front_page_with_a_message() -> void:
-	var fakes := FakeLinks.new()
-	var guest := _flow(fakes)
+func test_a_bad_code_stays_on_the_front_page_with_a_message() -> void:
+	var relay := FakeRelay.new()
+	var guest := _flow(relay)
 	guest.start("")
-	guest._on_join("Bob", "not an invite")
+	guest._on_join("Bob", "not a code")
 	assert_true(guest._screen is NetMenuScreen)
 	assert_ne((guest._screen.find_child("Status", true, false) as Label).text, "")
 	guest.free()
 
 
-func test_a_reply_for_another_match_is_refused() -> void:
-	var fakes := FakeLinks.new()
-	var host := _flow(fakes)
-	host.start("")
-	host._on_host("Alice")
-	var other := _flow(fakes)
-	other.start("")
-	other._on_host("Eve")
-	var invite := {}
-	other.hub.invite_ready.connect(func(code: String, _link: String, _seat: int) -> void: invite.merge({"code": code}, true))
-	other.hub.create_invite()
-	var guest := _flow(fakes)
+func test_a_code_nobody_has_goes_back_to_the_front_page_with_a_message() -> void:
+	var relay := FakeRelay.new()
+	var guest := _flow(relay)
 	guest.start("")
-	var reply := {}
-	guest.hub.reply_ready.connect(func(code: String, _link: String) -> void: reply.merge({"code": code}, true))
-	guest._on_join("Bob", invite["code"])
-	assert_ne(host.hub.accept_reply(reply["code"]), "", "Alice's match is not Eve's")
-	host.free()
-	other.free()
+	guest._on_join("Bob", "abcdef")
+	assert_true(guest._screen is NetJoinScreen)
+	_pump(relay, [guest])
+	assert_true(guest._screen is NetMenuScreen, "back on the front page")
+	assert_true((guest._screen.find_child("Status", true, false) as Label).text.begins_with("No match has that code"))
 	guest.free()
 
 
 func test_the_fight_opens_on_both_screens_and_leads_back_to_the_lobby() -> void:
-	var fakes := FakeLinks.new()
-	var host := _flow(fakes)
-	host.start("")
-	host._on_host("Alice")
-	var invite := {}
-	host.hub.invite_ready.connect(func(code: String, _link: String, _seat: int) -> void: invite.merge({"code": code}, true))
-	host.hub.create_invite()
-	var guest := _flow(fakes)
-	guest.start("")
-	var reply := {}
-	guest.hub.reply_ready.connect(func(code: String, _link: String) -> void: reply.merge({"code": code}, true))
-	guest._on_join("Bob", invite["code"])
-	host._on_reply_pasted(reply["code"])
-	fakes.flush()
+	var relay := FakeRelay.new()
+	var both := _two_players(relay)
+	var host: NetFlow = both[0]
+	var guest: NetFlow = both[1]
 	await _frames()
 	guest.hub.session.set_field("side", 1)
 	host.hub.session.set_field("side", 0)
-	fakes.flush()
+	_pump(relay, both)
 	host.hub.session.set_ready(true)
 	guest.hub.session.set_ready(true)
-	fakes.flush()
+	_pump(relay, both)
 	host.hub.session.start_match()
-	fakes.flush()
+	_pump(relay, both)
 	await _frames(3)
 	assert_true(host._screen is NetBattleController, "the fight on the host's screen")
 	assert_true(guest._screen is NetBattleController, "and the guest's")
@@ -358,7 +340,6 @@ func test_scrolling_past_the_end_of_the_spell_list_does_not_close_the_popup() ->
 func test_the_teams_are_blue_and_red_everywhere() -> void:
 	assert_eq(NetUi.side_name(0), "Blue team")
 	assert_eq(NetUi.side_name(1), "Red team")
-	assert_eq(NetStatusPanel.SIDE_COLORS, NetUi.SIDE_COLORS)
 	var lobby := NetLobbyScreen.new()
 	var rig := NetRig.new()
 	rig.host(1)
@@ -371,42 +352,197 @@ func test_the_teams_are_blue_and_red_everywhere() -> void:
 	lobby.free()
 
 
-func test_emotes_show_on_the_lobby_and_the_fight_panel() -> void:
+func _left_click() -> InputEventMouseButton:
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	return click
+
+
+func test_a_team_is_joined_by_clicking_it_and_there_is_no_join_button() -> void:
 	var rig := NetRig.new()
 	rig.host(1, "Alice")
 	rig.guest(2, "Bob")
-	assert_eq(MatchSession.EMOTE_COUNT, Emotes.count())
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[2])
+	assert_true(lobby.find_child("SideA", true, false) == null and lobby.find_child("SideB", true, false) == null, "the join buttons are gone")
+	(lobby.find_child("TeamA", true, false) as Control).gui_input.emit(_left_click())
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[2].side, 0, "a click on the card")
+	assert_true((lobby.find_child("JoinA", true, false) as Button).text.contains("your team"), "the card says it is mine")
+	(lobby.find_child("JoinB", true, false) as Button).pressed.emit()
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[2].side, 1, "the team's name is a button for the keyboard")
+	assert_false((lobby.find_child("JoinA", true, false) as Button).text.contains("your team"))
+	var right_click := _left_click()
+	right_click.button_index = MOUSE_BUTTON_RIGHT
+	(lobby.find_child("TeamA", true, false) as Control).gui_input.emit(right_click)
+	rig.net.flush()
+	assert_eq(rig.sessions[1].state.seats[2].side, 1, "only the left button joins")
+	lobby.free()
+
+
+func test_the_lobby_has_no_quick_messages_and_no_settings_button() -> void:
+	var rig := NetRig.new()
+	rig.start_match(2, 1)
 	var lobby := NetLobbyScreen.new()
 	_root().add_child(lobby)
 	lobby.bind(rig.sessions[1])
+	assert_true(lobby.find_child("Emote0", true, false) == null and lobby.find_child("Emotes", true, false) == null, "no quick messages in the lobby")
+	assert_true(lobby.find_child("SettingsButton", true, false) == null, "the settings are the cog at the top")
 	rig.sessions[2].send_emote(1)
 	rig.net.flush()
-	assert_true((lobby.find_child("Seat2", true, false) as Label).text.contains(Emotes.text(1)))
-	(lobby.find_child("Emote2", true, false) as Button).pressed.emit()
-	rig.net.flush()
+	assert_false((lobby.find_child("Seat2", true, false) as Label).text.contains(Emotes.text(1)), "and nothing shows on a row")
 	lobby.free()
+
+
+func test_the_team_cards_take_the_mouse_as_a_whole_so_the_hover_and_the_hand_work_on_the_title_too() -> void:
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	rig.guest(2, "Bob")
+	rig.sessions[2].set_field("side", 1)
+	rig.net.flush()
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	for name in ["TeamA", "TeamB"]:
+		var card := lobby.find_child(name, true, false) as Control
+		assert_eq(card.mouse_default_cursor_shape, Control.CURSOR_POINTING_HAND, name + ": a hand")
+		assert_eq(card.mouse_filter, Control.MOUSE_FILTER_STOP, name + ": the card is what the mouse is over")
+		for control in card.find_children("*", "Control", true, false):
+			if control is Button and (control as Button).name.begins_with("Kick"):
+				continue
+			assert_eq((control as Control).mouse_filter, Control.MOUSE_FILTER_IGNORE, "%s: %s lets the mouse through to the card" % [name, control.name])
+	var card_a := lobby.find_child("TeamA", true, false) as Control
+	card_a.mouse_entered.emit()
+	assert_ne(card_a.modulate, Color.WHITE, "hovered: lighter")
+	card_a.mouse_exited.emit()
+	assert_eq(card_a.modulate, Color.WHITE)
+	lobby.free()
+
+
+func test_the_new_map_button_is_a_round_arrow() -> void:
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	var button := lobby.find_child("NewSeed", true, false) as Button
+	assert_true(button.icon != null and button.text.is_empty(), "an icon and no text")
+	assert_ne(button.tooltip_text, "")
+	var seed_before: int = rig.sessions[1].state.settings["seed"]
+	button.pressed.emit()
+	assert_ne(rig.sessions[1].state.settings["seed"], seed_before, "it still draws a new map")
+	lobby.free()
+
+
+func test_the_room_code_is_written_the_same_way_everywhere() -> void:
+	assert_eq(RoomCode.pretty("aytjrd"), "ayt-jrd")
+	assert_eq(RoomCode.link_for("https://example.org/game/", "aytjrd"), "https://example.org/game/#room=ayt-jrd")
+	assert_eq(RoomCode.normalize(RoomCode.link_for("https://example.org/game/", "aytjrd")), "aytjrd", "and the link is read back")
+	assert_eq(NetFlow._join_code_in("room=ayt-jrd"), "aytjrd")
+	assert_eq(NetFlow._join_code_in("room=aytjrd"), "aytjrd", "an older link still works")
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	var lobby := NetLobbyScreen.new()
+	_root().add_child(lobby)
+	lobby.bind(rig.sessions[1])
+	lobby.show_room("aytjrd", RoomCode.link_for("https://example.org/", "aytjrd"))
+	assert_eq(lobby._room_code, "ayt-jrd", "the copied code is the displayed one")
+	assert_true((lobby.find_child("RoomCode", true, false) as Label).text.contains("ayt-jrd"))
+	lobby.free()
+
+
+func test_changing_the_map_or_the_rules_leaves_the_players_ready_on_every_screen() -> void:
+	var rig := NetRig.new()
+	rig.host(1, "Alice")
+	rig.guest(2, "Bob")
+	var host_lobby := NetLobbyScreen.new()
+	var guest_lobby := NetLobbyScreen.new()
+	_root().add_child(host_lobby)
+	_root().add_child(guest_lobby)
+	host_lobby.bind(rig.sessions[1])
+	guest_lobby.bind(rig.sessions[2])
+	rig.sessions[1].set_field("side", 0)
+	rig.sessions[2].set_field("side", 1)
+	rig.net.flush()
+	(host_lobby.find_child("Ready", true, false) as CheckBox).button_pressed = true
+	(guest_lobby.find_child("Ready", true, false) as CheckBox).button_pressed = true
+	rig.net.flush()
+	var changes: Array[Callable] = [
+		func() -> void: (host_lobby.find_child("Typology", true, false) as OptionButton).item_selected.emit(2),
+		func() -> void: (host_lobby.find_child("Size", true, false) as SpinBox).value = 12,
+		func() -> void: (host_lobby.find_child("NewSeed", true, false) as Button).pressed.emit(),
+		func() -> void: (host_lobby.find_child("Turn", true, false) as SpinBox).value = 60,
+		func() -> void: (host_lobby.find_child("Grace", true, false) as SpinBox).value = 33,
+		func() -> void: (host_lobby.find_child("Cards", true, false) as CheckButton).toggled.emit(true),
+	]
+	for change in changes:
+		change.call()
+		rig.net.flush()
+		assert_true(rig.sessions[1].state.seats[1].ready and rig.sessions[1].state.seats[2].ready, "still ready after the change")
+		assert_true((host_lobby.find_child("Ready", true, false) as CheckBox).button_pressed and (guest_lobby.find_child("Ready", true, false) as CheckBox).button_pressed, "and the boxes stay ticked")
+	assert_false(rig.sessions[1].state.start_problem() != "", "the host can start")
+	# What a player does to their own seat still takes their Ready back.
+	rig.sessions[2].set_field("hero", 1)
+	rig.net.flush()
+	assert_false(rig.sessions[1].state.seats[2].ready)
+	assert_true(rig.sessions[1].state.seats[1].ready)
+	host_lobby.free()
+	guest_lobby.free()
+
+
+func test_a_new_match_takes_45_seconds_a_turn() -> void:
+	assert_eq(MatchState.new().settings["turn"], 45)
+
+
+func test_the_settings_open_over_the_fight_and_the_lobby_without_leaving_the_match() -> void:
+	var relay := FakeRelay.new()
+	var both := _two_players(relay)
+	var host: NetFlow = both[0]
+	var changed := []
+	host.settings_changed.connect(func() -> void: changed.append(true))
+	var cog := host.find_child("CogButton", true, false) as Button
+	assert_true(cog.is_visible_in_tree(), "the cog is at the top of the lobby")
+	cog.pressed.emit()
+	await _frames()
+	var layer := host.get_node_or_null("SettingsLayer")
+	assert_true(layer != null, "the settings are open")
+	var screen := layer.get_child(0) as SettingsScreen
+	assert_true(screen.in_match)
+	assert_false(screen.find_child("CreditsButton", true, false).visible, "no credits, save reset or QA tools in a match")
+	assert_false(screen.find_child("ResetSaveButton", true, false).visible)
+	assert_false(screen.find_child("QaTools", true, false).visible)
+	assert_true(screen.find_child("MasterVolume", true, false).visible, "the volumes are there")
+	host._open_settings()
+	assert_eq(host.get_children().filter(func(node: Node) -> bool: return node.name == "SettingsLayer").size(), 1, "opened once")
+	screen.changed.emit()
+	assert_eq(changed.size(), 1, "the Game root is told to apply and save")
+	assert_true(host.hub.session != null and host._screen is NetLobbyScreen, "the match goes on underneath")
+	screen.back_pressed.emit()
+	await _frames()
+	assert_true(host.get_node_or_null("SettingsLayer") == null, "closed")
+	for flow in both:
+		flow.free()
 
 
 func test_the_lobby_opens_with_the_hero_the_player_likes() -> void:
 	_sandbox()
-	var fakes := FakeLinks.new()
+	var relay := FakeRelay.new()
 	NetUi.save_hero(2)
-	var host := _flow(fakes)
+	var host := _flow(relay)
 	host.start("")
 	host._on_host("Alice")
+	_pump(relay, [host])
 	assert_eq(host.hub.session.state.seats[1].hero, 2, "the host's seat starts with it")
-	var invite := {}
-	host.hub.invite_ready.connect(func(code: String, _link: String, _seat: int) -> void: invite.merge({"code": code}, true))
-	host.hub.create_invite()
 	NetUi.save_hero(1)  # Another player, another browser: their own favourite.
-	var guest := _flow(fakes)
+	var guest := _flow(relay)
 	guest.start("")
-	var reply := {}
-	guest.hub.reply_ready.connect(func(code: String, _link: String) -> void: reply.merge({"code": code}, true))
-	guest._on_join("Bob", invite["code"])
-	host._on_reply_pasted(reply["code"])
-	fakes.flush()
+	guest._on_join("Bob", host.hub.room_code)
+	_pump(relay, [host, guest])
 	await _frames()
+	_pump(relay, [host, guest])
 	assert_eq(guest.hub.session.state.seats[2].hero, 1, "and so does the guest's")
 	assert_eq(host.hub.session.state.seats[2].hero, 1, "everyone sees it")
 	host.free()
@@ -415,10 +551,11 @@ func test_the_lobby_opens_with_the_hero_the_player_likes() -> void:
 
 func test_the_lobby_can_copy_the_room_code_and_the_room_link() -> void:
 	_sandbox()
-	var fakes := FakeLinks.new()
-	var host := _flow(fakes)
+	var relay := FakeRelay.new()
+	var host := _flow(relay)
 	host.start("")
 	host._on_host("Alice")
+	_pump(relay, [host])
 	var lobby := host._screen as NetLobbyScreen
 	var label := lobby.find_child("RoomCode", true, false) as Label
 	assert_true(label.visible and label.text.contains(RoomCode.pretty(host.hub.room_code)), "the code is shown")
@@ -426,7 +563,22 @@ func test_the_lobby_can_copy_the_room_code_and_the_room_link() -> void:
 		var button := lobby.find_child(button_name, true, false) as Button
 		assert_true(button != null and button.visible, button_name)
 		button.pressed.emit()
-	assert_false(lobby.find_child("ManualInvite", true, false).visible, "the manual invite waits behind its button")
-	(lobby.find_child("ManualToggle", true, false) as Button).button_pressed = true
-	assert_true(lobby.find_child("ManualInvite", true, false).visible)
+	assert_true(lobby.find_child("ManualInvite", true, false) == null, "there is no manual invite any more")
 	host.free()
+
+
+func test_the_top_bar_has_the_cog_in_the_lobby_and_the_menu_too_in_the_fight() -> void:
+	var relay := FakeRelay.new()
+	var flow := _flow(relay)
+	flow.start("")
+	var bar := flow.find_child("NetTopBar", true, false) as NetTopBar
+	assert_false(bar.visible, "nothing on the front page")
+	flow._on_host("Alice")
+	_pump(relay, [flow])
+	assert_true(bar.visible and flow.find_child("CogButton", true, false).visible, "the cog in the lobby")
+	assert_false(flow.find_child("HamburgerButton", true, false).visible, "but no menu there")
+	assert_eq(bar.offset_right, -NetTopBar.RIGHT_GAP, "at the right edge")
+	assert_eq(bar.occupied_width(), NetTopBar.BUTTON_WIDTH + NetTopBar.GAP, "one button: the sound button leaves room for it")
+	assert_eq(bar.get_child(0).name, "CogButton", "the settings first from the left, the menu after it")
+	assert_eq(bar.get_child(1).name, "HamburgerButton")
+	flow.free()

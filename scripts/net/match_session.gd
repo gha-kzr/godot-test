@@ -81,8 +81,12 @@ var _pulling: Dictionary[int, bool] = {}
 var _last_emote: Dictionary[int, float] = {}
 var _budget: Dictionary[int, float] = {}
 var _last_rehello: Dictionary[int, float] = {}
-## Whether I lost every other player (my own connection is probably what broke): I wait instead of taking over.
+## Whether I am cut off from the others: my own connection is down, or every other player is gone.
 var connection_lost := false
+## My own connection was down at the last tick (and what to do when it is back: see _after_outage).
+var _offline := false
+## I am asking the player who is probably the host for the entries I missed while I was cut off.
+var _resync_pending := false
 
 
 ## The player who opens the match: seat id = their transport id, host from the start.
@@ -149,6 +153,9 @@ func peers() -> Array[int]:
 ## Asks for a change (the host checks and numbers it). Lobby and battle helpers below build the entries.
 func propose(entry: Dictionary) -> void:
 	if halted_now():
+		return
+	if not transport.is_online():
+		rejected.emit(TranslationServer.translate("not connected"))
 		return
 	_counter += 1
 	entry["c"] = "%d-%d" % [my_id, _counter]
@@ -225,6 +232,16 @@ func tick(delta: float) -> void:
 	_now += delta
 	if halted_now():
 		return
+	if not transport.is_online():
+		# My own connection is down: nothing is known about the others, so nothing is judged (no timeouts, no host
+		# swap, no dropping seats) until it is back.
+		if not _offline:
+			_offline = true
+			connection_lost = true
+			changed.emit()
+		return
+	if _offline:
+		_after_outage()
 	for id in _budget.keys():
 		_budget[id] = minf(PROPOSALS_BURST, _budget[id] + delta * PROPOSALS_PER_SECOND)
 	if state.battle != null and state.battle.state.started and not state.battle.state.is_over():
@@ -246,11 +263,29 @@ func tick(delta: float) -> void:
 
 # --- Receiving ------------------------------------------------------------------------------
 
+## My connection is back. Who is still here was told by the transport (peers gone are lost, the others heard again).
+## A host that was cut off was replaced by the others meanwhile: it asks them for what it missed, like any guest.
+func _after_outage() -> void:
+	_offline = false
+	connection_lost = peers().is_empty() and state.seat_ids().size() > 1
+	if is_host() and not _electing and not peers().is_empty():
+		host_id = peers().min()
+		_resync_pending = true
+		host_changed.emit(host_id)
+		_send_hello()
+	changed.emit()
+
+
 func _on_peer_connected(id: int) -> void:
 	_dead.erase(id)
 	_last_heard[id] = _now
 	if id == host_id and not is_host() and not is_synced:
 		_send_hello()
+	elif id == host_id and not is_host():
+		for proposal in _pending:
+			transport.send(host_id, {"m": "submit", "p": proposal})  # Sent while I was cut off: asked again (a nonce is applied once).
+	elif is_host() and state.seats.has(id):
+		_ask_to_come_back(id)  # A player whose connection blinked: its seat was dropped meanwhile, its token gets it back.
 
 
 func _send_hello() -> void:
@@ -276,7 +311,7 @@ func _on_message(from: int, message: Dictionary) -> void:
 		"reject": _on_reject(message)
 		"refused": _on_refused(from, message.get("why"))
 		"redirect": _on_redirect(message)
-		"rehello": if from == host_id and not is_host(): _send_hello()
+		"rehello": if from == host_id and not is_host() and is_synced: _send_hello()  # (not yet synced: my hello is already on its way)
 		"pull": _on_pull(from, message.get("from"))
 		"elected": _on_elected(from, message.get("host"), message.get("have"))
 		"have": _on_have(from, message.get("n"))
@@ -333,7 +368,7 @@ func _on_hello(from: int, message: Dictionary) -> void:
 
 func _on_redirect(message: Dictionary) -> void:
 	var new_host: Variant = message.get("host")
-	if new_host is int and new_host != host_id and not is_synced:
+	if new_host is int and new_host != host_id and (not is_synced or _resync_pending):
 		host_id = new_host
 		_send_hello()
 
@@ -348,6 +383,8 @@ func _on_entries(from: int, message: Dictionary) -> void:
 			return
 	_pulling.erase(from)  # The answer to my pull came; later entries are taken from the host only.
 	_election_pulling = false
+	if from == host_id:
+		_resync_pending = false
 	if not is_synced:
 		is_synced = true
 		synced.emit()

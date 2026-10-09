@@ -6,7 +6,7 @@
 [ext_resource type="Resource" uid="uid://cd6kstb7xerof" path="res://data/damage_types/fire.tres" id="4_kmrgi"]
 [ext_resource type="Script" uid="uid://diubgsgeigrq0" path="res://scripts/data/damage_effect.gd" id="5_tsjn5"]
 [ext_resource type="Script" uid="uid://cq12oalhu55my" path="res://scripts/data/move_effect.gd" id="6_dkg0b"]
-[ext_resource type="Texture2D" uid="uid://cjyiydrojfstm" path="res://ui/icons/fireball.svg" id="7_hjcaa"]
+[ext_resource type="Texture2D" uid="uid://d3x4waiapm8eq" path="res://ui/icons/dynamite.svg" id="7_hjcaa"]
 [ext_resource type="PackedScene" uid="uid://gjrh212jw6ty" path="res://scenes/fx/impact_explosion.tscn" id="8_xnj33"]
 [ext_resource type="PackedScene" uid="uid://dibxvmjgtpu1f" path="res://scenes/fx/projectile_meteor.tscn" id="9_7qyb6"]
 [ext_resource type="Script" uid="uid://5hf4pclcl7xg" path="res://scripts/data/spell_data.gd" id="10_lao0x"]

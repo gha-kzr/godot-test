@@ -52,6 +52,10 @@ class Reach:
 	func cost_to(cell: Vector2i) -> int:
 		return _costs.get(cell, -1) if cell not in _pass_only else -1
 
+	## MP needed to get to the cell from the origin, even a cell an ally stands on (which cost_to refuses); -1 if out of reach.
+	func walk_cost(cell: Vector2i) -> int:
+		return _costs.get(cell, -1)
+
 	## Cells to walk through from the origin, excluding it and including the destination.
 	## Empty if unreachable (or the origin itself).
 	func path_to(cell: Vector2i) -> Array[Vector2i]:
@@ -94,10 +98,13 @@ static func step_cost(grid: Grid, from: Vector2i, to: Vector2i) -> int:
 ## Enemies block their cells; allies can be walked through but not stopped on.
 ## Takes a unit id, not a UnitState: the unit is looked up in `state`, so the same call
 ## works on the real state and on AI clones.
-static func reach(state: BattleState, unit_id: int) -> Reach:
+## `as_seen`: the reach as the unit's player sees the board, for drawing it: an enemy this player can't see (stealth) is
+## not an obstacle, otherwise the hole in the highlighted cells would show where it stands. (The real rules still
+## block that cell: call without `as_seen` to know where a move can end.)
+static func reach(state: BattleState, unit_id: int, as_seen := false) -> Reach:
 	var unit := state.units[unit_id]
 	var start := unit.move_start()
-	return _flood(state, unit_id, start, unit.move_budget(), unit.cell)
+	return _flood(state, unit_id, start, unit.move_budget(), unit.cell, as_seen)
 
 
 ## The cells a unit would walk through from where it stands to `to` (excluding its cell,
@@ -108,7 +115,7 @@ static func walk_path(state: BattleState, unit_id: int, to: Vector2i) -> Array[V
 	return _flood(state, unit_id, unit.cell, 1 << 20, unit.cell).path_to(to)
 
 
-static func _flood(state: BattleState, unit_id: int, start: Vector2i, budget: int, standing: Vector2i) -> Reach:
+static func _flood(state: BattleState, unit_id: int, start: Vector2i, budget: int, standing: Vector2i, as_seen := false) -> Reach:
 	var unit := state.units[unit_id]
 	var costs: Dictionary[Vector2i, int] = {start: 0}
 	var came_from: Dictionary[Vector2i, Vector2i] = {}
@@ -124,8 +131,10 @@ static func _flood(state: BattleState, unit_id: int, start: Vector2i, budget: in
 			var other := state.unit_at(next)
 			if other != null and other.id != unit_id:
 				if other.team != unit.team:
-					continue
-				pass_only[next] = true
+					if not (as_seen and state.is_hidden_from(other, unit.team)):
+						continue
+				else:
+					pass_only[next] = true
 			var cost := costs[current] + step
 			if cost > budget:
 				continue

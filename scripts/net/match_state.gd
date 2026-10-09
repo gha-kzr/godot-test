@@ -43,7 +43,7 @@ class Seat extends RefCounted:
 
 var phase := Phase.LOBBY
 var seats: Dictionary[int, Seat] = {}
-var settings: Dictionary = {"typology": "open_field", "size": 14, "seed": 1, "turn": 30, "grace": 20, "cards": false}
+var settings: Dictionary = {"typology": "open_field", "size": 14, "seed": 1, "turn": 45, "grace": 20, "cards": false}
 ## Every entry applied so far; entry n is log[n - 1].
 var log: Array[Dictionary] = []
 var battle: Battle
@@ -275,9 +275,7 @@ func _cfg(entry: Dictionary) -> String:
 				return "bad flag"
 		_:
 			return "unknown setting"
-	settings[entry["f"]] = value
-	for id in seats:
-		seats[id].ready = false  # The settings changed under them.
+	settings[entry["f"]] = value  # Players who are ready stay ready: only a change of their own hero or team takes theirs back.
 	return ""
 
 

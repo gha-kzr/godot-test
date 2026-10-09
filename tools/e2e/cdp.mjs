@@ -2,12 +2,15 @@
 import { spawn } from 'node:child_process';
 
 export const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+/** The page's address for a test: the e2e hook, and the relay on this machine (RELAY_URL=default: the game's own, i.e. the real server). */
+export const pageUrl = () => (process.env.GAME_URL || 'http://127.0.0.1:8061/index.html') + '?e2e=1'
+  + (process.env.RELAY_URL === 'default' ? '' : '&relay=' + (process.env.RELAY_URL || 'ws://127.0.0.1:8787'));
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export async function launch(port = 9333, profile = '/tmp/e2e-chrome-profile') {
   const proc = spawn(CHROME, [
     '--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
-    ...(process.env.E2E_MDNS === '1' ? [] : ['--disable-features=WebRtcHideLocalIpsWithMdns']), '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
+    '--mute-audio', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',  // Muted: the game's music and effects would play on the user's speakers.
     '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', '--window-size=1280,720',
     '--no-first-run', '--no-default-browser-check', 'about:blank',
   ], { stdio: 'ignore' });
@@ -100,6 +103,39 @@ export class Player {
     throw new Error(`${this.name}: ${key} never appeared`);
   }
   async status() { return this.cmd('status'); }
+  /** Scrolls the page's scroll area under (x, y) by dy pixels (the mouse wheel). */
+  async wheel(x, y, dy) {
+    await this.browser.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y }, this.sessionId);
+    await this.browser.send('Input.dispatchMouseEvent', { type: 'mouseWheel', x, y, deltaX: 0, deltaY: dy }, this.sessionId);
+  }
+  /** A real mouse click at page coordinates. */
+  async click(x, y) {
+    for (const type of ['mouseMoved', 'mousePressed', 'mouseReleased']) {
+      await this.browser.send('Input.dispatchMouseEvent', { type, x, y, button: 'left', buttons: type === 'mousePressed' ? 1 : 0, clickCount: 1 }, this.sessionId);
+      await sleep(60);
+    }
+  }
+  /** Where a named control of the current screen is: [x, y, width, height], or null. */
+  async where(name) { return this.cmd('center', name); }
+  /** A real click in the middle of a named control (or at `fx`, `fy` fractions of it). */
+  async clickOn(name, fx = 0.5, fy = 0.5) {
+    const r = await this.where(name);
+    if (!r) throw new Error(`${this.name}: no visible control ${name}`);
+    await this.click(r[0] + r[2] * fx, r[1] + r[3] * fy);
+  }
+  /** A key press (a DOM key name such as 'ArrowDown' or 'Enter'). */
+  async key(key) {
+    for (const type of ['keyDown', 'keyUp']) {
+      await this.browser.send('Input.dispatchKeyEvent', { type, key, code: key, windowsVirtualKeyCode: { ArrowDown: 40, Enter: 13 }[key] }, this.sessionId);
+      await sleep(60);
+    }
+  }
+  /** A screenshot of the tab, saved as a PNG file. */
+  async shot(path) {
+    const { writeFileSync } = await import('node:fs');
+    const { data } = await this.browser.send('Page.captureScreenshot', { format: 'png' }, this.sessionId);
+    writeFileSync(path, Buffer.from(data, 'base64'));
+  }
   async until(predicate, what, timeoutMs = 30000) {
     const start = Date.now();
     let last;

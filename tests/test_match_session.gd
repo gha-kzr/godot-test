@@ -114,7 +114,7 @@ func test_the_host_sets_the_map_and_everyone_gets_the_same_battle() -> void:
 	rig.sessions[1].configure("typology", "ruins")
 	rig.sessions[1].configure("size", 15)
 	rig.sessions[1].configure("seed", 4242)
-	rig.sessions[1].configure("turn", 45)
+	rig.sessions[1].configure("turn", 60)
 	rig.sessions[1].set_field("side", 0)
 	rig.sessions[2].set_field("side", 1)
 	rig.net.flush()
@@ -129,12 +129,12 @@ func test_the_host_sets_the_map_and_everyone_gets_the_same_battle() -> void:
 	assert_eq(battle_a.grid.size, Vector2i(15, 15))
 	assert_eq(battle_b.grid.size, Vector2i(15, 15))
 	assert_eq(StateHash.of(battle_a), StateHash.of(battle_b), "the same map and units")
-	assert_eq(rig.sessions[2].state.settings["turn"], 45)
+	assert_eq(rig.sessions[2].state.settings["turn"], 60)
 	assert_eq(rig.sessions[1].unit_of(1), 0)
 	assert_eq(rig.sessions[1].unit_of(2), 1)
 
 
-func test_changing_a_setting_unreadies_everyone() -> void:
+func test_changing_a_setting_leaves_the_players_ready() -> void:
 	var rig := NetRig.new()
 	rig.host(1)
 	rig.guest(2)
@@ -144,7 +144,10 @@ func test_changing_a_setting_unreadies_everyone() -> void:
 	assert_true(rig.sessions[1].state.seats[2].ready)
 	rig.sessions[1].configure("size", 12)
 	rig.net.flush()
-	assert_false(rig.sessions[1].state.seats[2].ready, "they must see the new settings first")
+	assert_true(rig.sessions[1].state.seats[2].ready, "a player who is ready stays ready when the host edits the map or the rules")
+	rig.sessions[2].set_field("hero", 1)
+	rig.net.flush()
+	assert_false(rig.sessions[1].state.seats[2].ready, "but a change of their own hero takes their Ready back")
 
 
 func test_a_side_holds_four_players_at_most() -> void:
@@ -285,7 +288,7 @@ func test_a_player_who_drops_out_is_replaced_by_the_ai_after_the_grace_period() 
 	rig.run(float(rig.sessions[1].state.settings["grace"]) + 1.0)
 	assert_true(rig.sessions[1].state.seats[2].ai, "the AI plays their hero now")
 	var entries_before := rig.sessions[1].state.entry_count()
-	rig.run(30.0)
+	rig.run(float(rig.sessions[1].state.settings["turn"]) + 5.0)  # A whole turn timer: the idle player's turn ends by itself at the latest.
 	assert_true(rig.sessions[1].state.entry_count() > entries_before, "the game goes on without them")
 
 

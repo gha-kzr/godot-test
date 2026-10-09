@@ -764,7 +764,9 @@ func _set_state(new_state: State) -> void:
 			units_view.set_active(_placing_hero)
 			board_view.show_highlight(BoardView.Highlight.ZONE, _placement_zone())
 		State.IDLE:
-			_reach = Movement.reach(battle.state, unit_id)
+			# As the player sees the board: a hidden enemy leaves no hole in the highlighted cells, and a move through
+			# its cell is allowed (it is found by walking into it, see BattleActions.Move).
+			_reach = Movement.reach(battle.state, unit_id, true)
 			board_view.show_highlight(BoardView.Highlight.REACH, _reach.cells())
 		State.TARGETING:
 			var spell := battle.state.units[unit_id].data.spells[selected_spell]
@@ -1014,17 +1016,22 @@ func _active_card_unit_id() -> int:
 	return _placing_hero if _placing_hero != -1 else battle.state.units[0].id
 
 
+## The unit whose spells (or cards) the spell bar shows: the acting one. (A multiplayer fight shows the player's own.)
+func _spells_unit_id() -> int:
+	return _active_card_unit_id()
+
+
 ## Re-syncs the HUD from the battle state: the source of truth, after a playback (or a
 ## new battle, or a placement) while the events in between only updated the model.
 func _refresh_hud() -> void:
 	_hud_model = HudModel.from_state(battle.state, player_levels)
 	_show_turn()
-	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
-	if active != null:
-		if active.card_mode:
-			hud.show_cards(active)
+	var spells_unit := _hud_model.infos.get(_spells_unit_id()) as UnitInfo
+	if spells_unit != null:
+		if spells_unit.card_mode:
+			hud.show_cards(spells_unit)
 		else:
-			hud.show_spells(active.spells, active.ap, active.cooldowns)
+			hud.show_spells(spells_unit.spells, spells_unit.ap, spells_unit.cooldowns)
 
 
 ## Shows the model's turn in the HUD: order, active card, AP for the spell bar, inspect
@@ -1034,8 +1041,10 @@ func _show_turn() -> void:
 	var active := _hud_model.infos.get(_active_card_unit_id()) as UnitInfo
 	if active != null:
 		hud.show_unit(active)
-		hud.set_spell_ap(active.ap)
-		hud.set_spell_cooldowns(active.cooldowns)
+	var spells_unit := _hud_model.infos.get(_spells_unit_id()) as UnitInfo
+	if spells_unit != null:
+		hud.set_spell_ap(spells_unit.ap)
+		hud.set_spell_cooldowns(spells_unit.cooldowns)
 	_update_inspected()
 
 

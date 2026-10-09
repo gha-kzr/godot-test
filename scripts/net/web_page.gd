@@ -1,7 +1,7 @@
 class_name WebPage
 extends RefCounted
-## What the browser page knows, when the game runs in one: its address (and the part after #, where an
-## invite link keeps its code), and the clipboard. Elsewhere these answer with harmless defaults.
+## What the browser page knows, when the game runs in one: its address (and the part after #, where a
+## room link keeps its code), and the clipboard. Elsewhere these answer with harmless defaults.
 
 const DEFAULT_URL := "https://gha-kzr.github.io/rune-ascent-multiplayer/"
 
@@ -41,11 +41,6 @@ static func query(key: String) -> String:
 		if value is String:
 			return value
 	return ""
-
-
-## Whether the page runs in Brave (it limits what WebRTC may reveal, which can stop two players from connecting).
-static func is_brave() -> bool:
-	return is_web() and JavaScriptBridge.eval("typeof navigator.brave !== 'undefined'", true) == true
 
 
 ## Keeps the game running while its tab is hidden. A browser stops a hidden tab's animation frames, and the game's loop

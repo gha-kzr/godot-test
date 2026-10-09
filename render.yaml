@@ -1,0 +1,23 @@
+# The relay server on Render (https://render.com/docs/blueprint-spec): New + > Blueprint, pick this repository.
+# The free plan is enough: a service sleeps after 15 minutes without traffic (open WebSockets count as traffic)
+# and takes about a minute to wake, which the game covers with a warm-up request when the multiplayer menu opens.
+# The service's name decides its address (https://rune-ascent-relay.onrender.com): if Render gives it another one,
+# set it in scripts/net/relay_config.gd.
+services:
+  - type: web
+    name: rune-ascent-relay
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Pages allowed to open a WebSocket (comma separated; a trailing * matches any ending). Add your own address
+      # if the game is served from somewhere else than GitHub Pages.
+      - key: ALLOWED_ORIGINS
+        value: "https://gha-kzr.github.io,http://localhost:*,http://127.0.0.1:*"

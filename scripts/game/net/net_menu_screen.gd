@@ -1,7 +1,7 @@
 class_name NetMenuScreen
 extends Screen
-## The multiplayer front page, in cards: two separate ways in, host a match or join one with a room code (or an invite
-## link). An invite link opened in the browser fills the code in and joins by itself. Name, hero and team are chosen in
+## The multiplayer front page, in cards: two separate ways in, host a match or join one with a room code (or a room
+## link). A room link opened in the browser fills the code in and joins by itself. Name, hero and team are chosen in
 ## the lobby (the name starts as the last one used, or a random one).
 
 signal host_requested(player_name: String)
@@ -46,8 +46,6 @@ func _ready() -> void:
 	_status.theme_type_variation = &"SmallLabel"
 	_status.add_theme_color_override("font_color", Color(1.0, 0.6, 0.5))
 	column.add_child(_status)
-	if not WebPage.is_web():
-		NetUi.note(column, tr("Multiplayer needs the web version of the game (it uses the browser's WebRTC)."))
 	var back := HubStyle.button("Back", "BackButton")
 	back.pressed.connect(back_pressed.emit)
 	column.add_child(back)
@@ -70,7 +68,7 @@ func _build_join(parent: Control) -> void:
 	box.get_parent().size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_code_edit = LineEdit.new()
 	_code_edit.name = "CodeEdit"
-	_code_edit.placeholder_text = "Room code, or invite link"
+	_code_edit.placeholder_text = "Room code, or room link"
 	_code_edit.custom_minimum_size = Vector2(0, 44)
 	_code_edit.text_submitted.connect(func(_text: String) -> void: _on_join())
 	box.add_child(_code_edit)
@@ -80,7 +78,7 @@ func _build_join(parent: Control) -> void:
 	box.add_child(join)
 
 
-## Fills the invite in (from a link the page was opened with).
+## Fills the code in (from a link the page was opened with).
 func prefill_code(code: String) -> void:
 	_code_edit.text = code
 
@@ -100,6 +98,6 @@ func _on_host() -> void:
 func _on_join() -> void:
 	var text := _code_edit.text.strip_edges()
 	if text.is_empty():
-		_status.text = "Enter a room code or paste an invite first."
+		_status.text = "Enter a room code or paste a room link first."
 		return
 	join_requested.emit(player_name(), text)

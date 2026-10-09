@@ -1,8 +1,8 @@
 // The host's tab is hidden (another tab in front, like a host switching to read something) when a guest joins:
-// browsers pause hidden tabs, so does the room still answer?
-import { launch, Player } from './cdp.mjs';
+// browsers slow down hidden tabs, so does the room still answer?
+import { pageUrl, launch, Player } from './cdp.mjs';
 
-const BASE = (process.env.GAME_URL || 'http://127.0.0.1:8061/index.html') + '?e2e=1&stun=0';
+const BASE = pageUrl();
 const chrome = await launch();
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 try {
@@ -10,7 +10,7 @@ try {
   const bob = new Player(chrome.browser, 'bob');
   await alice.openTab(BASE); await alice.waitReady();
   await alice.cmd('open'); await alice.cmd('host', 'Alice');
-  const a = await alice.until((s) => s.in_match && s.room && s.relays && s.relays.split('/')[0] !== '0', 'alice on a tracker', 30000);
+  const a = await alice.until((s) => s.in_match && s.room, 'alice has a room', 90000);
   log('alice hosts room', a.room);
   const other = await chrome.browser.send('Target.createTarget', { url: 'about:blank', browserContextId: alice.contextId });
   await chrome.browser.send('Target.activateTarget', { targetId: other.targetId });

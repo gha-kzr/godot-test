@@ -114,6 +114,8 @@ func _build_spell(id: String, spec: Dictionary, statuses: Dictionary) -> SpellDa
 	var source := load("res://data/spells/%s.tres" % spec["from"]) as SpellData
 	var spell := source.duplicate() as SpellData if source != null else SpellData.new()
 	spell.display_name = spec["name"]
+	if spec.has("icon"):  # Its own icon, when the borrowed one is already used by another spell of the class.
+		spell.icon = load("res://ui/icons/%s.svg" % spec["icon"]) as Texture2D
 	spell.ap_cost = int(spec["ap"])
 	spell.cooldown = int(spec.get("cd", 0))
 	spell.min_range = int(spec["range"][0])

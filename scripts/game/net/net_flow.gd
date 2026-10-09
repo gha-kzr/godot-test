@@ -9,15 +9,25 @@ signal exit_requested
 signal sound(event: StringName)
 signal speed_changed
 signal music_requested(track: StringName)
+## The player changed a setting in the settings opened over the lobby or the fight (the Game root applies and saves it).
+signal settings_changed
+signal audio_live
+## How much room the top bar takes at the right of the screen (0 when it is hidden): the sound button moves left of it.
+signal top_bar_changed(width: float)
 
 const BATTLE_SCENE := preload("res://scenes/net/net_battle.tscn")
+const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
 
 var settings := Settings.new()
 var hub: MultiplayerHub
-## Links to use (null: WebRTC); tests give fakes.
-var link_factory: LinkFactory
+## Makes the sockets to the relay server (invalid: real WebSockets); tests give fakes.
+var make_socket := Callable()
 
 var _screen: Node
+## The round menu and settings buttons at the top right, over the lobby and the fight.
+var _top_bar: NetTopBar
+## The settings, open over the lobby or the fight (the match goes on underneath), or null.
+var _settings_layer: CanvasLayer
 var _battle: NetBattleController
 ## The player left the results for the lobby while the match's state still says "battle".
 var _after_battle := false
@@ -25,18 +35,28 @@ var _after_battle := false
 var _hero_preselected := false
 
 
-## `fragment`: the page address's # part. An invite link in it joins at once.
+## `fragment`: the page address's # part. A room link in it joins at once.
 func start(fragment := "") -> void:
 	WebPage.keep_running_when_hidden()
 	hub = MultiplayerHub.new()
 	hub.name = "Hub"
-	if link_factory != null:
-		hub.factory = link_factory
+	if make_socket.is_valid():
+		hub.make_socket = make_socket
+	var bar_layer := CanvasLayer.new()
+	bar_layer.name = "TopBarLayer"
+	bar_layer.layer = 40  # Over the screens, under the settings (50) and the sound button (100).
+	add_child(bar_layer)
+	_top_bar = NetTopBar.new()
+	_top_bar.visible = false
+	_top_bar.settings_requested.connect(_open_settings)
+	_top_bar.menu_requested.connect(func() -> void:
+		if _battle != null:
+			_battle.open_menu())
+	bar_layer.add_child(_top_bar)
 	add_child(hub)
 	hub.session_started.connect(_wire_session)
-	hub.invite_ready.connect(_on_invite_ready)
-	hub.reply_ready.connect(_on_reply_ready)
 	hub.failed.connect(_on_failed)
+	hub.warm_up()  # A sleeping server takes a minute to wake: start now, so it is ready when Host or Join is pressed.
 	var code := _join_code_in(fragment)
 	_show_menu()
 	if not code.is_empty():
@@ -44,48 +64,46 @@ func start(fragment := "") -> void:
 		_on_join(NetUi.saved_name(), code)
 
 
-## The invite or room code in the page address's # part, or "".
+## The room code in the page address's # part, or "".
 static func _join_code_in(fragment: String) -> String:
-	if fragment.begins_with(InviteCodec.JOIN_KEY + "="):
-		return InviteCodec.extract_code(fragment)
 	if fragment.begins_with(RoomCode.LINK_KEY + "="):
 		return RoomCode.normalize(fragment)
 	return ""
 
 
-## How long a joiner waits for the connection to the host to open once the host has answered.
-const CONNECT_TIMEOUT := 45.0
+## How long a joiner waits for the host to take them in once the server has let them into the room.
+const HOST_TIMEOUT := 20.0
 
-var _connecting_for := 0.0
+var _waiting_for_host := 0.0
 
 
 func _process(delta: float) -> void:
 	if not (_screen is NetJoinScreen) or hub == null:
-		_connecting_for = 0.0
+		_waiting_for_host = 0.0
 		return
 	var join := _screen as NetJoinScreen
 	if hub.session == null:
-		if hub.signaling != null:
-			join.show_search(hub.status(), hub.join_details())
-	elif not hub.session.is_synced and hub.joined_by_room():
-		_connecting_for += delta
-		join.show_connecting(hub.join_details())
-		if _connecting_for > CONNECT_TIMEOUT:
-			_connecting_for = 0.0
-			var why := TranslationServer.translate("Could not open a connection to the host. Some networks (company, school, some phone connections) block direct connections between players.")
-			if WebPage.is_brave():
-				why += " " + TranslationServer.translate("Brave limits WebRTC: in Brave's settings (Privacy and security), set \"WebRTC IP handling policy\" to \"Default public and private interface\", or try Chrome or Firefox.")
-			_on_failed(why)
+		join.show_status(hub.status())
+	elif not hub.session.is_synced:
+		_waiting_for_host += delta
+		join.show_status(tr("In the room. Waiting for the host to take you in..."))
+		if _waiting_for_host > HOST_TIMEOUT:
+			_waiting_for_host = 0.0
+			_on_failed(tr("The host did not answer."))
 
 
 # --- Screens --------------------------------------------------------------------------------
 
 func _swap(next: Node) -> void:
+	_close_settings()
 	if _screen != null:
 		remove_child(_screen)
 		_screen.queue_free()
 	_screen = next
 	add_child(next)
+	_top_bar.visible = next is NetLobbyScreen or next is NetBattleController
+	_top_bar.show_menu(next is NetBattleController)
+	top_bar_changed.emit(_top_bar.occupied_width())
 	if next is Screen:
 		(next as Screen).focus_first.call_deferred()
 
@@ -103,8 +121,11 @@ func _show_menu(message := "") -> void:
 
 
 func _on_host(player_name: String) -> void:
-	hub.host_room(player_name)  # Its session_started wires the session.
-	_show_lobby()
+	hub.host_room(player_name)  # The server makes the room: session_started comes, and the lobby with it.
+	var opening := NetJoinScreen.new()
+	_swap(opening)
+	opening.show_opening()
+	opening.cancelled.connect(_leave)
 
 
 func _on_join(player_name: String, text: String) -> void:
@@ -116,13 +137,14 @@ func _on_join(player_name: String, text: String) -> void:
 	var join := NetJoinScreen.new()
 	_swap(join)
 	join.cancelled.connect(_leave)
-	if hub.session == null:
-		join.show_search(hub.status())  # By room code: the trackers answer later.
+	join.show_status(hub.status())
 
 
 func _wire_session() -> void:
 	hub.session.synced.connect(_on_synced)
 	hub.session.changed.connect(_on_changed)
+	if hub.session.is_synced:
+		_on_synced()  # A host is in its own match from the start.
 
 
 func _show_lobby() -> void:
@@ -134,8 +156,6 @@ func _show_lobby() -> void:
 	lobby.bind(hub.session)
 	if not hub.room_code.is_empty():
 		lobby.show_room(hub.room_code, RoomCode.link_for(WebPage.url(), hub.room_code))
-	lobby.invite_requested.connect(hub.create_invite)
-	lobby.reply_pasted.connect(_on_reply_pasted)
 	lobby.leave_requested.connect(_leave)
 
 
@@ -173,6 +193,30 @@ func _leave() -> void:
 	_show_menu()
 
 
+## The settings over whatever is shown, for a player who came straight in by a room link (so never saw the title).
+func _open_settings() -> void:
+	if _settings_layer != null:
+		return
+	_settings_layer = CanvasLayer.new()
+	_settings_layer.name = "SettingsLayer"
+	_settings_layer.layer = 50
+	add_child(_settings_layer)
+	var screen := SETTINGS_SCENE.instantiate() as SettingsScreen
+	screen.in_match = true
+	_settings_layer.add_child(screen)
+	screen.show_settings(settings)
+	screen.back_pressed.connect(_close_settings)
+	screen.audio_live.connect(audio_live.emit)
+	screen.changed.connect(settings_changed.emit)
+	screen.focus_first.call_deferred()
+
+
+func _close_settings() -> void:
+	if _settings_layer != null:
+		_settings_layer.queue_free()
+		_settings_layer = null
+
+
 # --- Events ---------------------------------------------------------------------------------
 
 func _on_synced() -> void:
@@ -203,22 +247,6 @@ func _on_battle_finished(_state: BattleState) -> void:
 	if hub.session.is_host():
 		hub.session.back_to_lobby()
 	_show_lobby()
-
-
-func _on_invite_ready(code: String, link: String, _seat: int) -> void:
-	if _screen is NetLobbyScreen:
-		(_screen as NetLobbyScreen).show_invite(code, link)
-
-
-func _on_reply_ready(code: String, link: String) -> void:
-	if _screen is NetJoinScreen:
-		(_screen as NetJoinScreen).show_reply(code, link)
-
-
-func _on_reply_pasted(text: String) -> void:
-	var error := hub.accept_reply(text)
-	if _screen is NetLobbyScreen:
-		(_screen as NetLobbyScreen).show_invite_message(error if not error.is_empty() else tr("Connecting... the player appears in the list when it works."))
 
 
 func _on_failed(reason: String) -> void:

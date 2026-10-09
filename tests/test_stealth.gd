@@ -1,6 +1,7 @@
 extends TestCase
 ## Stealth (the Rogue's Vanish): a hidden unit can't be picked as a target by the other team, the AI doesn't aim at
-## it, it shows again when someone stands next to it, attacks, or is hurt, and its first strike hits harder.
+## it, it shows again when someone walks into it, attacks, or is hurt (standing next to it shows nothing), and its first
+## strike hits harder.
 ## Also the cleanse effect (the Priestess's Purify).
 
 const STEALTH := "res://data/pvp/statuses/stealth.tres"
@@ -27,14 +28,127 @@ func _knight_spell(name_text: String) -> int:
 	return -1
 
 
-func test_a_hidden_unit_is_hidden_from_the_other_team_only_and_not_when_someone_is_next_to_it() -> void:
+func test_a_hidden_unit_is_hidden_from_the_other_team_only_even_when_someone_is_next_to_it() -> void:
 	var state := _duel()
 	assert_true(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY))
 	assert_false(state.is_hidden_from(state.units[0], UnitState.Team.PLAYER), "its own team sees it")
 	state.units[1].cell = Vector2i(2, 3)
-	assert_false(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY), "an enemy standing next to it sees it")
+	assert_true(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY), "an enemy standing next to it still doesn't see it")
 	state.units[1].cell = Vector2i(2, 4)
-	assert_true(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY), "two cells away: still hidden")
+	assert_true(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY), "nor two cells away")
+
+
+func _knight_at(state: BattleState, knight_cell: Vector2i, rogue_cell: Vector2i) -> void:
+	state.units[1].cell = knight_cell
+	state.units[0].cell = rogue_cell
+
+
+## Plays the knight's turn up to where it can move (the rogue is unit 0, the knight unit 1).
+func _knights_turn(state: BattleState) -> Battle:
+	var battle := Battle.new(state)
+	battle.start()
+	while state.current_unit().id != 1:
+		battle.perform(BattleActions.EndTurn.new(state.current_unit().id))
+	return battle
+
+
+func test_the_cells_a_player_may_walk_to_do_not_give_a_hidden_enemy_away() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 7))  # Two cells from the knight, hidden.
+	assert_false(Vector2i(5, 7) in Movement.reach(state, 1).cells(), "really, nobody can stop on an occupied cell")
+	var seen := Movement.reach(state, 1, true).cells()
+	assert_true(Vector2i(5, 7) in seen, "but the drawing has no hole where the hidden enemy stands")
+	assert_true(Vector2i(5, 8) in seen, "nor a shadow behind it")
+	state.units[0].break_stealth()
+	assert_false(Vector2i(5, 7) in Movement.reach(state, 1, true).cells(), "a revealed enemy blocks its cell as any other")
+	assert_eq(Movement.reach(state, 1, true).cells().size(), Movement.reach(state, 1).cells().size(), "the same cells once nothing is hidden")
+
+
+func test_walking_into_a_hidden_enemy_stops_before_it_hurts_the_walker_and_finds_the_hidden_one() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 7))
+	var battle := _knights_turn(state)
+	var knight := state.units[1]
+	var mp_before := knight.mp
+	var hp_before := knight.hp
+	var result := battle.perform(BattleActions.Move.new(1, Vector2i(5, 8)))  # Straight through the rogue's cell.
+	assert_true(result.ok(), "the move can be asked for")
+	assert_eq(knight.cell, Vector2i(5, 6), "it stopped on the cell before the rogue")
+	assert_eq(mp_before - knight.mp, 1, "and paid for the one step it took")
+	var damage := maxi(1, roundi(knight.max_hp() * BattleActions.Move.BUMP_DAMAGE_PERCENT / 100.0))
+	assert_eq(hp_before - knight.hp, damage, "the walker is hurt")
+	assert_eq(state.units[0].hp, state.units[0].max_hp(), "the hidden one is not")
+	assert_false(state.units[0].is_stealthed(), "but it is found")
+	assert_false(state.is_hidden_from(state.units[0], UnitState.Team.ENEMY))
+	var kinds := result.events.map(func(e: BattleEvents.Event) -> String: return e.get_script().get_global_name() if e.get_script() != null else "?")
+	assert_eq(result.events.size(), 3, "moved, hurt, found")
+	assert_true(result.events[0] is BattleEvents.UnitMoved and result.events[1] is BattleEvents.DamageDealt and result.events[2] is BattleEvents.StatusExpired, str(kinds))
+	assert_eq((result.events[1] as BattleEvents.DamageDealt).unit_id, 1)
+	assert_eq((result.events[2] as BattleEvents.StatusExpired).unit_id, 0)
+
+
+func test_walking_onto_the_hidden_enemys_own_cell_is_a_bump_too() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 7))
+	var battle := _knights_turn(state)
+	var result := battle.perform(BattleActions.Move.new(1, Vector2i(5, 7)))
+	assert_true(result.ok())
+	assert_eq(state.units[1].cell, Vector2i(5, 6))
+	assert_false(state.units[0].is_stealthed())
+
+
+func test_a_hidden_enemy_on_the_first_step_means_no_move_but_still_a_bump() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 6))  # Next to the knight, and the knight can't tell.
+	var battle := _knights_turn(state)
+	var knight := state.units[1]
+	var mp_before := knight.mp
+	var result := battle.perform(BattleActions.Move.new(1, Vector2i(5, 8)))
+	assert_true(result.ok())
+	assert_eq(knight.cell, Vector2i(5, 5), "it didn't move")
+	assert_eq(knight.mp, mp_before, "and paid nothing")
+	assert_false(knight.moved, "the move didn't count")
+	assert_eq(result.events.size(), 2, "hurt, and found")
+	assert_false(state.units[0].is_stealthed())
+
+
+func test_a_walk_that_does_not_cross_the_hidden_enemy_is_a_plain_walk() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 7))
+	var battle := _knights_turn(state)
+	var hp_before := state.units[1].hp
+	var result := battle.perform(BattleActions.Move.new(1, Vector2i(3, 5)))
+	assert_true(result.ok())
+	assert_eq(state.units[1].cell, Vector2i(3, 5))
+	assert_eq(state.units[1].hp, hp_before, "no harm")
+	assert_true(state.units[0].is_stealthed(), "and nobody found")
+	assert_eq(result.events.size(), 1)
+
+
+func test_a_walker_can_die_of_the_bump() -> void:
+	var state := _duel()
+	_knight_at(state, Vector2i(5, 5), Vector2i(5, 7))
+	var battle := _knights_turn(state)
+	state.units[1].hp = 1
+	var result := battle.perform(BattleActions.Move.new(1, Vector2i(5, 8)))
+	assert_true(result.ok())
+	assert_false(state.units[1].is_alive(), "hurt for the last of its HP")
+	assert_true(result.events.any(func(e: BattleEvents.Event) -> bool: return e is BattleEvents.UnitDied))
+
+
+func test_a_hidden_rogue_still_ambushes_from_next_to_an_enemy_that_cannot_see_her() -> void:
+	var state := _duel()
+	state.use_average_rolls = true
+	_knight_at(state, Vector2i(5, 6), Vector2i(5, 5))
+	var battle := Battle.new(state)
+	battle.start()
+	while state.current_unit().id != 0:
+		battle.perform(BattleActions.EndTurn.new(state.current_unit().id))
+	var hp_before := state.units[1].hp
+	var result := battle.perform(BattleActions.CastSpell.new(0, 1, Vector2i(5, 6)))
+	assert_true(result.ok(), result.error)
+	var plain := (PvpHeroes.build(4)["unit"] as UnitData).spells[1].effects[0] as DamageEffect
+	assert_true(hp_before - state.units[1].hp > roundi(plain.average_roll() * 1.5), "the ambush bonus applied")
 
 
 func test_a_spell_that_needs_an_enemy_cannot_pick_a_hidden_one() -> void:
@@ -95,17 +209,17 @@ func test_the_first_strike_from_stealth_hits_harder() -> void:
 
 func test_the_ai_does_not_aim_at_a_hidden_unit_and_does_when_it_shows() -> void:
 	var state := _duel()
-	state.units[1].cell = Vector2i(2, 3)  # Next to it: seen.
+	state.units[1].cell = Vector2i(2, 3)  # Next to it: nothing shows.
 	var battle := Battle.new(state)
 	battle.start()
 	var knight_id := 1
 	while state.current_unit().id != knight_id:
 		battle.perform(BattleActions.EndTurn.new(state.current_unit().id))
-	assert_true(EnemyAI.choose_next(state, knight_id) is BattleActions.CastSpell, "it sees her next to it and hits her")
-	state.units[1].cell = Vector2i(2, 7)  # Far: hidden.
 	var action := EnemyAI.choose_next(state, knight_id)
 	var attacking := action is BattleActions.CastSpell and state.units[knight_id].data.spells[(action as BattleActions.CastSpell).spell_index].is_offensive()
-	assert_false(attacking, "no attack on a target it can't see")
+	assert_false(attacking, "no attack on a target it can't see, even next to it")
+	state.units[0].break_stealth()
+	assert_true(EnemyAI.choose_next(state, knight_id) is BattleActions.CastSpell, "once she shows, it hits her")
 
 
 func test_a_cleanse_removes_harmful_statuses_and_keeps_the_helpful_ones() -> void:

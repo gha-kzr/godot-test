@@ -9,7 +9,8 @@ extends RefCounted
 ##   ["dmg", min, max, type, filter, {lifesteal, ambush}]   ["heal", min, max, filter]
 ##   ["status", id, filter]   ["move", kind, distance, filter]   ["cleanse", "harmful"|"helpful", filter]
 ## filter: "all", "allies", "enemies" or "caster". Areas: "single", ["circle", n], ["cross", n], ["line", n].
-## `from` borrows an existing spell's look and sound (icon, projectile, impact, animation).
+## `from` borrows an existing spell's look and sound (icon, projectile, impact, animation); `icon` overrides the icon
+## (ui/icons/<icon>.svg): the spells of one class must all have different icons (a test checks it).
 
 ## Class order is the lobby's order.
 const ORDER: Array[String] = ["knight", "ranger", "sorceress", "necromancer", "rogue", "priestess", "goblin", "wraith", "monk"]
@@ -64,14 +65,14 @@ static func spells() -> Dictionary:
 		"sorc_fireball": {"name": "Fireball", "from": "fireball", "ap": 4, "range": [3, 6], "area": ["circle", 1],
 				"fx": [["dmg", 16, 20, "fire", "enemies"]]},
 		"sorc_frost_spike": {"name": "Frost Spike", "from": "frost_lance", "ap": 2, "range": [2, 5], "cd": 1, "fx": [["dmg", 15, 19, "frost"]]},
-		"sorc_meteor": {"name": "Meteor", "from": "fireball", "ap": 6, "range": [4, 7], "cd": 4, "area": ["circle", 2],
+		"sorc_meteor": {"name": "Meteor", "from": "fireball", "icon": "meteor", "ap": 6, "range": [4, 7], "cd": 4, "area": ["circle", 2],
 				"fx": [["dmg", 36, 44, "fire", "enemies"]]},
 		"sorc_blink": {"name": "Blink", "from": "blink", "ap": 2, "range": [1, 4], "los": false, "cd": 3, "fx": [["move", "teleport", 1, "caster"]]},
 		# --- Necromancer: damage over time and alterations ---
 		"necro_plague_bolt": {"name": "Plague Bolt", "from": "spore_bolt", "ap": 3, "range": [2, 5],
 				"fx": [["dmg", 10, 12, "poison"], ["status", "plague", "enemies"]]},
 		"necro_rot": {"name": "Rot Curse", "from": "spore_hex", "ap": 3, "range": [2, 5], "fx": [["status", "rot", "enemies"]]},
-		"necro_miasma": {"name": "Miasma", "from": "spore_hex", "ap": 4, "range": [3, 6], "area": ["circle", 1],
+		"necro_miasma": {"name": "Miasma", "from": "spore_hex", "icon": "miasma", "ap": 4, "range": [3, 6], "area": ["circle", 1],
 				"fx": [["status", "miasma", "enemies"]]},
 		"necro_grasp": {"name": "Grasping Dead", "from": "chill_touch", "ap": 3, "range": [2, 5], "cd": 3, "fx": [["status", "rooted", "enemies"]]},
 		"necro_drain": {"name": "Drain Will", "from": "wail", "ap": 3, "range": [2, 5], "cd": 2,
@@ -99,7 +100,7 @@ static func spells() -> Dictionary:
 		"goblin_pickpocket": {"name": "Pickpocket", "from": "hamstring", "ap": 2, "range": [1, 1], "cd": 3,
 				"fx": [["dmg", 5, 7, "physical", "enemies"], ["status", "robbed", "enemies"], ["status", "nimble", "caster"]]},
 		"goblin_scamper": {"name": "Scamper", "from": "guard", "ap": 2, "range": [0, 0], "los": false, "cd": 2, "fx": [["status", "hasty", "caster"]]},
-		"goblin_dynamite": {"name": "Dynamite", "from": "fireball", "ap": 4, "range": [3, 6], "cd": 3, "area": ["circle", 2],
+		"goblin_dynamite": {"name": "Dynamite", "from": "fireball", "icon": "dynamite", "ap": 4, "range": [3, 6], "cd": 3, "area": ["circle", 2],
 				"fx": [["dmg", 24, 30, "fire", "all"], ["move", "push", 1, "all"]]},
 		# --- Wraith ---
 		"wraith_touch": {"name": "Spectral Touch", "from": "chill_touch", "ap": 3, "range": [1, 3], "fx": [["dmg", 14, 18, "frost"]]},
@@ -107,7 +108,7 @@ static func spells() -> Dictionary:
 				"fx": [["dmg", 8, 10, "frost", "enemies"], ["status", "dread", "enemies"]]},
 		"wraith_phase": {"name": "Phase Walk", "from": "blink", "ap": 2, "range": [1, 4], "los": false, "cd": 2, "fx": [["move", "teleport", 1, "caster"]]},
 		"wraith_siphon": {"name": "Life Siphon", "from": "icy_grasp", "ap": 3, "range": [1, 3], "fx": [["dmg", 10, 12, "frost", "enemies", {"lifesteal": 60}]]},
-		"wraith_chill": {"name": "Grave Chill", "from": "chill_touch", "ap": 2, "range": [2, 5], "fx": [["dmg", 8, 10, "frost"], ["status", "slowed", "enemies"]]},
+		"wraith_chill": {"name": "Grave Chill", "from": "chill_touch", "icon": "grave_chill", "ap": 2, "range": [2, 5], "fx": [["dmg", 8, 10, "frost"], ["status", "slowed", "enemies"]]},
 		# --- Monk: pushes, pulls and quick feet ---
 		"monk_palm": {"name": "Palm Strike", "from": "club", "ap": 2, "range": [1, 1], "fx": [["dmg", 10, 14, "physical"]]},
 		"monk_dash": {"name": "Flying Kick", "from": "charge", "ap": 3, "range": [2, 4], "los": false, "cd": 2, "target": "any",
@@ -137,7 +138,7 @@ static func heroes() -> Dictionary:
 				"ai": "ranged", "role": "Curses and poison", "desc": "Wears enemies down with poison and rot, roots them, slows them and steals their action points. Little burst, no healing.",
 				"spells": ["necro_plague_bolt", "necro_rot", "necro_miasma", "necro_grasp", "necro_drain"]},
 		"rogue": {"name": "Rogue", "gender": "female", "hp": 110, "ap": 7, "mp": 6, "init": 115, "model": "rogue", "height": 1.5, "color": [0.25, 0.3, 0.35],
-				"role": "Assassin", "desc": "Vanishes until her next attack, then strikes for extra damage. Visible to anyone next to her, and any hit reveals her.",
+				"role": "Assassin", "desc": "Vanishes until her next attack, then strikes for extra damage. Enemies can't see her, even next to her, until she attacks, is hurt, or one of them walks into her (which hurts them).",
 				"spells": ["rogue_dagger", "rogue_ambush", "rogue_vanish", "rogue_shadow_step", "rogue_hamstring"]},
 		"priestess": {"name": "Priestess", "gender": "female", "hp": 150, "ap": 7, "mp": 4, "init": 100, "model": "priestess", "height": 1.55, "color": [0.95, 0.9, 0.6],
 				"ai": "support", "role": "Healer and support", "desc": "Heals, cleanses and blesses her team for extra action points. Her own damage is very low, and she cannot heal herself with Healing Touch.",
