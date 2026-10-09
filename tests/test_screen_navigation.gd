@@ -48,7 +48,7 @@ func test_title_arrows_move_between_the_buttons_and_enter_presses() -> void:
 	screen.focus_first()
 	await _frame()
 	assert_eq(_focused(screen).name, &"SoloButton")
-	_tap(screen.get_viewport(), KEY_DOWN)
+	_tap(screen.get_viewport(), KEY_RIGHT)
 	await _frame()
 	assert_eq(_focused(screen).name, &"MultiplayerButton")
 	_tap(screen.get_viewport(), KEY_DOWN)
