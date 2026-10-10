@@ -29,6 +29,7 @@ func _cast(effects: Array[EffectData], layout := "0p 0p 0e 0e", target := Vector
 			[BattleFixtures.unit("E0", 100), BattleFixtures.unit("E1", 90)])
 	for unit in state.units:
 		unit.hp = 10
+	state.friendly_fire = _friendly_fire
 	_state = state
 	var battle := Battle.new(state)
 	battle.start()
@@ -38,6 +39,8 @@ func _cast(effects: Array[EffectData], layout := "0p 0p 0e 0e", target := Vector
 
 
 var _state: BattleState
+## These tests are about the filters, so friendly fire is on unless a test turns it off.
+var _friendly_fire := true
 
 
 func _hit_ids(events: Array[BattleEvents.Event]) -> Array[int]:
@@ -95,3 +98,55 @@ func test_a_target_killed_by_an_earlier_effect_is_skipped() -> void:
 		if event is BattleEvents.StatusApplied:
 			statused.append((event as BattleEvents.StatusApplied).unit_id)
 	assert_eq(statused, [1] as Array[int], "the enemies died to the hit; only P1 gets poisoned")
+
+
+func _without_friendly_fire(effects: Array[EffectData], layout := "0p 0p 0e 0e", target := Vector2i(2, 0)) -> Array[BattleEvents.Event]:
+	_friendly_fire = false
+	var events := _cast(effects, layout, target)
+	_friendly_fire = true
+	return events
+
+
+func test_without_friendly_fire_a_harmful_effect_spares_the_casters_team() -> void:
+	# Aimed at P1 (1,0): the circle holds P0 (the caster), P1 and E0.
+	var events := _without_friendly_fire([_damage(2)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0))
+	assert_eq(_hit_ids(events), [2] as Array[int], "only the enemy")
+	assert_eq(_state.units[0].hp, 10, "the caster is spared")
+	assert_eq(_state.units[1].hp, 10, "so is P1")
+
+
+func test_without_friendly_fire_a_heal_and_a_helpful_status_still_reach_allies() -> void:
+	var events := _without_friendly_fire([_heal(5)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0))
+	assert_true(_hit_ids(events).has(0) and _hit_ids(events).has(1), "allies are healed: %s" % [_hit_ids(events)])
+	var guard := BattleFixtures.status("Guard", 2, 0, [] as Array[StatModifier], true)
+	var statused: Array[int] = []
+	for event in _without_friendly_fire([BattleFixtures.apply_status(guard)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0)):
+		if event is BattleEvents.StatusApplied:
+			statused.append((event as BattleEvents.StatusApplied).unit_id)
+	statused.sort()
+	assert_eq(statused, [0, 1, 2] as Array[int], "a positive status lands on everyone in the area")
+
+
+func test_without_friendly_fire_a_harmful_status_spares_allies_too() -> void:
+	var poison := BattleFixtures.status("Poison", 2, 1)
+	var statused: Array[int] = []
+	for event in _without_friendly_fire([BattleFixtures.apply_status(poison)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0)):
+		if event is BattleEvents.StatusApplied:
+			statused.append((event as BattleEvents.StatusApplied).unit_id)
+	assert_eq(statused, [2] as Array[int])
+
+
+func test_without_friendly_fire_an_effect_aimed_at_the_caster_still_hits_it() -> void:
+	var events := _without_friendly_fire([_damage(2, Filter.CASTER)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0))
+	assert_eq(_hit_ids(events), [0] as Array[int], "a self-inflicted cost is not friendly fire")
+
+
+func test_the_damage_preview_follows_the_rule() -> void:
+	_friendly_fire = false
+	_cast([_damage(2)] as Array[EffectData], "0p 0p 0e 0e", Vector2i(1, 0))
+	_friendly_fire = true
+	var entries := DamagePreview.for_cast(_state, 0, 0, Vector2i(1, 0))
+	var ids: Array[int] = []
+	for entry in entries:
+		ids.append(entry.unit_id)
+	assert_true(ids.has(2) and not ids.has(1), "the preview shows no damage on the ally: %s" % [ids])

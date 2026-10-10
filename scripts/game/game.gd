@@ -19,10 +19,6 @@ const CREDITS_SCENE := preload("res://scenes/game/credits_screen.tscn")
 const PARTY_SCENE := preload("res://scenes/game/party_screen.tscn")
 const RUN_SCENE := preload("res://scenes/game/run_screen.tscn")
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
-## Distance of the mute button from the corner of the window.
-## The screens' own margins (24 at the sides, 16 at the top): the corner button lines up with their top bars.
-const OVERLAY_MARGIN_X := 24.0
-const OVERLAY_MARGIN_Y := 16.0
 ## How long an achievement toast stays.
 const TOAST_SECONDS := 3.5
 const AUDIO_SET := preload("res://data/audio/audio_set.tres")
@@ -44,7 +40,13 @@ var settings: Settings
 var audio: AudioService
 ## The guided first steps (their progress lives in the settings).
 var tutorial: Tutorial
+## The round buttons at the top right of every screen (sound, settings, and the fight's menu).
+var _top_bar: TopBar
 var _mute_button: MuteButton
+## The settings, open over the screen shown (a fight or a match goes on underneath), or null.
+var _settings_layer: CanvasLayer
+## Whether the settings overlay paused the fight under it (a solo fight waits; a multiplayer match cannot).
+var _paused_by_settings := false
 var _toast: PanelContainer
 var _toast_label: Label
 var _toast_tween: Tween
@@ -71,6 +73,7 @@ func _ready() -> void:
 	profile = _store.load_or_create(roster)
 	audio = AudioService.new()
 	audio.audio_set = AUDIO_SET
+	audio.process_mode = Node.PROCESS_MODE_ALWAYS  # The music and the clicks go on while a fight waits behind the settings.
 	add_child(audio)
 	audio.hook_buttons(get_tree())  # Every button clicks.
 	_build_overlay()
@@ -119,9 +122,7 @@ func show_multiplayer() -> void:
 	flow.exit_requested.connect(show_title)
 	flow.sound.connect(audio.play_sfx)
 	flow.speed_changed.connect(_on_settings_changed)
-	flow.settings_changed.connect(_on_settings_changed)
-	flow.top_bar_changed.connect(_shift_mute_button)
-	flow.audio_live.connect(func() -> void: SettingsApplier.apply_audio(settings))
+	flow.view_changed.connect(_update_top_bar)
 	flow.music_requested.connect(audio.play_music)
 	_replace_screen(flow)
 	var fragment := WebPage.fragment()
@@ -166,7 +167,7 @@ func start_qa_battle(encounter: Encounter, team: QaTools.Team, title: String) ->
 	if team.units.size() > spawns:
 		show_qa(tr("The party needs 1 to %d heroes to fight on this map.") % spawns)
 		return
-	var battle := BATTLE_SCENE.instantiate() as BattleController
+	var battle := BATTLE_SCENE.instantiate() as SoloBattleController
 	battle.setup(encounter, team.units, team.modifiers, rng_seed, [], tower.sudden_death_round, tower.sudden_death_percent,
 			title, team.levels)
 	battle.settings = settings
@@ -218,28 +219,18 @@ func show_settings() -> void:
 	settings_screen.reset_save_confirmed.connect(_on_reset_save_confirmed)
 
 
-## Makes room at the right of the sound button: a multiplayer screen puts its own round buttons in the corner and the
-## sound button sits to their left.
-func _shift_mute_button(room: float) -> void:
-	if _mute_button == null:
-		return
-	_mute_button.offset_right = -OVERLAY_MARGIN_X - room
-	_mute_button.offset_left = _mute_button.offset_right - 48.0
-
-
-## What stays on top of every screen: the mute button, in the top right corner.
+## What stays on top of every screen: the top right buttons and the toast.
 func _build_overlay() -> void:
 	var overlay := CanvasLayer.new()
 	overlay.layer = 100
+	overlay.process_mode = Node.PROCESS_MODE_ALWAYS  # The buttons answer while a fight waits behind the settings.
 	add_child(overlay)
-	_mute_button = MuteButton.new()
-	_mute_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_mute_button.offset_left = -OVERLAY_MARGIN_X - 48.0
-	_mute_button.offset_right = -OVERLAY_MARGIN_X
-	_mute_button.offset_top = OVERLAY_MARGIN_Y
-	_mute_button.offset_bottom = OVERLAY_MARGIN_Y + 44.0
+	_top_bar = TopBar.new()
+	_top_bar.settings_requested.connect(_open_settings_overlay)
+	_top_bar.menu_requested.connect(_on_menu_requested)
+	_mute_button = _top_bar.mute_button
 	_mute_button.toggled.connect(_on_mute_toggled)
-	overlay.add_child(_mute_button)
+	overlay.add_child(_top_bar)
 	_toast = PanelContainer.new()
 	_toast.theme_type_variation = &"Chip"
 	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -252,6 +243,74 @@ func _build_overlay() -> void:
 	_toast.add_child(_toast_label)
 	_toast.hide()
 	overlay.add_child(_toast)
+
+
+## Shows the buttons the current screen calls for: the settings in a fight and in the multiplayer lobby, and the menu
+## (leaving the fight) in a fight until its result shows. While the settings are open over a screen, only the sound.
+func _update_top_bar() -> void:
+	var cog := false
+	var menu := false
+	if screen is BattleController:
+		cog = true
+		menu = (screen as BattleController).menu_available()
+	elif screen is NetFlow:
+		var flow := screen as NetFlow
+		cog = flow.in_lobby() or flow.in_battle()
+		menu = flow.menu_available()
+	var over_settings := _settings_layer != null
+	_top_bar.show_settings(cog and not over_settings)
+	_top_bar.show_menu(menu and not over_settings)
+
+
+## The menu button: the fight asks whether to leave.
+func _on_menu_requested() -> void:
+	if screen is BattleController:
+		(screen as BattleController).open_menu()
+	elif screen is NetFlow:
+		(screen as NetFlow).open_menu()
+
+
+## The settings over whatever is shown, with only what concerns this player's device (see SettingsScreen.in_match).
+## A solo fight waits underneath (the tree is paused; the overlay, the top buttons and the audio keep running); a
+## multiplayer match goes on.
+func _open_settings_overlay() -> void:
+	if _settings_layer != null:
+		return
+	_settings_layer = CanvasLayer.new()
+	_settings_layer.name = "SettingsLayer"
+	_settings_layer.layer = 50  # Over the screens, under the top buttons (100).
+	_settings_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	if screen is BattleController:
+		_paused_by_settings = true
+		get_tree().paused = true
+	add_child(_settings_layer)
+	var settings_screen := SETTINGS_SCENE.instantiate() as SettingsScreen
+	settings_screen.in_match = true
+	_settings_layer.add_child(settings_screen)
+	settings_screen.show_settings(settings)
+	settings_screen.back_pressed.connect(_close_settings_overlay)
+	settings_screen.audio_live.connect(func() -> void: SettingsApplier.apply_audio(settings))
+	settings_screen.changed.connect(_on_settings_changed)
+	settings_screen.focus_first.call_deferred()
+	_update_top_bar()
+
+
+func _close_settings_overlay() -> void:
+	if _settings_layer != null:
+		_settings_layer.queue_free()
+		_settings_layer = null
+		_resume_from_settings()
+		_update_top_bar()
+
+
+func _resume_from_settings() -> void:
+	if _paused_by_settings:
+		_paused_by_settings = false
+		get_tree().paused = false
+
+
+func _exit_tree() -> void:
+	_resume_from_settings()  # A paused tree must not outlive the game that paused it.
 
 
 func _on_mute_toggled(muted: bool) -> void:
@@ -387,7 +446,7 @@ func start_battle() -> void:
 	if profile.party.is_empty() or profile.party.size() > spawns:
 		show_party(tr("The party needs 1 to %d heroes to fight on this map.") % spawns)
 		return
-	var battle := BATTLE_SCENE.instantiate() as BattleController
+	var battle := BATTLE_SCENE.instantiate() as SoloBattleController
 	battle.setup(setup.encounter, setup.units, setup.modifiers, rng_seed, setup.hero_hp,
 			setup.sudden_death_round, setup.sudden_death_percent, setup.title, setup.levels)
 	battle.tutorial = tutorial
@@ -587,12 +646,15 @@ func _save() -> bool:
 ## Swaps the current screen for `next`. The old one leaves the tree now and is freed at
 ## the end of the frame: it may be the one whose signal led here (a battle's Continue).
 func _replace_screen(next: Node) -> void:
-	_shift_mute_button(0.0)
+	_close_settings_overlay()
 	if screen != null:
 		remove_child(screen)
 		screen.queue_free()
 	screen = next
 	add_child(next)
+	if next is BattleController:
+		(next as BattleController).menu_changed.connect(_update_top_bar)
+	_update_top_bar()
 	if next is not StartScreen:  # Before the first click the browser plays nothing anyway.
 		audio.play_music(_battle_music if next is BattleController else &"hub")
 	if next is Screen:

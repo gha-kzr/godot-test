@@ -312,7 +312,7 @@ func test_the_menu_is_a_button_in_the_top_bar_not_in_the_actions_column() -> voi
 	var rig := _fight()
 	var host := _controller(rig, 1)
 	await _frames()
-	assert_false((host.find_child("MenuButton", true, false) as Button).visible, "no Menu button in the column any more")
+	assert_true(host.find_child("MenuButton", true, false) == null, "no Menu button in the column: it is the Game root's hamburger")
 	host.open_menu()
 	assert_true(host.hud.is_modal_open(), "the leave question opens")
 	host.hud.close_leave_panel()

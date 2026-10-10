@@ -56,7 +56,7 @@ func test_an_obstacle_cell_has_a_floor_box_and_a_hull_that_is_smaller_than_its_c
 
 
 func test_the_light_turns_with_the_camera_so_shadows_fall_the_same_way_on_screen() -> void:
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	_tree().root.add_child(controller)
 	var light := controller.camera_rig.find_child("DirectionalLight3D", true, false) as DirectionalLight3D
 	assert_true(light != null, "the light hangs under the camera rig")

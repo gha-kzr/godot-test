@@ -149,7 +149,7 @@ class CastSpell extends Action:
 				in_area.append(unit.id)
 		# Effect by effect: every hit lands, then every status, and so on.
 		for effect in spell.effects:
-			for target_id in _targets_of(effect, state, in_area):
+			for target_id in _targets_of(spell, effect, state, in_area):
 				if state.units[target_id].is_alive():  # Killed by an earlier effect: skipped.
 					events.append_array(effect.apply_cast(state, actor_id, target_id, target))
 		if spell.is_offensive():
@@ -158,16 +158,23 @@ class CastSpell extends Action:
 		caster.commit_position()  # A cast ends free repositioning: the next move counts from here.
 		return events
 
-	## The units an effect applies to, by its target filter.
-	func _targets_of(effect: EffectData, state: BattleState, in_area: Array[int]) -> Array[int]:
+	## The units an effect applies to, by its target filter. Without friendly fire a harmful effect spares the
+	## caster's team (the caster included, unless the effect is aimed at the caster alone), except for a spell that
+	## is aimed at an ally on purpose (the Ghoul's Feast).
+	func _targets_of(spell: SpellData, effect: EffectData, state: BattleState, in_area: Array[int]) -> Array[int]:
 		var caster_team := state.units[actor_id].team
+		var spares_team := effect.is_harmful() and not state.friendly_fire and spell.target_unit != SpellData.TargetUnit.ALLY
 		match effect.target_filter:
 			EffectData.TargetFilter.CASTER:
 				return [actor_id]
 			EffectData.TargetFilter.ALLIES:
+				if spares_team:
+					return []
 				return in_area.filter(func(id: int) -> bool: return state.units[id].team == caster_team)
 			EffectData.TargetFilter.ENEMIES:
 				return in_area.filter(func(id: int) -> bool: return state.units[id].team != caster_team)
+		if spares_team:
+			return in_area.filter(func(id: int) -> bool: return state.units[id].team != caster_team)
 		return in_area
 
 

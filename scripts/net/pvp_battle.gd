@@ -33,6 +33,7 @@ static func create(map: MapData, side_a: Array[Dictionary], side_b: Array[Dictio
 	if state == null:
 		return null
 	state.pvp = true
+	state.friendly_fire = true  # A lobby rule (MatchState settings); the balance tools play with it.
 	var heroes: Array[int] = []
 	for entry in side_a:
 		heroes.append(int(entry["hero"]))

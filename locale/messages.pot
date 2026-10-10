@@ -895,6 +895,10 @@ msgstr ""
 msgid "Found: %s."
 msgstr ""
 
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Friendly fire"
+msgstr ""
+
 #: scripts/game/hub/destination_bar.gd
 msgid "From floor %d"
 msgstr ""
@@ -1285,7 +1289,7 @@ msgstr ""
 msgid "Mending Rain"
 msgstr ""
 
-#: scripts/game/net/net_top_bar.gd scenes/battle/hud.tscn
+#: scripts/game/top_bar.gd
 msgid "Menu"
 msgstr ""
 
@@ -1933,7 +1937,7 @@ msgstr ""
 msgid "Set the best floor to this value"
 msgstr ""
 
-#: scripts/game/net/net_top_bar.gd scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
+#: scripts/game/top_bar.gd scenes/game/settings_screen.tscn scenes/game/title_screen.tscn
 msgid "Settings"
 msgstr ""
 
@@ -2079,6 +2083,10 @@ msgstr ""
 
 #: scripts/progression/tutorial.gd
 msgid "Spells cost AP. Pick one (or press its number) to see where it can reach."
+msgstr ""
+
+#: scripts/game/net/net_lobby_screen.gd
+msgid "Spells that hurt (damage, harmful statuses) also hit your own team, and you can hit yourself with an area. Off: they only hit enemies."
 msgstr ""
 
 #: data/pvp/heroes/wraith.tres

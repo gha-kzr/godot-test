@@ -12,13 +12,13 @@ func after_each_clean() -> void:
 	Engine.time_scale = 1.0
 
 
-func _controller(tutorial: Tutorial, hero_mp := 3) -> BattleController:
+func _controller(tutorial: Tutorial, hero_mp := 3) -> SoloBattleController:
 	Engine.time_scale = 10.0
 	var hero := BattleFixtures.unit("P0", 200, hero_mp, 6, 40)
 	hero.spells = [BattleFixtures.damage_spell(2, 1, 5, 3)] as Array[SpellData]
 	var enemy := BattleFixtures.unit("E0", 100, 3, 6, 400)
 	enemy.spells = [BattleFixtures.damage_spell(2, 1, 5, 1)] as Array[SpellData]
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0 0e", [enemy])
 	controller.players = [hero] as Array[UnitData]
@@ -27,7 +27,7 @@ func _controller(tutorial: Tutorial, hero_mp := 3) -> BattleController:
 	return controller
 
 
-func _wait_state(controller: BattleController, state: BattleController.State) -> bool:
+func _wait_state(controller: SoloBattleController, state: BattleController.State) -> bool:
 	for i in 1500:
 		if controller.input_state == state:
 			return true
@@ -35,7 +35,7 @@ func _wait_state(controller: BattleController, state: BattleController.State) ->
 	return false
 
 
-func _step_id(controller: BattleController) -> String:
+func _step_id(controller: SoloBattleController) -> String:
 	return str(controller._step.get("id", ""))
 
 

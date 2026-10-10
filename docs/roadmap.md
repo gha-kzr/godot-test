@@ -98,5 +98,5 @@ The fork's multiplayer now lives in the same game (the title has **Solo** and **
 | Feature | Category | Pairs with |
 |---|---|---|
 | [Merge the solo and PvP classes](backlog.md#merge-the-solo-and-pvp-classes) | Content / balance | heroes, runes, balance lab, `PvpHeroes` |
-| [Hide the enemy's spell bar in solo](backlog.md#hide-the-enemys-spell-bar-in-solo) | UX / battle readability | spell bar, multiplayer controller |
 | [Co-op PvE (idea)](backlog.md#co-op-pve-idea) | Multiplayer | match session, AI takeover, run state |
+| [Three-team multiplayer](backlog.md#three-team-multiplayer-3v3v3-4v4v4) | Multiplayer | match state, PvP map, lobby |

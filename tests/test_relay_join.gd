@@ -132,24 +132,24 @@ func test_nobody_joins_a_full_lobby_or_a_match_that_started_unless_they_left_it(
 	assert_eq(pair[0].session.state.seat_ids(), [1, 2] as Array[int])
 
 
-func test_the_lobby_is_full_at_eight_players() -> void:
+func test_the_lobby_is_full_at_twelve_players() -> void:
 	var host := _hub()
 	host.host_room("Alice")
 	_run([host], 1.0)
 	var guests: Array = []
-	for index in 7:
+	for index in 11:
 		var guest := _hub()
 		guest.join("Guest %d" % index, host.room_code)
 		guests.append(guest)
 		_run([host] + guests, 1.0)
-	assert_eq(host.session.state.seat_ids().size(), 8)
-	var ninth := _hub()
+	assert_eq(host.session.state.seat_ids().size(), 12)
+	var thirteenth := _hub()
 	var told := []
-	ninth.failed.connect(func(why: String) -> void: told.append(why))
-	ninth.join("Ninth", host.room_code)
-	_run([host, ninth] + guests, 3.0)
-	assert_true(ninth.session.halted_now())
-	assert_eq(told, ["The match is full"])
+	thirteenth.failed.connect(func(why: String) -> void: told.append(why))
+	thirteenth.join("Thirteenth", host.room_code)
+	_run([host, thirteenth] + guests, 3.0)
+	assert_true(thirteenth.session == null, "never seated: the relay's room holds twelve")
+	assert_eq(told, ["The match is full."])
 
 
 func test_a_player_who_left_comes_back_to_their_own_seat_with_their_token() -> void:

@@ -111,7 +111,7 @@ func test_the_achievements_are_saved_and_loaded() -> void:
 func test_a_won_battle_unlocks_toasts_and_saves() -> void:
 	var game := _game()
 	game.start_tower(1)
-	var battle := game.screen as BattleController
+	var battle := game.screen as SoloBattleController
 	for unit in battle.battle.state.units:
 		if unit.team == UnitState.Team.ENEMY:
 			unit.hp = 0

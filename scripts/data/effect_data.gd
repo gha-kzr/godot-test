@@ -34,6 +34,12 @@ func allows_target(_state: BattleState, _caster_id: int, _cell: Vector2i) -> boo
 	return true
 
 
+## Whether the effect hurts the unit it lands on (damage, a harmful status). With friendly fire off
+## (BattleState.friendly_fire) a harmful effect skips the caster's own team.
+func is_harmful() -> bool:
+	return false
+
+
 ## Short player-facing text, e.g. "5-7 damage". Every effect kind describes itself.
 @abstract func describe() -> String
 

@@ -1,6 +1,6 @@
 # Multiplayer (PvP) — how it works
 
-A fight between human players, up to 4 against 4, one hero each, from a static web page plus a small relay server
+A fight between human players, up to 6 against 6, one hero each, from a static web page plus a small relay server
 (`server/`) that only passes messages between the players. The game is in `scripts/net/` (rules, session, network)
 and `scripts/game/net/` (screens).
 
@@ -113,9 +113,9 @@ when the multiplayer menu opens (to wake it up), which tells Render's host that 
 The lobby (`NetLobbyScreen`): your player (name, hero cards, Ready), the two team cards (a click anywhere on a card, or its
 name as a button for the keyboard, joins the team; it says "your team" on yours; the host's Remove button is on each row),
 the invite card (room code written `abc-def`, a button copies the code, one the link) and the map and rules ("new map" is a
-round-arrow button). The round **top bar** (`NetTopBar`) sits at the top right and the sound button moves to its left
-(`Game._shift_mute_button`): from left to right the sound, the settings cog (lobby and fight) and, in the fight, a hamburger
-button for the menu (leaving the match). Changing the map or the rules leaves the players Ready as they are (only a change of a player's own hero or team takes
+round-arrow button). The round **top bar** (`TopBar`, owned by the Game root and shared with the single-player game) sits at the top
+right: from left to right the sound, the settings cog (every screen but the title ones) and, in a fight, a hamburger
+button for the menu (leaving the match). The settings open as an overlay (`Game._open_settings_overlay`), the match going on underneath. Changing the map or the rules leaves the players Ready as they are (only a change of a player's own hero or team takes
 their Ready back). There are no quick messages in the lobby:
 in the fight a "Say something" button above End turn opens the list in the middle of the screen
 (`NetBattleController`), and a message appears above the sender's hero in a comic speech bubble (`SpeechBubble`, 5 s; a

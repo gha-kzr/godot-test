@@ -477,6 +477,7 @@ func test_changing_the_map_or_the_rules_leaves_the_players_ready_on_every_screen
 		func() -> void: (host_lobby.find_child("Turn", true, false) as SpinBox).value = 60,
 		func() -> void: (host_lobby.find_child("Grace", true, false) as SpinBox).value = 33,
 		func() -> void: (host_lobby.find_child("Cards", true, false) as CheckButton).toggled.emit(true),
+		func() -> void: (host_lobby.find_child("FriendlyFire", true, false) as CheckButton).toggled.emit(false),
 	]
 	for change in changes:
 		change.call()
@@ -495,36 +496,6 @@ func test_changing_the_map_or_the_rules_leaves_the_players_ready_on_every_screen
 
 func test_a_new_match_takes_45_seconds_a_turn() -> void:
 	assert_eq(MatchState.new().settings["turn"], 45)
-
-
-func test_the_settings_open_over_the_fight_and_the_lobby_without_leaving_the_match() -> void:
-	var relay := FakeRelay.new()
-	var both := _two_players(relay)
-	var host: NetFlow = both[0]
-	var changed := []
-	host.settings_changed.connect(func() -> void: changed.append(true))
-	var cog := host.find_child("CogButton", true, false) as Button
-	assert_true(cog.is_visible_in_tree(), "the cog is at the top of the lobby")
-	cog.pressed.emit()
-	await _frames()
-	var layer := host.get_node_or_null("SettingsLayer")
-	assert_true(layer != null, "the settings are open")
-	var screen := layer.get_child(0) as SettingsScreen
-	assert_true(screen.in_match)
-	assert_false(screen.find_child("CreditsButton", true, false).visible, "no credits, save reset or QA tools in a match")
-	assert_false(screen.find_child("ResetSaveButton", true, false).visible)
-	assert_false(screen.find_child("QaTools", true, false).visible)
-	assert_true(screen.find_child("MasterVolume", true, false).visible, "the volumes are there")
-	host._open_settings()
-	assert_eq(host.get_children().filter(func(node: Node) -> bool: return node.name == "SettingsLayer").size(), 1, "opened once")
-	screen.changed.emit()
-	assert_eq(changed.size(), 1, "the Game root is told to apply and save")
-	assert_true(host.hub.session != null and host._screen is NetLobbyScreen, "the match goes on underneath")
-	screen.back_pressed.emit()
-	await _frames()
-	assert_true(host.get_node_or_null("SettingsLayer") == null, "closed")
-	for flow in both:
-		flow.free()
 
 
 func test_the_lobby_opens_with_the_hero_the_player_likes() -> void:
@@ -567,18 +538,19 @@ func test_the_lobby_can_copy_the_room_code_and_the_room_link() -> void:
 	host.free()
 
 
-func test_the_top_bar_has_the_cog_in_the_lobby_and_the_menu_too_in_the_fight() -> void:
+func test_the_flow_tells_the_game_root_when_its_view_changes_and_when_the_fight_is_on() -> void:
 	var relay := FakeRelay.new()
 	var flow := _flow(relay)
+	var views := {"count": 0}
+	flow.view_changed.connect(func() -> void: views.count += 1)
 	flow.start("")
-	var bar := flow.find_child("NetTopBar", true, false) as NetTopBar
-	assert_false(bar.visible, "nothing on the front page")
+	assert_eq(views.count, 1, "the front page")
+	assert_false(flow.in_battle())
 	flow._on_host("Alice")
 	_pump(relay, [flow])
-	assert_true(bar.visible and flow.find_child("CogButton", true, false).visible, "the cog in the lobby")
-	assert_false(flow.find_child("HamburgerButton", true, false).visible, "but no menu there")
-	assert_eq(bar.offset_right, -NetTopBar.RIGHT_GAP, "at the right edge")
-	assert_eq(bar.occupied_width(), NetTopBar.BUTTON_WIDTH + NetTopBar.GAP, "one button: the sound button leaves room for it")
-	assert_eq(bar.get_child(0).name, "CogButton", "the settings first from the left, the menu after it")
-	assert_eq(bar.get_child(1).name, "HamburgerButton")
+	assert_true(views.count >= 2, "the lobby came")
+	assert_true(flow.in_lobby(), "the settings button is offered in the lobby")
+	assert_false(flow.in_battle(), "no fight yet")
+	assert_false(flow.menu_available(), "so the Game root's menu button stays away")
+	flow.open_menu()  # No fight: nothing happens.
 	flow.free()

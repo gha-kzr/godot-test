@@ -218,7 +218,7 @@ func test_the_controller_announces_the_players_turn_and_the_result() -> void:
 	Engine.time_scale = 10.0
 	var hero := BattleFixtures.unit("P0", 200, 3, 6, 20)
 	var enemy := BattleFixtures.unit("E0", 100, 3, 6, 20)
-	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as BattleController
+	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0 0e", [enemy])
 	controller.players = [hero] as Array[UnitData]

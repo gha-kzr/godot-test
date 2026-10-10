@@ -385,6 +385,18 @@ func test_hovering_a_spell_shows_its_details_in_a_panel_above_the_bar() -> void:
 	hud.free()
 
 
+func test_the_first_spell_details_are_not_a_tall_panel() -> void:
+	# A wrapping label that was never laid out used to size the panel at a thousand pixels the first time.
+	var hud := _hud()
+	var bar := hud.get_node("%SpellBar") as SpellBar
+	hud.show_spells([load("res://data/spells/fireball.tres")] as Array[SpellData], 10)
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	bar.hover_at(bar.slot(0).get_global_rect().get_center())
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_true((bar.get_node("%Details") as Control).size.y < 250.0, "%s" % [(bar.get_node("%Details") as Control).size])
+	hud.free()
+
+
 func test_hovering_a_spell_on_the_inspect_card_shows_its_details() -> void:
 	var hud := _hud()
 	var bar := hud.get_node("%SpellBar") as SpellBar
@@ -601,7 +613,7 @@ func test_the_menu_button_asks_before_leaving_the_fight() -> void:
 	hud.leave_confirmed.connect(func() -> void: leaves.count += 1)
 	var panel := hud.get_node("%LeavePanel") as Control
 	assert_false(panel.visible, "closed at first")
-	(hud.get_node("%MenuButton") as Button).pressed.emit()
+	hud.open_leave_panel()
 	assert_true(panel.visible)
 	assert_eq(leaves.count, 0, "asking isn't leaving")
 	assert_true(_spell_button(hud, 0).disabled and (hud.get_node("%EndTurnButton") as Button).disabled, "the shortcuts are locked meanwhile")
@@ -609,23 +621,11 @@ func test_the_menu_button_asks_before_leaving_the_fight() -> void:
 	assert_false(panel.visible)
 	assert_false((hud.get_node("%EndTurnButton") as Button).disabled, "unlocked again")
 	assert_eq(leaves.count, 0)
-	(hud.get_node("%MenuButton") as Button).pressed.emit()
+	hud.open_leave_panel()
 	(hud.get_node("%LeaveButton") as Button).pressed.emit()
 	assert_eq(leaves.count, 1)
 	assert_false(panel.visible)
 	assert_false(hud.close_leave_panel(), "nothing left to close")
-	hud.free()
-
-
-func test_the_menu_button_can_be_hidden_and_goes_away_with_the_result() -> void:
-	var hud := _hud()
-	var menu := hud.get_node("%MenuButton") as Button
-	assert_true(menu.visible)
-	hud.set_leave_available(false)
-	assert_false(menu.visible)
-	hud.set_leave_available(true)
-	hud.show_result(true)
-	assert_false(menu.visible, "the result screen has its own button")
 	hud.free()
 
 

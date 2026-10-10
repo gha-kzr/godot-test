@@ -128,6 +128,7 @@ func test_area_spell_hits_every_unit_in_it_allies_included() -> void:
 	var enemies: Array[UnitData] = [_fighter("E0", 100), _fighter("E1", 90)]
 	# Target (2,0): hits P1 at (1,0), E0 at (3,0), E1 at (2,1). P0 at (0,0) is outside.
 	var battle := _battle("0p 0p 0 0e\n0 0 0e 0", players, enemies)
+	battle.state.friendly_fire = true
 	var result := battle.perform(CastSpell.new(0, 0, Vector2i(2, 0)))
 	assert_true(result.ok(), result.error)
 	var hit: Array[int] = []
@@ -197,6 +198,7 @@ func test_caster_killed_by_its_own_spell_ends_its_turn() -> void:
 	var players: Array[UnitData] = [_fighter("P0", 200, [nova]), _fighter("P1", 150)]
 	var enemies: Array[UnitData] = [_fighter("E0", 100)]
 	var battle := _battle("0p 0 0p 0e", players, enemies)
+	battle.state.friendly_fire = true
 	var result := battle.perform(CastSpell.new(0, 0, Vector2i(0, 0)))
 	assert_true(result.ok(), result.error)
 	assert_eq(_types(result.events), ["SpellCast", "DamageDealt", "UnitDied", "TurnStarted"] as Array[String])
@@ -206,6 +208,7 @@ func test_caster_killed_by_its_own_spell_ends_its_turn() -> void:
 func test_mutual_wipe_is_a_draw() -> void:
 	var nova := BattleFixtures.damage_spell(3, 0, 0, 50, AreaShape.Kind.CIRCLE, 1)
 	var battle := _battle("0p 0e", [_fighter("P0", 200, [nova])])
+	battle.state.friendly_fire = true
 	var result := battle.perform(CastSpell.new(0, 0, Vector2i(0, 0)))
 	assert_true(result.ok(), result.error)
 	assert_eq(_types(result.events), ["SpellCast", "DamageDealt", "DamageDealt", "UnitDied", "UnitDied", "BattleEnded"] as Array[String])

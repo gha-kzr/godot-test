@@ -94,7 +94,7 @@ func test_rewards_follow_the_spawn() -> void:
 
 
 func test_the_controller_uses_a_units_own_ai_profile_first() -> void:
-	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as BattleController
+	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as SoloBattleController
 	controller.encounter = load("res://data/encounters/slice.tres")
 	var unit := UnitState.new(0, BattleFixtures.unit("E"), UnitState.Team.ENEMY, Vector2i.ZERO)
 	assert_eq(controller._ai_profile_for(unit), controller.encounter.ai_profile, "the encounter's")
@@ -121,7 +121,7 @@ func test_encounter_builds_and_validation() -> void:
 
 func test_a_preset_enemy_shows_its_label_in_battle() -> void:
 	var elite := load("res://data/presets/elite.tres") as DifficultyPreset
-	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as BattleController
+	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as SoloBattleController
 	controller.encounter = BattleFixtures.encounter("0p 0 0 0e", [BattleFixtures.unit("Ogre", 100)] as Array[UnitData], 0, elite)
 	controller.players = [BattleFixtures.unit("P0", 200)] as Array[UnitData]
 	controller.rng_seed = 1
@@ -144,7 +144,7 @@ func test_empty_slots_are_reported_not_crashed_on() -> void:
 
 
 func test_a_battle_refuses_an_invalid_encounter() -> void:
-	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as BattleController
+	var controller := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as SoloBattleController
 	controller.encounter = Encounter.new()
 	controller.encounter.map = load("res://data/maps/slice.tres")
 	expect_error("invalid encounter")

@@ -132,12 +132,6 @@ grow_vertical = 0
 mouse_filter = 2
 alignment = 2
 
-[node name="MenuButton" type="Button" parent="Root/Actions"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-text = "Menu"
-
 [node name="RecenterButton" type="Button" parent="Root/Actions"]
 unique_name_in_owner = true
 layout_mode = 2

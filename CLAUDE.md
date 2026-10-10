@@ -1,1 +1,158 @@
-@README.md
+# Rune Ascent
+
+A turn-based tactical roguelite in **one game with two modes**: **Solo** (three heroes, tower runs, runes) and **Multiplayer** (PvP up to 6 against 6 through a relay server). A **Godot 4.7** project (GDScript), developed from the command line; the editor UI is optional. The repository, the folder and the save folder are all `rune-ascent` (`application/config/custom_user_dir_name` sets the save folder). `README.md` is the player-facing page; this file is for agents.
+
+## Where to read
+
+- `docs/gameplay.md`: every rule, screen and control (solo and multiplayer). Read it before changing a mechanic.
+- `docs/multiplayer.md`: how multiplayer works inside (replicated log, host swap, relay).
+- `docs/decisions/`: design decisions, newest `2026-10-10-shared-core.md` (what solo and multiplayer share, and what stays apart). Read before designing; don't re-ask what's settled.
+- `docs/roadmap.md` (finished and proposed milestones) and `docs/backlog.md` (each feature in full).
+
+## The two modes
+
+- Solo and multiplayer keep separate code paths and their own classes (solo's Knight / Mage / Ranger with levels and runes; multiplayer's nine fixed PvP classes in `data/pvp/`). Merging the classes is a future milestone that needs a re-balance.
+- They share the battle core: `BattleController` (views, HUD, camera, input, playback) with hooks filled by `SoloBattleController` (encounter, AI turns, tutorial, tips, QA tools) and `NetBattleController` (the match log); the `TopBar` (sound, settings cog, menu) is owned by the `Game` root; settings open as an overlay (solo pauses behind it, multiplayer never does).
+- Card combat is multiplayer only for now.
+- The title has two buttons, **Solo** and **Multiplayer**. Multiplayer needs the relay: `RELAY_URL=ws://127.0.0.1:8787` (desktop) or `?relay=` (web) points the game at a local one (`scripts/net/relay_config.gd`).
+
+## Setup
+
+Godot is installed as a macOS app at `/Applications/Godot.app`. The app bundle doesn't put a `godot` command on your PATH, so add a symlink to the binary inside it:
+
+```sh
+ln -sf /Applications/Godot.app/Contents/MacOS/Godot ~/.local/bin/godot
+godot --version   # 4.7.2.stable...
+```
+
+(`~/.local/bin` must be on your `PATH`.)
+
+### After cloning (each machine)
+
+1. `godot --headless --import` — builds the `.godot/` cache (class names, imported icons).
+2. `godot --headless --script res://tests/run_tests.gd` — all tests should pass.
+
+Running from the editor (F5): by default Godot embeds the game in the editor's **Game** tab, where the editor sets its size and it can look blurry on a non-Retina second monitor. For a real window, turn off "Embed Game on Next Play" in the Game tab's ⋮ menu (or set Editor Settings → Run → Window Placement → Game Embed Mode to Disabled). Turn it back on when you want the Game tab's runtime tools (clicking nodes in the running game, frame stepping, free camera).
+
+## CLI usage
+
+Run these from the repo root:
+
+| Task | Command |
+| --- | --- |
+| Run the game (the title: Solo or Multiplayer) | `godot` |
+| Run one battle on its own (no progression) | `godot scenes/battle/battle.tscn` |
+| Run headless (no window), quit after N frames | `godot --headless --quit-after 60` |
+| Import assets, refresh the `.godot/` cache (run after adding a `class_name` script) | `godot --headless --import` |
+| Check a script for errors | `godot --headless --check-only --script scripts/battle/battle.gd` |
+| Run all tests (exit code 1 on failure) | `godot --headless --script res://tests/run_tests.gd` |
+| Run tests whose file name matches | `godot --headless --script res://tests/run_tests.gd -- movement` |
+| Add missing UIDs / `uid=` references to `.tres` / `.tscn` made from the CLI | `godot --headless --script res://tools/fill_uid_refs.gd` |
+| Rebuild the UI theme (`ui/theme.tres`) | `godot --headless --script res://tools/build_theme.gd` |
+| Render frames to PNG (visual check; needs a window, not `--headless`) | `godot --write-movie /tmp/shot.png --fixed-fps 10 --quit-after 30 scenes/battle/battle.tscn` |
+| Rebuild `locale/messages.pot` and merge new texts into `locale/fr.po` (new ones arrive empty, to translate) | `godot --headless --script res://tools/extract_strings.gd` |
+| Build the hand-made models from their recipes (all, or the named ones; then run `tools/fill_uid_refs.gd`) | `godot --headless --script res://tools/build_models.gd [-- knight warg]` |
+| Look at models on tiles in the battle's light (needs a window): `units=knight,warg`, `anim=Attack`, `at=0.3` (seconds), `spin=1` (a turntable of one unit repeated), `yaw=`, `scale=`; add `--write-movie` for a still | `godot scenes/tools/model_stage.tscn -- units=knight,warg anim=Walk` |
+| Refine a model by hand (needs a window): `model=knight`, `clip=Attack`, `at=0.35` (seconds), `select=Rig/Hips/Arm_R` (a node's path), `tab=1` (the Pose tab); saves `assets/models/<name>.tweaks.tres` | `godot scenes/tools/model_workshop.tscn -- model=knight` |
+| Replay one spell over and over (reloads when its files are saved) | `godot scenes/tools/spell_stage.tscn -- spell=res://data/spells/fireball.tres` |
+| Open the editor | `godot -e` |
+| Export (needs `export_presets.cfg`) | `godot --headless --export-release "<preset>" build/<file>` |
+| Web build into `build/web` (needs the 4.7.2 export templates); `--publish` also commits it to the local `gh-pages` branch | `tools/export_web.sh [--publish]` |
+
+## Web build (GitHub Pages)
+
+The `Web` preset (`export_presets.cfg`) exports single-threaded, so it runs on GitHub Pages, which can't send the headers threads need; the web build uses the Compatibility renderer (`rendering_method.web` in `project.godot`). `tools/export_web.sh --publish` builds and commits it to an orphan `gh-pages` branch; push that branch (`git push origin gh-pages`) and set **Settings → Pages → Deploy from a branch → `gh-pages` / root**. Saves and settings live in the browser's storage (per browser and address).
+
+## Multiplayer development
+
+- Balancing the classes: the numbers are in `scripts/tools/pvp/pvp_class_specs.gd`; `godot --headless --script res://tools/build_pvp_classes.gd` rebuilds `data/pvp/` from them (then `tools/fill_uid_refs.gd`), and `godot --headless --script res://tools/pvp_balance.gd -- duel games=6` (or `teams2`, `teams3`, `teams4`, with `map=`, `size=` and `cards=1` for card combat) plays AI-vs-AI matches and prints the win-rate matrix. The AI plays worse than a person, so read it as a pointer to outliers.
+- Tests: `godot --headless --script res://tests/run_tests.gd` (the network is faked in tests), `cd server && npm test` (the relay itself), and `tools/e2e/run.sh [basic|full]` plays whole matches between real Chrome tabs and a local relay. Its cleanup trap fails and leaves a web server on 8061 and a relay on 8787 running: `pkill -f "http.server 8061"; pkill -f "node index.mjs"`.
+- Run the server locally: `cd server && npm ci && npm start`, then open the game with `?relay=ws://127.0.0.1:8787`. Deploying it: `render.yaml` (see `docs/multiplayer.md`).
+
+## Design tools (editor plugin)
+
+`addons/design_tools` is enabled in the project. Open the editor (`godot -e`):
+
+- **Previews in the Inspector** — select a spell `.tres` to see its range and area on a grid, expected damage / heal across Power (columns) and resistance (rows), damage per AP and its statuses' totals; select an enemy to see HP / Power / XP / resistances at levels 1–10 for the normal, elite and boss presets, and its loot odds. Previews follow your edits.
+- **Design panel** (bottom, next to Output) — **New** creates a spell, enemy (with its unit), encounter or preset from a valid template; **Duplicate selected** copies the one open in the Inspector under a new name; **Export floor** saves a tower floor's generated encounter (map included) in `data/encounters/`. New files get a UID and open in the Inspector.
+- **Balance lab** (in the Design panel) — pick an encounter, three heroes and their levels, a battle count, and **Run**: AI-vs-AI battles run in the background and show the party's win rate, average rounds, damage dealt / taken per unit and spell use. **Run tower** plays whole tower runs instead (from a starting floor, heroes at a level, keeping levels and runes between runs or not; found runes are equipped automatically) and shows where runs end and how often each floor is lost: the tool for tuning the tower's bands. The AI plays the party worse than a player does, so read it as a lower bound.
+- **Spell stage** (Design panel button, or run `scenes/tools/spell_stage.tscn` with F6) — plays the spell open in the Inspector over and over through the real battle rules and event player: pick a caster and a target, slow it down, loop it. It reloads by itself when you save the spell, its effect scenes, its damage type or the shared effects, so the loop is: edit in the Inspector or the particle scenes, Ctrl+S, watch. To try an animation from another model: assign its scene to the spell's `animation_scene` (it must have the same joints, e.g. another biped; the spell's start / end / speed fields cut the clip).
+- **Board preview** — `scenes/battle/battle.tscn` shows its map in the 3D viewport (`BoardView.preview_map`), updated live as you edit the map's layout.
+
+## Adding content
+
+Content is data (`.tres` resources), edited in the Inspector or as text; no code changes. The headless tests load and validate every file under `data/`, so run them after any change.
+
+- **A spell** — `data/spells/<name>.tres`, a `SpellData`: `display_name`, `ap_cost`, `min_range` / `max_range` (Manhattan; `min_range = 0` allows the caster's own cell), `needs_line_of_sight`, `height_extends_range`, an `area` (`AreaShape`: SINGLE, CROSS, CIRCLE or LINE with a `size`) and `effects`, applied one after another: `DamageEffect` / `HealEffect` (`min_amount` / `max_amount`, `power_scaling`: how much of the caster's Power applies, 100 % by default; a damage's `lifesteal_percent` heals the caster that share of the damage dealt) or `ApplyStatusEffect` (`status`) or `MoveEffect` (`kind`: TELEPORT or JUMP to the target cell, CHARGE next to the targeted unit in a straight line, RETREAT straight back from the target, which move the caster and need the CASTER filter; PUSH or PULL each target `distance` cells; spells aimed with one only offer the cells it can use). `cooldown` makes the caster wait that many of its turns before casting it again (1: once per turn); `target_unit` can require an ENEMY or an ALLY (never the caster) on the target cell. Each effect has a `target_filter`: ALL units in the area (default), ALLIES, ENEMIES, or the CASTER only (even outside the area). New effect kinds are `EffectData` subclasses implementing `apply()` and `describe()` (and `apply_cast()` / `allows_target()` when they need the target cell).
+- **A status** — `data/statuses/<name>.tres`, a `StatusData`: `display_name`, `icon` (optional; a default one otherwise), `short_label` (no longer drawn), `color` (tints the icon), `aura_effect` (optional looping particles on the carrier while it lasts; a `Node3D` scene, not an `Fx`), `is_positive`, `duration` (the carrier's turns), `tick_effects` (fired at each of its turn starts, e.g. a `DamageEffect` for poison) and `modifiers` (`StatModifier`: AP, MP or DAMAGE_TAKEN_PERCENT with an `amount`). Recasting a status refreshes it; it keeps running if its caster dies. A spell applies it through an `ApplyStatusEffect`.
+- **A unit** — `data/units/<name>.tres`, a `UnitData`: `display_name`, `max_hp`, `ap`, `mp`, `initiative` (higher acts first), `spells` (2–4 spell files), `innate_modifiers` (always-on stats, e.g. an enemy's resistances), and a placeholder `color` (or a `model_scene`: a hand-built model). A spell costing more AP than the unit has is a validation error. **Its model:** set `model_scene` (a scene with an `AnimationPlayer`, see *A model* below), `model_scale` (1 for the hand-built models) and `model_height` (world units, for labels and the click target; a test checks it against the model) and optionally a `held_item` (a prop in the model's hand: in place of a named part, or on a joint, e.g. `Hand.R` for the Knight's sword; `held_item_scale`, `held_item_rotation` and `held_item_offset` place it); animations are found by name (`Idle`, `Walk`, `Attack` / `Cast`, `Hit`, `Death`, `Victory`, `Defeat`; a part after a `|` like `Armature|Idle` is fine, a missing one is skipped), so a new hero or enemy is a model plus these fields (elite and boss scaling applies on top).
+- **A model** — every model is built in the project, no downloaded 3D asset: `scripts/tools/modeling/recipes/<name>.gd` is a *recipe* (`static func build() -> ModelKit`) that stacks flat-shaded solids (`ModelKit.prism` / `box` / `blob` / `wedge`) on named joints (`Arm.L`, `Head`; the model faces +Z, its right side is -X) and gets one of three ready-made animation sets (`BipedClips`, `QuadrupedClips`, `FloaterClips`, built by `RigAnimator` from lists of poses). `godot --headless --script res://tools/build_models.gd [-- name …]` saves each recipe as `assets/models/<name>.tscn` (a rebuilt scene keeps its UID); run `tools/fill_uid_refs.gd` after. Props (a sword, a rock) are recipes without animations. Preview with the model stage (below). The style and the choices are in `docs/decisions/2026-10-05-own-models.md`.
+- **Refining a model (model workshop)** — polish a drafted model without editing its recipe: `godot scenes/tools/model_workshop.tscn -- model=knight`. Pick a model in the top bar; the tree (left) lists its joints and parts (a joint is marked "(joint)", a node with a tweak "•"); select one to see it highlighted on the model. **Node tab** (right): sliders and number boxes to move (m), turn (degrees) and scale it, and for a part its color, glow and hidden flag; **Reset this node** drops its tweak. **Pose tab**: pick a clip in the bottom bar, scrub or step key to key (`< key`, `key >`), select a joint, pause, and move its sliders: the joint's rotation (or position offset) *at that time* becomes a pose override of that clip (listed under the tabs; click one to jump to it). Drag to turn around the model, wheel to zoom, **Original** shows the recipe without your tweaks, `Cmd/Ctrl + Z` undoes (`+ Shift + Z` or `Y` redoes), **Save** (`Cmd/Ctrl + S`) writes `assets/models/<name>.tweaks.tres` and rebuilds the model's scene (run `tools/fill_uid_refs.gd` before committing). The recipe is read again whenever its file is saved, so code and sliders can be mixed. A tweak is stored as a *change* to what the recipe builds and is keyed by the node's path (`Rig/Hips/Head/Helmet`), so recipe edits that move a part keep the tweak; tweaks whose node a recipe no longer builds are listed in the left panel as orphans (select one, select its new node, **Map to the selected node**: it is stored in the file's `renames`), and `tools/build_models.gd` re-applies the file on every rebuild and fails on orphans. Clip sets pass an optional third value per pose, `RigAnimator.SNAP` (accelerates into it: a strike) or `SETTLE` (arrives fast and slows: a recovery).
+- **The board's look** — `data/board/stone.tres`, a `BoardTheme`: colors, `toon` shading, `noise_strength` (speckle), and `obstacle_scenes` (models stretched to fill the obstacle cube, one per cell). Without models obstacles are plain cubes.
+- **A map** — `data/maps/<name>.tres`, a `MapData` whose `layout` is text, one row per line, one token per cell: a height (`0`, `1`, `2`…), `<height>p` / `<height>e` for the player start zone / enemy spawns (enemies use them in reading order; with more `p` cells than heroes, heroes are placed by reach and the player can rearrange them), `#` for an obstacle on a level-0 cell, `<height>#` (e.g. `2#`) on a raised one (a cube two levels tall: it blocks line of sight up to its top, so a caster standing higher sees over it), `.` for a hole. A step can climb 1 level and drop 2; keep every floor cell reachable from the spawns (the slice map test checks this for its map).
+- **A damage type** — `data/damage_types/<name>.tres`, a `DamageType` (`display_name`, `color`); set it as a `DamageEffect`'s `damage_type` and in resistance modifiers. `impact_effect` is the particle scene shown on a unit it hits (see `scenes/fx/`; a scene whose root has the `Fx` script and `CPUParticles3D` children); a spell can override it (`SpellData.impact_effect`) or add one on the caster (`cast_effect`), and `cast_animation` names the caster's animation (empty: Attack for range 1, Cast otherwise). **Cast timing** (Inspector group on the spell): `animation_scene` + `animation_name` borrow an animation from another model file with the same skeleton (a file that doesn't fit is reported and the caster's own plays), `animation_start` / `animation_end` / `animation_speed` cut it, `impact_delay` is the time until the effects land (-1: default pacing), and `projectile` (any `Node3D` scene with looping particles, not an `Fx`) flies from the caster to the target at `projectile_speed` before they do. `projectile_falls` makes it drop from the sky onto the target cell (the Fireball's meteor), `projectile_count` / `projectile_interval` send several one after another over the cells of the area (the Volley's arrows), and `impact_shake` shakes the camera when the effects land. The spell's ground effects (`impact_effect` on empty cells of the area) also wait for that moment. Try it all on the spell stage. Default hit and heal effects: `data/fx/battle_fx.tres`.
+- **Sounds and music** — `data/audio/audio_set.tres`, an `AudioSet`: `sfx` (events: `ui_click`, `cast`, `cast_fire`, `cast_fireball`, `cast_physical`, `cast_poison`, `hit`, `heal`, `step`, `death`, `turn_start`, `victory`, `defeat`), `music` (tracks: `hub`, `battle`, `boss`), `music_gain_db` (the music's loudness, below 0 so spells stand out), and per event `sfx_gain_db`, `sfx_pitch_variation` and `sfx_cooldown`. An event with no stream is silent (turn start is, on purpose). A cast plays its spell's `cast_sound`, else its damage type's `cast_sound`, else `cast`. New files go under `assets/audio/` with a row in `CREDITS.md` and `assets/audio/SOURCE.md` (a test checks).
+- **Translations** — texts are English in the code and the data and are the message ids; `locale/fr.po` holds the French. `tr()` / `tr_n()` in code (one full sentence per template, placeholders `%s` / `%d`, never glued fragments); plain texts on a `Control` translate by themselves. Run the extraction command after adding any text, translate the empty entries, and the tests tell you what is missing, obsolete or has lost a placeholder. A new language is a new `locale/<code>.po`, a line in `Localization.LANGUAGES` and the project's translation list.
+- **An achievement** — `data/achievements/<name>.tres`, an `AchievementData`: `display_name`, `description`, `kind` (floor reached, elite or boss won, flawless floor, full rune set, hero level, stages cleared), `threshold`, `sort_order`; the file name is its id.
+- **Branding** — `ui/branding/logo.png` and `title_image.png` (see its README): the title uses them when present.
+- **A rune** — `data/runes/<name>.tres`, a `RuneData`: `display_name`, `rarity` (COMMON, RARE, EPIC, LEGENDARY: drop weight and color; epic+ are one per hero), `modifiers` (`StatModifier`: AP, MP, POWER, MAX_HP, INITIATIVE, DAMAGE_TAKEN_PERCENT, or RESISTANCE_PERCENT with a `damage_type`). Add it to enemies' loot tables to make it drop.
+- **An enemy** — `data/enemies/<name>.tres`, an `EnemyData`: its `unit` (a `UnitData`), its `role` (TANK, BRUISER, RANGED, SUPPORT, SKIRMISHER: what compositions ask for, shown on its card), an optional `positioning` (`data/ai/positioning_*.tres`, a `Positioning`: a preferred distance, what the nearest hero must walk to reach it, and a bonus for staying near an ally; its `max_distance` stays within a hero's reach, 4, or the AI could kite for ever (validation reports it); without one it walks straight at the heroes), per-level growth (`hp_per_level`, `power_per_level`), XP (`xp_base` + `xp_per_level`) and a `loot_table` (`data/loot/*.tres`: `rolls`, `drop_chance`, `runes`; a drop picks a rune weighted by rarity); `max_per_floor` caps how many a generated floor may have (the Ghost: one); `boss_spells` are added when it spawns with a preset that has `grants_boss_spells` (the boss Ghoul's Feast). Use **New → Enemy** in the Design panel.
+- **A difficulty preset** — `data/presets/<name>.tres`, a `DifficultyPreset`: `tag` (shown after the name, e.g. "Elite"), `hp_multiplier`, `power_bonus`, `extra_modifiers`, `xp_multiplier`, `extra_loot_rolls`, `rarity_floor`, an optional `ai_profile` and `visual_scale`.
+- **An encounter** — `data/encounters/<name>.tres`, an `Encounter`: a `map`, `spawns` (each an enemy, a `level` and a `preset`, in enemy-spawn order) and an `ai_profile`. Try it in the balance lab.
+- **A hero** — `data/heroes/<name>.tres`, a `HeroData`: its `unit` (a `UnitData`: base stats and kit) and `level_rewards` (one `LevelReward` per level from 2: `modifiers` and unlocked `spells`; a hero may know any number of spells, 5 go in its loadout), then `growth_reward` (stats added at every level past that table, up to the cap) and `milestone_rewards` (level → extra reward, e.g. 14: a spell, 15: +1 MP, 20: +1 AP). Add it to `data/progression/roster.tres` (`heroes`, `starting_unlocked`, `starting_party`); the level cap (100), `first_rune` (the starter rune of the first victory) and the XP curve (`curve_coefficient` × (L − 1) ^ `curve_exponent`, after the hand-set `xp_thresholds`) are in `data/progression/config.tres`.
+- **The tower** — `data/tower/tower.tres`, a `TowerConfig`: `seed_salt` (changing it changes every floor), `initial_cap`, `bands` (`FloorBand` from a floor: `enemy_level` + `levels_per_floor`, `min_enemies` / `max_enemies`, `enemy_pool`, `boss_pool`), the normal / elite / boss presets, `ai_profile`, `boons` and `boss_tier_floors` (a boss on floor 10 offers tier-1 boons, 20 tier 2, 30 and above tier 3; `boon_offer_size` of them), `map_settings` (`MapGenSettings`: sizes, plateaus, heights, obstacle and hole densities; start-zone layouts: `edge_weight` / `corner_weight` / `ambush_weight`, `ambush_from_floor`, `ambush_size`, and `min_enemy_distance` between the 3 × 3 zone and the enemies), the sudden-death round and percent, and `stages`.
+- **A map typology** — `data/maps/typologies/<name>.tres`, a `MapTypology`: `kind` (OPEN_FIELD, MOUNTAIN, CRATER, ISLANDS, CANYON, RUINS), `label` (for designers), `max_height`, and the shape's knobs (`plateaus_per_100_cells`, `noise_frequency`, `land_share`, `crossings`, `room_size`, `obstacle_density`, `hole_density`). A tower band lists `map_typologies` and `boss_map_typologies` with weights and its maps' `map_min_size` / `map_max_size` (boss floors 2 more, at most 20); a stage can fix its `map_typology`. Every generated map is checked (reachable everywhere from the start zone, enemies `min_enemy_distance` to `max_enemy_distance` MP away) and redrawn from the same seed if not.
+- **A composition** — `data/compositions/<name>.tres`, a `CompositionData`: `label` (for designers), `weight`, and ordered `slots` (`CompositionSlot`: a `role`, or a fixed `enemy`, and a `level_offset`). A tower band lists its `compositions` (normal and elite floors; the first slot is the elite) and `boss_compositions` (boss floors and stages; the first slot is the boss, from the band's `boss_pool`); roles are filled from the band's `enemy_pool`, and validation reports a role the pool lacks. A band without compositions draws `min_enemies` to `max_enemies` at random.
+- **A boon** — `data/boons/<name>.tres`, a `BoonData`: `display_name`, `tier`, `modifiers` (like a rune's, applied to every hero for the rest of the run). Add it to the tower's `boons`.
+- **A stage** — `data/stages/<name>.tres`, a `StageData`: `display_name`, `seed` (its map and enemies), `difficulty_floor` (a boss fight at that floor's enemy levels; by convention `unlocks_cap` − 5), `unlocks_cap` and `unlocks_start_floor`. Add it to the tower's `stages`, in order.
+- **A standalone battle** — select the `Battle` node in `scenes/battle/battle.tscn` and set `encounter`, `players`, a fallback `ai_profile` (`data/ai/*.tres`: kill bonus, heal and friendly-fire weights, and how it values statuses) and `rng_seed` (0 = random).
+
+## Agent guidelines
+
+Instructions for AI agents working on this repo:
+
+- **Never improvise a game mechanic.** Before implementing one (movement, combat, inventory, state, save/load, …), use an established Godot pattern or best practice you know well. If you're not sure of the idiomatic approach for Godot 4.7, search for it (official docs first) before writing code. Name the pattern you're following when you explain the change.
+- **Design before code for new systems:** settle open decisions with the `godot-grill` skill, then plan the scene tree and signals with `godot-brainstorming`.
+- **Verify through the CLI:** run `--check-only` on edited scripts and run the game headless. Write tests following `godot-gdscript-headless-testing`.
+- **No `assert()` in game or test code:** a failed assert hangs headless runs instead of failing. Use `push_error()` with a safe fallback in game code, and `TestCase` assertions in tests. Any error logged during a test fails it; a test that triggers one on purpose declares it with `expect_error()`.
+- **Review with `godot-code-review`** before calling a mechanic done.
+- **Keep resource files in the editor's format.** After generating or hand-editing `.tres` / `.tscn` files from the CLI, run `tools/fill_uid_refs.gd` (a test fails otherwise), so opening the editor doesn't rewrite them into formatting-only diffs. Commit any editor re-save on its own.
+- **Read the test result, not the exit code.** Run the suite and grep the `Results:` / `FAIL` lines: a pipeline's exit code is misleading. Check the branch (`git branch --show-current`) before committing.
+- **Stage explicit paths** (never `git add -A`): the open Godot editor rewrites and recreates files.
+- **Milestones live on a branch until done.** Work on `milestone-<n>` (e.g. `milestone-5a`), committing task by task; push the branch as a backup if needed. `main` only receives a finished milestone, squashed into one commit, when the user asks.
+- **Credit every external asset.** Anything downloaded, bought or copied (icons, fonts, models, sounds, UI packs) gets a row in `CREDITS.md` (files, source URL, author, license) in the same commit, with the license file next to the asset when it has one.
+- **Design decisions are recorded in `docs/decisions/`.** Read them before designing; don't re-ask what's settled. The finished milestones and the proposed next milestones are in `docs/roadmap.md`, the full descriptions of each feature in `docs/backlog.md`.
+
+Project skills live in `.claude/skills/`, copied from [GodotPrompter](https://github.com/jame581/GodotPrompter) and [awesome-gamedev-agent-skills](https://github.com/gamedev-skills/awesome-gamedev-agent-skills) and trimmed to stand alone.
+
+## Project layout
+
+```
+project.godot     # project config (main scene: res://scenes/game/game.tscn)
+addons/           # editor plugins (design_tools: previews, Design panel, balance lab)
+scenes/           # .tscn scene files
+scripts/          # .gd scripts (and their .uid files, commit these)
+  battle/         #   rules: state, movement, targeting, actions, AI (no nodes)
+  data/           #   content resource classes (units, spells, effects, maps, AI profiles)
+  view/           #   display: board, camera, units, event player, HUD (hud.gd facade, hud/ components, hud_model.gd), controller
+  tools/          #   developer tool scenes' scripts (the spell stage)
+  progression/    #   lasting progress: hero records, profile, save (no nodes)
+  run/            #   run loop: tower and map generators, run state and director (no nodes)
+  game/           #   game root (profile, settings, screens): title, settings, hub (party screen, hub/ components), run screen (run/ components), hint card, the shared top bar (sound, settings cog, menu)
+    net/          #     the multiplayer screens and their flow (front page, lobby, NetFlow)
+  net/            #   multiplayer: the replicated match (MatchState, MatchSession, ActionCodec, StateHash), the relay connection, the multiplayer battle controller
+data/             # content .tres files (units, enemies, spells, statuses, damage types, runes, loot, presets, encounters, heroes, maps, AI profiles, tower, boons, stages)
+server/           # the multiplayer relay (Node; `npm ci && npm test`), deployed on Render (render.yaml)
+tests/            # headless tests: test_*.gd files extending TestCase
+tools/            # CLI helper scripts (fill_uid_refs.gd, build_theme.gd, extract_strings.gd, export_web.sh)
+ui/               # UI theme, fonts, icons (third-party files credited in CREDITS.md)
+assets/           # hand-built models (assets/models, generated by tools/build_models.gd) and third-party audio (assets/audio: SOURCE.md has page URLs and file hashes), credited in CREDITS.md
+locale/           # translations: messages.pot (generated) and fr.po
+docs/gameplay.md  # every rule, screen and control, for players (the README only has the short version)
+docs/multiplayer.md # how multiplayer works inside (replicated log, host swap, relay)
+docs/roadmap.md   # finished milestones, then the proposed next milestones with their features (by category)
+docs/backlog.md   # the backlog in full: what each feature is and its open questions
+docs/decisions/   # design decision records
+docs/plans/       # implementation plans
+.godot/           # editor/import cache, gitignored
+```

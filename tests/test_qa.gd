@@ -139,7 +139,7 @@ func test_a_qa_battle_returns_to_the_qa_screen_and_saves_nothing() -> void:
 	var before := JSON.stringify(game.profile.to_dict())
 	var file_before := FileAccess.get_file_as_string(SAVE) if FileAccess.file_exists(SAVE) else ""
 	(game.screen.find_child("FightFloor", true, false) as Button).pressed.emit()
-	var battle := game.screen as BattleController
+	var battle := game.screen as SoloBattleController
 	assert_true(battle != null and battle.qa_battle, "a QA battle")
 	battle.end_turn()  # Ready.
 	assert_true(await _wait_for(battle, [BattleController.State.IDLE]), "the heroes' turn")
@@ -158,8 +158,8 @@ func test_leaving_a_qa_battle_returns_to_the_qa_screen() -> void:
 	game.show_qa()
 	var file_before := FileAccess.get_file_as_string(SAVE) if FileAccess.file_exists(SAVE) else ""
 	(game.screen.find_child("FightFloor", true, false) as Button).pressed.emit()
-	var battle := game.screen as BattleController
-	(battle.hud.get_node("%MenuButton") as Button).pressed.emit()
+	var battle := game.screen as SoloBattleController
+	(game.find_child("HamburgerButton", true, false) as Button).pressed.emit()
 	(battle.hud.get_node("%LeaveButton") as Button).pressed.emit()
 	assert_true(game.screen is QaScreen, "back to the QA screen")
 	assert_eq(FileAccess.get_file_as_string(SAVE) if FileAccess.file_exists(SAVE) else "", file_before, "nothing written")
@@ -177,7 +177,7 @@ func test_one_quick_team_and_the_tab_is_kept() -> void:
 	game.free()
 
 
-func _wait_for(battle: BattleController, wanted: Array) -> bool:
+func _wait_for(battle: SoloBattleController, wanted: Array) -> bool:
 	for i in 3000:
 		if battle.input_state in wanted:
 			return true

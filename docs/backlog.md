@@ -127,14 +127,14 @@ Milestone 7. A balance pass with playtests and the balance lab (tower bands, boo
 
 Decided with the multiplayer merge: for now solo keeps its own heroes (`HeroData`: levels, runes, a 5-spell loadout from a larger kit) and multiplayer its nine fixed-stat classes (`PvpHero`, `data/pvp/`). Later the PvP classes replace the solo heroes. What is known: `PvpHeroes.build()` already returns a unit plus modifiers and `BattleState.create` takes per-unit modifiers, so a PvP class can carry levels and runes in solo; what is not: the solo hub, runes, loadout and achievements are built on `HeroData` (a hero's `level_rewards`, `growth_reward`, `milestone_rewards`, `roster.tres`), and the party is three heroes against one per player. Open questions: keep the PvP kits fixed in solo (progression from runes and boons only) or let them level there (PvP stays fixed either way)? A party of three picked from nine? What happens to the tower's enemy levels and bands, the stages and the hero-level achievements? Everything needs a re-balance (balance lab: `tools/pvp_balance.gd` for PvP, Run tower for solo).
 
-## Hide the enemy's spell bar in solo
-
-*Milestone: 15 One game, or any (small) · Category: UX / battle readability · Pairs with: spell bar, multiplayer controller*
-
-In multiplayer the spell bar always shows the player's own hero (`_spells_unit_id` in `NetBattleController`); in solo it follows whoever is acting, so during an enemy's turn the bar shows the enemy's spells. Stop doing that: keep the last hero's bar (greyed) or the party's active hero, as multiplayer does. The seam already exists (`BattleController._spells_unit_id`).
-
 ## Co-op PvE (idea)
 
 *Milestone: 15 One game, or later · Category: Multiplayer · Pairs with: match session, AI takeover, run state*
 
 Decided direction: build it as a new mode on the multiplayer stack, keeping solo offline (not mandatory online, and solo is not migrated onto the match log). The engine nearly has it: a player who leaves hands their hero to the AI and the host plays its turns as log entries, so a co-op fight is close to a PvP match whose whole enemy side is AI from the start. The real question is progression: who owns the run state (floor, boons, runes) and the save, and how every player sees it. Grill before building.
+
+## Three-team multiplayer (3v3v3, 4v4v4)
+
+*Milestone: later · Category: Multiplayer · Pairs with: match state, PvP map, lobby*
+
+A free-for-all between three (or four) teams instead of two. The replicated log does not care; the work is in the rules (the team type has two values, about 66 uses in 18 files; solo keeps them, PvP would use a team number, "last team standing" and a winner), the map (the PvP map is fair thanks to a half-turn mirror; 3 teams have no mirror on a square grid, so a generator with a fairness check, while 4 teams get a quarter-turn mirror), and the lobby (sides 0 and 1, team colours, zone highlight, size limit by mode: 4v4v4 fits the relay's 12 seats). Targeting, friendly fire and the AI already read "not my team". Open: selectable 2 / 3 / 4 teams, how to keep a player from waiting for others to weaken each other, spectating once out, and balance (areas and healers gain value). Wanted by the user; start with the rules and 4 teams, then 3. Grill before building.

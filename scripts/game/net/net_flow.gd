@@ -9,14 +9,10 @@ signal exit_requested
 signal sound(event: StringName)
 signal speed_changed
 signal music_requested(track: StringName)
-## The player changed a setting in the settings opened over the lobby or the fight (the Game root applies and saves it).
-signal settings_changed
-signal audio_live
-## How much room the top bar takes at the right of the screen (0 when it is hidden): the sound button moves left of it.
-signal top_bar_changed(width: float)
+## A screen came or went (the fight in particular): the Game root's top buttons follow.
+signal view_changed
 
 const BATTLE_SCENE := preload("res://scenes/net/net_battle.tscn")
-const SETTINGS_SCENE := preload("res://scenes/game/settings_screen.tscn")
 
 var settings := Settings.new()
 var hub: MultiplayerHub
@@ -24,10 +20,6 @@ var hub: MultiplayerHub
 var make_socket := Callable()
 
 var _screen: Node
-## The round menu and settings buttons at the top right, over the lobby and the fight.
-var _top_bar: NetTopBar
-## The settings, open over the lobby or the fight (the match goes on underneath), or null.
-var _settings_layer: CanvasLayer
 var _battle: NetBattleController
 ## The player left the results for the lobby while the match's state still says "battle".
 var _after_battle := false
@@ -42,17 +34,6 @@ func start(fragment := "") -> void:
 	hub.name = "Hub"
 	if make_socket.is_valid():
 		hub.make_socket = make_socket
-	var bar_layer := CanvasLayer.new()
-	bar_layer.name = "TopBarLayer"
-	bar_layer.layer = 40  # Over the screens, under the settings (50) and the sound button (100).
-	add_child(bar_layer)
-	_top_bar = NetTopBar.new()
-	_top_bar.visible = false
-	_top_bar.settings_requested.connect(_open_settings)
-	_top_bar.menu_requested.connect(func() -> void:
-		if _battle != null:
-			_battle.open_menu())
-	bar_layer.add_child(_top_bar)
 	add_child(hub)
 	hub.session_started.connect(_wire_session)
 	hub.failed.connect(_on_failed)
@@ -95,15 +76,12 @@ func _process(delta: float) -> void:
 # --- Screens --------------------------------------------------------------------------------
 
 func _swap(next: Node) -> void:
-	_close_settings()
 	if _screen != null:
 		remove_child(_screen)
 		_screen.queue_free()
 	_screen = next
 	add_child(next)
-	_top_bar.visible = next is NetLobbyScreen or next is NetBattleController
-	_top_bar.show_menu(next is NetBattleController)
-	top_bar_changed.emit(_top_bar.occupied_width())
+	view_changed.emit()
 	if next is Screen:
 		(next as Screen).focus_first.call_deferred()
 
@@ -182,6 +160,7 @@ func _show_battle() -> void:
 	battle.speed_changed.connect(speed_changed.emit)
 	battle.left_battle.connect(_leave)
 	battle.battle_finished.connect(_on_battle_finished)
+	battle.menu_changed.connect(view_changed.emit)
 	_swap(battle)
 	_battle = battle
 
@@ -193,28 +172,25 @@ func _leave() -> void:
 	_show_menu()
 
 
-## The settings over whatever is shown, for a player who came straight in by a room link (so never saw the title).
-func _open_settings() -> void:
-	if _settings_layer != null:
-		return
-	_settings_layer = CanvasLayer.new()
-	_settings_layer.name = "SettingsLayer"
-	_settings_layer.layer = 50
-	add_child(_settings_layer)
-	var screen := SETTINGS_SCENE.instantiate() as SettingsScreen
-	screen.in_match = true
-	_settings_layer.add_child(screen)
-	screen.show_settings(settings)
-	screen.back_pressed.connect(_close_settings)
-	screen.audio_live.connect(audio_live.emit)
-	screen.changed.connect(settings_changed.emit)
-	screen.focus_first.call_deferred()
+## Whether the lobby is on screen (the Game root's settings button is offered, as in the fight).
+func in_lobby() -> bool:
+	return _screen is NetLobbyScreen
 
 
-func _close_settings() -> void:
-	if _settings_layer != null:
-		_settings_layer.queue_free()
-		_settings_layer = null
+## Whether the fight is on screen.
+func in_battle() -> bool:
+	return _screen is NetBattleController
+
+
+## Whether the Game root's menu button is offered: in the fight, until its result shows.
+func menu_available() -> bool:
+	return _screen is NetBattleController and (_screen as NetBattleController).menu_available()
+
+
+## The menu button (leaving the fight).
+func open_menu() -> void:
+	if _battle != null:
+		_battle.open_menu()
 
 
 # --- Events ---------------------------------------------------------------------------------

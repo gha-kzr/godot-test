@@ -20,7 +20,7 @@ func test_two_quick_casts_each_show_their_effects() -> void:
 	var target := BattleFixtures.unit("E0", 100, 3, 6, 80)
 	target.model_scene = load("res://assets/models/orc_guard.tscn")
 	target.model_scale = 1.0
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0e 0", [target])
 	controller.players = [caster] as Array[UnitData]

@@ -15,12 +15,12 @@ func after_each_clean() -> void:
 	Engine.time_scale = 1.0
 
 
-func _controller(settings: Settings, layout := "0p 0 0 0e") -> BattleController:
+func _controller(settings: Settings, layout := "0p 0 0 0e") -> SoloBattleController:
 	var hero := BattleFixtures.unit("P0", 200, 3, 6, 40)
 	hero.spells = [BattleFixtures.damage_spell(2, 1, 5, 3)] as Array[SpellData]
 	var enemy := BattleFixtures.unit("E0", 100, 3, 6, 400)
 	enemy.spells = [BattleFixtures.damage_spell(2, 1, 5, 1)] as Array[SpellData]
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter(layout, [enemy])
 	controller.players = [hero] as Array[UnitData]
@@ -29,7 +29,7 @@ func _controller(settings: Settings, layout := "0p 0 0 0e") -> BattleController:
 	return controller
 
 
-func _wait_idle(controller: BattleController) -> bool:
+func _wait_idle(controller: SoloBattleController) -> bool:
 	for i in 1500:
 		if controller.input_state == BattleController.State.IDLE:
 			return true
@@ -114,14 +114,14 @@ func test_floating_texts_of_one_action_are_stacked() -> void:
 	controller.free()
 
 
-func _boxed_in_hero_controller(auto: bool) -> BattleController:
+func _boxed_in_hero_controller(auto: bool) -> SoloBattleController:
 	var hero := BattleFixtures.unit("P0", 200, 0, 2, 40)  # No MP, 2 AP: one cast and it is done.
 	hero.spells = [BattleFixtures.damage_spell(2, 1, 5, 1)] as Array[SpellData]
 	var enemy := BattleFixtures.unit("E0", 100, 0, 6, 400)
 	enemy.spells = [BattleFixtures.damage_spell(2, 1, 5, 1)] as Array[SpellData]
 	var settings := Settings.new()
 	settings.auto_end_turn = auto
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0e", [enemy])
 	controller.players = [hero] as Array[UnitData]
@@ -130,7 +130,7 @@ func _boxed_in_hero_controller(auto: bool) -> BattleController:
 	return controller
 
 
-func _hero_turn_ends(controller: BattleController) -> Array:
+func _hero_turn_ends(controller: SoloBattleController) -> Array:
 	var count := [0]
 	controller.event_player.event_played.connect(func(event: BattleEvents.Event) -> void:
 		if event is BattleEvents.TurnEnded and event.unit_id == 0:
@@ -177,7 +177,7 @@ func test_auto_end_turn_waits_while_a_tutorial_step_is_showing() -> void:
 	var tutorial := Tutorial.new(Settings.new())
 	for id in ["ready", "move", "spell", "cast"]:
 		tutorial.complete(id)  # Only the End turn step is left.
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	controller.encounter = BattleFixtures.encounter("0p 0 0e", [enemy])
 	controller.players = [hero] as Array[UnitData]

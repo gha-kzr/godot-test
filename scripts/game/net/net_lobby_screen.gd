@@ -33,6 +33,7 @@ var _seed: LineEdit
 var _turn: SpinBox
 var _grace: SpinBox
 var _cards: CheckButton
+var _friendly_fire: CheckButton
 var _preview: MapPreview
 var _preview_key := ""
 var _start: Button
@@ -237,7 +238,13 @@ func _build_settings(parent: Control) -> void:
 	_cards.tooltip_text = tr("Instead of action points, each turn draws a hand of four cards from the hero's spells and plays at most two of them. Rare spells come up less often.")
 	_cards.toggled.connect(func(on: bool) -> void: session.configure("cards", on))
 	box.add_child(_cards)
-	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace, _cards]
+	_friendly_fire = CheckButton.new()
+	_friendly_fire.name = "FriendlyFire"
+	_friendly_fire.text = tr("Friendly fire")
+	_friendly_fire.tooltip_text = tr("Spells that hurt (damage, harmful statuses) also hit your own team, and you can hit yourself with an area. Off: they only hit enemies.")
+	_friendly_fire.toggled.connect(func(on: bool) -> void: session.configure("friendly_fire", on))
+	box.add_child(_friendly_fire)
+	_settings_fields = [_typology, _size, _seed, new_seed, _turn, _grace, _cards, _friendly_fire]
 
 
 ## Invite players: the room code and the link to it.
@@ -421,6 +428,7 @@ func _refresh_settings(editable: bool) -> void:
 	_turn.set_value_no_signal(settings["turn"])
 	_grace.set_value_no_signal(settings["grace"])
 	_cards.set_pressed_no_signal(bool(settings.get("cards", false)))
+	_friendly_fire.set_pressed_no_signal(bool(settings.get("friendly_fire", true)))
 	for field in _settings_fields:
 		if field is OptionButton:
 			(field as OptionButton).disabled = not editable

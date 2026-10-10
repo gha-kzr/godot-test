@@ -46,17 +46,13 @@ func _ready() -> void:
 	session.rejected.connect(_on_rejected)
 	session.emote_received.connect(_on_emote)
 	session.changed.connect(_on_session_changed)
-	hud.set_leave_available(false)  # The menu is a button in the top bar (NetTopBar), next to the settings.
 	(hud.get_node("%SpeedButton") as Control).hide()  # Everyone plays at x1 here.
 	_build_say_popup()
 	_catch_up()
 
 
-func apply_battle_speed() -> void:
-	var kept := settings.battle_speed  # The setting stays as the player chose it (it is for solo battles).
-	settings.battle_speed = play_speed
-	super.apply_battle_speed()
-	settings.battle_speed = kept
+func _battle_speed() -> Settings.BattleSpeed:
+	return play_speed
 
 
 func cycle_battle_speed() -> void:
@@ -214,12 +210,6 @@ func _on_emote(seat_id: int, emote_id: int) -> void:
 	var unit_view := units_view.find_view(session.unit_of(seat_id))
 	if unit_view != null:
 		unit_view.say(Emotes.text(emote_id))
-
-
-## The menu (leaving the fight): the top bar's hamburger button asks for it.
-func open_menu() -> void:
-	if input_state != State.ENDED:
-		hud.open_leave_panel()
 
 
 ## A button above End turn opens the list of quick messages, in the middle of the screen.

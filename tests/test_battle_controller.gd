@@ -17,9 +17,9 @@ func _tree() -> SceneTree:
 
 ## The slice battle (the enemy Skeleton Archer acts first), or a small custom one; placement is skipped
 ## (Ready) unless `ready` is false.
-func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = [], ready := true) -> BattleController:
+func _controller(layout := "", players: Array[UnitData] = [], enemies: Array[UnitData] = [], ready := true) -> SoloBattleController:
 	Engine.time_scale = TIME_SCALE
-	var controller := BATTLE_SCENE.instantiate() as BattleController
+	var controller := BATTLE_SCENE.instantiate() as SoloBattleController
 	controller.rng_seed = 7
 	if not layout.is_empty():
 		controller.encounter = BattleFixtures.encounter(layout, enemies)
@@ -36,7 +36,7 @@ func _fighter(unit_name: String, initiative: int, max_hp := 20, damage := 5) -> 
 	return data
 
 
-func _wait_for(controller: BattleController, wanted: Array) -> bool:
+func _wait_for(controller: SoloBattleController, wanted: Array) -> bool:
 	for i in MAX_WAIT_FRAMES:
 		if controller.input_state in wanted:
 			return true
@@ -44,7 +44,7 @@ func _wait_for(controller: BattleController, wanted: Array) -> bool:
 	return false
 
 
-func _assert_views_in_sync(controller: BattleController) -> void:
+func _assert_views_in_sync(controller: SoloBattleController) -> void:
 	for unit in controller.battle.state.units:
 		var view := controller.units_view.view(unit.id)
 		assert_eq(view.visible, unit.is_alive(), "unit %d visibility" % unit.id)
@@ -188,7 +188,7 @@ func test_a_real_mouse_click_moves_the_unit() -> void:
 
 ## Waits until a cast is playing with its spell area lit (from the cast's start through its flash),
 ## polled per frame (no timing guesses).
-func _wait_for_area_flash(controller: BattleController, _caster_id: int) -> bool:
+func _wait_for_area_flash(controller: SoloBattleController, _caster_id: int) -> bool:
 	var deadline := Time.get_ticks_msec() + FLASH_WAIT_MSEC
 	while Time.get_ticks_msec() < deadline:
 		# The area is lit from the cast's start through its flash; polled per frame at a slowed
@@ -250,6 +250,7 @@ func test_a_mutual_wipe_is_shown_as_a_defeat() -> void:
 	var caster := BattleFixtures.unit("P0", 200, 3, 6, 5)
 	caster.spells = [nova] as Array[SpellData]
 	var controller := _controller("0p 0e", [caster], [_fighter("E0", 100, 5)])
+	controller.battle.state.friendly_fire = true
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
 	controller.select_spell(0)
 	controller.click_cell(Vector2i(0, 0))
@@ -310,6 +311,18 @@ func test_the_active_unit_is_marked() -> void:
 	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN]))
 	assert_true(controller.units_view.view(1).is_active(), "E0's turn")
 	assert_false(controller.units_view.view(0).is_active())
+
+
+func test_the_spell_bar_is_empty_during_the_enemys_turn() -> void:
+	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
+	var bar := controller.hud.get_node("%SpellBar") as SpellBar
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
+	assert_true(bar.slot_count() > 0, "P0's spells on its own turn")
+	controller.end_turn()
+	assert_true(await _wait_for(controller, [BattleController.State.ENEMY_TURN]))
+	assert_eq(bar.slot_count(), 0, "not E0's spells")
+	assert_true(await _wait_for(controller, [BattleController.State.IDLE, BattleController.State.ENDED]))
+	assert_true(bar.slot_count() > 0, "P0's again on its next turn")
 
 
 func test_aiming_shows_cells_hidden_from_sight_faded() -> void:
@@ -421,7 +434,7 @@ func test_placement_swaps_heroes_and_cancel_deselects() -> void:
 	assert_eq([a.cell, b.cell], [b_cell, a_cell], "swapped")
 
 
-func _inspect_card(controller: BattleController) -> Control:
+func _inspect_card(controller: SoloBattleController) -> Control:
 	return controller.hud.get_node("%InspectCard") as Control
 
 
@@ -615,25 +628,23 @@ func test_prompts_show_the_keys_the_player_bound() -> void:
 	SettingsApplier.reset_bindings(Settings.new())
 
 
-func test_leaving_the_fight_is_offered_when_injected_and_esc_closes_the_question_first() -> void:
+func test_the_menu_asks_to_leave_and_esc_closes_the_question_first() -> void:
 	var controller := _controller("0p 0 0 0e", [_fighter("P0", 200)], [_fighter("E0", 100)])
 	assert_true(await _wait_for(controller, [BattleController.State.IDLE]))
-	assert_false((controller.hud.get_node("%MenuButton") as Control).visible, "a standalone battle has nowhere to go back to")
 	controller.standalone = false
-	controller.hud.set_leave_available(true)
 	var left := {"count": 0}
 	controller.left_battle.connect(func() -> void: left.count += 1)
-	(controller.hud.get_node("%MenuButton") as Button).pressed.emit()
+	controller.open_menu()
 	controller.select_spell(0)
 	controller.cancel()
 	assert_false((controller.hud.get_node("%LeavePanel") as Control).visible, "Esc closes the question")
 	assert_eq(left.count, 0, "and leaves nothing")
-	(controller.hud.get_node("%MenuButton") as Button).pressed.emit()
+	controller.open_menu()
 	(controller.hud.get_node("%LeaveButton") as Button).pressed.emit()
 	assert_eq(left.count, 1)
 
 
-func _mouse(controller: BattleController, pressed: bool, at: Vector2) -> void:
+func _mouse(controller: SoloBattleController, pressed: bool, at: Vector2) -> void:
 	var button := InputEventMouseButton.new()
 	button.button_index = MOUSE_BUTTON_LEFT
 	button.pressed = pressed
@@ -676,7 +687,7 @@ func test_a_release_without_a_board_press_clicks_nothing() -> void:
 	assert_eq(controller.battle.state.units[0].cell, Vector2i(0, 0))
 
 
-func _camera_settles_on(controller: BattleController, point: Vector3) -> bool:
+func _camera_settles_on(controller: SoloBattleController, point: Vector3) -> bool:
 	for i in MAX_WAIT_FRAMES:
 		if controller.camera_rig.position.is_equal_approx(point):
 			return true

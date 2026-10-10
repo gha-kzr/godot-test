@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmdj5j2exkl1d"]
 
-[ext_resource type="Script" uid="uid://cwkpahbpnouqx" path="res://scripts/view/battle_controller.gd" id="1_ctrl"]
+[ext_resource type="Script" uid="uid://rujex27y1my0" path="res://scripts/view/solo_battle_controller.gd" id="1_ctrl"]
 [ext_resource type="Resource" uid="uid://coynthw3vfyac" path="res://data/encounters/slice.tres" id="2_encounter"]
 [ext_resource type="PackedScene" uid="uid://b2t6kloj1y2ny" path="res://scenes/battle/camera_rig.tscn" id="3_rig"]
 [ext_resource type="Script" uid="uid://cbdeb2snmkgq1" path="res://scripts/view/board_view.gd" id="4_board"]

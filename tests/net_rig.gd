@@ -53,7 +53,7 @@ func in_step() -> bool:
 
 
 ## Everyone ready and the match started, with `a_count` players on side A and the rest on side B (ids 1..n).
-func start_match(total: int, a_count: int, cards := false) -> void:
+func start_match(total: int, a_count: int, cards := false, friendly_fire := true) -> void:
 	for id in range(1, total + 1):
 		if id == 1:
 			host(1, "Host")
@@ -65,6 +65,9 @@ func start_match(total: int, a_count: int, cards := false) -> void:
 	net.flush()
 	if cards:
 		sessions[1].configure("cards", true)
+		net.flush()
+	if not friendly_fire:
+		sessions[1].configure("friendly_fire", false)
 		net.flush()
 	for id in range(1, total + 1):
 		sessions[id].set_ready(true)

@@ -150,17 +150,31 @@ func test_changing_a_setting_leaves_the_players_ready() -> void:
 	assert_false(rig.sessions[1].state.seats[2].ready, "but a change of their own hero takes their Ready back")
 
 
-func test_a_side_holds_four_players_at_most() -> void:
+func test_a_side_holds_six_players_at_most() -> void:
 	var rig := NetRig.new()
 	rig.host(1)
-	for id in range(2, 7):
+	for id in range(2, 9):
 		rig.guest(id)
-	for id in range(1, 7):
+	for id in range(1, 9):
 		rig.sessions[id].set_field("side", 0)
 	rig.net.flush()
-	assert_eq(rig.sessions[1].state.seats_on(0).size(), 4)
+	assert_eq(rig.sessions[1].state.seats_on(0).size(), 6)
 	assert_eq(rig.sessions[1].state.seats_on(1).size(), 0, "the others stay where they were")
-	assert_eq(rig.sessions[1].state.seats[6].side, -1)
+	assert_eq(rig.sessions[1].state.seats[8].side, -1)
+	assert_true(rig.in_step())
+
+
+func test_six_against_six_starts_with_everyone_on_their_own_cell() -> void:
+	var rig := NetRig.new()
+	rig.start_match(12, 6)
+	assert_eq(rig.sessions[1].state.phase, MatchState.Phase.BATTLE)
+	var battle_state := rig.sessions[1].state.battle.state
+	assert_eq(battle_state.units.size(), 12)
+	var cells := {}
+	for unit in battle_state.units:
+		cells[unit.cell] = true
+	assert_eq(cells.size(), 12, "a cell each in the two 3 x 3 start zones")
+	rig.run(5.0)
 	assert_true(rig.in_step())
 
 
@@ -562,3 +576,25 @@ func test_the_fight_starts_when_the_placement_time_is_up() -> void:
 	assert_true(rig.sessions[2].state.battle.state.started)
 	assert_eq(rig.sessions[1].placement_seconds_left(), -1.0)
 	assert_true(rig.in_step())
+
+
+func test_friendly_fire_is_a_lobby_rule_on_by_default_that_reaches_every_battle() -> void:
+	assert_true(MatchState.new().settings["friendly_fire"], "a new match keeps friendly fire, as it always was")
+	var on := NetRig.new()
+	on.start_match(2, 1)
+	assert_true(on.sessions[1].state.battle.state.friendly_fire and on.sessions[2].state.battle.state.friendly_fire)
+	var off := NetRig.new()
+	off.start_match(2, 1, false, false)
+	assert_false(off.sessions[1].state.battle.state.friendly_fire, "the host's choice reached the battle")
+	assert_false(off.sessions[2].state.battle.state.friendly_fire, "on every peer")
+	assert_true(off.in_step())
+
+
+func test_only_the_host_changes_friendly_fire_and_only_to_a_flag() -> void:
+	var rig := NetRig.new()
+	rig.host(1)
+	rig.guest(2)
+	rig.sessions[2].configure("friendly_fire", false)
+	rig.net.flush()
+	assert_true(rig.sessions[1].state.settings["friendly_fire"], "a guest's change is refused")
+	assert_eq(rig.sessions[1].state.apply({"k": "cfg", "f": "friendly_fire", "v": "no"}), "bad flag")

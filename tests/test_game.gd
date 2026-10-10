@@ -43,8 +43,8 @@ func _press(screen: Node, button_name: String) -> void:
 	(screen.find_child(button_name, true, false) as Button).pressed.emit()
 
 
-func _battle(game: Game) -> BattleController:
-	return game.screen as BattleController
+func _battle(game: Game) -> SoloBattleController:
+	return game.screen as SoloBattleController
 
 
 ## Ends the current battle, then closes its result screen ("Continue").
@@ -243,7 +243,7 @@ func test_equip_requests_go_through_the_game_and_save() -> void:
 	after_each_clean()
 
 func test_the_standalone_battle_scene_still_plays_again() -> void:
-	var battle := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as BattleController
+	var battle := (load("res://scenes/battle/battle.tscn") as PackedScene).instantiate() as SoloBattleController
 	battle.rng_seed = 3
 	_tree().root.add_child(battle)
 	assert_true(battle.standalone)
@@ -492,10 +492,11 @@ func test_leaving_a_fight_returns_to_the_hub_with_the_run_and_no_rewards() -> vo
 	var game := _game()
 	game.start_tower(1)
 	var battle := _battle(game)
-	assert_true((battle.hud.get_node("%MenuButton") as Control).visible, "offered in a run")
+	var menu := game.find_child("HamburgerButton", true, false) as Button
+	assert_true(menu.is_visible_in_tree(), "offered in a run")
 	var xp_before := game.profile.heroes[0].xp
 	var hp_before := game.profile.run.hero_hp.duplicate()
-	(battle.hud.get_node("%MenuButton") as Button).pressed.emit()
+	menu.pressed.emit()
 	(battle.hud.get_node("%LeaveButton") as Button).pressed.emit()
 	assert_true(game.screen is PartyScreen, "back on the hub")
 	assert_true(game.profile.run != null and game.profile.run.floor_number == 1, "the run waits at the same floor")
@@ -701,3 +702,83 @@ func test_click_to_start_pulses() -> void:
 	var center := pill.get_global_rect().get_center()
 	assert_true(absf(center.x - screen.size.x / 2.0) < 2.0, "the pill is centered on the screen")
 	screen.free()
+
+
+func _bar_button(game: Game, button_name: String) -> Button:
+	return game.find_child(button_name, true, false) as Button
+
+
+func test_the_top_bar_follows_the_screen_sound_everywhere_settings_and_menu_in_a_fight() -> void:
+	var game := _game()
+	assert_true(_bar_button(game, "MuteButton").is_visible_in_tree(), "the sound is always there")
+	assert_true(game.screen is PartyScreen)
+	assert_false(_bar_button(game, "CogButton").is_visible_in_tree(), "no settings button on the hub")
+	assert_false(_bar_button(game, "HamburgerButton").is_visible_in_tree(), "and no menu: no fight")
+	game.start_tower(1)
+	assert_true(_bar_button(game, "CogButton").is_visible_in_tree(), "the settings in a fight")
+	assert_true(_bar_button(game, "HamburgerButton").is_visible_in_tree(), "and the menu")
+	var order := _bar_button(game, "MuteButton").get_parent().get_children()
+	assert_eq([order[0].name, order[1].name, order[2].name], [&"MuteButton", &"CogButton", &"HamburgerButton"], "sound, settings, menu")
+	_finish(game, true)  # The result screen is up for a moment, then the run screen.
+	assert_false(_bar_button(game, "HamburgerButton").is_visible_in_tree(), "no menu once the fight is over")
+	game.show_title()
+	assert_false(_bar_button(game, "CogButton").is_visible_in_tree(), "the title has its own Settings button")
+	game.free()
+
+
+func test_the_menu_goes_away_when_the_result_shows() -> void:
+	var game := _game()
+	game.start_tower(1)
+	var battle := _battle(game)
+	battle.battle.start()
+	for unit in battle.battle.state.units:
+		if unit.team == UnitState.Team.ENEMY:
+			unit.hp = 0
+	battle._begin_next()
+	assert_eq(battle.input_state, BattleController.State.ENDED)
+	assert_false(_bar_button(game, "HamburgerButton").is_visible_in_tree(), "the result has its own button")
+	assert_true(_bar_button(game, "CogButton").is_visible_in_tree(), "the settings stay")
+	game.free()
+
+
+func test_the_settings_open_over_a_fight_and_pause_it() -> void:
+	var game := _game()
+	game.start_tower(1)
+	var battle := _battle(game)
+	_bar_button(game, "CogButton").pressed.emit()
+	await _tree().process_frame
+	var layer := game.get_node_or_null("SettingsLayer")
+	assert_true(layer != null, "the settings are open")
+	var overlay := layer.get_child(0) as SettingsScreen
+	assert_true(overlay.in_match, "only what concerns this device")
+	assert_false(overlay.find_child("ResetSaveButton", true, false).visible, "no save reset over a fight")
+	assert_true(overlay.find_child("MasterVolume", true, false).visible, "the volumes are there")
+	assert_true(game.screen == battle, "the fight is still the screen")
+	assert_true(_tree().paused, "a solo fight waits")
+	assert_false(_bar_button(game, "CogButton").is_visible_in_tree(), "the cog and the menu give way")
+	assert_false(_bar_button(game, "HamburgerButton").is_visible_in_tree())
+	assert_true(_bar_button(game, "MuteButton").is_visible_in_tree(), "the sound stays")
+	game._open_settings_overlay()
+	assert_eq(game.get_children().filter(func(node: Node) -> bool: return node.name == "SettingsLayer").size(), 1, "opened once")
+	overlay.back_pressed.emit()
+	await _tree().process_frame
+	assert_true(game.get_node_or_null("SettingsLayer") == null, "closed")
+	assert_false(_tree().paused, "the fight goes on")
+	assert_true(_bar_button(game, "HamburgerButton").is_visible_in_tree(), "the buttons are back")
+	game.free()
+
+
+func test_the_settings_over_a_fight_close_and_unpause_when_the_screen_changes_or_the_game_goes() -> void:
+	var game := _game()
+	game.start_tower(1)
+	game._open_settings_overlay()
+	assert_true(_tree().paused)
+	game.show_party()
+	await _tree().process_frame
+	assert_true(game.get_node_or_null("SettingsLayer") == null, "gone with the screen it was over")
+	assert_false(_tree().paused)
+	game.start_tower(1)
+	game._open_settings_overlay()
+	assert_true(_tree().paused)
+	game.free()
+	assert_false(_tree().paused, "a freed game leaves nothing paused")

@@ -203,6 +203,10 @@ func show_details(spell: SpellData) -> void:
 	else:
 		_details_cost.text = tr("%d AP") % spell.ap_cost
 	_details_body.text = "\n".join(lines)
+	# A wrapping label wraps (and reports its height) only when asked, at the width it has: never laid out, it was
+	# a thousand pixels tall the first time a spell was shown. Giving it its width and asking for its lines first.
+	_details_body.size.x = _details.custom_minimum_size.x
+	_details_body.get_line_count()
 	_details.reset_size()  # Shrinks back to the new text.
 	_details.show()
 

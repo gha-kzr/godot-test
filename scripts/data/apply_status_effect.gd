@@ -7,6 +7,10 @@ extends EffectData
 @export var status: StatusData
 
 
+func is_harmful() -> bool:
+	return status != null and not status.is_positive
+
+
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
 	var instance := state.units[target_id].add_status(status, caster_id)
 	return [BattleEvents.StatusApplied.new(target_id, status, instance.turns_left)]

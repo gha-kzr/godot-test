@@ -72,6 +72,7 @@ func test_avoids_hitting_an_ally_with_an_area() -> void:
 	var blast := [BattleFixtures.damage_spell(3, 2, 3, 5, AreaShape.Kind.CIRCLE, 1)] as Array[SpellData]
 	var battle := _battle("0p 0p 0e 0 0", [_fighter("P0", 200, blast, 20, 0), _fighter("P1", 190, _melee())],
 			[_fighter("E0", 100, _melee())])
+	battle.state.friendly_fire = true
 	var action := EnemyAI.choose_next(battle.state, 0)
 	assert_true(action is CastSpell, "casts")
 	assert_eq((action as CastSpell).target, Vector2i(3, 0))

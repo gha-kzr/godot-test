@@ -27,6 +27,9 @@ var started := false
 var pvp := false
 ## Card combat (CardRules): every unit's spells are a deck, see enable_cards().
 var cards := false
+## Whether a spell's harmful effects (damage, harmful statuses) also hit the caster's own team: solo never, a
+## multiplayer lobby chooses (EffectData.is_harmful).
+var friendly_fire := false
 var zone_enemy: Array[Vector2i] = []
 
 
@@ -158,6 +161,7 @@ func clone() -> BattleState:
 	copy.zone = zone.duplicate()
 	copy.pvp = pvp
 	copy.cards = cards
+	copy.friendly_fire = friendly_fire
 	copy.zone_enemy = zone_enemy.duplicate()
 	copy.started = started
 	return copy

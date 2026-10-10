@@ -70,7 +70,7 @@ icon_alignment = 1
 expand_icon = true
 
 [node name="Spacer" type="Control" parent="Rows/TopBar"]
-custom_minimum_size = Vector2(64, 0)
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 
 [node name="Summary" type="Label" parent="Rows"]

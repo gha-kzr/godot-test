@@ -679,6 +679,9 @@ msgstr "Couronne de concentration"
 msgid "Found: %s."
 msgstr "Trouvé : %s."
 
+msgid "Friendly fire"
+msgstr "Tirs alliés"
+
 msgid "From floor %d"
 msgstr "À partir de l'étage %d"
 
@@ -1569,6 +1572,9 @@ msgstr "Sorts"
 
 msgid "Spells cost AP. Pick one (or press its number) to see where it can reach."
 msgstr "Les sorts coûtent des PA. Choisissez-en un (ou appuyez sur son numéro) pour voir sa portée."
+
+msgid "Spells that hurt (damage, harmful statuses) also hit your own team, and you can hit yourself with an area. Off: they only hit enemies."
+msgstr "Les sorts qui font mal (dégâts, états nuisibles) touchent aussi votre équipe, et une zone peut vous toucher vous-même. Désactivé : ils ne touchent que les ennemis."
 
 msgid "Spirit"
 msgstr "Esprit"

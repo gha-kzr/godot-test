@@ -48,7 +48,6 @@ var _pulse_tween: Tween
 @onready var _round_label: Label = %RoundLabel
 var _round_text := ""
 var _countdown := -1
-@onready var _menu_button: Button = %MenuButton
 @onready var _recenter_button: Button = %RecenterButton
 @onready var _leave_panel: Control = %LeavePanel
 @onready var _leave_button: Button = %LeaveButton
@@ -95,7 +94,6 @@ func _ready() -> void:
 	_inspect_card.closed.connect(card_closed.emit)
 	_hint_card.dismissed.connect(hint_dismissed.emit)
 	_hint_card.visibility_changed.connect(_refresh_buttons)  # A shown hint is modal.
-	_menu_button.pressed.connect(_open_leave_panel)
 	_recenter_button.pressed.connect(recenter_pressed.emit)
 	_recenter_button.text = tr("Recenter (%s)") % SettingsApplier.key_text(&"camera_recenter")
 	_stay_button.pressed.connect(close_leave_panel)
@@ -194,20 +192,10 @@ func is_inspect_control(control: Control) -> bool:
 	return _inspect_card.visible and (control == _inspect_card or _inspect_card.is_ancestor_of(control))
 
 
-## Whether the Menu button (leave the fight) is offered: not in a standalone battle, which has
-## nowhere to go back to, and not once the result is showing.
-func set_leave_available(available: bool) -> void:
-	_menu_button.visible = available
-
-
-func _open_leave_panel() -> void:
+## The leave question, opened from the menu button in the Game root's top bar.
+func open_leave_panel() -> void:
 	_leave_panel.show()
 	_refresh_buttons()
-
-
-## The leave question, opened from outside (a menu button elsewhere on the screen).
-func open_leave_panel() -> void:
-	_open_leave_panel()
 
 
 ## Whether a full-screen panel (order, leave question, result) is over the board.
@@ -400,7 +388,6 @@ func show_result(won: bool, battle_seed := 0) -> void:
 	_result_label.text = "Victory!" if won else "Defeat"
 	_seed_label.text = tr("Battle seed %d") % battle_seed
 	set_player_controls_enabled(false)
-	_menu_button.hide()  # The result's own button leaves the fight.
 	_result_panel.show()
 
 

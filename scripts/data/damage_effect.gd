@@ -16,6 +16,10 @@ extends EffectData
 @export_range(0, 500) var ambush_bonus_percent := 0
 
 
+func is_harmful() -> bool:
+	return true
+
+
 func apply(state: BattleState, caster_id: int, target_id: int) -> Array[BattleEvents.Event]:
 	var target := state.units[target_id]
 	var amount := mini(roundi(scaled(state, caster_id, target_id, state.roll(min_amount, max_amount))), target.hp)
